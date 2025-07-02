@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@tryforge/forge.db": "github:tryforge/ForgeDB",
+    "@tryforge/forge.music": "^1.0.0",
+    "@tryforge/forgescript": "github:tryforge/ForgeScript#dev",
+    "discord-player-youtubei": "^1.4.6",
+    "dotenv": "^16.5.0",
+    "forgeyoutube": "github:zack-911/forgeyoutube#dev",
+    "sqlite3": "^5.1.7"
+  }
+}
