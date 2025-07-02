@@ -12,8 +12,14 @@ module.exports = {
     $if[$advancedTextSplit[$customID;_;1]==nodequeue;
     $!deferUpdate
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    $async[
     $!disableComponentsOf[$get[cid];$get[mid]]
+    ]
+    $if[$selectMenuValues[0]==0;
+    $!skipTrack
+    ;
     $!skipTo[$selectMenuValues[0]]
+    ]
     ]
     $if[$advancedTextSplit[$customID;_;1]==loop;
     $!deferUpdate
