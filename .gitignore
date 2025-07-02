@@ -1,9 +1,0 @@
-# Node.js dependencies
-/node_modules
-
-# Environment variables
-.env
-
-# Other
-/database
-forge.db
