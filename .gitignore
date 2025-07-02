@@ -3,3 +3,7 @@
 
 # Environment variables
 .env
+
+# Other
+/database
+forge.db
