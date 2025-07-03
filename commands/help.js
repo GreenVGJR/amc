@@ -15,11 +15,14 @@ module.exports = {
   $onlyIf[$guildID!=;]
   
   $ephemeral
+  $defer
+  
+  $jsonLoad[test;$applicationCommands]
+  $let[container;]
+  $arrayForEach[test;tests;$if[$env[tests;name]!=help;$let[container;$get[container]</$env[tests;name]:$env[tests;id]> ]]]
   
   $author[Help]
-  $title[Available Commands]
-  $addField[Music;\`/play /stop /seek /queue /skip /volume\`;false]
-  $addField[Other;\`/bot-info /search /lyrics\`;false]
+  $addField[Available Commands;$get[container];false]
   $thumbnail[$userAvatar[$clientID;2048]]
   $color[$callFunction[useIcon;color_embed]]
   $timestamp
