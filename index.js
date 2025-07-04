@@ -40,7 +40,7 @@ const music = new ForgeMusic({
 
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
-    logLevel: LogPriority.VeryLow,
+    logLevel: LogPriority.Low,
     intents: [
         "Guilds",
         "GuildMembers",
@@ -104,6 +104,8 @@ db.commands.add({
     $!setGlobalVar[authmusic_youtube_key;]
     $!setGlobalVar[authmusic_soundcloud;]
     $!setGlobalVar[authmusic_spotify;]
+    $!setGlobalVar[authmusic_amazonmusic;]
+    $!setGlobalVar[authmusic_deezer;]
     $!setGlobalVar[authmusic_azlyrics;]
     $localFunction[refreshkey;
     $if[$env[refresh]==true;
@@ -113,14 +115,18 @@ db.commands.add({
 
     $let[aa;$getGlobalVar[authmusic_youtube_key]]
     $let[b;$getGlobalVar[authmusic_soundcloud]]
-    $let[b;$getGlobalVar[authmusic_spotify]]
+    $let[c;$getGlobalVar[authmusic_spotify]]
+    $let[d;$getGlobalVar[authmusic_amazonmusic]]
+    $let[d;$getGlobalVar[authmusic_deezer]]
 
-    $let[c;$getGlobalVar[authmusic_checktime;0]]
-    $chalkLog[AZLyrics   : $if[$get[lyric1]!=;✅;❌]\n;red]
-    $chalkLog[Youtube    : $if[$get[aa]!=;✅;❌];red]
-    $chalkLog[Soundcloud : $if[$get[b]!=;✅;❌];red]
-    $chalkLog[Spotify    : $if[$get[b]!=;✅;❌];red]
-    $chalkLog[\nLast update: $get[c] / $parseDate[$multi[$get[c];1000];ISO]\n$if[$get[c]!=0;This will auto update every a hour or you do starts this bot.\n];blue]
+    $let[z;$getGlobalVar[authmusic_checktime;0]]
+    $chalkLog[AZLyrics        :  $if[$get[lyric1]!=;✅;❌]\n
+Youtube         :  $if[$get[aa]!=;✅;❌]
+Soundcloud      :  $if[$get[b]!=;✅;❌]
+Spotify         :  $if[$get[c]!=;✅;❌]
+Amazon Music    :  $if[$get[d]!=;✅;❌]
+Deezer          :  $if[$get[e]!=;✅;❌] (Constant Refresh);red]
+    $chalkLog[\nLast update: $get[z] / $parseDate[$multi[$get[z];1000];ISO]\n$if[$get[z]!=0;This will auto update every a hour or you do starts this bot.\n];blue]
     $async[$!setGlobalVar[authmusic_checktime;$cropText[$getTimestamp;0;10]]]
     $chalkLog[--- Generate ---;blue]
     $if[$or[$get[lyric1]==;$env[refresh]==true];
@@ -161,11 +167,25 @@ db.commands.add({
     $async[
         $chalkLog[\\[PLAYER\\] Generating Spotify             | Token;cyan]
             $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\; Win64\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36]
-            $!httpRequest[https://open.spotify.com/embed/track/$randomText[4PTG3Z6ehGkBFwjybzWkR8;2yR2sziCF4WEs3klW1F38d;0IuVhCflrQPMGRrOyoY5RW;2yWlGEgEfPot0lv3OAjuG3;4Xfp9BcKrKYmxJPxn68Yb8;7uuJqaRjSXzja6VGgDpWem];GET]
+            $!httpRequest[https://open.spotify.com/embed/track/$randomText[4PTG3Z6ehGkBFwjybzWkR8;2yR2sziCF4WEs3klW1F38d;0IuVhCflrQPMGRrOyoY5RW;2yWlGEgEfPot0lv3OAjuG3;4Xfp9BcKrKYmxJPxn68Yb8;7uuJqaRjSXzja6VGgDpWem;3BP1klbHxsOf6IxscNIX0r;6BYzwbWg1Z2EB6VUXTYnhm];GET]
             $let[token;$advancedTextSplit[$httpResult;"accessToken":";1;";0]]
             $log[$if[$get[token]!=;OK - $cropText[$get[token];0;12;...]$!setGlobalVar[authmusic_spotify;$get[token]];Failed to Retrieve] - Spotify]
     ]
     ;$log[Failed to Retrieve - Spotify]]
+    ]
+    $if[$or[$get[d]==;$env[refresh]==true];
+    $try[
+    $async[
+        $chalkLog[\\[PLAYER\\] Generating Amazon Music        | Config & Token;cyan]
+            $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\; Win64\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36]
+            $!httpRequest[https://music.amazon.com/;HEAD]
+            $httpAddHeader[Cookie;$httpGetHeader[Set-Cookie]]
+            $httpAddHeader[Origin;https://music.amazon.com/]
+            $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\; Win64\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36]
+            $!httpRequest[https://music.amazon.com/config.json;GET;tokens]
+            $log[$if[$env[tokens;csrf;token]!=;OK - $cropText[$env[tokens;csrf;token];0;12;...]$!setGlobalVar[authmusic_amazonmusic;$env[tokens]];Failed to Retrieve] - Amazon Music]
+    ]
+    ;$log[Failed to Retrieve - Amazon Music]]
     ]
     $setTimeout[$callLocalFunction[refreshkey;true];$randomNumber[45;60]m]
     ;refresh]

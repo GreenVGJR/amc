@@ -28,6 +28,14 @@ module.exports = {
         {
           "name": "Apple Music",
           "value": "applemusic"
+        },
+        {
+          "name": "Amazon Music",
+          "value": "amazonmusic"
+        },
+        {
+          "name": "Deezer",
+          "value": "deezer"
         }
       ]
     },
@@ -55,6 +63,7 @@ module.exports = {
   $jsonLoad[loadser;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
   $onlyIf[$env[loadser;0]!=;No result.]
   $arrayLoad[results]
+  $arraySlice[loadser;loadser;0;9]
   $arrayReverse[loadser;loadser]
   $let[count;0]
   $!interactionFollowUp[

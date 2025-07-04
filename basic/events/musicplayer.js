@@ -67,7 +67,7 @@ module.exports = {
     $defer
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $!stopTrack
-    $!interactionFollowUp[OK]
+    $!interactionDelete
     ]
     $if[$advancedTextSplit[$customID;_;1]==actionplayer;
     $!deferUpdate
