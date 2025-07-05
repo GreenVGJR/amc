@@ -1,1 +1,76 @@
-This project still on progress. :D
+<div align="center">
+  <img src="https://github-readme-stats.vercel.app/api/pin/?username=greenvgjr&repo=amc-discord-bot&theme=dark" alt=""/>
+  <p><b><br>Discord music bot built-in with various libraries and version</b></p>
+  <div>
+  <a href="https://github.com/tryforge/ForgeScript"><img src="https://github.com/user-attachments/assets/ce7c0de3-1ad2-4d5d-a60b-2bf9c3da1f64" width=50 height=50 alt="Forgescript"/></a>
+  <a href="https://github.com/aoijs/aoi.js"><img src="https://github.com/user-attachments/assets/b71fd559-d747-4c87-902f-10f84aa67d2e" width=50 height=50 alt="Aoi.js"/></a>
+    <a href="https://botdesignerdiscord.com/"><img src="https://github.com/user-attachments/assets/c1f59eee-9fec-4b95-8365-eb21422668e3" width=50 height=50 alt="Bdfd"/></a>
+  </div>
+</div>
+
+> [!NOTE]
+> This project is still on progress.
+
+<details open>
+
+<summary>
+
+## Forgescript.js
+  
+</summary>
+
+#### Dev
+> [Local](https://github.com/GreenVGJR/amc-discord-bot/tree/fs-dev-local)<br>
+> Lavalink (WIP)
+
+#### Main (stable)
+> Local<br>
+> Lavalink
+
+</details>
+<details close>
+
+<summary>
+
+## Aoi.js
+  
+</summary>
+
+#### Dev
+> Local<br>
+> Lavalink
+
+#### Main (stable)
+> Local<br>
+> Lavalink
+
+</details>
+<details close>
+
+<summary>
+
+## BDFD
+  
+</summary>
+
+#### Dev
+> Lavalink?
+
+#### Main (stable)
+> Lavalink?
+
+</details>
+
+___
+
+## Credits
+
+- [Emoji.gg - for emojis source](https://emoji.gg/)<br>
+- [Cyberghxst/Sora - for FS config](https://github.com/Cyberghxst/Sora/)<br>
+- [skick1234/DisTube - for reference](https://github.com/skick1234/DisTube)<br>
+- [ForgeYoutube - extensions for FS](https://github.com/Zack-911/ForgeYoutube/tree/dev)
+
+<br><br>
+<div align="center">
+<p><h4>(づ•́ ᵔ •̀)づ</h4></p>
+</div>
