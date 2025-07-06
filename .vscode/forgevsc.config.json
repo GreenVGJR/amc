@@ -1,0 +1,40 @@
+{
+  "syntax": {
+    "colors": [
+      "#a87ffb",
+      "#b895fd",
+      "#92A9FF",
+      "#85CDF1",
+      "#708fff",
+      "#77D5A3",
+      "#FFD395",
+      "#f7768e",
+      "#fc8f8e",
+      "#ffa23e",
+      "#ffc26e",
+      "#BD9CFE",
+      "#c8aaff",
+      "#9AC1F6",
+      "#5A8CFF"
+    ],
+    "operators": ["!", "#", "@[]"]
+  },
+  "urls": {
+    "forgescript": "tryforge/forgescript#dev",
+    "forgedb": "tryforge/forgedb#dev",
+    "forgeexpress": "zack-911/forgeexpress#dev",
+    "forgecanvas": "tryforge/forgecanvas#dev"
+  },
+  "customFunctions": {
+    "Example1": {
+      "name": "customFunc1",
+      "params": ["param1", "param2"],
+      "category": "customCategory"
+    },
+    "Example2": {
+      "name": "mySpecialFunc",
+      "params": ["input"],
+      "category": "specialCategory"
+    }
+  }
+}

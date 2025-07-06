@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@tryforge/forge.db": "github:tryforge/ForgeDB",
+    "@tryforge/forge.linked": "^1.1.3",
+    "@tryforge/forgescript": "github:tryforge/ForgeScript#dev",
+    "dotenv": "^16.5.0",
+    "forgeyoutube": "github:zack-911/forgeyoutube#dev",
+    "sqlite3": "^5.1.7"
+  }
+}

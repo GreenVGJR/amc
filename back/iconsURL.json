@@ -1,0 +1,15 @@
+{
+    "color_embed": "a09fff",
+    "error_color_embed": "ff0000",
+
+    "loading": "https://cdn3.emoji.gg/emojis/1181-maruloader.gif",
+
+    "youtube": "https://cdn3.emoji.gg/emojis/6463-youtube.png",
+    "soundcloud": "https://cdn3.emoji.gg/emojis/3827-soundcloud.png",
+    "spotify": "https://cdn3.emoji.gg/emojis/2320-spotify.png",
+    "null": "https://cdn3.emoji.gg/emojis/68380-music-note.png",
+
+    "genius": "https://images.genius.com/086f5809e96b133dd536982629e5844b.1000x1000x1.png",
+    "azlyrics": "https://www.azlyrics.com/az_logo_tr.png",
+    "lrclib": "https://lrclib.net/assets/lrclib-370c57eb.png"
+}

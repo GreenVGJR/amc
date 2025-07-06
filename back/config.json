@@ -1,0 +1,7 @@
+{
+    "_comment": "Currently only YT & SC for searching",
+    "default_provider": "youtube",
+    "fallback_provider": "soundcloud",
+
+    "autodelete_nextmessage": true
+}
