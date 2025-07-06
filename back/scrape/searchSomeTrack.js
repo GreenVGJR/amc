@@ -30,7 +30,7 @@ module.exports = {
     $jsonLoad[ser;$try[$ytMusicSearch[$env[query];10];{}]]
     $arrayLoad[results]
     $arrayForEach[ser;result;
-    $arrayPushJSON[results;{"title":"$replace[$env[result;name];";\\\\"]","duration":"Unknown","thumbnail":"https://i.ytimg.com/vi_webp/$env[result;id]/sddefault.webp","url":"$env[result;url]"}]
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;name];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"https://i.ytimg.com/vi_webp/$env[result;id]/sddefault.webp","url":"$env[result;url]"}]
     ]
     ;
     $if[$env[provider]==soundcloud;
@@ -39,7 +39,7 @@ module.exports = {
     $jsonLoad[res;$env[tests;collection]]
     $arrayLoad[results]
     $arrayForEach[res;result;
-    $arrayPushJSON[results;{"title":"$replace[$env[result;title];";\\\\"]","duration":"$parseDigital[$env[result;full_duration]]$if[$env[result;duration]==30000;\\\\n-# REGION LOCK]","thumbnail":"$env[result;artwork_url]","url":"$env[result;permalink_url]"}]
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$parseDigital[$env[result;full_duration]]$if[$env[result;duration]==30000;\\\\n-# REGION LOCK]","thumbnail":"$env[result;artwork_url]","url":"$env[result;permalink_url]"}]
     ]
     ;
     $if[$env[provider]==spotify;
@@ -49,7 +49,7 @@ module.exports = {
     $!httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=10;GET;jsonres]
     $jsonLoad[res1;$env[jsonres;tracks;items]]
     $arrayLoad[results]
-    $arrayForEach[res1;res2;$arrayPushJSON[results;{"title":"$replace[$env[res2;name];";\\\\"]","duration":"$parseDigital[$env[res2;duration_ms]]","thumbnail":"$env[res2;album;images;0;url]","url":"$env[res2;external_urls;spotify]"}]]
+    $arrayForEach[res1;res2;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res2;name];\\\\;];";\\\\"]","duration":"$parseDigital[$env[res2;duration_ms]]","thumbnail":"$env[res2;album;images;0;url]","url":"$env[res2;external_urls;spotify]"}]]
     ;
     $if[$env[provider]==applemusic;
     $httpAddHeader[User-Agent;$get[agent]]
@@ -61,7 +61,7 @@ module.exports = {
     $arraySlice[res4;res4;0;10]
 
     $arrayLoad[results]
-    $arrayForEach[res4;res5;$arrayPushJSON[results;{"title":"$replace[$env[res5;title];";\\\\"]","duration":"Unknown","thumbnail":"$replace[$env[res5;artwork;dictionary;url];{w}x{h}bb.{f};1080x1080bb.webp]","url":"$advancedTextSplit[$env[res5;contentDescriptor;url];?;0]"}]]
+    $arrayForEach[res4;res5;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res5;title];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"$replace[$env[res5;artwork;dictionary;url];{w}x{h}bb.{f};1080x1080bb.webp]","url":"$advancedTextSplit[$env[res5;contentDescriptor;url];?;0]"}]]
     ;
     $if[$env[provider]==amazonmusic;
     $jsonLoad[a;$getGlobalVar[authmusic_amazonmusic;{}]]
@@ -73,7 +73,7 @@ module.exports = {
     $arrayMap[c;cd;$if[$toLowercase[$env[cd;header]]==songs;$return[$env[cd;items]]];d]
     $jsonLoad[e;$env[d;0]]
     $arrayLoad[results]
-    $arrayForEach[e;ef;$arrayPushJSON[results;{"title":"$replace[$env[ef;primaryText;text];";\\\\"]","duration":"Unknown","thumbnail":"$env[ef;image]","url":"https://music.amazon.com$env[ef;primaryLink;deeplink]"}]]
+    $arrayForEach[e;ef;$arrayPushJSON[results;{"title":"$replace[$replace[$env[ef;primaryText;text];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"$env[ef;image]","url":"https://music.amazon.com$env[ef;primaryLink;deeplink]"}]]
     ;
     $if[$env[provider]==deezer;
     $localFunction[refreshdeezer;
@@ -94,7 +94,7 @@ module.exports = {
     $onlyIf[$or[$env[res]==;$checkContains[$env[res;errors;0;type];Expired]]!=true;$callLocalFunction[refreshdeezer;true]]
     $arrayLoad[results]
     $jsonLoad[forres;$env[res;data;instantSearch;results;tracks;edges]]
-    $arrayForEach[forres;resat;$arrayPushJSON[results;{"title":"$replace[$env[resat;node;title];";\\\\"]","duration":"$parseDigital[$multi[$env[resat;node;duration];1000]]","thumbnail":"$env[resat;node;album;cover;xxx_small;0]","url":"https://www.deezer.com/us/track/$env[resat;node;id]"}]]
+    $arrayForEach[forres;resat;$arrayPushJSON[results;{"title":"$replace[$replace[$env[resat;node;title];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[resat;node;duration];1000]]","thumbnail":"$env[resat;node;album;cover;xxx_small;0]","url":"https://www.deezer.com/us/track/$env[resat;node;id]"}]]
     ]
     ;refresh]
     $callLocalFunction[refreshdeezer;true]

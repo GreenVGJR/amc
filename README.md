@@ -11,7 +11,7 @@
 ___
 
 ## Installation
-1. Make sure you have [node.js](https://nodejs.org/) installed, and greater than version v16.11.0
+1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v16.11.0 for node.js
 2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-dev-local.zip) this branch (.zip)
 3. Extract it, and rename `.env.example` file to `.env` inside folder you did extract
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
