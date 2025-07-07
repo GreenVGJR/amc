@@ -21,7 +21,7 @@
 
 #### Dev
 > [Local](https://github.com/GreenVGJR/amc-discord-bot/tree/fs-dev-local)<br>
-> Lavalink (WIP)
+> [Lavalink](https://github.com/GreenVGJR/amc-discord-bot/tree/fs-dev-lavalink)
 
 #### Main (stable)
 > Local<br>
@@ -65,10 +65,10 @@ ___
 
 ## Credits
 
-- [Emoji.gg - for emojis source](https://emoji.gg/)<br>
-- [Cyberghxst/Sora - for FS config](https://github.com/Cyberghxst/Sora/)<br>
-- [skick1234/DisTube - for reference](https://github.com/skick1234/DisTube)<br>
-- [ForgeYoutube - extensions for FS](https://github.com/Zack-911/ForgeYoutube/tree/dev)
+- [Emoji.gg](https://emoji.gg/) - for emojis source<br>
+- [Cyberghxst/Sora](https://github.com/Cyberghxst/Sora/) - for FS config<br>
+- [skick1234/DisTube](https://github.com/skick1234/DisTube) - for style reference<br>
+- [ForgeYoutube](https://github.com/Zack-911/ForgeYoutube/tree/dev) - extensions for FS
 
 <br><br>
 <div align="center">
