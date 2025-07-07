@@ -71,7 +71,7 @@ client.login();
 
 client.functions.load("back/scrape") // Custom Functions
 
-client.commands.load("basic/commands") // Basic Command
+// client.commands.load("basic/commands") // Basic Command
 client.commands.load("basic/autocomplete") // Autocomplete
 client.commands.load("basic/events") // Events
 
