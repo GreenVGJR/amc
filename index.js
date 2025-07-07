@@ -43,7 +43,7 @@ const lavalink = new ForgeLink({
 
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
-    logLevel: LogPriority.High,
+    logLevel: LogPriority.Low,
     intents: [
         "Guilds",
         "GuildMembers",
