@@ -25,7 +25,7 @@ node .
 Ignore first & last installation step.
 
 > [!NOTE]
-> Please change the lavalink server address after you do install.
+> Please change the lavalink server address after install.
 
 ___
 
