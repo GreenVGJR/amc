@@ -37,8 +37,8 @@
 </summary>
 
 #### Dev
-> Local<br>
-> Lavalink
+> Local (Soon)<br>
+> Lavalink (Soon)
 
 #### Main (stable)
 > Local<br>
@@ -54,10 +54,10 @@
 </summary>
 
 #### Dev
-> Lavalink?
+> API (Soon)
 
 #### Main (stable)
-> Lavalink?
+> API (Soon)
 
 </details>
 
