@@ -40,7 +40,7 @@ const music = new ForgeMusic({
 
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
-    logLevel: LogPriority.Low,
+    logLevel: LogPriority.VeryLow,
     intents: [
         "Guilds",
         "GuildMembers",
