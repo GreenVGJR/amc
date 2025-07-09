@@ -32,14 +32,16 @@ module.exports = [{
 {
     type: "playerResume",
     code: `
+
+    $onlyIf[$djsEval[(0, require("discord-player").useMainPlayer)().queues.get(ctx.client.guilds.cache.get("$guildID"))]!=null;]
+
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
 
     $arrayLoad[testmessage;]
     $arrayPushJSON[testmessage;{
     "id": "$trackInfo[id]",
-    "title": "$trackInfo[title]",
-    "description": "$trackInfo[description]",
+    "title": "$replace[$trackInfo[title];\\\\;\\\\\\\\]",
     "author": "$trackInfo[author]",
     "url": "$trackInfo[url]",
     "thumbnail": "$trackInfo[thumbnail]",
@@ -68,5 +70,6 @@ module.exports = [{
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    $!disableComponentsOf[$get[cid];$get[mid]]
     `
 }]

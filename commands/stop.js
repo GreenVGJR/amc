@@ -25,7 +25,6 @@ module.exports = {
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;You must same with <@$clientID> in <#$voiceID[$guildID;$clientID]>.]
     $defer
     $!clearInterval[intervalmusicmessage_$guildID_$getVar[musicplayer_message;$guildID_channelid]]
-    $!disableComponentsOf[$getVar[musicplayer_message;$guildID_channelid];$getVar[musicplayer_message;$guildID_messageid]]
     $if[$option[destroy];$leaveVoiceChannel;$!stopTrack]
     $!deleteVar[musicplayer_message;$guildID_messageid]
     $!deleteVar[musicplayer_message;$guildID_channelid]

@@ -40,7 +40,7 @@ const music = new ForgeMusic({
 
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
-    logLevel: LogPriority.VeryLow,
+    logLevel: LogPriority.Low,
     intents: [
         "Guilds",
         "GuildMembers",
@@ -117,7 +117,7 @@ db.commands.add({
     $let[b;$getGlobalVar[authmusic_soundcloud]]
     $let[c;$getGlobalVar[authmusic_spotify]]
     $let[d;$getGlobalVar[authmusic_amazonmusic]]
-    $let[d;$getGlobalVar[authmusic_deezer]]
+    $let[e;$getGlobalVar[authmusic_deezer]]
 
     $let[z;$getGlobalVar[authmusic_checktime;0]]
     $chalkLog[AZLyrics        :  $if[$get[lyric1]!=;✅;❌]\n
@@ -125,7 +125,7 @@ Youtube         :  $if[$get[aa]!=;✅;❌]
 Soundcloud      :  $if[$get[b]!=;✅;❌]
 Spotify         :  $if[$get[c]!=;✅;❌]
 Amazon Music    :  $if[$get[d]!=;✅;❌]
-Deezer          :  $if[$get[e]!=;✅;❌] (Constant Refresh);red]
+Deezer          :  $if[$get[e]!=;✅;❌] | (Constant Refresh);red]
     $chalkLog[\nLast update: $get[z] / $parseDate[$multi[$get[z];1000];ISO]\n$if[$get[z]!=0;This will auto update every a hour or you do starts this bot.\n];blue]
     $async[$!setGlobalVar[authmusic_checktime;$cropText[$getTimestamp;0;10]]]
     $chalkLog[--- Generate ---;blue]

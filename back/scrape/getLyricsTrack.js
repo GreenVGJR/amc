@@ -24,7 +24,7 @@ module.exports = {
     ]
     $if[$and[$env[pulltrack;type]==youtube;$get[ytmusic]!=null;$env[isExclude]!=true];
     $jsonLoad[ytmusic;$get[ytmusic]]
-    $let[lyric_filter;$replace[$env[ytmusic;results;lyrics];
+    $let[lyric_filter;$replace[$replace[$env[ytmusic;results;lyrics];\\\\r;];
 ;\\\\n]]
     $arrayLoad[results;]
     $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[ytmusic;ping]","results":{"provider":"youtube","query":"$encodeURI[$env[query]]","url":"$trackInfo[url]","autocomplete":"$decodeURI[$env[query]]","lyric":"$get[lyric_filter]"}}]]

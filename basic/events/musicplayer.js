@@ -75,39 +75,29 @@ module.exports = {
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekdown;
     $if[$getVar[musicplayer_message;$guildID_attemptseek;false]==true;$ephemeral $interactionReply[It's still processing.] $stop]
-    $!deferUpdate
+    $ephemeral
+    $defer
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $async[
-    $!editMessage[$get[cid];$get[mid];
-    $fetchResponse[$get[cid];$get[mid]]
-    $footer[Re-Downloading;$callFunction[useIcon;loading]]
-    $timestamp
-    ]
-    ]
     $let[curduration;$callFunction[musicVirtualDuration;$guildID;$get[cid]]]
     $let[seeks;10000]
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sub[$get[curduration];$get[seeks]]]]
     $setVar[musicplayer_message;$guildID_attemptseek;true]
     $let[resseek;$if[$sub[$get[curduration];$get[seeks]]<0;0;$sub[$get[curduration];$get[seeks]]]]
     $!seekTrack[$get[resseek]]
+    $!interactionDelete
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekup;
     $if[$getVar[musicplayer_message;$guildID_attemptseek;false]==true;$ephemeral $interactionReply[It's still processing.] $stop]
-    $!deferUpdate
+    $ephemeral
+    $defer
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $async[
-    $!editMessage[$get[cid];$get[mid];
-    $fetchResponse[$get[cid];$get[mid]]
-    $footer[Re-Downloading;$callFunction[useIcon;loading]]
-    $timestamp
-    ]
-    ]
     $let[curduration;$callFunction[musicVirtualDuration;$guildID;$get[cid]]]
     $let[seeks;10000]
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sum[$get[curduration];$get[seeks]]]]
     $setVar[musicplayer_message;$guildID_attemptseek;true]
     $let[resseek;$if[$sum[$get[curduration];$get[seeks]]<0;0;$sum[$get[curduration];$get[seeks]]]]
     $!seekTrack[$get[resseek]]
+    $!interactionDelete
     ]
     
     $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown]!=true;]
@@ -115,8 +105,7 @@ module.exports = {
     $arrayLoad[testmessage;]
     $arrayPushJSON[testmessage;{
     "id": "$trackInfo[id]",
-    "title": "$trackInfo[title]",
-    "description": "$trackInfo[description]",
+    "title": "$replace[$trackInfo[title];\\\\;\\\\\\\\]",
     "author": "$trackInfo[author]",
     "url": "$trackInfo[url]",
     "thumbnail": "$trackInfo[thumbnail]",

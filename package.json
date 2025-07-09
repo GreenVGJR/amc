@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@tryforge/forge.db": "github:tryforge/ForgeDB",
+    "@tryforge/forge.db": "^2.1.0",
     "@tryforge/forge.music": "^1.0.0",
     "@tryforge/forgescript": "github:tryforge/ForgeScript#dev",
     "discord-player-youtubei": "^1.4.6",

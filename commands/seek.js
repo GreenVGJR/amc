@@ -37,16 +37,11 @@ module.exports = {
     ;
     $let[pest;$if[$parseString[$replace[$option[duration]; ;]]<0;0;$parseString[$replace[$option[duration]; ;]]]]
     ]
-    $async[
+
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $!editMessage[$get[cid];$get[mid];
-    $fetchResponse[$get[cid];$get[mid]]
-    $footer[Re-Downloading;$callFunction[useIcon;loading]]
-    $timestamp
-    ]
-    ]
     $setVar[musicplayer_message;$guildID_attemptseek;true]
     $let[test;$seekTrack[$get[pest]]]
     $if[$get[test];
@@ -55,5 +50,6 @@ module.exports = {
     ;
     $!interactionFollowUp[Failed to seek.]
     ]
+    $setTimeout[$!interactionDelete;3s]
   `
 }

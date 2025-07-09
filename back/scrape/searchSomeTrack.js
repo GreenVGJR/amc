@@ -23,7 +23,7 @@ module.exports = {
     $jsonLoad[loadser2;$env[loadser;results]]
     $arrayLoad[results]
     $arrayForEach[loadser2;result;
-    $arrayPushJSON[results;{"title":"$replace[$env[result;title];";\\\\"]","duration":"$if[$env[result;durationSeconds]==0;LIVE;$parseDigital[$multi[$env[result;durationSeconds];1000]]]","thumbnail":"$if[$env[result;animatedThumbnail;0;url]==;$env[result;thumbnail;0;url];$env[result;animatedThumbnail;0;url]]","url":"$env[result;url]"}]
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$if[$env[result;durationSeconds]==0;LIVE;$parseDigital[$multi[$env[result;durationSeconds];1000]]]","thumbnail":"$if[$env[result;animatedThumbnail;0;url]==;$env[result;thumbnail;0;url];$env[result;animatedThumbnail;0;url]]","url":"$env[result;url]"}]
     ]
     ;
     $if[$env[provider]==youtubemusic;

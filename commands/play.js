@@ -30,15 +30,21 @@ module.exports = {
   $defer
  
   $let[default_provider;$callFunction[configMusic;default_provider]]
+  $let[fallback_provider;$callFunction[configMusic;fallback_provider]]
   $if[$isValidLink[$option[query]]==false;
   $let[basic_type;true]
   $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$get[default_provider];null]]
-  $onlyIf[$env[result;id]!=;$interactionFollowUp[
+  $let[cac1;$env[result;id]]
+  $if[$get[cac1]==;
+  $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$get[fallback_provider];null]]
+  $let[cac2;$env[result;id]]
+  $onlyIf[$and[$get[cac1]!=;$get[cac2]!=];
+  $interactionFollowUp[
   $description[No results found.]
   $color[$callFunction[useIcon;error_color_embed]]
   $footer[slash]
   $timestamp
-  ]]
+  ]]]
   $let[music_requestedBy;<@$authorID>]
   $let[music_title;$env[result;title]]
   $let[music_id;$env[result;id]]
@@ -100,7 +106,7 @@ module.exports = {
   ]
 
   $if[$get[attemptry]>=$get[donetry];
-  $!editMessage[$channelID;$get[mid];
+  $!interactionUpdate[
   $description[Can't process this.\nError: $codeBlock[$env[causeplayerror]]]
   $color[$callFunction[useIcon;error_color_embed]]
   $timestamp
@@ -110,7 +116,7 @@ module.exports = {
   ]
 
   $if[$and[$queueLength!=0;$get[iscreatedfirst]==false];
-  $!editMessage[$channelID;$get[mid];
+  $!interactionUpdate[
   $author[Queue;;;0]
   $addField[Added Song;$sub[$queueLength;$get[queue_lengthtemp]];true;0]
   $addField[Total Song;$queueLength;true;0]

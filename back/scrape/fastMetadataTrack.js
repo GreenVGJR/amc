@@ -26,12 +26,13 @@ module.exports = {
         "duration":"$env[res;results;0;durationSeconds]",
         "title":"$replace[$env[res;results;0;title];\\";\\\\"]"
     }]
-    $return[$env[rest2]]
     ;
     $if[$env[provider]==soundcloud;
+    $try[
     $httpAddHeader[User-Agent;$get[agent]]
     $!httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getGlobalVar[authmusic_soundcloud]&limit=1;GET]
-    $jsonLoad[res;$httpResult]
+    ]
+    $jsonLoad[res;$if[$httpResult==;{};$httpResult]]
     $jsonLoad[rest2;{
         "id":"$advancedTextSplit[$env[res;collection;0;permalink_url];soundcloud.com/;1]",
         "dynamic_thumbnail":"",
@@ -39,7 +40,7 @@ module.exports = {
         "duration":$round[$divide[$env[res;collection;0;duration];1000];0],
         "title":"$replace[$env[res;collection;0;title];\\";\\\\"]"
     }]
-    $return[$env[rest2]]
     ]]
+    $return[$env[rest2]]
     `
 }
