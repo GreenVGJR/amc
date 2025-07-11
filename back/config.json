@@ -3,5 +3,5 @@
     "default_provider": "youtube",
     "fallback_provider": "soundcloud",
 
-    "autodelete_nextmessage": true
+    "autodelete_nextmessage": false
 }

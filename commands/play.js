@@ -9,6 +9,18 @@ module.exports = {
       "description": "Search a track to play",
       "required": true,
       "autocomplete": true
+    },
+    {
+      "type": 5,
+      "name": "force_skip",
+      "description": "Instantly skip track after adding track",
+      "required": false,
+    },
+    {
+      "type": 5,
+      "name": "direct_cdn",
+      "description": "Use's Direct CDN after searching track",
+      "required": false,
     }
   ],
   "contexts": [
@@ -52,7 +64,15 @@ module.exports = {
   $let[music_thumbnail;$if[$env[result;dynamic_thumbnail]==;$env[result;thumbnail];$env[result;dynamic_thumbnail]]]
   $let[music_provider;$get[default_provider]]
 
-  $let[music_playurl;$if[$get[default_provider]==youtube;https://music.youtube.com/watch?v=$env[result;id];$if[$get[default_provider]==soundcloud;https://soundcloud.com/$env[result;id]]]]
+  $let[isforcedirect;$option[direct_cdn]]
+  $let[tempstoreurl;$if[$get[default_provider]==youtube;https://youtube.com/watch?v=$env[result;id];$if[$get[default_provider]==soundcloud;https://soundcloud.com/$env[result;id]]]]
+
+  $if[$get[isforcedirect]==true;
+  $let[music_playurl;$callFunction[fallbackPlaybackTrack;$get[tempstoreurl]]]
+  $if[$or[$get[music_playurl]==live;$get[music_playurl]==null]==true;$let[music_playurl;$get[tempstoreurl]] $let[isforcedirect;false]]
+  ;
+  $let[music_playurl;$get[tempstoreurl]]
+  ]
   ;
   $let[basic_type;false]
   $let[music_playurl;$option[query]]
@@ -64,16 +84,15 @@ module.exports = {
   $addField[Title;$get[music_title];true]
   $addField[Duration;$if[$get[music_duration]==0;LIVE;$parseDigital[$get[music_duration]]];true]
   $thumbnail[$get[music_thumbnail]]
-  $author[Fetching;$callFunction[useIcon;loading]]
   $timestamp
   $color[$callFunction[useIcon;color_embed]]
-  $footer[$toTitleCase[$get[music_provider]];$callFunction[useIcon;$get[music_provider]]]
+  $footer[Fetching$if[$get[isforcedirect]; (DIRECT CDN)];$callFunction[useIcon;loading]]
   ;true]]
   ;
   $let[mid;$interactionFollowUp[
   $addField[Requested By;<@$authorID>;false]
   $addField[Query;$codeBlock[$cropText[$option[query];0;1016]];false]
-  $author[Fetching;$callFunction[useIcon;loading]]
+  $footer[Fetching;$callFunction[useIcon;loading]]
   $thumbnail[$userAvatar[$authorID;1024]]
   $timestamp
   $color[$callFunction[useIcon;color_embed]]
@@ -86,19 +105,29 @@ module.exports = {
   $setVar[musicplayer_message;$guildID_messageid;$get[mid]]
   ]
 
+  $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[music_playurl]]]
+
   $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
   $let[attemptry;0]
   $let[donetry;3]
   $let[found;false]
   $try[
+  $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==soundcloud]!=true;
+  $playTrack[$voiceID;$get[music_playurl];$env[whatmusictype;type]]
+  ;
   $playTrack[$voiceID;$get[music_playurl]]
+  ]
   ;
   $letSum[attemptry;1]
   ]
 
   $while[$and[$get[attemptry]!=0;$get[attemptry]<=$get[donetry];$get[found]==false];
     $try[
+    $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==soundcloud]!=true;
+    $playTrack[$voiceID;$get[music_playurl];$env[whatmusictype;type]]
+    ;
     $playTrack[$voiceID;$get[music_playurl]]
+    ]
     $let[found;true]
     ;
     $letSum[attemptry;1]
@@ -112,6 +141,9 @@ module.exports = {
   $timestamp
   $footer[slash]
   ]
+  $setTimeout[
+  $if[$get[iscreatedfirst]==false;$!interactionDelete]
+  ;5s]
   $stop
   ]
 
@@ -124,8 +156,19 @@ module.exports = {
   $color[$callFunction[useIcon;color_embed];0]
   $timestamp[;0]
   ]
+  $async[
   $setTimeout[
   $if[$messageExists[$channelID;$get[mid]];$!deleteMessage[$channelID;$get[mid]]]
   ;5s]
+  ]
+  $if[$option[force_skip]==true;
+  $let[mid2;$sendMessage[$channelID;
+    $reply[$channelID;$get[mid];true]
+    $color[$callFunction[useIcon;color_embed]]
+    $footer[Attempting to Skip...;$callFunction[useIcon;loading]]
+  ;true]]
+  $!skipTo[$sub[$queueLength;1]]
+  $!deleteMessage[$channelID;$get[mid2]]
+  ]
   ]`
 }

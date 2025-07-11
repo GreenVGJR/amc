@@ -43,7 +43,7 @@ module.exports = {
     $stop
     ]
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$env[guildId];$env[channelId]];0]]
-    $let[changeevery_time;6000]
+    $let[changeevery_time;8000]
     $let[expectsecond;$multi[$second;1000]]
 
     $if[$or[$getVar[musicplayer_message;$guildID_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[expectsecond];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$stop]
@@ -108,7 +108,7 @@ module.exports = {
     $footer[$toTitleCase[$if[$get[provider]==null;File;$get[provider]]];$callFunction[useIcon;$get[provider]];0]
     ]
     $addActionRow
-    $addStringSelectMenu[musicplayer_nodequeue_$env[messageId];$cropText[Queue | $trackInfo[title];0;61;...];$or[$queueLength==0;$getLoopMode==TRACK];1;1]
+    $addStringSelectMenu[musicplayer_nodequeue_$env[messageId]_$randomBytes[4];$cropText[Queue | $trackInfo[title];0;61;...];$or[$queueLength==0;$getLoopMode==TRACK];1;1]
 
     $let[countqueue;0]
     $if[$queueLength!=0;
@@ -120,19 +120,19 @@ module.exports = {
     $addOption[null;null;null]
     ]
     $addActionRow
-    $addButton[musicplayer_loop_$env[messageId];Loop: $toTitleCase[$getLoopMode];$if[$getLoopMode==OFF;Secondary;Primary];🔁;false]
-    $addButton[musicplayer_shuffle_$env[messageId];Shuffle: $if[$get[statusshuffle];On;Off];$if[$get[statusshuffle];Primary;Secondary];🔀;false]
-    $addButton[musicplayer_lyrics_$env[messageId];Lyrics;Primary;🎶;$or[$env[jsonmusicdata;durationMS]==0;$get[provider]==null]]    
+    $addButton[musicplayer_loop_$env[messageId]_$randomBytes[4];Loop: $toTitleCase[$getLoopMode];$if[$getLoopMode==OFF;Secondary;Primary];🔁;false]
+    $addButton[musicplayer_shuffle_$env[messageId]_$randomBytes[4];Shuffle: $if[$get[statusshuffle];On;Off];$if[$get[statusshuffle];Primary;Secondary];🔀;false]
+    $addButton[musicplayer_lyrics_$env[messageId]_$randomBytes[4];Lyrics;Primary;🎶;$or[$env[jsonmusicdata;durationMS]==0;$get[provider]==null]]    
     $addActionRow
-    $addButton[musicplayer_volumedown_$env[messageId];-10%;Secondary;🔉;$checkCondition[$getVolume==0]]
-    $addButton[null0;Volume: $getVolume%;Secondary;;true]
-    $addButton[musicplayer_volumeup_$env[messageId];+10%;Secondary;🔉;$checkCondition[$getVolume==150]]
-    $addButton[musicplayer_volumemute_$env[messageId];$if[$getVolume==0;Unmute;Mute];Secondary;🔈;false]
+    $addButton[musicplayer_volumedown_$env[messageId]_$randomBytes[4];-10%;Secondary;🔉;$checkCondition[$getVolume==0]]
+    $addButton[null0_$randomBytes[4];Volume: $getVolume%;Secondary;;true]
+    $addButton[musicplayer_volumeup_$env[messageId]_$randomBytes[4];+10%;Secondary;🔉;$checkCondition[$getVolume==150]]
+    $addButton[musicplayer_volumemute_$env[messageId]_$randomBytes[4];$if[$getVolume==0;Unmute;Mute];Secondary;🔈;false]
     $addActionRow
-    $addButton[musicplayer_seekdown_$env[messageId];-10s;Primary;⏪;$or[$env[jsonmusicdata;durationMS]==0;$isPaused]]
-    $addButton[musicplayer_stopplayer_$env[messageId];Stop;Danger;⏹️;false]
-    $addButton[musicplayer_seekup_$env[messageId];+10s;Primary;⏩;$or[$env[jsonmusicdata;durationMS]==0;$isPaused]]
-    $addButton[musicplayer_actionplayer_$env[messageId];$if[$isPaused;Resume;Pause];Secondary;$if[$isPaused;▶️;⏸️];$checkCondition[$env[jsonmusicdata;durationMS]==0]]
+    $addButton[musicplayer_seekdown_$env[messageId]_$randomBytes[4];-10s;Primary;⏪;$or[$env[jsonmusicdata;durationMS]==0;$isPaused]]
+    $addButton[musicplayer_stopplayer_$env[messageId]_$randomBytes[4];Stop;Danger;⏹️;false]
+    $addButton[musicplayer_seekup_$env[messageId]_$randomBytes[4];+10s;Primary;⏩;$or[$env[jsonmusicdata;durationMS]==0;$isPaused]]
+    $addButton[musicplayer_actionplayer_$env[messageId]_$randomBytes[4];$if[$isPaused;Resume;Pause];Secondary;$if[$isPaused;▶️;⏸️];$checkCondition[$env[jsonmusicdata;durationMS]==0]]
     ]
     ]
     `,

@@ -24,36 +24,30 @@ module.exports = {
     ]
     $if[$and[$env[pulltrack;type]==youtube;$get[ytmusic]!=null;$env[isExclude]!=true];
     $jsonLoad[ytmusic;$get[ytmusic]]
-    $let[lyric_filter;$replace[$replace[$env[ytmusic;results;lyrics];\\\\r;];
-;\\\\n]]
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[ytmusic;ping]","results":{"provider":"youtube","query":"$encodeURI[$env[query]]","url":"$trackInfo[url]","autocomplete":"$decodeURI[$env[query]]","lyric":"$get[lyric_filter]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[ytmusic;ping]","results":{"provider":"youtube","query":"$encodeURI[$env[query]]","url":"$trackInfo[url]","autocomplete":"$decodeURI[$env[query]]","lyric":"$deflate[$env[ytmusic;results;lyrics];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
     $let[http_2;$httpRequest[https://lrclib.net/api/search?q=$env[query];GET;ges1]]
     $if[$env[ges1;0;id]!=;
-    $let[lyric_filter;$replace[$env[ges1;0;plainLyrics];
-;\\\\n]]
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_2],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"lrclib","query":"$encodeURI[$env[query]]","url":"https://lrclib.net/api/get/$env[ges1;0;id]","autocomplete":"$env[ges1;0;name]","lyric":"$if[$env[ges1;0;instrumental];\\[Instrumental\\];$get[lyric_filter]]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_2],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"lrclib","query":"$encodeURI[$env[query]]","url":"https://lrclib.net/api/get/$env[ges1;0;id]","autocomplete":"$env[ges1;0;name]","lyric":"$deflate[$if[$env[ges1;0;instrumental];\\[Instrumental\\];$env[ges1;0;plainLyrics]];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
     $let[http_1;$httpRequest[https://genius.com/api/search/song?&per_page=1&q=$env[query];GET;ges]]
     $if[$env[ges;response;sections;0;hits;0]!=;
     $httpAddHeader[User-Agent;$get[agent]]
     $let[http2_1;$httpRequest[https://genius.com$env[ges;response;sections;0;hits;0;result;api_path]/embed.js;GET;ges2]]
-    $let[a2;$advancedTextSplit[$replace[$replace[$replace[$env[ges2];\\\\n;
-];\\\\;];<br>;];<p>;1;</p>;0]]
+    $let[a2;$advancedTextSplit[$replace[$replace[$env[ges2];\\\\;];<br>;];<p>;1;</p>;0]]
     $if[$advancedTextSplit[$get[a2];<a href=";1]!=;
     $arrayLoad[a2_rest;<a href=";$get[a2]]
     $let[r1;$advancedTextSplit[$get[a2];<a href=";0]]
     $arrayForEach[a2_rest;restore_a2;$let[r1;$get[r1]$advancedTextSplit[$env[restore_a2];https://;1;">;1]]]
     $let[a2;$get[r1]]
     ]
-    $let[a2_filtering;$trimLines[$replace[$replace[$replace[$replace[$replace[$replace[$replace[$replace[$get[a2];
-;\\\\n];<a>;];</a>;];<i>;];</i>;];<b>;];</b>;];";\\\\"]]]
+    $let[a2_filtering;$trimLines[$replace[$replace[$replace[$replace[$replace[$replace[$replace[$get[a2];<a>;];</a>;];<i>;];</i>;];<b>;];</b>;];";\\\\"]]]
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_1],"status_2":$get[http2_1],"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"genius","query":"$encodeURI[$env[query]]","url":"$env[ges;response;sections;0;hits;0;result;url]","autocomplete":"$env[ges;response;sections;0;hits;0;result;title_with_featured]","lyric":"$get[a2_filtering]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_1],"status_2":$get[http2_1],"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"genius","query":"$encodeURI[$env[query]]","url":"$env[ges;response;sections;0;hits;0;result;url]","autocomplete":"$env[ges;response;sections;0;hits;0;result;title_with_featured]","lyric":"$deflate[$get[a2_filtering];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
     $let[http;$httpRequest[https://search.azlyrics.com/suggest.php?q=$encodeURI[$env[query]]&x=$getGlobalVar[authmusic_azlyrics];GET;res]]
@@ -66,10 +60,9 @@ module.exports = {
     $httpAddHeader[User-Agent;$get[agent]]
     $let[http2;$httpRequest[$get[a];GET;res2]]
     $let[a1;$replace[$advancedTextSplit[$env[res2];class="lyricsh";1;<div>;1;</div>;0;-->;1];<br>;]]
-    $let[a1;$trimLines[$replace[$replace[$replace[$replace[$replace[$replace[$replace[$replace[$get[a1];
-;\\\\n];<a>;];</a>;];<i>;];</i>;];<b>;];</b>;];";\\\\"]]]
+    $let[a1;$trimLines[$replace[$replace[$replace[$replace[$replace[$replace[$replace[$get[a1];<a>;];</a>;];<i>;];</i>;];<b>;];</b>;];";\\\\"]]]
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":$get[http],"status_2":$get[http2],"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"azlyrics","query":"$encodeURI[$env[query]]","url":"$get[a]","autocomplete":"$get[b]","lyric":"$get[a1]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":$get[http],"status_2":$get[http2],"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"azlyrics","query":"$encodeURI[$env[query]]","url":"$get[a]","autocomplete":"$get[b]","lyric":"$deflate[$get[a1];hex]"}}]]
     ]
     ]
     ]

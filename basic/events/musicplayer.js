@@ -41,10 +41,11 @@ module.exports = {
     $defer
     $jsonLoad[result;$callFunction[getLyricsTrack;$if[$charCount[$trackInfo[title];-]==0;$advancedTextSplit[$trackInfo[author];-;0] - $advancedTextSplit[$trackInfo[title];(;0];$advancedTextSplit[$trackInfo[title];(;0]]]]
     $onlyIf[$env[result;results]!=;No lyrics for this track.]
-    $if[$charCount[$env[result;results;lyric]]>3900;$attachment[$env[result;results;lyric];lyrics-$getTimestamp.txt;true]]
+    $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
+    $if[$charCount[$get[loadlyrics]]>3900;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
     $!interactionUpdate[
     $title[$env[result;results;autocomplete];$env[result;results;url]]
-    $description[$codeBlock[$cropText[$env[result;results;lyric];0;3900;\n\n(Unfortunately, i can't show the rest of them.)]]]
+    $description[$codeBlock[$cropText[$get[loadlyrics];0;3900;\n\n(Unfortunately, i can't show the rest of them.)]]]
     $footer[$env[result;results;provider];$callFunction[useIcon;$env[result;results;provider]]]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp

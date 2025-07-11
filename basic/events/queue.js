@@ -45,7 +45,7 @@ module.exports = {
     $author[Queue ($separateNumber[$queueLength;.]);;;1]
     $description[$if[$queueLength==0;There's no track on this queue;$get[contains]];1]
     $color[$callFunction[useIcon;color_embed];1]
-    $if[$queueLength!=0;$thumbnail[$queue[0;1;{track.thumbnail}];1]]
+    $if[$queueLength!=0;$thumbnail[$if[$or[$queue[0;1;{track.thumbnail}]==null;$queue[0;1;{track.thumbnail}]==];$userDefaultAvatar[$authorID];$queue[0;1;{track.thumbnail}]];1]]
     $timestamp[;1]
     $if[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;
     $addActionRow

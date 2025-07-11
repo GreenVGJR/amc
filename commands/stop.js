@@ -26,8 +26,6 @@ module.exports = {
     $defer
     $!clearInterval[intervalmusicmessage_$guildID_$getVar[musicplayer_message;$guildID_channelid]]
     $if[$option[destroy];$leaveVoiceChannel;$!stopTrack]
-    $!deleteVar[musicplayer_message;$guildID_messageid]
-    $!deleteVar[musicplayer_message;$guildID_channelid]
     $!interactionFollowUp[OK]
     `
 }

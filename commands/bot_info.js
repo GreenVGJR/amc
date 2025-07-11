@@ -23,7 +23,7 @@ module.exports = {
   $if[$djsEval[(0, require("discord-player").useMainPlayer)().nodes.has(ctx.client.guilds.cache.get("$env[guilds]"))];$letSum[countnode;1]]
   ]]
 
-  $let[owner_banner;$userBanner[$botOwnerID;2048]]
+  $let[owner_banner;$try[$userBanner[$botOwnerID;2048]]]
 
   $author[$username[$authorID] / $botOwnerID;;;0]
   $title[Owner;;0]
