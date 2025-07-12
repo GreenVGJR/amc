@@ -85,7 +85,7 @@ music.player.extractors.register(YoutubeiExtractor, {
   disablePlayer: false,
   streamOptions: {
     useClient: "WEB_EMBEDDED",
-    highWaterMark: 2 * 1024 * 1024
+    highWaterMark: 1 * 1024 * 1024
   }
 });
 

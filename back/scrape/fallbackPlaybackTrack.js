@@ -24,7 +24,7 @@ module.exports = {
     $return[$env[filter_aa;$arrayFindIndex[filter_aa;filters_aa;$or[$env[filters_aa;itag]==251;$env[filters_aa;itag]==140;$env[filters_aa;itag]==18]];url]&cpn=$toLowercase[$randomString[16]]]
     ;
     $if[$env[whattype;type]==soundcloud;
-    $jsonLoad[test;$extractTrack[https://soundcloud.com/nurkomusic/nurko-tonight-ft-luma]]
+    $jsonLoad[test;$extractTrack[$env[url]]]
     $jsonLoad[loadres;$env[test;results]]
     $arrayMap[loadres;test2;$if[$env[test2;hydratable]==sound;$return[$env[test2]]];test3]
     $jsonLoad[test4;$env[test3;0;data;media;transcodings]]

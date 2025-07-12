@@ -1,8 +1,16 @@
 module.exports = {
   data: {
-  "type": 1,
   "name": "skip",
   "description": "Skip a track",
+  "options": [
+    {
+      "type": 4,
+      "name": "position",
+      "description": "Skip to specific track",
+      "min_value": 1,
+      "required": false,
+    },
+  ],
   "contexts": [
     0
   ],
@@ -21,15 +29,22 @@ module.exports = {
     $onlyIf[$get[nodes]!=0;Nothing to skip track.]
     $onlyIf[$getLoopMode!=TRACK;Disable loop mode to skip.]
 
+    $if[$option[position]!=;
+    $onlyIf[$sub[$option[position];1]<$queueLength;Nothing to skip on position: \`$option[position]\`]
+    ]
+
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
 
     $defer
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $let[cacinfo;$queue[0;1;{track.title}]]
+    $if[$option[position]!=;
+    $let[test;$skipTo[$sub[$option[position];1]]]
+    ;
     $let[test;$skipTrack]
+  ]
     $if[$get[test];
-    $!interactionFollowUp[Skipped to:$codeBlock[$get[cacinfo]]]
+    $!interactionFollowUp[Skipped.]
     ;
     $!interactionFollowUp[Failed to skip.]
     ]
