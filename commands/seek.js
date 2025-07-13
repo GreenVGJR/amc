@@ -21,14 +21,14 @@ module.exports = {
   code: `
     $onlyIf[$guildID!=;]
     $ephemeral
-    $onlyIf[$voiceID!=;You must join a voice channel.]
-    $onlyIf[$voiceID[$guildID;$clientID]!=;Nothing is playing.]
-    $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;You must same with <@$clientID> in <#$voiceID[$guildID;$clientID]>.]
+    $onlyIf[$voiceID!=;$callFunction[useCustomMusicMessage;config_errorJoin]]
+    $onlyIf[$voiceID[$guildID;$clientID]!=;$callFunction[useCustomMusicMessage;config_errorClientPlayer]]
+    $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
 
     $let[checkdurationms;$if[$hasMusicNode;$if[$isPlaying;$trackInfo[durationMS];0];0]]
-    $onlyIf[$get[checkdurationms]!=0;This track is LIVE.]
-    $onlyIf[$isPaused!=true;You can't seek while it's paused.]
-    $onlyIf[$getVar[musicplayer_message;$guildID_attemptseek;false]==false;It's still processing.]
+    $onlyIf[$get[checkdurationms]!=0;$callFunction[useCustomMusicMessage;config_errorLiveBeforeSeek]]
+    $onlyIf[$isPaused!=true;$callFunction[useCustomMusicMessage;config_errorPauseBeforeSeek]]
+    $onlyIf[$getVar[musicplayer_message;$guildID_attemptseek;false]==false;$callFunction[useCustomMusicMessage;config_errorProcessSeek]]
     
     $defer
 
@@ -46,9 +46,9 @@ module.exports = {
     $let[test;$seekTrack[$get[pest]]]
     $if[$get[test];
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[pest]]]
-    $!interactionFollowUp[Seek to \`$parseDigital[$get[pest]]\`]
+    $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalSeekTrack] \`$parseDigital[$get[pest]]\`]
     ;
-    $!interactionFollowUp[Failed to seek.]
+    $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalFailSeekTrack]]
     ]
     $setTimeout[$!interactionDelete;3s]
   `

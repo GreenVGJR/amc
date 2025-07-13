@@ -69,8 +69,8 @@ module.exports = [{
     code: `
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
-    $try[
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    $try[
     $!disableComponentsOf[$get[cid];$get[mid]]
     ]
     `

@@ -29,9 +29,9 @@ module.exports = {
     $addButton[musicplayer_actionplayer;;Secondary;⏸️;true]
     ]
     ;
-    $!leaveVoiceChannel
+    $try[$!leaveVoiceChannel]
     $sendMessage[$channelID;
-    $description[Can't process this.]
+    $description[$callFunction[useCustomMusicMessage;config_errorPlayTrackEvents]]
     $color[$callFunction[useIcon;error_color_embed]]
     $footer[event]]
     ]

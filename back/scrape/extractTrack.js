@@ -48,14 +48,6 @@ module.exports = {
     $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$replace[$replace[$get[a];/stream/hls;/stream/hls?client_id=$getGlobalVar[authmusic_soundcloud]];/stream/progressive;/stream/progressive?client_id=$getGlobalVar[authmusic_soundcloud]]]}]
     
     ]
-    $if[$env[filterid;type]==tiktok;
-
-    $httpAddHeader[User-Agent;$get[agent]]
-    $let[http;$httpRequest[https://$get[spliturl];GET;reshttp]]
-    $let[a;$advancedTextSplit[$env[reshttp];"webapp.video-detail":;1;,"webapp.;0]]
-    $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$get[a]]}]
-
-    ]
     $if[$env[filterid;type]==spotify;
     
     $httpAddHeader[User-Agent;$get[agent]]

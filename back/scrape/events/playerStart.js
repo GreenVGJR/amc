@@ -49,7 +49,7 @@ module.exports = {
     $if[$or[$getVar[musicplayer_message;$guildID_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[expectsecond];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$stop]
     $if[$getVar[musicplayer_message;$guildID_attemptseek]!=;$!deleteVar[musicplayer_message;$guildID_attemptseek]]
     $if[$messageExists[$env[channelId];$env[messageId]]==false;
-    $let[secmid;$sendMessage[$channelID;Seems like the current message wasn't exist. This will be use to continue interval.;true]]
+    $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;conifg_errorIntervalMessage];true]]
     $setVar[musicplayer_message;$guildID_channelid;$channelID]
     $setVar[musicplayer_message;$guildID_messageid;$get[secmid]]
     $stop

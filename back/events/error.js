@@ -6,15 +6,17 @@ module.exports = {
 
     $try[
     $!editMessage[$get[cid];$get[mid];
-    $description[Can't process this.\nError:$codeBlock[$env[error]]]
+    $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]$codeBlock[$env[error]]]
     $color[$callFunction[useIcon;error_color_embed]]
     $footer[event]
     $timestamp
     ]
     ]
     
+    $try[
     $if[$voiceID[$guildID;$clientID]!=;$!leaveVoiceChannel]
-
+    ]
+    
     $!deleteVar[musicplayer_message;$guildID_messageid]
     $!deleteVar[musicplayer_message;$guildID_channelid]
     $!deleteVar[musicplayer_message;$guildID_config_error]

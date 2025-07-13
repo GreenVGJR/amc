@@ -61,7 +61,7 @@ module.exports = {
   $defer
 
   $jsonLoad[loadser;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
-  $onlyIf[$env[loadser;0]!=;No result.]
+  $onlyIf[$env[loadser;0]!=;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
   $arrayLoad[results]
   $arraySlice[loadser;loadser;0;9]
   $arrayReverse[loadser;loadser]

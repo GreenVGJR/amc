@@ -22,15 +22,15 @@ module.exports = {
   code: `
     $onlyIf[$guildID!=;]
     $ephemeral
-    $onlyIf[$voiceID!=;You must join a voice channel.]
-    $onlyIf[$voiceID[$guildID;$clientID]!=;Nothing is playing.]
-    $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;You must same with <@$clientID> in <#$voiceID[$guildID;$clientID]>.]
+    $onlyIf[$voiceID!=;$callFunction[useCustomMusicMessage;config_errorJoin]]
+    $onlyIf[$voiceID[$guildID;$clientID]!=;$callFunction[useCustomMusicMessage;config_errorClientPlayer]]
+    $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
     $let[nodes;$if[$hasMusicNode;$queueLength;0]]
-    $onlyIf[$get[nodes]!=0;Nothing to skip track.]
-    $onlyIf[$getLoopMode!=TRACK;Disable loop mode to skip.]
+    $onlyIf[$get[nodes]!=0;$callFunction[useCustomMusicMessage;config_errorNoTrackBeforeSeek]]
+    $onlyIf[$getLoopMode!=TRACK;$callFunction[useCustomMusicMessage;config_errorPlayerBeforeSeek]]
 
     $if[$option[position]!=;
-    $onlyIf[$sub[$option[position];1]<$queueLength;Nothing to skip on position: \`$option[position]\`]
+    $onlyIf[$sub[$option[position];1]<$queueLength;$callFunction[useCustomMusicMessage;config_errorPositionBeforeSeek] \`$option[position]\`]
     ]
 
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
@@ -44,9 +44,9 @@ module.exports = {
     $let[test;$skipTrack]
   ]
     $if[$get[test];
-    $!interactionFollowUp[Skipped.]
+    $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalSkipTrack]]
     ;
-    $!interactionFollowUp[Failed to skip.]
+    $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalFailSkipTrack]]
     ]
     $setTimeout[$!interactionDelete;3s]
     `

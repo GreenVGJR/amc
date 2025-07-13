@@ -16,7 +16,7 @@ module.exports = {
 
   $let[nodes;$if[$hasMusicNode;$isPlaying;false]]
   $ephemeral
-  $onlyIf[$get[nodes];There's no active player.]
+  $onlyIf[$get[nodes];$callFunction[useCustomMusicMessage;config_errorNoQueue]]
   $defer
 
   $arrayload[rest;
@@ -45,7 +45,7 @@ module.exports = {
   $color[$callFunction[useIcon;color_embed];0]
   $footer[$toTitleCase[$if[$get[provider]==null;File;$get[provider]]];$callFunction[useIcon;$get[provider]];0]
   $author[Queue ($separateNumber[$queueLength;.]);;;1]
-  $description[$if[$queueLength==0;There's no track on this queue;$get[contains]];1]
+  $description[$if[$queueLength==0;$callFunction[useCustomMusicMessage;config_errorNoQueueList];$get[contains]];1]
   $color[$callFunction[useIcon;color_embed];1]
   $if[$queueLength!=0;$thumbnail[$if[$or[$queue[0;1;{track.thumbnail}]==null;$queue[0;1;{track.thumbnail}]==];$userDefaultAvatar[$authorID];$queue[0;1;{track.thumbnail}]];1]]
   $timestamp[;1]

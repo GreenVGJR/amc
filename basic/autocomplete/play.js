@@ -5,8 +5,8 @@ module.exports = {
     ],
     code: `
     $onlyIf[$and[$applicationCommandName==play;$focusedOptionName==query]]
-    $onlyIf[$guildID!=;$addChoice[\\[WARNING\\] Execute this Application in Server.;__null__]]
-    $onlyIf[$voiceID[$guildID;$authorID]!=;$addChoice[\\[WARNING\\] You must be on voice channel to use this.;__null1__]]
+    $onlyIf[$guildID!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearch];__null__]]
+    $onlyIf[$voiceID[$guildID;$authorID]!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchJoinVC];__null1__]]
     $onlyIf[$or[$focusedOptionValue!=;$getVar[cachesearchistory_user_autocomplete;$authorID]!=]]
 
     $if[$isValidLink[$focusedOptionValue]==false;

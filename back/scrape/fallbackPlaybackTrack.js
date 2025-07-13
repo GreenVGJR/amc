@@ -19,9 +19,11 @@ module.exports = {
     ]
 
     $jsonLoad[aa;$env[reshttp;streamingData;adaptiveFormats]]
-    $onlyIf[$or[$env[ab;contentLength]!=;$env[ab;contentLength]!=0];$return[live]]
     $jsonLoad[filter_aa;$arrayMap[aa;ab;$return[$replace[$env[ab];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$env[ab;contentLength];1]]]]
-    $return[$env[filter_aa;$arrayFindIndex[filter_aa;filters_aa;$or[$env[filters_aa;itag]==251;$env[filters_aa;itag]==140;$env[filters_aa;itag]==18]];url]&cpn=$toLowercase[$randomString[16]]]
+    $let[getcdnyt;$env[filter_aa;$arrayFindIndex[filter_aa;filters_aa;$or[$env[filters_aa;itag]==251;$env[filters_aa;itag]==140;$env[filters_aa;itag]==18]];url]]
+    $let[getcdnytlength;$env[filter_aa;$arrayFindIndex[filter_aa;filters_aa;$or[$env[filters_aa;itag]==251;$env[filters_aa;itag]==140;$env[filters_aa;itag]==18]];contentLength]]
+    $onlyIf[$or[$get[getcdnytlength]==;$get[getcdnytlength]==0]!=true;$return[live]]
+    $return[$get[getcdnyt]&cpn=$toLowercase[$randomString[16]]]
     ;
     $if[$env[whattype;type]==soundcloud;
     $jsonLoad[test;$extractTrack[$env[url]]]

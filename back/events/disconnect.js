@@ -7,7 +7,7 @@ module.exports = {
     $try[
     $if[$and[$getComponents[$get[cid];$get[mid];1;0;style]==Secondary;$getComponents[$get[cid];$get[mid];3;1;disabled]!=false];
     $!editMessage[$get[cid];$get[mid];
-    $description[Can't process this.]
+    $description[$callFunction[useCustomMusicMessage;config_errorPlayTrackEvents]]
     $color[$callFunction[useIcon;error_color_embed]]
     $footer[event]
     $timestamp

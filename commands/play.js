@@ -33,11 +33,11 @@ module.exports = {
   type: 0,
   code: `
   $onlyIf[$guildID!=;]
-  $onlyIf[$hasPerms[$guildID;$clientID;SendMessages];$ephemeral Missing Permission, **Send Messages** - <@$clientID>]
-  $onlyIf[$hasPerms[$guildID;$clientID;Connect];$ephemeral Missing Permission, **Connect** - <@$clientID>]
-  $onlyIf[$voiceID!=;$ephemeral You must join a voice channel.]
-  $onlyIf[$channelHasPerms[$voiceID;$clientID;Connect];$ephemeral Can't join to voice channel.\nReason: Missing Permission, **Connect** - <@$clientID> (<#$voiceID>)]
-  $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$ephemeral You must same with <@$clientID> in <#$voiceID[$guildID;$clientID]>.]
+  $onlyIf[$hasPerms[$guildID;$clientID;SendMessages];$ephemeral $callFunction[useCustomMusicMessage;config_errorPerm] **Send Messages** - <@$clientID>]
+  $onlyIf[$hasPerms[$guildID;$clientID;Connect];$ephemeral $callFunction[useCustomMusicMessage;config_errorPerm] **Connect** - <@$clientID>]
+  $onlyIf[$voiceID!=;$ephemeral $callFunction[useCustomMusicMessage;config_errorJoin]]
+  $onlyIf[$channelHasPerms[$voiceID;$clientID;Connect];$ephemeral $callFunction[useCustomMusicMessage;config_errorChannelPerm] $callFunction[useCustomMusicMessage;config_errorPerm] **Connect** - <@$clientID> (<#$voiceID>)]
+  $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
 
   $defer
  
@@ -52,7 +52,7 @@ module.exports = {
   $let[cac2;$env[result;id]]
   $onlyIf[$and[$get[cac1]!=;$get[cac2]!=];
   $interactionFollowUp[
-  $description[No results found.]
+  $description[$callFunction[useCustomMusicMessage;config_errorNoResult]]
   $color[$callFunction[useIcon;error_color_embed]]
   $footer[slash]
   $timestamp
@@ -136,7 +136,7 @@ module.exports = {
 
   $if[$get[attemptry]>=$get[donetry];
   $!interactionUpdate[
-  $description[Can't process this.\nError: $codeBlock[$env[causeplayerror]]]
+  $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack] $codeBlock[$env[causeplayerror]]]
   $color[$callFunction[useIcon;error_color_embed]]
   $timestamp
   $footer[slash]
@@ -159,13 +159,13 @@ module.exports = {
   $async[
   $setTimeout[
   $if[$messageExists[$channelID;$get[mid]];$!deleteMessage[$channelID;$get[mid]]]
-  ;5s]
+  ;3s]
   ]
   $if[$option[force_skip]==true;
   $let[mid2;$sendMessage[$channelID;
     $reply[$channelID;$get[mid];true]
     $color[$callFunction[useIcon;color_embed]]
-    $footer[Attempting to Skip...;$callFunction[useIcon;loading]]
+    $footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;loading]]
   ;true]]
   $!skipTo[$sub[$queueLength;1]]
   $!deleteMessage[$channelID;$get[mid2]]
