@@ -1,9 +1,8 @@
 <div align="center">
   <img src="https://github-readme-stats.vercel.app/api/pin/?username=greenvgjr&repo=amc-discord-bot&theme=dark" alt=""/>
-  <p><b><br>Discord music bot built-in with various libraries and version</b></p>
+  <p><b><br>Discord music bot for ForgeScript and BDFD</b></p>
   <div>
   <a href="https://github.com/tryforge/ForgeScript"><img src="https://github.com/user-attachments/assets/ce7c0de3-1ad2-4d5d-a60b-2bf9c3da1f64" loading="lazy" width=50 height=50 alt="Forgescript"/></a>
-  <a href="https://github.com/aoijs/aoi.js"><img src="https://github.com/user-attachments/assets/b71fd559-d747-4c87-902f-10f84aa67d2e" loading="lazy" width=50 height=50 alt="Aoi.js"/></a>
   <a href="https://botdesignerdiscord.com/"><img src="https://github.com/user-attachments/assets/c1f59eee-9fec-4b95-8365-eb21422668e3" loading="lazy" width=50 height=50 alt="Bdfd"/></a>
   </div>
 </div>
@@ -22,23 +21,6 @@
 #### Dev
 > [Local](https://github.com/GreenVGJR/amc-discord-bot/tree/fs-dev-local)<br>
 > [Lavalink](https://github.com/GreenVGJR/amc-discord-bot/tree/fs-dev-lavalink)
-
-#### Main (stable)
-> Local<br>
-> Lavalink
-
-</details>
-<details close>
-
-<summary>
-
-## Aoi.js
-  
-</summary>
-
-#### Dev
-> Local (Soon)<br>
-> Lavalink (Soon)
 
 #### Main (stable)
 > Local<br>
