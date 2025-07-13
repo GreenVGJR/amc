@@ -23,7 +23,7 @@
 > [Lavalink](https://github.com/GreenVGJR/amc-discord-bot/tree/fs-dev-lavalink)
 
 #### Main (stable)
-> Local<br>
+> [Local](https://github.com/GreenVGJR/amc-discord-bot/tree/fs-main-local)<br>
 > Lavalink
 
 </details>
