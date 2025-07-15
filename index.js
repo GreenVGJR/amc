@@ -101,11 +101,12 @@ client.commands.add({
     $setInterval[$setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk];1m]
 
     $let[typedebug;$callFunction[configMusic;debug_auth]]
+    $if[$get[typedebug]==false;$log[\nLogged as $userTag[$clientID]\n]]
 
     $localFunction[refreshkey;
     $if[$env[refresh]==true;
     ]
-    $if[$get[typedebug];$chalkLog[\n--- Auth Check ---\n;blue];$log[\nLogged as $username[$clientID]\n]]
+    $if[$get[typedebug];$chalkLog[\n--- Auth Check ---\n;blue]]
     $let[lyric1;$getGlobalVar[authmusic_azlyrics]]
 
     $let[aa;$getGlobalVar[authmusic_youtube_key]]
