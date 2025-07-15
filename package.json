@@ -4,7 +4,7 @@
     "@tryforge/forge.music": "^1.0.0",
     "@tryforge/forgescript": "github:tryforge/ForgeScript#dev",
     "discord-player-soundcloud": "^1.0.7",
-    "discord-player-youtubei": "^1.4.6",
+    "discord-player-youtubei": "^1.4.7-beta.2",
     "dotenv": "^16.5.0",
     "ffmpeg-static": "^5.2.0",
     "forgeyoutube": "github:zack-911/forgeyoutube#dev",

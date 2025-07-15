@@ -38,6 +38,10 @@ const music = new ForgeMusic({
         "playerFinish",
         ],
     includeExtractors: DefaultExtractors,
+    connectOptions: {
+        bufferingTimeout: 0,
+        connectionTimeout: 60000
+    },
     connectionTimeout: 86400000,
     probeTimeout: 86400000,
     lagMonitor: 86400000
@@ -85,13 +89,16 @@ music.commands.load("back/events") // Events
 
 music.player.extractors.register(SoundcloudExtractor, {});
 music.player.extractors.register(YoutubeiExtractor, {
-  generateWithPoToken: true,
-  ignoreSignInErrors: true,
-  forceRevalidate: true,
-  disablePlayer: false,
-  streamOptions: {
-    useClient: "WEB_EMBEDDED"
-  }
+    generateWithPoToken: true,
+    ignoreSignInErrors: true,
+    forceRevalidate: true,
+    disablePlayer: false,
+    streamOptions: {
+        useClient: "WEB_EMBEDDED"
+    },
+    overrideDownloadOptions: {
+        client: "WEB"
+    },
 });
 
 client.commands.add({
