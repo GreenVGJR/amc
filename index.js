@@ -10,6 +10,12 @@ const { ForgeYoutube } = require("forgeyoutube");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const { SoundcloudExtractor } = require("discord-player-soundcloud");
 
+const { Agent, setGlobalDispatcher } = require('undici');
+setGlobalDispatcher(new Agent({
+  headersTimeout: 0,
+  bodyTimeout: 0
+}));
+
 require('dotenv').config(); // Load Environment
 
 const youtube = new ForgeYoutube({
@@ -26,7 +32,7 @@ const db = new ForgeDB({
 
 const music = new ForgeMusic({
     events: [
-        "connection",
+     // "connection",
         "connectionDestroyed",
         "disconnect",
         "emptyQueue",
@@ -40,7 +46,7 @@ const music = new ForgeMusic({
     includeExtractors: DefaultExtractors,
     connectOptions: {
         bufferingTimeout: 0,
-        connectionTimeout: 60000
+        connectionTimeout: 300000
     },
     connectionTimeout: 86400000,
     probeTimeout: 86400000,
@@ -93,12 +99,11 @@ music.player.extractors.register(YoutubeiExtractor, {
     ignoreSignInErrors: true,
     forceRevalidate: true,
     disablePlayer: false,
+    slicePlaylist: true,
     streamOptions: {
-        useClient: "WEB_EMBEDDED"
-    },
-    overrideDownloadOptions: {
-        client: "WEB"
-    },
+        useClient: "WEB_EMBEDDED",
+        highWaterMark: 1<<25
+    }
 });
 
 client.commands.add({

@@ -39,7 +39,11 @@ module.exports = {
   $onlyIf[$channelHasPerms[$voiceID;$clientID;Connect];$ephemeral $callFunction[useCustomMusicMessage;config_errorChannelPerm] $callFunction[useCustomMusicMessage;config_errorPerm] **Connect** - <@$clientID> (<#$voiceID>)]
   $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
 
-  $defer
+  $let[mid;$interactionReply[
+  $footer[Fetching;$callFunction[useIcon;loading]]
+  $color[$callFunction[useIcon;color_embed]]
+  $timestamp
+  ;true]]
  
   $let[default_provider;$callFunction[configMusic;default_provider]]
   $let[fallback_provider;$callFunction[configMusic;fallback_provider]]
@@ -78,27 +82,6 @@ module.exports = {
   $let[music_playurl;$option[query]]
   ]
 
-  $if[$get[basic_type]==true;
-  $let[mid;$interactionFollowUp[
-  $addField[Requested By;$get[music_requestedBy];false]
-  $addField[Title;$get[music_title];true]
-  $addField[Duration;$if[$get[music_duration]==0;LIVE;$parseDigital[$get[music_duration]]];true]
-  $thumbnail[$get[music_thumbnail]]
-  $timestamp
-  $color[$callFunction[useIcon;color_embed]]
-  $footer[Fetching$if[$get[isforcedirect]; (DIRECT CDN)];$callFunction[useIcon;loading]]
-  ;true]]
-  ;
-  $let[mid;$interactionFollowUp[
-  $addField[Requested By;<@$authorID>;false]
-  $addField[Query;$codeBlock[$cropText[$option[query];0;1016]];false]
-  $footer[Fetching;$callFunction[useIcon;loading]]
-  $thumbnail[$userAvatar[$authorID;1024]]
-  $timestamp
-  $color[$callFunction[useIcon;color_embed]]
-  ;true]]
-  ]
-
   $let[queue_lengthtemp;$if[$hasMusicNode;$queueLength;0]]
   $if[$or[$getVar[musicplayer_message;$guildID_channelid;null]==null;$voiceID[$guildID;$clientID]==];
   $setVar[musicplayer_message;$guildID_channelid;$channelID]
@@ -115,7 +98,7 @@ module.exports = {
   $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==soundcloud]!=true;
   $playTrack[$voiceID;$get[music_playurl];$env[whatmusictype;type]]
   ;
-  $playTrack[$voiceID;$get[music_playurl]]
+  $playTrack[$voiceID;$get[music_playurl];auto]
   ]
   ;
   $letSum[attemptry;1]
@@ -126,7 +109,7 @@ module.exports = {
     $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==soundcloud]!=true;
     $playTrack[$voiceID;$get[music_playurl];$env[whatmusictype;type]]
     ;
-    $playTrack[$voiceID;$get[music_playurl]]
+    $playTrack[$voiceID;$get[music_playurl];auto]
     ]
     $let[found;true]
     ;
