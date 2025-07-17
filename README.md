@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github-readme-stats.vercel.app/api/pin/?username=greenvgjr&repo=amc-discord-bot&theme=dark" alt=""/>
+  <img src="https://github-readme-stats.vercel.app/api/pin/?username=greenvgjr&repo=amc-discord-bot&theme=dark&cache=1" alt=""/>
   <p><b><br>Discord music bot for ForgeScript and BDFD</b></p>
   <div>
   <a href="https://github.com/tryforge/ForgeScript"><img src="https://github.com/user-attachments/assets/ce7c0de3-1ad2-4d5d-a60b-2bf9c3da1f64" loading="lazy" width=50 height=50 alt="Forgescript"/></a>
