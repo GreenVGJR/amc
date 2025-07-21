@@ -7,6 +7,7 @@ module.exports = {
     $onlyIf[$and[$applicationCommandName==play;$focusedOptionName==query]]
     $onlyIf[$guildID!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearch];__null__]]
     $onlyIf[$voiceID[$guildID;$authorID]!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchJoinVC];__null1__]]
+    $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];__null2__]]
     $onlyIf[$or[$focusedOptionValue!=;$getVar[cachesearchistory_user_autocomplete;$authorID]!=]]
 
     $if[$isValidLink[$focusedOptionValue]==false;
@@ -17,7 +18,7 @@ module.exports = {
     $addChoice[$if[$focusedOptionValue==;$getVar[cachesearchistory_user_autocomplete;$authorID];$focusedOptionValue];$if[$focusedOptionValue==;$getVar[cachesearchistory_user_autocomplete;$authorID];$focusedOptionValue]]
     ;
     $while[$charCount[$env[testing;results;$sum[$get[count];1]]]!=0;
-    $addChoice[$env[testing;results;$sum[$get[count];1]];$env[testing;results;$sum[$get[count];1]]]
+    $addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;$sum[$get[count];1]];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;$sum[$get[count];1]];";\\\\"]")]]
     $letSum[count;1]
     ]
     ]

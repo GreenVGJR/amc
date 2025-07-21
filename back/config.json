@@ -4,5 +4,6 @@
     "fallback_provider": "soundcloud",
 
     "debug_auth": false,
-    "autodelete_nextmessage": false
+    "autodelete_nextmessage": false,
+    "interval_message": false
 }

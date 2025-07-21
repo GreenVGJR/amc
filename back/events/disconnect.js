@@ -4,8 +4,10 @@ module.exports = {
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
 
+    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+
     $try[
-    $if[$and[$getComponents[$get[cid];$get[mid];1;0;style]==Secondary;$getComponents[$get[cid];$get[mid];3;1;disabled]!=false];
+    $if[$or[$and[$getVar[radioplayer_data;$guildID_playerstatus;false]==true;$getVar[radioplayer_data;$guildID_checkplayer;false]==true];$and[$getComponents[$get[cid];$get[mid];1;0;style]==Secondary;$getComponents[$get[cid];$get[mid];3;1;disabled]!=false;$getVar[radioplayer_data;$guildID_playerstatus;false]==false;$getVar[radioplayer_data;$guildID_checkplayer;false]==false]];
     $!editMessage[$get[cid];$get[mid];
     $description[$callFunction[useCustomMusicMessage;config_errorPlayTrackEvents]]
     $color[$callFunction[useIcon;error_color_embed]]
@@ -13,7 +15,7 @@ module.exports = {
     $timestamp
     ]
     ]
-    $if[$getComponents[$get[cid];$get[mid];3;1;disabled]==false;
+    $if[$or[$getComponents[$get[cid];$get[mid];3;1;disabled]==false;$and[$getVar[radioplayer_data;$guildID_playerstatus;false]==true;$getComponents[$get[cid];$get[mid];1;1;disabled]==false]];
     $!disableComponentsOf[$get[cid];$get[mid]]
     ]
     ]
@@ -22,5 +24,7 @@ module.exports = {
     $!deleteVar[musicplayer_message;$guildID_channelid]
     $!deleteVar[musicplayer_message;$guildID_isshuffle]
     $!deleteVar[musicplayer_message;$guildID_attemptseek]
+    $!deleteVar[radioplayer_data;$guildID_playerstatus]
+    $!deleteVar[radioplayer_data;$guildID_metadata]
     `
 }

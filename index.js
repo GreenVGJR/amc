@@ -10,12 +10,6 @@ const { ForgeYoutube } = require("forgeyoutube");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const { SoundcloudExtractor } = require("discord-player-soundcloud");
 
-const { Agent, setGlobalDispatcher } = require('undici');
-setGlobalDispatcher(new Agent({
-  headersTimeout: 0,
-  bodyTimeout: 0
-}));
-
 require('dotenv').config(); // Load Environment
 
 const youtube = new ForgeYoutube({
@@ -46,17 +40,18 @@ const music = new ForgeMusic({
     includeExtractors: DefaultExtractors,
     connectOptions: {
         bufferingTimeout: 0,
-        connectionTimeout: 300000
+        connectionTimeout: 300000,
+        leaveOnEmpty: true
     },
     connectionTimeout: 86400000,
-    probeTimeout: 86400000,
-    lagMonitor: 86400000
+    probeTimeout: 0,
+    lagMonitor: 0
     // For avoids connect error thing
 });
 
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
-    logLevel: LogPriority.Low,
+    logLevel: LogPriority.VeryLow,
     shards: "auto",
     shardCount: 3,
     intents: [
@@ -88,7 +83,7 @@ client.functions.load("back/scrape") // Custom Functions
 client.commands.load("basic/autocomplete") // Autocomplete
 client.commands.load("basic/events") // Events
 
-// client.commands.load("basic/commands") // Basic Command
+client.commands.load("basic/commands") // Basic Command
 client.applicationCommands.load("commands") // Slash Command
 
 music.commands.load("back/events") // Events
@@ -102,18 +97,22 @@ music.player.extractors.register(YoutubeiExtractor, {
     slicePlaylist: true,
     streamOptions: {
         useClient: "WEB_EMBEDDED",
-        highWaterMark: 1<<25
+        highWaterMark: 2 * 1024 * 1024
     }
 });
 
 client.commands.add({
     type: "ready",
     code: `
+    $async[
     $setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk]
     $setInterval[$setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk];1m]
+    ]
+
+    $!djsEval[try { console.clear() } catch {}]
 
     $let[typedebug;$callFunction[configMusic;debug_auth]]
-    $if[$get[typedebug]==false;$log[\nLogged as $userTag[$clientID]\n]]
+    $if[$get[typedebug]==false;$log[\nWelcome!\n$userTag[$clientID]\n]]
 
     $localFunction[refreshkey;
     $if[$env[refresh]==true;
@@ -203,9 +202,11 @@ db.commands.add({
     code: `
     $chalkLog[--- Refreshing Cache ---;blue]
     $deleteRecords[cachesearchistory_user_autocomplete]
-    $log[OK]
+    $log[OK - Autocomplete]
     $deleteRecords[musicplayer_message]
-    $log[OK]
+    $log[OK - Music Player]
+    $deleteRecords[radioplayer_data]
+    $log[OK - Radio Player]
     $!setGlobalVar[authmusic_youtube_key;]
     $!setGlobalVar[authmusic_soundcloud;]
     $!setGlobalVar[authmusic_spotify;]

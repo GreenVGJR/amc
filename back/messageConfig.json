@@ -12,6 +12,7 @@
 
     "config_errorAttemptSearch": "[WARNING] Execute this Application in Server.",
     "config_errorAttemptSearchJoinVC": "[WARNING] You must be on voice channel to use this.",
+    "config_errorAttemptRadioPlayer": "[WARNING] Stop the current active player before switching player.",
 
     "config_errorNoResult": "No results found.",
     "config_errorNoResultSearch": "No result.",
@@ -40,5 +41,7 @@
     "config_generalFailSeekTrack": "Failed to seek.",
     "config_generalStopTrack": "OK",
     "config_generalSkipTrack": "Skipped.",
-    "config_generalVolumeTrack": "Volume changed to:"
+    "config_generalVolumeTrack": "Volume changed to:",
+
+    "config_errorRadioPlayer": "Stop the current active player before switching player."
 }

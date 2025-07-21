@@ -1,5 +1,8 @@
 module.exports = {
     name: "eval",
     type: "messageCreate",
-    code: `$eval[$message]`
+    code: `
+    $onlyIf[$botOwnerID==$authorID]
+    $eval[$message]
+    `
 }

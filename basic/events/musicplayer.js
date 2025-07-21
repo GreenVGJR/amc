@@ -117,6 +117,6 @@ module.exports = {
     "playlist": null
     }]
 
-    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[testmessage;0];false;intervalmusicmessage_$guildID_$get[cid];$guildID;true]
+    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[testmessage;0];false;intervalmusicmessage_$guildID_$get[cid];$guildID;true;$callFunction[configMusic;interval_message]]
     `
 }

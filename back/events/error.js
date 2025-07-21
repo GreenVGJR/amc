@@ -19,8 +19,9 @@ module.exports = {
     
     $!deleteVar[musicplayer_message;$guildID_messageid]
     $!deleteVar[musicplayer_message;$guildID_channelid]
-    $!deleteVar[musicplayer_message;$guildID_config_error]
     $!deleteVar[musicplayer_message;$guildID_isshuffle]
     $!deleteVar[musicplayer_message;$guildID_attemptseek]
+    $!deleteVar[radioplayer_data;$guildID_playerstatus]
+    $!deleteVar[radioplayer_data;$guildID_metadata]
     `
 }

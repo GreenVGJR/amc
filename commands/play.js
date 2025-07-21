@@ -13,13 +13,13 @@ module.exports = {
     {
       "type": 5,
       "name": "force_skip",
-      "description": "Instantly skip track after adding track",
+      "description": "Instantly skip current track after adding track",
       "required": false,
     },
     {
       "type": 5,
       "name": "direct_cdn",
-      "description": "Use's Direct CDN after searching track",
+      "description": "Uses Direct CDN after searching track to play",
       "required": false,
     }
   ],
@@ -39,7 +39,10 @@ module.exports = {
   $onlyIf[$channelHasPerms[$voiceID;$clientID;Connect];$ephemeral $callFunction[useCustomMusicMessage;config_errorChannelPerm] $callFunction[useCustomMusicMessage;config_errorPerm] **Connect** - <@$clientID> (<#$voiceID>)]
   $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
 
+  $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
+
   $let[mid;$interactionReply[
+  $addField[Query;$codeBlock[$option[query]]]
   $footer[Fetching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   $timestamp
