@@ -41,6 +41,7 @@ ___
 | ------------- | ------------- |
 | Youtube       | Youtube       |
 | Soundcloud    | Soundcloud    |
+| -             | Spotify       |
 | Local/HTTP    | Local/HTTP    |
 
 
@@ -63,6 +64,7 @@ ___
 - Dynamic message
 - Controller
 - Queue
+- Seek
 - Skip song
 - Change Volume
 - Stop song
