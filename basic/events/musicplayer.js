@@ -79,7 +79,7 @@ module.exports = {
     $ephemeral
     $defer
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $let[curduration;$callFunction[musicVirtualDuration;$guildID;$get[cid]]]
+    $let[curduration;$if[$callFunction[configMusic;interval_message];$callFunction[musicVirtualDuration;$guildID;$get[cid]];$playerElapsedTime]]
     $let[seeks;10000]
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sub[$get[curduration];$get[seeks]]]]
     $setVar[musicplayer_message;$guildID_attemptseek;true]
@@ -92,7 +92,7 @@ module.exports = {
     $ephemeral
     $defer
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $let[curduration;$callFunction[musicVirtualDuration;$guildID;$get[cid]]]
+    $let[curduration;$if[$callFunction[configMusic;interval_message];$callFunction[musicVirtualDuration;$guildID;$get[cid]];$playerElapsedTime]]
     $let[seeks;10000]
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sum[$get[curduration];$get[seeks]]]]
     $setVar[musicplayer_message;$guildID_attemptseek;true]

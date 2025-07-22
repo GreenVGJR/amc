@@ -94,7 +94,7 @@ module.exports = {
     $footer[Requested by: $username[$get[requestedBy]];$userAvatar[$get[requestedBy];512];0]
     $author[Now Playing;;;1]
     $title[$cropText[$env[jsonmusicdata;title];0;253;...];$env[jsonmusicdata;url];1]
-    $if[$get[delayping];$description[Bad connection.\nThe current music playing may be sound robotic.;1]]
+    $if[$and[$get[delayping];$env[toggleInterval]];$description[Bad connection.\nThe current music playing may be sound robotic.;1]]
     $addField[Requested By;<@$env[jsonmusicdata;requestedBy;id]>;false;1]
     $addField[Owner;\`$env[jsonmusicdata;author]\`;true;1]
     $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]LIVE;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]$parseDigital[$env[jsonmusicdata;durationMS]]];true;1]
@@ -106,7 +106,7 @@ module.exports = {
     ;
     $author[Now Playing;;;0]
     $title[$cropText[$env[jsonmusicdata;title];0;253;...];$env[jsonmusicdata;url];0]
-    $if[$get[delayping];$description[Bad connection.\nThe current music playing may be sound robotic.;0]]
+    $if[$and[$get[delayping];$env[toggleInterval]];$description[Bad connection.\nThe current music playing may be sound robotic.;0]]
     $addField[Requested By;<@$env[jsonmusicdata;requestedBy;id]>;false;0]
     $addField[Owner;\`$env[jsonmusicdata;author]\`;true;0]
     $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]LIVE;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]$parseDigital[$env[jsonmusicdata;durationMS]]];true;0]
