@@ -75,6 +75,7 @@ ___
 - Dynamic info message
 - Show suggestion song name
 - Controller
+- Radio
 - Queue
 - Skip song
 - Seek to specific duration
@@ -93,7 +94,10 @@ ___
 
 </summary>
 
-![Preview 1](https://github.com/user-attachments/assets/8bb08356-e66a-4557-9e2e-b9688edf53b7)
-![Preview 2](https://github.com/user-attachments/assets/328df602-1054-4d53-9ecc-02d4492f9f34)
+![Preview 1](https://github.com/user-attachments/assets/8b816b71-9d0a-48cf-8909-ba0f28b15d00)
+![Preview 2](https://github.com/user-attachments/assets/608c5871-6a98-4672-9a48-63a716a85090)
+![Preview 3](https://github.com/user-attachments/assets/dba3cf06-760b-4a6d-a474-674df7d7ffcc)
+![Preview 4](https://github.com/user-attachments/assets/3d35f946-8717-4021-b137-f6b9e73d3409)
+![Preview 5](https://github.com/user-attachments/assets/302d5348-3466-4d5d-bd9c-0bb2153b0e2f)
 
 </details>

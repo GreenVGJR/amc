@@ -8,6 +8,10 @@ module.exports = {
     code: `
     $onlyIf[$isValidLink[$env[url]];$return[null]]
     $jsonLoad[whattype;$callFunction[filterMediaID;$env[url]]]
+    $localFunction[oncecode;
+    $let[trycount;0]
+    $onlyIf[$get[trycount]<3;$return[null]]
+    $if[$env[retry];$letSum[trycount;1]]
     $if[$env[whattype;type]==youtube;
 
     $let[videoid;$env[whattype;id]]
@@ -23,7 +27,13 @@ module.exports = {
     $let[getcdnyt;$env[filter_aa;$arrayFindIndex[filter_aa;filters_aa;$or[$env[filters_aa;itag]==251;$env[filters_aa;itag]==140;$env[filters_aa;itag]==18]];url]]
     $let[getcdnytlength;$env[filter_aa;$arrayFindIndex[filter_aa;filters_aa;$or[$env[filters_aa;itag]==251;$env[filters_aa;itag]==140;$env[filters_aa;itag]==18]];contentLength]]
     $onlyIf[$or[$get[getcdnytlength]==;$get[getcdnytlength]==0]!=true;$return[live]]
-    $return[$get[getcdnyt]&cpn=$toLowercase[$randomString[16]]]
+    $let[finalurl;$get[getcdnyt]&cpn=$toLowercase[$randomString[16]]]
+    $try[
+    $onlyIf[$httpRequest[$get[finalurl];HEAD]==200;$callLocalFunction[oncecode;true]]
+    ;
+    $callLocalFunction[oncecode;true]
+    ]
+    $return[$trimLines[$get[finalurl]]]
     ;
     $if[$env[whattype;type]==soundcloud;
     $jsonLoad[test;$extractTrack[$env[url]]]
@@ -32,8 +42,15 @@ module.exports = {
     $jsonLoad[test4;$env[test3;0;data;media;transcodings]]
     $arrayMap[test4;test5;$if[$env[test5;format;protocol]==progressive;$return[$env[test5]]];test6]
     $!httpRequest[$env[test6;0;url]&track_authorization=$env[test3;0;data;track_authorization];GET;rest]
-    $return[$env[rest;url]]
+    $let[finalurl;$env[rest;url]]
+    $try[
+    $onlyIf[$httpRequest[$get[finalurl];HEAD]==200;$callLocalFunction[oncecode;true]]
+    ;
+    $callLocalFunction[oncecode;true]
+    ]
+    $return[$trimLines[$get[finalurl]]]
     ]]
-    $return[null]
+    ;retry]
+    $callLocalFunction[oncecode;false]
     `
 }

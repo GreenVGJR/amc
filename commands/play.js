@@ -75,7 +75,7 @@ module.exports = {
   $let[tempstoreurl;$if[$get[default_provider]==youtube;https://youtube.com/watch?v=$env[result;id];$if[$get[default_provider]==soundcloud;https://soundcloud.com/$env[result;id]]]]
 
   $if[$get[isforcedirect]==true;
-  $let[music_playurl;$callFunction[fallbackPlaybackTrack;$get[tempstoreurl]]]
+  $let[music_playurl;$trimLines[$callFunction[fallbackPlaybackTrack;$get[tempstoreurl]]]]
   $if[$or[$get[music_playurl]==live;$get[music_playurl]==null]==true;$let[music_playurl;$get[tempstoreurl]] $let[isforcedirect;false]]
   ;
   $let[music_playurl;$get[tempstoreurl]]

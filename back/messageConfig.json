@@ -36,12 +36,12 @@
 
     "conifg_errorIntervalMessage": "Seems like the current message wasn't exist. This will be use to continue interval.",
 
+    "config_errorRadioPlayer": "Stop the current active player before switching player.",
+
     "config_generalForceSkipTrack": "Attempting to Skip...",
     "config_generalSeekTrack": "Seek to",
     "config_generalFailSeekTrack": "Failed to seek.",
     "config_generalStopTrack": "OK",
     "config_generalSkipTrack": "Skipped.",
-    "config_generalVolumeTrack": "Volume changed to:",
-
-    "config_errorRadioPlayer": "Stop the current active player before switching player."
+    "config_generalVolumeTrack": "Volume changed to:"
 }

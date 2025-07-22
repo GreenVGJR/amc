@@ -59,22 +59,32 @@ module.exports = {
 
   $ephemeral
   $defer
-
+  $let[check;$getVar[cachesearch_global;$md5[$option[query]$option[provider]];null]]
+  $if[$get[check]==null;
   $jsonLoad[loadser;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
   $onlyIf[$env[loadser;0]!=;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
-  $arrayLoad[results]
-  $arraySlice[loadser;loadser;0;9]
-  $arrayReverse[loadser;loadser]
-  $let[count;0]
-  $!interactionFollowUp[
-  $arrayForEach[loadser;result;
-  $author[$env[result;title];;;$get[count]]
-  $addField[URL;$env[result;url];true;$get[count]]
-  $addField[Duration;$env[result;duration];true;$get[count]]
-  $thumbnail[$if[$or[$env[result;thumbnail]==null;$env[result;thumbnail]==];$userDefaultAvatar[$authorID];$env[result;thumbnail]];$get[count]]
-  $color[aa$randomBytes[2];$get[count]]
-  $letSum[count;1]
+  ;
+  $jsonLoad[loadser;$inflate[$get[check];base64]]
   ]
+  $arrayLoad[results]
+  $arraySlice[loadser;loadser;0;10]
+  $arrayReverse[loadser;loadser]
+  $!interactionUpdate[
+  $addContainer[
+  $addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$round[$executionTime;0]ms\`]
+  $addSeparator[Large;true]
+  $arrayForEach[loadser;result;
+  $addSection[
+  $addTextDisplay[
+  > ### $replace[$env[result;title];#;\\\\#]
+  > $env[result;url]
+
+  Duration: \`$if[$and[$advancedTextSplit[$env[result;duration];:;1]==;$advancedTextSplit[$env[result;duration];:;2]==];$advancedTextSplit[$env[result;duration];:;0];$if[$advancedTextSplit[$env[result;duration];:;0]==00;$advancedTextSplit[$env[result;duration];:;1]:$advancedTextSplit[$env[result;duration];:;2];$env[result;duration]]]\`
+  ]
+  $addThumbnail[$if[$or[$env[result;thumbnail]==null;$env[result;thumbnail]==];$userDefaultAvatar[$authorID];$env[result;thumbnail]]]
+  ]
+  ]
+  ;aa$randomBytes[2]]
   ]
   `
 }

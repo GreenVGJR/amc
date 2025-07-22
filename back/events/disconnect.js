@@ -7,7 +7,7 @@ module.exports = {
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
 
     $try[
-    $if[$or[$and[$getVar[radioplayer_data;$guildID_playerstatus;false]==true;$getVar[radioplayer_data;$guildID_checkplayer;false]==true];$and[$getComponents[$get[cid];$get[mid];1;0;style]==Secondary;$getComponents[$get[cid];$get[mid];3;1;disabled]!=false;$getVar[radioplayer_data;$guildID_playerstatus;false]==false;$getVar[radioplayer_data;$guildID_checkplayer;false]==false]];
+    $if[$or[$and[$getVar[radioplayer_data;$guildID_playerstatus;false]==true;$getVar[radioplayer_data;$guildID_checkplayer;false]==true];$and[$getComponents[$get[cid];$get[mid];0]==;$getVar[radioplayer_data;$guildID_playerstatus;false]==false;$getVar[radioplayer_data;$guildID_checkplayer;false]==false];$and[$getComponents[$get[cid];$get[mid];1;0;style]==Secondary;$getComponents[$get[cid];$get[mid];3;1;disabled]!=false;$getVar[radioplayer_data;$guildID_playerstatus;false]==false;$getVar[radioplayer_data;$guildID_checkplayer;false]==false]];
     $!editMessage[$get[cid];$get[mid];
     $description[$callFunction[useCustomMusicMessage;config_errorPlayTrackEvents]]
     $color[$callFunction[useIcon;error_color_embed]]

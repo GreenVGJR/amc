@@ -51,7 +51,7 @@ const music = new ForgeMusic({
 
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
-    logLevel: LogPriority.VeryLow,
+    logLevel: LogPriority.Low,
     shards: "auto",
     shardCount: 3,
     intents: [
@@ -130,7 +130,7 @@ client.commands.add({
     $if[$get[typedebug];$chalkLog[AZLyrics        :  $if[$get[lyric1]!=;✅;❌]\n
 Youtube         :  $if[$get[aa]!=;✅;❌]
 Soundcloud      :  $if[$get[b]!=;✅;❌]
-Spotify         :  $if[$get[c]!=;✅;❌]
+Spotify         :  $if[$get[c]!=;✅;❌] | (Constant Refresh)
 Amazon Music    :  $if[$get[d]!=;✅;❌]
 Deezer          :  $if[$get[e]!=;✅;❌] | (Constant Refresh);red]]
     $if[$get[typedebug];$chalkLog[\nLast update: $get[z] / $parseDate[$multi[$get[z];1000];ISO]\n$if[$get[z]!=0;This will auto update every a hour or you do starts this bot.\n];blue]]
@@ -169,24 +169,13 @@ Deezer          :  $if[$get[e]!=;✅;❌] | (Constant Refresh);red]]
     ;$log[Failed to Retrieve - Soundcloud]]
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Soundcloud          | ClientID;cyan]]
     ]
-    $if[$or[$get[c]==;$env[refresh]==true];
-    $try[
-    $async[
-        $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\; Win64\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36]
-        $!httpRequest[https://open.spotify.com/embed/track/$randomText[4PTG3Z6ehGkBFwjybzWkR8;2yR2sziCF4WEs3klW1F38d;0IuVhCflrQPMGRrOyoY5RW;2yWlGEgEfPot0lv3OAjuG3;4Xfp9BcKrKYmxJPxn68Yb8;7uuJqaRjSXzja6VGgDpWem;3BP1klbHxsOf6IxscNIX0r;6BYzwbWg1Z2EB6VUXTYnhm];GET]
-        $let[token;$advancedTextSplit[$httpResult;"accessToken":";1;";0]]
-        $log[$if[$get[token]!=;OK - $cropText[$get[token];0;12;...]$!setGlobalVar[authmusic_spotify;$get[token]];Failed to Retrieve] - Spotify]
-    ]
-    ;$log[Failed to Retrieve - Spotify]]
-    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Token;cyan]]
-    ]
     $if[$or[$get[d]==;$env[refresh]==true];
     $try[
     $async[
         $httpAddHeader[Origin;https://music.amazon.com/]
         $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\; Win64\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36]
         $!httpRequest[https://music.amazon.com/config.json;GET;tokens]
-        $log[$if[$env[tokens;csrf;token]!=;OK - $cropText[$env[tokens;csrf;token];0;12;...]$!setGlobalVar[authmusic_amazonmusic;$env[tokens]];Failed to Retrieve] - Amazon Music]
+        $log[$if[$env[tokens;csrf;token]!=;OK - $cropText[$env[tokens;csrf;token];0;12;...]$!setGlobalVar[authmusic_amazonmusic;$deflate[$env[tokens];base64]];Failed to Retrieve] - Amazon Music]
     ]
     ;$log[Failed to Retrieve - Amazon Music]]
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Amazon Music        | Config & Token;cyan]]
@@ -200,13 +189,23 @@ Deezer          :  $if[$get[e]!=;✅;❌] | (Constant Refresh);red]]
 db.commands.add({
     type: "connect",
     code: `
-    $chalkLog[--- Refreshing Cache ---;blue]
+    $chalkLog[--- Refresh Data ---;blue]
+    $try[
     $deleteRecords[cachesearchistory_user_autocomplete]
     $log[OK - Autocomplete]
+    ]
+    $try[
+    $deleteRecords[cachesearch_global]
+    $log[OK - Search]
+    ]
+    $try[
     $deleteRecords[musicplayer_message]
     $log[OK - Music Player]
+    ]
+    $try[
     $deleteRecords[radioplayer_data]
     $log[OK - Radio Player]
+    ]
     $!setGlobalVar[authmusic_youtube_key;]
     $!setGlobalVar[authmusic_soundcloud;]
     $!setGlobalVar[authmusic_spotify;]

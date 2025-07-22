@@ -24,6 +24,7 @@ module.exports = {
     $onlyIf[$or[$env[filterid;id]==null;$env[filterid;type]==null]!=true;$return[{}]]
     $arrayLoad[results;]
     
+    $try[
     $if[$env[filterid;type]==youtube;
     
     $httpAddHeader[User-Agent;$get[agent]]
@@ -55,6 +56,7 @@ module.exports = {
     $let[a;$advancedTextSplit[$env[reshttp];__NEXT_DATA__;1;">;1;</script>;0]]
     $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$get[a]]}]
 
+    ]
     ]
     $let[resultforeturn;$if[$env[results;0]==;{};$env[results;0]]]
     $return[$if[$and[$env[limitChar]==true;$env[limitChar]!=false];$cropText[$get[resultforeturn];1;2000;];$get[resultforeturn]]]

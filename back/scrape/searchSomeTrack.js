@@ -23,14 +23,14 @@ module.exports = {
     $jsonLoad[loadser2;$env[loadser;results]]
     $arrayLoad[results]
     $arrayForEach[loadser2;result;
-    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$if[$env[result;durationSeconds]==0;LIVE;$parseDigital[$multi[$env[result;durationSeconds];1000]]]","thumbnail":"$if[$env[result;animatedThumbnail;0;url]==;$env[result;thumbnail;0;url];$env[result;animatedThumbnail;0;url]]","url":"$env[result;url]"}]
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$if[$env[result;isLive];LIVE;$parseDigital[$multi[$env[result;durationSeconds];1000]]]","thumbnail":"$if[$env[result;animatedThumbnail;0;url]==;$env[result;thumbnail;0;url];$env[result;animatedThumbnail;0;url]]","url":"$if[$env[result;isLive];https://youtube.com/live/$env[result;id];$env[result;url]]"}]
     ]
     ;
     $if[$env[provider]==youtubemusic;
     $jsonLoad[ser;$try[$ytMusicSearch[$env[query];10];{}]]
     $arrayLoad[results]
     $arrayForEach[ser;result;
-    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;name];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"https://i.ytimg.com/vi_webp/$env[result;id]/sddefault.webp","url":"$env[result;url]"}]
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;name];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"https://i.ytimg.com/vi_webp/$env[result;id]/maxresdefault.webp","url":"$env[result;url]"}]
     ]
     ;
     $if[$env[provider]==soundcloud;
@@ -39,17 +39,29 @@ module.exports = {
     $jsonLoad[res;$env[tests;collection]]
     $arrayLoad[results]
     $arrayForEach[res;result;
-    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$parseDigital[$env[result;full_duration]]$if[$env[result;duration]==30000;\\\\n-# REGION LOCK]","thumbnail":"$env[result;artwork_url]","url":"$env[result;permalink_url]"}]
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$parseDigital[$env[result;full_duration]]$if[$env[result;duration]==30000; - REGION LOCK]","thumbnail":"$env[result;artwork_url]","url":"$env[result;permalink_url]"}]
     ]
     ;
     $if[$env[provider]==spotify;
+    $localFunction[refreshspotify;
+    $try[
+    $if[$env[refresh]==true;
+    $httpAddHeader[User-Agent;$get[agent]]
+    $!httpRequest[https://open.spotify.com/embed/track/$randomText[4PTG3Z6ehGkBFwjybzWkR8;2yR2sziCF4WEs3klW1F38d;0IuVhCflrQPMGRrOyoY5RW;2yWlGEgEfPot0lv3OAjuG3;4Xfp9BcKrKYmxJPxn68Yb8;7uuJqaRjSXzja6VGgDpWem;3BP1klbHxsOf6IxscNIX0r;6BYzwbWg1Z2EB6VUXTYnhm];GET]
+    $let[token;$advancedTextSplit[$httpResult;"accessToken":";1;";0]]
+    $!setGlobalVar[authmusic_spotify;$get[token]]
+    ]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_spotify]]
     $httpAddHeader[App-platform;WebPlayer]
-    $!httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=10;GET;jsonres]
+    $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=10;GET;jsonres]]
+    $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;$callLocalFunction[refreshspotify;true]]
     $jsonLoad[res1;$env[jsonres;tracks;items]]
     $arrayLoad[results]
     $arrayForEach[res1;res2;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res2;name];\\\\;];";\\\\"]","duration":"$parseDigital[$env[res2;duration_ms]]","thumbnail":"$env[res2;album;images;0;url]","url":"$env[res2;external_urls;spotify]"}]]
+    ]
+    ;refresh]
+    $callLocalFunction[refreshspotify;false]
     ;
     $if[$env[provider]==applemusic;
     $httpAddHeader[User-Agent;$get[agent]]
@@ -61,10 +73,10 @@ module.exports = {
     $arraySlice[res4;res4;0;10]
 
     $arrayLoad[results]
-    $arrayForEach[res4;res5;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res5;title];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"$replace[$env[res5;artwork;dictionary;url];{w}x{h}bb.{f};1080x1080bb.webp]","url":"$advancedTextSplit[$env[res5;contentDescriptor;url];?;0]"}]]
+    $arrayForEach[res4;res5;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res5;title];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"$replace[$env[res5;artwork;dictionary;url];{w}x{h}bb.{f};2160x2160bb.webp]","url":"$advancedTextSplit[$env[res5;contentDescriptor;url];?;0]"}]]
     ;
     $if[$env[provider]==amazonmusic;
-    $jsonLoad[a;$getGlobalVar[authmusic_amazonmusic;{}]]
+    $jsonLoad[a;$if[$getGlobalVar[authmusic_amazonmusic;{}]=={};{};$inflate[$getGlobalVar[authmusic_amazonmusic];base64]]]
     $httpSetBody[{"keyword":"{\\\\"interface\\\\":\\\\"Web.TemplatesInterface.v1_0.Touch.SearchTemplateInterface.SearchKeywordClientInformation\\\\",\\\\"keyword\\\\":\\\\"$env[query]\\\\"}","userHash":"{\\\\"level\\\\":\\\\"LIBRARY_MEMBER\\\\"}","headers":"{\\\\"x-amzn-authentication\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"ClientAuthenticationInterface.v1_0.ClientTokenElement\\\\\\\\\\\\",\\\\\\\\\\\\"accessToken\\\\\\\\\\\\":\\\\\\\\\\\\"\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-device-model\\\\":\\\\"WEBPLAYER\\\\",\\\\"x-amzn-device-width\\\\":\\\\"1920\\\\",\\\\"x-amzn-device-family\\\\":\\\\"WebPlayer\\\\",\\\\"x-amzn-device-id\\\\":\\\\"$env[a;deviceId]\\\\",\\\\"x-amzn-user-agent\\\\":\\\\"$get[agent]\\\\",\\\\"x-amzn-session-id\\\\":\\\\"$env[a;sessionId]\\\\",\\\\"x-amzn-device-height\\\\":\\\\"1080\\\\",\\\\"x-amzn-request-id\\\\":\\\\"$randomBytes[4]-$randomBytes[2]-$randomBytes[2]-$randomBytes[6]\\\\",\\\\"x-amzn-device-language\\\\":\\\\"$env[a;displayLanguage]\\\\",\\\\"x-amzn-currency-of-preference\\\\":\\\\"USD\\\\",\\\\"x-amzn-os-version\\\\":\\\\"$advancedTextSplit[$env[a;version];.;0].$advancedTextSplit[$env[a;version];.;1]\\\\",\\\\"x-amzn-application-version\\\\":\\\\"$env[a;version]\\\\",\\\\"x-amzn-device-time-zone\\\\":\\\\"$djsEval[Intl.DateTimeFormat().resolvedOptions().timeZone]\\\\",\\\\"x-amzn-timestamp\\\\":\\\\"$getTimestamp\\\\",\\\\"x-amzn-csrf\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"CSRFInterface.v1_0.CSRFHeaderElement\\\\\\\\\\\\",\\\\\\\\\\\\"token\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;token]\\\\\\\\\\\\",\\\\\\\\\\\\"timestamp\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;ts]\\\\\\\\\\\\",\\\\\\\\\\\\"rndNonce\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;rnd]\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-music-domain\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-referer\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-affiliate-tags\\\\":\\\\"\\\\",\\\\"x-amzn-ref-marker\\\\":\\\\"\\\\",\\\\"x-amzn-page-url\\\\":\\\\"https://music.amazon.com/search\\\\",\\\\"x-amzn-weblab-id-overrides\\\\":\\\\"\\\\",\\\\"x-amzn-video-player-token\\\\":\\\\"\\\\",\\\\"x-amzn-feature-flags\\\\":\\\\"\\\\",\\\\"x-amzn-has-profile-id\\\\":\\\\"\\\\"}"}]
     $httpAddHeader[Origin;https://music.amazon.com]
     $httpAddHeader[User-Agent;$get[agent]]
@@ -99,6 +111,12 @@ module.exports = {
     ;refresh]
     $callLocalFunction[refreshdeezer;true]
     ]]]]]]]
+    $if[$env[results;0]!=;
+    $setVar[cachesearch_global;$md5[$env[query]$env[provider]];$deflate[$env[results];base64]]
+    $setTimeout[
+    $!deleteVar[cachesearch_global;$md5[$env[query]$env[provider]]]
+    ;30m]
+    ]
     ;
     $arrayLoad[results]
     ]
