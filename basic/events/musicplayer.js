@@ -24,6 +24,13 @@ module.exports = {
     $timestamp
     ]
     ]
+    $if[$advancedTextSplit[$customID;_;1]==loop;
+    $!deferUpdate
+    $let[isloop;$getVar[musicplayer_message;$guildID_isloop;none]]
+    $let[dochangeloop;$if[$get[isloop]==none;track;$if[$get[isloop]==track;queue;none]]]
+    $setLoopMode[$guildID;$get[dochangeloop]]
+    $setVar[musicplayer_message;$guildID_isloop;$get[dochangeloop]]
+    ]
     $if[$advancedTextSplit[$customID;_;1]==volumedown;
     $!deferUpdate
     $!setVolume[$guildID;$if[$sub[$getVolume[$guildID];10]>=0;$sub[$getVolume[$guildID];10];0]]

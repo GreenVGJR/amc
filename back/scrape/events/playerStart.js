@@ -42,29 +42,29 @@ module.exports = {
     $!clearInterval[$env[intervalName]]
     $stop
     ]
-    $let[elapsedtime;$if[$hasPlayer[$env[guildId]];$playerElapsedTime[$guildID];0]]
+    $let[elapsedtime;$if[$hasPlayer[$env[guildId]];$playerElapsedTime[$env[guildId]];0]]
     $let[changeevery_time;6000]
     $let[expectsecond;$multi[$second;1000]]
 
-    $if[$or[$getVar[musicplayer_message;$guildID_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[expectsecond];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$stop]
-    $if[$getVar[musicplayer_message;$guildID_attemptseek]!=;$!deleteVar[musicplayer_message;$guildID_attemptseek]]
+    $if[$or[$getVar[musicplayer_message;$env[guildId]_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[expectsecond];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$stop]
+    $if[$getVar[musicplayer_message;$env[guildId]_attemptseek]!=;$!deleteVar[musicplayer_message;$env[guildId]_attemptseek]]
     $if[$messageExists[$env[channelId];$env[messageId]]==false;
-    $let[secmid;$sendMessage[$channelID;Seems like the current message wasn't exist. This will be use to continue interval.;true]]
-    $setVar[musicplayer_message;$guildID_channelid;$channelID]
-    $setVar[musicplayer_message;$guildID_messageid;$get[secmid]]
+    $let[secmid;$sendMessage[$env[channelId];Seems like the current message wasn't exist. This will be use to continue interval.;true]]
+    $setVar[musicplayer_message;$env[guildId]_channelid;$env[channelId]]
+    $setVar[musicplayer_message;$env[guildId]_messageid;$get[secmid]]
     $stop
     ]
     $jsonLoad[jsonmusicdata;$env[musicInfo]]
     $jsonLoad[jsonmedia;$callFunction[filterMediaID;$env[jsonmusicdata;0;url]]]
     $let[provider;$env[jsonmedia;type]]
 
-    $jsonLoad[currenttrack;$currentTrackInfo[$guildID]]
+    $jsonLoad[currenttrack;$currentTrackInfo[$env[guildId]]]
 
-    $let[statusshuffle;$getVar[musicplayer_message;$guildID_isshuffle;false]]
+    $let[statusshuffle;$getVar[musicplayer_message;$env[guildId]_isshuffle;false]]
 
     $let[delayping;$checkCondition[$round[$executionTime;0]>=250]]
     $let[checkdurationms;$if[$hasPlayer[$env[guildId]];$env[currenttrack;info;length];0]]
-    $jsonLoad[rest;$queue[$guildID]]
+    $jsonLoad[rest;$queue[$env[guildId]]]
 
     $try[
     $!editMessage[$env[channelId];$env[messageId];
@@ -101,14 +101,16 @@ module.exports = {
     $footer[$toTitleCase[$if[$get[provider]==null;File;$get[provider]]];$callFunction[useIcon;$get[provider]];0]
     ]
     $addActionRow
-    $addButton[musicplayer_volumedown_$env[messageId];-10%;Secondary;🔉;$checkCondition[$getVolume[$guildID]==0]]
-    $addButton[null0;Volume: $getVolume[$guildID]%;Secondary;;true]
-    $addButton[musicplayer_volumeup_$env[messageId];+10%;Secondary;🔉;$checkCondition[$getVolume[$guildID]==150]]
-    $addButton[musicplayer_volumemute_$env[messageId];$if[$getVolume[$guildID]==0;Unmute;Mute];Secondary;🔈;false]
+    $addButton[musicplayer_loop_$env[messageId];Loop: $toTitleCase[$getVar[musicplayer_message;$env[guildId]_isloop;none]];$if[$getVar[musicplayer_message;$env[guildId]_isloop;none]==none;Secondary;Primary];🔁;false]
     $addActionRow
-    $addButton[musicplayer_actionplayer_$env[messageId];$if[$isPaused[$guildID];Resume;Pause];Secondary;$if[$isPaused[$guildID];▶️;⏸️];$checkCondition[$env[jsonmusicdata;0;durationMS]==0]]
+    $addButton[musicplayer_volumedown_$env[messageId];-10%;Secondary;🔉;$checkCondition[$getVolume[$env[guildId]]==0]]
+    $addButton[null0;Volume: $getVolume[$env[guildId]]%;Secondary;;true]
+    $addButton[musicplayer_volumeup_$env[messageId];+10%;Secondary;🔉;$checkCondition[$getVolume[$env[guildId]]==150]]
+    $addButton[musicplayer_volumemute_$env[messageId];$if[$getVolume[$env[guildId]]==0;Unmute;Mute];Secondary;🔈;false]
+    $addActionRow
+    $addButton[musicplayer_actionplayer_$env[messageId];$if[$isPaused[$env[guildId]];Resume;Pause];Secondary;$if[$isPaused[$env[guildId]];▶️;⏸️];$checkCondition[$env[jsonmusicdata;0;durationMS]==0]]
     $addButton[musicplayer_stopplayer_$env[messageId];Stop;Danger;⏹️;false]
-    $addButton[musicplayer_skipplayer_$env[messageId];Skip;Primary;⏭️;$checkCondition[$skipExists[$guildID]==false]]
+    $addButton[musicplayer_skipplayer_$env[messageId];Skip;Primary;⏭️;$checkCondition[$skipExists[$env[guildId]]==false]]
     $addButton[musicplayer_lyrics_$env[messageId];Lyrics;Primary;🎶;$or[$env[jsonmusicdata;0;durationMS]==0;$get[provider]==null]]
     ]
     ]

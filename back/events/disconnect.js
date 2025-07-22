@@ -5,7 +5,7 @@ module.exports = {
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
 
     $try[
-    $if[$and[$getComponents[$get[cid];$get[mid];0;0;style]==Secondary;$getComponents[$get[cid];$get[mid];1;1;disabled]!=false];
+    $if[$and[$getComponents[$get[cid];$get[mid];0;0;style]==Secondary;$getComponents[$get[cid];$get[mid];2;1;disabled]!=false];
     $!editMessage[$get[cid];$get[mid];
     $description[Can't process this.]
     $color[$callFunction[useIcon;error_color_embed]]
@@ -13,13 +13,13 @@ module.exports = {
     $timestamp
     ]
     ]
-    $if[$getComponents[$get[cid];$get[mid];1;1;disabled]==false;
+    $if[$getComponents[$get[cid];$get[mid];2;1;disabled]==false;
     $!disableComponentsOf[$get[cid];$get[mid]]
     ]
     ]
 
     $!deleteVar[musicplayer_message;$guildID_messageid]
     $!deleteVar[musicplayer_message;$guildID_channelid]
-    $!deleteVar[musicplayer_message;$guildID_isshuffle]
+    $!deleteVar[musicplayer_message;$guildID_isloop]
     `
 }
