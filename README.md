@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://github-readme-stats.vercel.app/api/pin/?username=greenvgjr&repo=amc-discord-bot&theme=dark&cache=1" alt=""/>
-  <p><b><br>Discord music bot for ForgeScript and BDFD</b></p>
+  <img src="https://github-readme-stats.vercel.app/api/pin/?username=greenvgjr&repo=amc-discord-bot&theme=dark&cache=2" alt=""/>
+  <p><b><br>Discord music bot for <a href="https://github.com/tryforge/ForgeScript">ForgeScript.js</a> and <a href="https://botdesignerdiscord.com/">BDFD</a></b></p>
   <div>
   <a href="https://github.com/tryforge/ForgeScript"><img src="https://github.com/user-attachments/assets/ce7c0de3-1ad2-4d5d-a60b-2bf9c3da1f64" loading="lazy" width=50 height=50 alt="Forgescript"/></a>
   <a href="https://botdesignerdiscord.com/"><img src="https://github.com/user-attachments/assets/c1f59eee-9fec-4b95-8365-eb21422668e3" loading="lazy" width=50 height=50 alt="Bdfd"/></a>
@@ -45,6 +45,10 @@
 
 ___
 
+## What is this?
+This project is designed for users who want an instant setup without any weird configuration,<br>
+while still offering some cool features. :D
+
 ## Credits
 
 - [Emoji.gg](https://emoji.gg/) - Emojis source<br>
@@ -52,7 +56,7 @@ ___
 - [skick1234/DisTube](https://github.com/skick1234/DisTube) - Style reference<br>
 - [ForgeYoutube](https://github.com/Zack-911/ForgeYoutube/tree/dev) - Extensions for FS
 
-<br><br>
+<br>
 <div align="center">
 <p><h4>(づ•́ ᵔ •̀)づ</h4></p>
 </div>
