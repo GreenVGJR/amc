@@ -39,7 +39,6 @@ const music = new ForgeMusic({
         "playerFinish",
         ],
     includeExtractors: DefaultExtractors,
-    blockExtractors: DefaultExtractors,
     connectOptions: {
         onBeforeCreateStream: true,
         bufferingTimeout: 0,
