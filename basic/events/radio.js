@@ -55,7 +55,6 @@ module.exports = [{
     $let[thumbnail;https:$advancedTextSplit[$httpResult;class="station";1;src=";1;";0]]
     $let[validthumbnail;$advancedTextSplit[$httpResult;class="station";1;src=";1;";0]]
     $let[name;$advancedTextSplit[$httpResult;class="station";1;radioName=";1;";0]]
-    $replace[$replace[$replace[$replace[$replace[$replace[$replace[$get[a2];<a>;];</a>;];<i>;];</i>;];<b>;];</b>;];";\\\\"]
     $let[stream;$advancedTextSplit[$httpResult;class="station";1;stream=";1;";0]]
     $let[description;$trimLines[$advancedTextSplit[$httpResult;station__description;1;">;1;</div>;0;<a href=";0]]]
     $let[rating;$advancedTextSplit[$httpResult;class="stars-rating";1;data-rating=";1;";0]]
@@ -75,7 +74,7 @@ module.exports = [{
     $description[$djsEval[require("entities").decodeHTML(ctx.getKeyword("description"))]]
     $addField[Tags;$djsEval[require("entities").decodeHTML(ctx.getKeyword("storetags"))];true]
     $addField[Rating;$get[rating] / 5;true]
-    $addField[Current Track;$if[$get[current_track]==;Not available;$codeBlock[$get[current_track]]];false]
+    $addField[Current Track;$if[$get[current_track]==;Not available;$codeBlock[$djsEval[require("entities").decodeHTML("$get[current_track]")]]];false]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
     $if[$get[validthumbnail]!=;$thumbnail[$get[thumbnail]]]
@@ -102,7 +101,7 @@ module.exports = [{
     $onlyIf[$channelHasPerms[$voiceID;$clientID;Connect];$ephemeral $callFunction[useCustomMusicMessage;config_errorChannelPerm] $callFunction[useCustomMusicMessage;config_errorPerm] **Connect** - <@$clientID> (<#$voiceID>)]
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
     
-    $defer
+    $!deferUpdate
     
     $try[
 
@@ -133,7 +132,7 @@ module.exports = [{
     $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
     $if[$get[iscreatedfirst];
     $setVar[musicplayer_message;$guildID_channelid;$channelID]
-    $setVar[musicplayer_message;$guildID_messageid;$messageID]
+    $setVar[musicplayer_message;$guildID_messageid;$messageReferenceID[$channelID;$messageID]]
     ]
     $setVar[radioplayer_data;$guildID_playerstatus;true]
     $setVar[radioplayer_data;$guildID_checkplayer;true]
@@ -145,11 +144,13 @@ module.exports = [{
     $footer[Attempting to Skip;$callFunction[useIcon;loading]]
     ]
     $!skipTo[$sub[$queueLength;1]]
-    $!deleteMessage[$channelID;$messageID;$messageReferenceID[$channelID;$messageID]]
+    $!deleteMessage[$channelID;$messageReferenceID[$channelID;$messageID]]
+    ;
+    $!editMessage[$channelID;$messageReferenceID[$channelID;$messageID];...]
     ]
     $!interactionDelete
     ;
-    $!interactionFollowUp[
+    $!interactionUpdate[
     $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]$codeBlock[Unplayable / Geo-restricted.]]
     $color[$callFunction[useIcon;error_color_embed]]
     $footer[event]
@@ -157,7 +158,6 @@ module.exports = [{
     ]
 
     $setTimeout[
-    $!interactionDelete
     $!deleteMessage[$channelID;$messageID]
     ;3s]
 

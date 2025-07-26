@@ -28,7 +28,7 @@ module.exports = {
   $author[$username[$authorID] / $botOwnerID;;;0]
   $title[Owner;;0]
   $thumbnail[$userAvatar[$botOwnerID];0]
-  $color[$randomBytes[3];0]
+  $color[aa$randomBytes[2];0]
   $addField[Created At;<t:$cropText[$userCreatedAt[$authorID];0;10]:F>;true;0]
   $if[$get[owner_banner]!=;$addField[Banner;\\[Image\\]($get[owner_banner]);true;0]]
   $author[$username[$clientID] / $clientID;;;1]

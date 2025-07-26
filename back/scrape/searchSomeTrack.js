@@ -30,7 +30,8 @@ module.exports = {
     $jsonLoad[ser;$try[$ytMusicSearch[$env[query];10];{}]]
     $arrayLoad[results]
     $arrayForEach[ser;result;
-    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;name];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"https://i.ytimg.com/vi_webp/$env[result;id]/maxresdefault.webp","url":"$env[result;url]"}]
+    $jsonLoad[getytduration;$callFunction[extractTrack;$env[result;url]]]
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;name];\\\\;];";\\\\"]","duration":"$if[$env[getytduration;results;isLiveContent];LIVE;$parseDigital[$multi[$env[getytduration;results;lengthSeconds];1000]]]","thumbnail":"https://i.ytimg.com/vi_webp/$env[result;id]/maxresdefault.webp","url":"$env[result;url]"}]
     ]
     ;
     $if[$env[provider]==soundcloud;
@@ -46,10 +47,7 @@ module.exports = {
     $localFunction[refreshspotify;
     $try[
     $if[$env[refresh]==true;
-    $httpAddHeader[User-Agent;$get[agent]]
-    $!httpRequest[https://open.spotify.com/embed/track/$randomText[4PTG3Z6ehGkBFwjybzWkR8;2yR2sziCF4WEs3klW1F38d;0IuVhCflrQPMGRrOyoY5RW;2yWlGEgEfPot0lv3OAjuG3;4Xfp9BcKrKYmxJPxn68Yb8;7uuJqaRjSXzja6VGgDpWem;3BP1klbHxsOf6IxscNIX0r;6BYzwbWg1Z2EB6VUXTYnhm];GET]
-    $let[token;$advancedTextSplit[$httpResult;"accessToken":";1;";0]]
-    $!setGlobalVar[authmusic_spotify;$get[token]]
+    $callFunction[generateAuthKeys;spotify;;false]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_spotify]]
@@ -91,11 +89,7 @@ module.exports = {
     $localFunction[refreshdeezer;
     $try[
     $if[$env[refresh]==true;
-    $httpSetContentType[Json]
-    $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Origin;https://www.deezer.com]
-    $!httpRequest[https://auth.deezer.com/login/anonymous?jo=p;GET;test]
-    $!setGlobalVar[authmusic_deezer;$env[test;jwt]]
+    $callFunction[generateAuthKeys;deezer;;false]
     ]
     $httpSetBody[{"operationName":"SearchFull","variables":{"query":"$env[query]","firstList":10},"query":"$inflate[789c95524d6b23310cfd2b2ef4904209e9a150e656965d28f4509a1cf66008ca589988f5c813596e134afe7bf13869b39b6d869eacafa7f724799d50b6668a20f5ea57f27e74b9ce91ca4c55889b8b6b73b92489fa48512bf3c07a7165de2c134705d6821bed2105dae70563f21ab3a902f59f38eabb5447ddfa3a740df6551c1ce6773c1ecf60e171965196e773dd76c8d0a2e5dd89db41830fbc0c7d27763f92c420a755424148b743ddfe71779697024d8bace65392096c8a91b7e02c2ba947cb2e092805b6dc852e792884147f6e3a4f35a9e5161dc10125d4acca7ac095e705c8679623f37ea9783a4e4c8bef01cebbe017a93dc872143b0fdb5999a90e2f28fba33c51ad49f0f7b405ef8f238f200d0e91d4815568913448fceaec79b3f7a214f5a0a6c0bf35cd79f7e39e7f4d9389f78103f366b399c79cab4c121f475d493fe33a61fec56fafe47455999bc9dde4daac305fb378bb2bcbb8bff95441531c54d16ff03f227c8e0f08b89d1cf1df4e86e9df01fd8e862c;hex]"}]
     $httpAddHeader[Content-Type;application/json]
@@ -115,7 +109,7 @@ module.exports = {
     $setVar[cachesearch_global;$md5[$env[query]$env[provider]];$deflate[$env[results];base64]]
     $setTimeout[
     $!deleteVar[cachesearch_global;$md5[$env[query]$env[provider]]]
-    ;30m]
+    ;24h]
     ]
     ;
     $arrayLoad[results]

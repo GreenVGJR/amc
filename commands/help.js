@@ -18,11 +18,12 @@ module.exports = {
   $defer
   
   $jsonLoad[test;$applicationCommands]
-  $let[container;]
-  $arrayForEach[test;tests;$if[$env[tests;name]!=help;$let[container;$get[container]</$env[tests;name]:$env[tests;id]> ]]]
   
   $author[Help]
   $addField[Available Commands;$get[container];false]
+  $arrayForEach[test;tests;
+  $if[$env[tests;name]!=help;$addField[</$env[tests;name]:$env[tests;id]>;$advancedTextSplit[$env[tests;description];|;0];true]
+  ]]
   $thumbnail[$userAvatar[$clientID;2048]]
   $color[$callFunction[useIcon;color_embed]]
   $timestamp

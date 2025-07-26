@@ -21,11 +21,14 @@ module.exports = {
     $if[$env[isExclude]!=true;
     $jsonLoad[pulltrack;$callFunction[filterMediaID;$trackInfo[url]]]
     $let[ytmusic;$try[$getMusicLyrics[$env[pulltrack;id]];null]]
+    ;
+    $jsonLoad[pullyt;$try[$ytMusicSearch[$env[query];1];{}]]
+    $let[ytmusic;$try[$getMusicLyrics[$env[pullyt;0;id]];null]]
     ]
-    $if[$and[$env[pulltrack;type]==youtube;$get[ytmusic]!=null;$env[isExclude]!=true];
+    $if[$or[$env[pulltrack;type]==youtube;$get[ytmusic]!=null];
     $jsonLoad[ytmusic;$get[ytmusic]]
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[ytmusic;ping]","results":{"provider":"youtube","query":"$encodeURI[$env[query]]","url":"$trackInfo[url]","autocomplete":"$decodeURI[$env[query]]","lyric":"$deflate[$env[ytmusic;results;lyrics];hex]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[ytmusic;ping]","results":{"provider":"youtube","query":"$encodeURI[$env[query]]","url":"$if[$env[isExclude]!=true;$trackInfo[url];$env[pullyt;0;url]]","autocomplete":"$if[$env[isExclude]!=true;$decodeURI[$env[query]];$env[pullyt;0;name]]","lyric":"$deflate[$env[ytmusic;results;lyrics];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
     $let[http_2;$httpRequest[https://lrclib.net/api/search?q=$env[query];GET;ges1]]
