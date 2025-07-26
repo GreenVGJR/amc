@@ -28,7 +28,6 @@ const music = new ForgeMusic({
     events: [
      // "connection",
         "connectionDestroyed",
-        "debug",
         "disconnect",
         "emptyQueue",
         "error",
