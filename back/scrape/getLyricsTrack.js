@@ -23,6 +23,7 @@ module.exports = {
     $let[ytmusic;$try[$getMusicLyrics[$env[pulltrack;id]];null]]
     ;
     $jsonLoad[pullyt;$try[$ytMusicSearch[$env[query];1];{}]]
+    $jsonLoad[pulltrack;$callFunction[filterMediaID;$env[pullyt;0;url]]]
     $let[ytmusic;$try[$getMusicLyrics[$env[pullyt;0;id]];null]]
     ]
     $if[$and[$env[pulltrack;type]==youtube;$get[ytmusic]!=null];
