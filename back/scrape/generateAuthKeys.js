@@ -44,10 +44,10 @@ module.exports = {
     $try[
     $async[
         $httpAddHeader[User-Agent;$get[agent]]
-        $!httpRequest[https://www.youtube.com;GET;g1]
-        $let[a1;$advancedTextSplit[$env[g1];"INNERTUBE_API_KEY":";1;";0]]
-        $if[$get[a1]!=;$!setGlobalVar[authmusic_youtube_key;$get[a1]]]
-        $if[$env[successlog]==true;$log[$if[$get[a1]!=;OK - $cropText[$get[a1];0;12;...];Failed to Retrieve] - InnerTube (Youtube)]]
+        $!httpRequest[https://www.youtube.com;GET;g3]
+        $let[a3;$advancedTextSplit[$env[g3];"INNERTUBE_API_KEY":";1;";0]]
+        $if[$get[a3]!=;$!setGlobalVar[authmusic_youtube_key;$get[a3]]]
+        $if[$env[successlog]==true;$log[$if[$get[a3]!=;OK - $cropText[$get[a3];0;12;...];Failed to Retrieve] - InnerTube (Youtube)]]
     ]
     ;$log[Failed to Retrieve - InnerTube (Youtube)]]
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating InnerTube (Youtube) | Key;cyan]]
