@@ -110,11 +110,11 @@ music.player.extractors.register(YoutubeiExtractor, {
 client.commands.add({
     type: "ready",
     code: `
+    $logger[Info;Ready on client $username[$clientID]]
     $setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk]
     $setInterval[$setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk];1m]
 
-    $log[Welcome!\n$userTag[$clientID]\n]
-    $log[Attempting to Generate.]
+    $logger[Info;Attempting to Generate]
     $callFunction[generateAuthKeys;all;;true]
     $setInterval[$callFunction[generateAuthKeys;all;;true];1h]
     ` 
@@ -123,7 +123,7 @@ client.commands.add({
 db.commands.add({
     type: "connect",
     code: `
-    $!djsEval[try { console.clear() } catch {}]
+    $logger[Info;Waiting online]
     $try[
     $deleteRecords[cachesearchistory_user_autocomplete]
     ]
