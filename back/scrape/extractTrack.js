@@ -51,10 +51,24 @@ module.exports = {
     ]
     $if[$env[filterid;type]==spotify;
     
+    $localFunction[refreshspotify;
+    $if[$env[refresh]==true;
+    $callFunction[generateAuthKeys;spotify;;false]
+    ]
+    $httpAddHeader[authorization;Bearer $getGlobalVar[authmusic_spotify]]
+    $httpAddHeader[client-token;$getGlobalVar[authmusic_spotify_token]]
+    $httpAddHeader[Accept;application/json]
+    $httpAddHeader[Origin;https://open.spotify.com/]
+    $httpAddHeader[app-platform;WebPlayer]
+    $httpAddHeader[spotify-app-version;1.0]
     $httpAddHeader[User-Agent;$get[agent]]
-    $let[http;$httpRequest[https://open.spotify.com/embed$advancedTextSplit[$get[url];$advancedTextSplit[$get[url];://;1;/;0];1];GET;reshttp]]
-    $let[a;$advancedTextSplit[$env[reshttp];__NEXT_DATA__;1;">;1;</script>;0]]
-    $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$get[a]]}]
+    $jsonLoad[test;$filterMediaID[$get[url]]]
+    $let[gid;$djsEval[(id => \\[...id\\].reduce((a, c) => a * 62n + BigInt("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(c)), 0n).toString(16).padStart(32, '0'))("$env[test;id]")]]
+    $let[http;$httpRequest[https://spclient.wg.spotify.com/metadata/4/track/$get[gid];GET;a]]
+    $onlyIf[$or[$get[http]==401;$get[http]==400]!=true;$callLocalFunction[refreshspotify;true]]
+    $arrayPushJSON[results;{"status":$get[http],"results":$if[$env[a]==;null;$env[a]]}]
+    ;retry]
+    $callLocalFunction[refreshspotify;false]
 
     ]
     ]

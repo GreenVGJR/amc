@@ -24,7 +24,7 @@ module.exports = {
         "dynamic_thumbnail":"$if[$env[res;results;0;animatedThumbnail]!=;$env[res;results;0;animatedThumbnail;0;url]]",
         "thumbnail":"$env[res;results;0;thumbnail;0;url]",
         "duration":"$env[res;results;0;durationSeconds]",
-        "title":"$replace[$env[res;results;0;title];\\";\\\\"]"
+        "title":"$replace[$replace[$env[res;results;0;title];\\\\;];";\\\\"]"
     }]
     ;
     $if[$env[provider]==soundcloud;
@@ -38,9 +38,32 @@ module.exports = {
         "dynamic_thumbnail":"",
         "thumbnail":"$env[res;collection;0;artwork_url]",
         "duration":$round[$divide[$env[res;collection;0;duration];1000];0],
-        "title":"$replace[$env[res;collection;0;title];\\";\\\\"]"
+        "title":"$replace[$replace[$env[res;collection;0;title];\\\\;];";\\\\"]"
     }]
-    ]]
+    ;
+    $if[$env[provider]==spotify;
+    $localFunction[refreshspotify;
+    $if[$env[refresh]==true;
+    $callFunction[generateAuthKeys;spotify;;false]
+    ]
+    $try[
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_spotify]]
+    $httpAddHeader[App-platform;WebPlayer]
+    $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1;GET;jsonres]]
+    $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;$callLocalFunction[refreshspotify;true]]
+    ]
+    $jsonLoad[res1;$env[jsonres;tracks;items]]
+    $jsonLoad[rest2;{
+        "id":"$advancedTextSplit[$env[res1;0;external_urls;spotify];/;4]",
+        "dynamic_thumbnail":"",
+        "thumbnail":"$env[res1;0;album;images;0;url]",
+        "duration":$round[$divide[$env[res1;0;duration_ms];1000];0],
+        "title":"$replace[$replace[$env[res1;0;name];\\\\;];";\\\\"]"
+    }]
+    ;refresh]
+    $callLocalFunction[refreshspotify;false]
+    ]]]
     $return[$env[rest2]]
     `
 }

@@ -11,6 +11,26 @@ module.exports = {
       "autocomplete": true
     },
     {
+    "type": 3,
+    "name": "provider",
+    "description": "Provider to use for searching track",
+    "required": false,
+    "choices": [
+      {
+        "name": "YouTube",
+        "value": "youtube"
+      },
+      {
+        "name": "Soundcloud",
+        "value": "soundcloud"
+      },
+      {
+        "name": "Spotify",
+        "value": "spotify"
+      }
+    ]
+    },
+    {
       "type": 5,
       "name": "force_skip",
       "description": "Instantly skip current track after adding track",
@@ -41,6 +61,8 @@ module.exports = {
 
   $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
 
+  $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
+
   $let[mid;$interactionReply[
   $addField[Query;$codeBlock[$option[query]]]
   $footer[Fetching;$callFunction[useIcon;loading]]
@@ -52,10 +74,14 @@ module.exports = {
   $let[fallback_provider;$callFunction[configMusic;fallback_provider]]
   $if[$isValidLink[$option[query]]==false;
   $let[basic_type;true]
-  $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$get[default_provider];null]]
+  $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$if[$option[provider]!=;$option[provider];$get[default_provider]];null]]
+  $let[tempstoreurl;$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtube;https://youtube.com/watch/$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==soundcloud;https://soundcloud.com/$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==spotify;https://open.spotify.com/track/$env[result;id]]]]]
+  $let[use_provider;$if[$option[provider]!=;$option[provider];$get[default_provider]]]
   $let[cac1;$env[result;id]]
   $if[$get[cac1]==;
   $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$get[fallback_provider];null]]
+  $let[tempstoreurl;$if[$get[fallback_provider]==youtube;https://youtube.com/watch/$env[result;id];$if[$get[fallback_provider]==soundcloud;https://soundcloud.com/$env[result;id];$if[$get[fallback_provider]==spotify;https://open.spotify.com/track/$env[result;id]]]]]
+  $let[use_provider;$get[fallback_provider]]
   $let[cac2;$env[result;id]]
   $onlyIf[$and[$get[cac1]!=;$get[cac2]!=];
   $interactionFollowUp[
@@ -69,10 +95,23 @@ module.exports = {
   $let[music_id;$env[result;id]]
   $let[music_duration;$multi[$env[result;duration];1000]]
   $let[music_thumbnail;$if[$env[result;dynamic_thumbnail]==;$env[result;thumbnail];$env[result;dynamic_thumbnail]]]
-  $let[music_provider;$get[default_provider]]
+  $let[music_provider;$get[use_provider]]
 
   $let[isforcedirect;$option[direct_cdn]]
-  $let[tempstoreurl;$if[$get[default_provider]==youtube;https://youtube.com/watch?v=$env[result;id];$if[$get[default_provider]==soundcloud;https://soundcloud.com/$env[result;id]]]]
+
+  $if[$get[iscreatedfirst];
+  $async[
+    $!interactionUpdate[
+        $addField[Requested By;$get[music_requestedBy];false]
+        $addField[Title;$get[music_title];true]
+        $addField[Duration;$if[$get[music_duration]==0;LIVE;$parseDigital[$get[music_duration]]];true]
+        $thumbnail[$get[music_thumbnail]]
+        $author[Fetching;$callFunction[useIcon;loading]]
+        $timestamp
+        $color[$callFunction[useIcon;color_embed]]
+        $footer[$if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$get[music_provider]];$callFunction[useIcon;$get[music_provider]]]
+    ]
+  ]]
 
   $if[$get[isforcedirect]==true;
   $let[music_playurl;$trimLines[$callFunction[fallbackPlaybackTrack;$get[tempstoreurl]]]]
@@ -93,7 +132,6 @@ module.exports = {
 
   $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[music_playurl]]]
 
-  $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
   $let[attemptry;0]
   $let[donetry;3]
   $let[found;false]
@@ -134,27 +172,31 @@ module.exports = {
   ]
 
   $if[$and[$queueLength!=0;$get[iscreatedfirst]==false];
+  $async[$if[$option[force_skip]==true;$!skipTo[$sub[$queueLength;1]]]]
   $!interactionUpdate[
+  $if[$get[basic_type];
+  $author[Add to Track;;;0]
+  $addField[Requested By;$get[music_requestedBy];false;0]
+  $addField[Title;$get[music_title];true;0]
+  $addField[Duration;$if[$get[music_duration]==0;LIVE;$parseDigital[$get[music_duration]]];true;0]
+  $thumbnail[$get[music_thumbnail];0]
+  $color[$callFunction[useIcon;color_embed];0]
+  $footer[$if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$get[music_provider]];$callFunction[useIcon;$get[music_provider];0]]
+  $author[Queue;;;1]
+  $addField[Added Song;$sub[$queueLength;$get[queue_lengthtemp]];true;1]
+  $addField[Total Song;$queueLength;true;1]
+  $addField[Total Duration;$parseDigital[$queueEstimatedDuration];true;1]
+  $if[$option[force_skip]==true;$footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;loading];1]]
+  $color[$callFunction[useIcon;color_embed];0]
+  $color[$callFunction[useIcon;color_embed];1]
+  ;
   $author[Queue;;;0]
   $addField[Added Song;$sub[$queueLength;$get[queue_lengthtemp]];true;0]
   $addField[Total Song;$queueLength;true;0]
   $addField[Total Duration;$parseDigital[$queueEstimatedDuration];true;0]
+  $if[$option[force_skip]==true;$footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;loading];0]]
   $color[$callFunction[useIcon;color_embed];0]
-  $timestamp[;0]
-  ]
-  $async[
-  $setTimeout[
-  $if[$messageExists[$channelID;$get[mid]];$!deleteMessage[$channelID;$get[mid]]]
-  ;3s]
-  ]
-  $if[$option[force_skip]==true;
-  $let[mid2;$sendMessage[$channelID;
-    $reply[$channelID;$get[mid];true]
-    $color[$callFunction[useIcon;color_embed]]
-    $footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;loading]]
-  ;true]]
-  $!skipTo[$sub[$queueLength;1]]
-  $!deleteMessage[$channelID;$get[mid2]]
-  ]
+  ]]
+  $setTimeout[$!interactionDelete;3s]
   ]`
 }

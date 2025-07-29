@@ -44,7 +44,7 @@ module.exports = {
     $try[
     $async[
         $httpAddHeader[User-Agent;$get[agent]]
-        $!httpRequest[https://www.youtube.com;GET;g3]
+        $!httpRequest[https://www.youtube.com/embed;GET;g3]
         $let[a3;$advancedTextSplit[$env[g3];"INNERTUBE_API_KEY":";1;";0]]
         $if[$get[a3]!=;$!setGlobalVar[authmusic_youtube_key;$get[a3]]]
         $if[$env[successlog]==true;$log[$if[$get[a3]!=;OK - $cropText[$get[a3];0;12;...];Failed to Retrieve] - InnerTube (Youtube)]]

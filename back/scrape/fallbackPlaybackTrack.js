@@ -41,15 +41,23 @@ module.exports = {
     $arrayMap[loadres;test2;$if[$env[test2;hydratable]==sound;$return[$env[test2]]];test3]
     $jsonLoad[test4;$env[test3;0;data;media;transcodings]]
     $arrayMap[test4;test5;$if[$env[test5;format;protocol]==progressive;$return[$env[test5]]];test6]
+    $onlyIf[$env[test6;0;url]!=;$return[null]]
     $!httpRequest[$env[test6;0;url]&track_authorization=$env[test3;0;data;track_authorization];GET;rest]
     $let[finalurl;$env[rest;url]]
+    $onlyIf[$get[finalurl]!=;$return[null]]
     $try[
     $onlyIf[$httpRequest[$get[finalurl];HEAD]==200;$callLocalFunction[oncecode;true]]
     ;
     $callLocalFunction[oncecode;true]
     ]
     $return[$trimLines[$get[finalurl]]]
-    ]]
+    ;
+    $if[$env[whattype;type]==spotify;
+    $jsonLoad[test;$extractTrack[$env[url]]]
+    $onlyIf[$env[test;results;preview;0;file_id]!=;$return[null]]
+    $let[fileurl;https://p.scdn.co/mp3-preview/$env[test;results;preview;0;file_id]]
+    $return[$trimLines[$get[fileurl]]]
+    ]]]
     ;retry]
     $callLocalFunction[oncecode;false]
     `

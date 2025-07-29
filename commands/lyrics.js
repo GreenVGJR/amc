@@ -1,7 +1,7 @@
 module.exports = {
   data: {
   "name": "lyrics",
-  "description": "Search for lyrics | Providers: Lrclib, Genius, AZLyrics",
+  "description": "Search for lyrics | Providers: YT Music, Lrclib, Genius, AZLyrics",
   "options": [
     {
       "type": 3,
@@ -11,7 +11,7 @@ module.exports = {
     }
   ],
   "description_localizations": {
-    "id": "Mencari lirik | Sumber: Lrclib, Genius, AZLyrics"
+    "id": "Mencari lirik | Sumber: YT Music, Lrclib, Genius, AZLyrics"
   },
   "contexts": [
     0

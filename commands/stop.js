@@ -27,5 +27,6 @@ module.exports = {
     $!clearInterval[intervalmusicmessage_$guildID_$getVar[musicplayer_message;$guildID_channelid]]
     $if[$option[destroy];$leaveVoiceChannel;$!stopTrack]
     $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalStopTrack]]
+    $setTimeout[$!interactionDelete;2s]
     `
 }
