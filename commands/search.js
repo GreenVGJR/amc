@@ -59,6 +59,7 @@ module.exports = {
 
   $ephemeral
   $defer
+
   $let[check;$getVar[cachesearch_global;$md5[$option[query]$option[provider]];null]]
   $if[$get[check]==null;
   $jsonLoad[loadser;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
@@ -66,12 +67,13 @@ module.exports = {
   ;
   $jsonLoad[loadser;$inflate[$get[check];base64]]
   ]
+  $let[currentping;$round[$executionTime;0]]
   $arrayLoad[results]
   $arraySlice[loadser;loadser;0;10]
   $arrayReverse[loadser;loadser]
-  $!interactionUpdate[
+  $!interactionReply[
   $addContainer[
-  $addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$round[$executionTime;0]ms\`]
+  $addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms\`]
   $addSeparator[Large;true]
   $arrayForEach[loadser;result;
   $addSection[

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@evan/opus": "^1.0.3",
     "@tryforge/forge.db": "^2.1.0",
     "@tryforge/forge.music": "^1.0.0",
     "@tryforge/forgescript": "github:tryforge/ForgeScript#dev",
@@ -8,8 +9,6 @@
     "dotenv": "^16.5.0",
     "entities": "^6.0.1",
     "ffmpeg-static": "^5.2.0",
-    "forgeyoutube": "github:zack-911/forgeyoutube#dev",
-    "opusscript": "^0.1.1",
     "sqlite3": "^5.1.7"
   }
 }

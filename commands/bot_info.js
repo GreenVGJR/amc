@@ -15,6 +15,7 @@ module.exports = {
   $onlyIf[$guildID!=;]
   $ephemeral
   $defer
+  $let[currentping;$executionTime]
 
   $arrayLoad[guild;,;$guildIDs[,]]
   $let[countnode;0]
@@ -40,13 +41,17 @@ module.exports = {
   $addField[Server Count;\`$guildCount\`;true;1]
   $addField[Uptime;<t:$sub[$cropText[$getTimestamp;0;10];$round[$divide[$uptime;1000]]]:F>\n-# $parseMS[$uptime];false;1]
   $addField[OS Uptime ($os);<t:$sub[$cropText[$getTimestamp;0;10];$round[$osUptime]]:F>\n-# $parseMS[$multi[$osUptime;1000]];false;1]
-  $addField[Ping;\`$pingms / $round[$executionTime]ms\`;true;1]
+  $addField[Ping;\`$pingms / $round[$get[currentping]]ms\`;true;1]
   $addField[DB Ping;\`$round[$dbPing]ms\`;true;1]
   $addField[Player Ping;\`$round[$try[$djsEval[(0, require("discord-player").useQueue)(ctx.interaction.guild).ping];0]]ms\`;true;1]
   $addField[Total Connections;\`$get[countnode] / $guildCount\`;true;1]
   $addField[Player Type;\`Local\`;true;1]
   $addField[Version;\`v$version\`, \`v$djsVersion\`, \`$nodeVersion\`;true;1]
-  $footer[CPU: $round[$math[$cpu/($cpuCores*100)];2]% | RAM: $round[$ram;2]MB;;1]
+  $footer[CPU: $round[$math[$cpu/($cpuCores*10)];2]% | RAM: $round[$ram;2]MB;;1]
   $timestamp[;1]
+  $if[$botOwnerID==$authorID;
+  $addActionRow
+  $addButton[botinfoclearcache;Clear Search Caches;Secondary;🗑️]
+  ]
   `
 }

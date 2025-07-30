@@ -12,13 +12,13 @@ module.exports = {
 
     $if[$isValidLink[$focusedOptionValue]==false;
     $jsonLoad[testing;$callFunction[fastSearchTrack;$if[$focusedOptionValue!=;$focusedOptionValue;$getVar[cachesearchistory_user_autocomplete;$authorID]]]]
-    $if[$focusedOptionValue!=;$setVar[cachesearchistory_user_autocomplete;$authorID;$focusedOptionValue]]
+    $async[$if[$focusedOptionValue!=;$setVar[cachesearchistory_user_autocomplete;$authorID;$focusedOptionValue]]]
     $let[count;-1]
     $if[$env[testing;results;0]==;
     $addChoice[$if[$focusedOptionValue==;$getVar[cachesearchistory_user_autocomplete;$authorID];$focusedOptionValue];$if[$focusedOptionValue==;$getVar[cachesearchistory_user_autocomplete;$authorID];$focusedOptionValue]]
     ;
     $while[$charCount[$env[testing;results;$sum[$get[count];1]]]!=0;
-    $addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;$sum[$get[count];1]];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;$sum[$get[count];1]];";\\\\"]")]]
+    $addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;$sum[$get[count];1]];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;$sum[$get[count];1]];";\\\\"]\\\`)]]
     $letSum[count;1]
     ]
     ]

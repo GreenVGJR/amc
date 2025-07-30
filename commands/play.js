@@ -84,14 +84,14 @@ module.exports = {
   $let[use_provider;$get[fallback_provider]]
   $let[cac2;$env[result;id]]
   $onlyIf[$and[$get[cac1]!=;$get[cac2]!=];
-  $interactionFollowUp[
+  $interactionUpdate[
   $description[$callFunction[useCustomMusicMessage;config_errorNoResult]]
   $color[$callFunction[useIcon;error_color_embed]]
   $footer[slash]
   $timestamp
   ]]]
   $let[music_requestedBy;<@$authorID>]
-  $let[music_title;$env[result;title]]
+  $let[music_title;$inflate[$env[result;title];base64]]
   $let[music_id;$env[result;id]]
   $let[music_duration;$multi[$env[result;duration];1000]]
   $let[music_thumbnail;$if[$env[result;dynamic_thumbnail]==;$env[result;thumbnail];$env[result;dynamic_thumbnail]]]

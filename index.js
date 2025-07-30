@@ -3,20 +3,11 @@ const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
 const { ForgeDB } = require("@tryforge/forge.db");
 const { ForgeMusic, DefaultExtractors } = require('@tryforge/forge.music');
 
-// External
-const { ForgeYoutube } = require("forgeyoutube");
-
 // Extractor
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const { SoundcloudExtractor } = require("discord-player-soundcloud");
 
 require('dotenv').config(); // Load Environment
-
-const youtube = new ForgeYoutube({
-  youtube: {
-    apiKey: ""
-  }
-});
 
 const db = new ForgeDB({
     events: [
@@ -39,15 +30,12 @@ const music = new ForgeMusic({
         ],
     includeExtractors: DefaultExtractors,
     connectOptions: {
-        onBeforeCreateStream: true,
         bufferingTimeout: 0,
         connectionTimeout: 300000,
-        disableResampler: false,
         leaveOnEmpty: true,
         leaveOnEmptyCooldown: 30000,
-        pauseOnEmpty: true,
+        pauseOnEmpty: true
     },
-    skipFFmpeg: true,
     connectionTimeout: 86400000,
     probeTimeout: 0,
     lagMonitor: 0
@@ -76,9 +64,8 @@ const client = new ForgeClient({
         "?"
     ],
     extensions: [
-        db,
         music,
-        youtube
+        db
     ]
 });
 
@@ -116,19 +103,16 @@ client.commands.add({
 
     $logger[Info;Attempting to Generate]
     $callFunction[generateAuthKeys;all;;true]
-    $setInterval[$callFunction[generateAuthKeys;all;;true];1h]
+    $setInterval[$logger[Info;\nAttempting to Generate] $callFunction[generateAuthKeys;all;;true];1h]
     ` 
 });
 
 db.commands.add({
     type: "connect",
     code: `
-    $logger[Info;Waiting online]
+    $logger[Info;Waiting to online]
     $try[
     $deleteRecords[cachesearchistory_user_autocomplete]
-    ]
-    $try[
-    $deleteRecords[cachesearch_global]
     ]
     $try[
     $deleteRecords[musicplayer_message]

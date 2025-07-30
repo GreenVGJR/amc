@@ -19,19 +19,19 @@ module.exports = {
     $try[
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
     $if[$env[provider]==youtube;
-    $jsonLoad[loadser;$try[$youtubeVideoSearch[$env[query];10];{}]]
+    $jsonLoad[loadser;$try[$getYoutubeVideo[$env[query]];{}]]
     $jsonLoad[loadser2;$env[loadser;results]]
     $arrayLoad[results]
     $arrayForEach[loadser2;result;
-    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$if[$env[result;isLive];LIVE;$parseDigital[$multi[$env[result;durationSeconds];1000]]]","thumbnail":"$if[$env[result;animatedThumbnail;0;url]==;$env[result;thumbnail;0;url];$env[result;animatedThumbnail;0;url]]","url":"$if[$env[result;isLive];https://youtube.com/live/$env[result;id];$env[result;url]]"}]
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$if[$env[result;duration]==0;LIVE;$parseDigital[$multi[$env[result;duration];1000]]]","thumbnail":"$env[result;thumbnail]","url":"$env[result;url]"}]
     ]
     ;
     $if[$env[provider]==youtubemusic;
-    $jsonLoad[ser;$try[$ytMusicSearch[$env[query];10];{}]]
+    $jsonLoad[ser;$try[$getYoutubeMusic[$env[query]];{}]]
+    $jsonLoad[loadser;$env[ser;results]]
     $arrayLoad[results]
-    $arrayForEach[ser;result;
-    $jsonLoad[getytduration;$callFunction[extractTrack;$env[result;url]]]
-    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;name];\\\\;];";\\\\"]","duration":"$if[$env[getytduration;results;isLiveContent];LIVE;$parseDigital[$multi[$env[getytduration;results;lengthSeconds];1000]]]","thumbnail":"https://i.ytimg.com/vi_webp/$env[result;id]/maxresdefault.webp","url":"$env[result;url]"}]
+    $arrayForEach[loadser;result;
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[result;duration];1000]]","thumbnail":"$env[result;thumbnail]","url":"$env[result;url]"}]
     ]
     ;
     $if[$env[provider]==soundcloud;
@@ -105,12 +105,10 @@ module.exports = {
     ;refresh]
     $callLocalFunction[refreshdeezer;true]
     ]]]]]]]
+    $async[
     $if[$env[results;0]!=;
     $setVar[cachesearch_global;$md5[$env[query]$env[provider]];$deflate[$env[results];base64]]
-    $setTimeout[
-    $!deleteVar[cachesearch_global;$md5[$env[query]$env[provider]]]
-    ;24h]
-    ]
+    ]]
     ;
     $arrayLoad[results]
     ]
