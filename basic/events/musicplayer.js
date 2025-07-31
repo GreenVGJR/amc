@@ -5,16 +5,13 @@ module.exports = {
     $onlyIf[$advancedTextSplit[$customID;_;0]==musicplayer;]
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
-    $onlyIf[$get[mid]==$messageID;$!disableComponentsOf[$channelID;$messageID]]
+    $onlyIf[$get[mid]==$messageID;$!disableComponentsOf[$channelID;$messageID] $!deferUpdate]
     $onlyIf[$voiceID[$guildID;$clientID]!=;]
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;]
 
     $if[$advancedTextSplit[$customID;_;1]==nodequeue;
     $!deferUpdate
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $async[
-    $!disableComponentsOf[$get[cid];$get[mid]]
-    ]
     $if[$selectMenuValues[0]==0;
     $!skipTrack
     ;

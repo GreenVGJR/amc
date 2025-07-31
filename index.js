@@ -81,7 +81,7 @@ client.applicationCommands.load("commands") // Slash Command
 
 music.commands.load("back/events") // Events
 
-music.player.extractors.register(SoundcloudExtractor, {})
+music.player.extractors.register(SoundcloudExtractor, {});
 music.player.extractors.register(YoutubeiExtractor, {
     generateWithPoToken: true,
     ignoreSignInErrors: true,
@@ -103,7 +103,7 @@ client.commands.add({
 
     $logger[Info;Attempting to Generate]
     $callFunction[generateAuthKeys;all;;true]
-    $setInterval[$logger[Info;\nAttempting to Generate] $callFunction[generateAuthKeys;all;;true];1h]
+    $setInterval[$logger[Info;Attempting to Generate] $callFunction[generateAuthKeys;all;;true];1h]
     ` 
 });
 

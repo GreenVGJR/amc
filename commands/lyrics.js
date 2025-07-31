@@ -31,7 +31,7 @@ module.exports = {
     $!interactionFollowUp[
     $title[$env[result;results;autocomplete];$env[result;results;url]]
     $description[$codeBlock[$cropText[$get[loadlyrics];0;3900;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
-    $footer[$env[result;results;provider];$callFunction[useIcon;$env[result;results;provider]]]
+    $footer[$toTitleCase[$env[result;results;provider]];$callFunction[useIcon;$env[result;results;provider]]]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
     ]

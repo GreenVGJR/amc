@@ -143,6 +143,7 @@ module.exports = [{
     $fetchEmbeds[$channelID;$messageID;0]
     $footer[Attempting to Skip;$callFunction[useIcon;loading]]
     ]
+    $if[$getLoopMode!=OFF;$setLoopMode[OFF] $wait[1s]]
     $!skipTo[$sub[$queueLength;1]]
     $!deleteMessage[$channelID;$messageReferenceID[$channelID;$messageID]]
     ;

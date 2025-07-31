@@ -159,12 +159,13 @@ module.exports = {
   ]
 
   $if[$get[attemptry]>=$get[donetry];
+  $async[
   $!interactionUpdate[
   $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack] $codeBlock[$env[causeplayerror]]]
   $color[$callFunction[useIcon;error_color_embed]]
   $timestamp
   $footer[slash]
-  ]
+  ]]
   $setTimeout[
   $if[$get[iscreatedfirst]==false;$!interactionDelete]
   ;5s]
@@ -172,7 +173,13 @@ module.exports = {
   ]
 
   $if[$and[$queueLength!=0;$get[iscreatedfirst]==false];
-  $async[$if[$option[force_skip]==true;$!skipTo[$sub[$queueLength;1]]]]
+  $async[$if[$option[force_skip]==true;
+  $let[statusloop;$getLoopMode]
+  $if[$get[statusloop]==TRACK;$setLoopMode[OFF] $wait[1s]]
+  $!skipTo[$sub[$queueLength;1]]
+  $wait[1s]
+  $if[$get[statusloop]==TRACK;$setLoopMode[TRACK]]
+  ]]
   $!interactionUpdate[
   $if[$get[basic_type];
   $author[Add to Track;;;0]
