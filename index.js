@@ -121,6 +121,7 @@ db.commands.add({
     $deleteRecords[radioplayer_data]
     ]
     $!setGlobalVar[authmusic_youtube_key;]
+    $!setGlobalVar[authmusic_youtube_visitor;]
     $!setGlobalVar[authmusic_soundcloud;]
     $!setGlobalVar[authmusic_spotify;]
     $!setGlobalVar[authmusic_spotify_token;]

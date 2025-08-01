@@ -37,13 +37,15 @@ module.exports = {
             }
         }
     }]
-    $let[http;$httpRequest[https://music.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key];POST;reshttp]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $let[http;$httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=videoDetails;POST;reshttp]]
     $arrayPushJSON[results;{"status":$get[http],"results":$if[$env[reshttp;videoDetails]==;null;$env[reshttp;videoDetails]]}]
 
     ]
     $if[$env[filterid;type]==soundcloud;
     
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
     $let[http;$httpRequest[https://$get[spliturl];GET;reshttp]]
     $let[a;$advancedTextSplit[$env[reshttp];<script>window.__sc_hydration;1;= ;1;\\;</script>;0]]
     $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$replace[$replace[$get[a];/stream/hls;/stream/hls?client_id=$getGlobalVar[authmusic_soundcloud]];/stream/progressive;/stream/progressive?client_id=$getGlobalVar[authmusic_soundcloud]]]}]
@@ -59,6 +61,7 @@ module.exports = {
     $httpAddHeader[client-token;$getGlobalVar[authmusic_spotify_token]]
     $httpAddHeader[Accept;application/json]
     $httpAddHeader[Origin;https://open.spotify.com/]
+    $httpAddHeader[Accept-Encoding;gzip]
     $httpAddHeader[app-platform;WebPlayer]
     $httpAddHeader[spotify-app-version;1.0]
     $httpAddHeader[User-Agent;$get[agent]]
