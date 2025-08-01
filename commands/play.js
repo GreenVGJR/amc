@@ -64,7 +64,7 @@ module.exports = {
   $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
 
   $let[mid;$interactionReply[
-  $addField[Query;$codeBlock[$option[query]]]
+  $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
   $footer[Fetching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   $timestamp
