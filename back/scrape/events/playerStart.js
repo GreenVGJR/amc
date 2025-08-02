@@ -48,7 +48,7 @@ module.exports = {
     $stop
     ]
     $if[$or[$env[messageId]==;$env[channelId]==];
-    $!stopPlayer
+    $!stopTrack
     $stop
     ]
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$env[guildId];$env[channelId]];0]]
