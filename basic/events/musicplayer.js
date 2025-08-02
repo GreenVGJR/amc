@@ -10,7 +10,7 @@ module.exports = {
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;]
 
     $if[$advancedTextSplit[$customID;_;1]==nodequeue;
-    $!deferUpdate
+    $async[$!deferUpdate]
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $if[$selectMenuValues[0]==0;
     $!skipTrack
@@ -19,12 +19,12 @@ module.exports = {
     ]
     ]
     $if[$advancedTextSplit[$customID;_;1]==loop;
-    $!deferUpdate
+    $async[$!deferUpdate]
     $if[$getLoopMode==OFF;$setLoopMode[TRACK];
     $if[$getLoopMode==TRACK;$setLoopMode[QUEUE];$setLoopMode[OFF]
     ]]]
     $if[$advancedTextSplit[$customID;_;1]==shuffle;
-    $!deferUpdate
+    $async[$!deferUpdate]
     $let[statusshuffle;$getVar[musicplayer_message;$guildID_isshuffle;false]]
     $if[$get[statusshuffle];
     $!unShuffleQueue
@@ -43,32 +43,31 @@ module.exports = {
     $!interactionUpdate[
     $title[$env[result;results;autocomplete];$env[result;results;url]]
     $description[$codeBlock[$cropText[$get[loadlyrics];0;3900;\n\n(Unfortunately, i can't show the rest of them.)]]]
-    $footer[$env[result;results;provider];$callFunction[useIcon;$env[result;results;provider]]]
+    $footer[$toTitleCase[$env[result;results;provider]];$callFunction[useIcon;$env[result;results;provider]]]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
     ]
     ]
     $if[$advancedTextSplit[$customID;_;1]==volumedown;
-    $!deferUpdate
+    $async[$!deferUpdate]
     $!setVolume[$if[$sub[$getVolume;10]>=0;$sub[$getVolume;10];0]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==volumeup;
-    $!deferUpdate
+    $async[$!deferUpdate]
     $!setVolume[$if[$sum[$getVolume;10]<=150;$sum[$getVolume;10];150]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==volumemute;
-    $!deferUpdate
+    $async[$!deferUpdate]
     $!setVolume[$if[$getVolume==0;100;0]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==stopplayer;
     $ephemeral
-    $defer
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    $async[$defer $!interactionDelete]
     $!stopTrack
-    $!interactionDelete
     ]
     $if[$advancedTextSplit[$customID;_;1]==actionplayer;
-    $!deferUpdate
+    $async[$!deferUpdate]
     $if[$isPaused;$!resumeTrack;$!pauseTrack]
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekdown;

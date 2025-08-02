@@ -13,6 +13,10 @@ module.exports = {
   "description_localizations": {
     "id": "Mencari lirik | Sumber: YT Music, Lrclib, Genius, AZLyrics"
   },
+  "integration_types": [
+    0,
+    1
+  ],
   "contexts": [
     0
   ]

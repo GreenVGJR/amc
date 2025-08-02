@@ -15,9 +15,6 @@ module.exports = {
     $timestamp
     ]
     ]
-    $if[$or[$getComponents[$get[cid];$get[mid];3;1;disabled]==false;$and[$getVar[radioplayer_data;$guildID_playerstatus;false]==true;$getComponents[$get[cid];$get[mid];1;1;disabled]==false]];
-    $!disableComponentsOf[$get[cid];$get[mid]]
-    ]
     ]
 
     $!deleteVar[musicplayer_message;$guildID_messageid]

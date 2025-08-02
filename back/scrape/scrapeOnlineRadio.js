@@ -31,6 +31,7 @@ module.exports = {
     $try[
     
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
     $!httpRequest[https://onlineradiobox.com/search?part=1&q=$env[query]&c=$env[countrycode]&offset=$multi[$env[page];20];GET]
     $arrayLoad[res;"stations__station";$advancedTextSplit[$httpResult;class="stations-list";1]]
     $arrayForEach[res;rest;

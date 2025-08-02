@@ -69,7 +69,7 @@ module.exports = {
   $color[$callFunction[useIcon;color_embed]]
   $timestamp
   ;true]]
- 
+  
   $let[default_provider;$callFunction[configMusic;default_provider]]
   $let[fallback_provider;$callFunction[configMusic;fallback_provider]]
   $if[$isValidLink[$option[query]]==false;

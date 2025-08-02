@@ -34,7 +34,7 @@
 
     "config_errorStopTrack": "Already disconnect.",
 
-    "conifg_errorIntervalMessage": "Seems like the current message wasn't exist. This will be use to continue interval.",
+    "config_errorIntervalMessage": "Seems like the current message wasn't exist. This will be use to continue interval.",
 
     "config_errorRadioPlayer": "Stop the current active player before switching player.",
 

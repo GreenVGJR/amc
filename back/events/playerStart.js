@@ -12,7 +12,14 @@ module.exports = [{
     ]
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$if[$env[reason]!=filters;0]]]
 
+    $if[$messageExists[$get[cid];$get[mid]];
     $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[track];false;intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
+    ;
+    $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
+    $setVar[musicplayer_message;$guildID_channelid;$channelID]
+    $setVar[musicplayer_message;$guildID_messageid;$get[secmid]]
+    $callFunction[musicPlayerMessage;$channelID;$get[secmid];$env[track];false;intervalmusicmessage_$guildID_$channelID;$guildID;;$callFunction[configMusic;interval_message]]
+    ]
 
     $if[$callFunction[configMusic;interval_message];
     $setInterval[
@@ -79,7 +86,7 @@ module.exports = [{
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     ]
     $try[
-    $!disableComponentsOf[$get[cid];$get[mid]]
+    $if[$messageExists[$get[cid];$get[mid]];$!disableComponentsOf[$get[cid];$get[mid]]]
     ]
     `
 }]

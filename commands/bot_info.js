@@ -49,7 +49,11 @@ module.exports = {
   $addField[Version;\`v$version\`, \`v$djsVersion\`, \`$nodeVersion\`;true;1]
   $footer[CPU: $round[$math[$cpu/($cpuCores*10)];2]% | RAM: $round[$ram;2]MB;;1]
   $timestamp[;1]
+  $addActionRow
+  $addButton[$botInvite;Invite Bot;Link]
   $if[$botOwnerID==$authorID;
+  $addActionRow
+  $addButton[nulloptdonot;-- Developer Options --;Success;;true]
   $addActionRow
   $addButton[botinfoclearcache;Clear Search Caches;Secondary;🗑️]
   ]

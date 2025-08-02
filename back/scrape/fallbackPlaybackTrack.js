@@ -24,21 +24,25 @@ module.exports = {
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $jsonLoad[fts;$env[reshttp;streamingData;formats]]
     $jsonLoad[aa;$arrayConcat[;afs;fts]]
-    $jsonLoad[filter_aa;$arrayMap[aa;ab;$return[$replace[$env[ab];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$env[ab;contentLength];1]]]]
-    $let[getindex251;$arrayFindIndex[filter_aa;filters_aa;$env[filters_aa;itag]==251]]
-    $let[getindex140;$arrayFindIndex[filter_aa;filters_aa;$env[filters_aa;itag]==140]]
-    $let[getindex18;$arrayFindIndex[filter_aa;filters_aa;$env[filters_aa;itag]==18]]
+    $let[getindex251;$arrayFindIndex[aa;aaa;$env[aaa;itag]==251]]
+    $if[$get[getindex251]==-1;
+    $let[getindex140;$arrayFindIndex[aa;aaa;$env[aaa;itag]==140]]
+    $if[$get[getindex140]==-1;
+    $let[getindex18;$arrayFindIndex[aa;aaa;$env[aaa;itag]==18]]
+    $onlyIf[$get[getindex18]==-1;$return[null]]
+    ]]
     $let[lookindex;$if[$get[getindex251]!=;$get[getindex251];$if[$get[getindex140]!=;$get[getindex140];$get[getindex18]]]]
-    $let[getcdnyt;$env[filter_aa;$get[lookindex];url]]
-    $let[getcdnytlength;$env[filter_aa;$get[lookindex];contentLength]]
+    $let[getcdnyt;$env[aa;$get[lookindex];url]]
+    $let[getcdnytlength;$env[aa;$get[lookindex];contentLength]]
     $onlyIf[$or[$get[getcdnytlength]==;$get[getcdnytlength]==0]!=true;$return[live]]
     $let[finalurl;$get[getcdnyt]&cpn=$toLowercase[$randomString[16]]]
     $try[
-    $onlyIf[$httpRequest[$get[finalurl];HEAD]==200;$callLocalFunction[oncecode;true]]
+    $let[httpcode;$httpRequest[$replace[$get[finalurl];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-0;1];GET]]
+    $onlyIf[$get[httpcode]==200;$callLocalFunction[oncecode;true]]
     ;
     $callLocalFunction[oncecode;true]
     ]
-    $return[$trimLines[$get[finalurl]]]
+    $return[$trimLines[$replace[$get[finalurl];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]]]
     ;
     $if[$env[whattype;type]==soundcloud;
     $jsonLoad[test;$extractTrack[$env[url]]]

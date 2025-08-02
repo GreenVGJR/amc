@@ -47,6 +47,10 @@ module.exports = {
     $!clearInterval[$env[intervalName]]
     $stop
     ]
+    $if[$or[$env[messageId]==;$env[channelId]==];
+    $!stopPlayer
+    $stop
+    ]
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$env[guildId];$env[channelId]];0]]
     $let[changeevery_time;8000]
     $let[expectsecond;$multi[$second;1000]]
@@ -55,7 +59,7 @@ module.exports = {
     $if[$getVar[musicplayer_message;$env[guildId]_attemptseek]!=;$!deleteVar[musicplayer_message;$env[guildId]_attemptseek]]
     $if[$getVar[radioplayer_data;$env[guildId]_checkplayer]!=;$!deleteVar[radioplayer_data;$env[guildId]_checkplayer]]
     $if[$try[$messageExists[$env[channelId];$env[messageId]];false]==false;
-    $let[secmid;$sendMessage[$env[channelId];$callFunction[useCustomMusicMessage;conifg_errorIntervalMessage];true]]
+    $let[secmid;$sendMessage[$env[channelId];$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
     $setVar[musicplayer_message;$env[guildId]_channelid;$env[channelId]]
     $setVar[musicplayer_message;$env[guildId]_messageid;$get[secmid]]
     $stop

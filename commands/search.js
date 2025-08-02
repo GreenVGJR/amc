@@ -44,7 +44,17 @@ module.exports = {
       "name": "query",
       "description": "Search a song",
       "required": true
+    },
+    {
+      "type": 5,
+      "name": "ephemeral",
+      "description": "Respond on ephemeral?",
+      "required": false
     }
+  ],
+  "integration_types": [
+    0,
+    1
   ],
   "contexts": [
     0
@@ -56,22 +66,20 @@ module.exports = {
   type: 0,
   code: `
   $onlyIf[$guildID!=;]
-
-  $ephemeral
-  $defer
+  $if[$option[ephemeral]==true;$ephemeral]
 
   $let[check;$getVar[cachesearch_global;$md5[$option[query]$option[provider]];null]]
   $if[$get[check]==null;
+  $defer
   $jsonLoad[loadser;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
   $onlyIf[$env[loadser;0]!=;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
   ;
   $jsonLoad[loadser;$inflate[$get[check];base64]]
   ]
   $let[currentping;$round[$executionTime;0]]
-  $arrayLoad[results]
+  $interactionReply[
   $arraySlice[loadser;loadser;0;10]
   $arrayReverse[loadser;loadser]
-  $!interactionReply[
   $addContainer[
   $addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms\`]
   $addSeparator[Large;true]

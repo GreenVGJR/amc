@@ -48,6 +48,7 @@ module.exports = [{
     $defer
     $let[code;$selectMenuValues[0]]
     $try[
+    $httpAddHeader[Accept-Encoding;gzip]
     $!httpRequest[https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/;GET]
     
     $let[current_track;$replace[$replace[$replace[$replace[$replace[$replace[$replace[$advancedTextSplit[$httpResult;class="station-onair";1;class="track_history_item";1;class="ajax">;1;</a>;0];<a>;];</a>;];<i>;];</i>;];<b>;];</b>;];";\\\\"]]
