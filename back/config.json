@@ -1,7 +1,7 @@
 {
     "_comment": "Currently only youtube / soundcloud / spotify for searching",
-    "default_provider": "youtube",
-    "fallback_provider": "spotify",
+    "default_provider": "spotify",
+    "fallback_provider": "youtube",
 
     "debug_auth": false,
     "autodelete_nextmessage": false,

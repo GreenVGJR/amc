@@ -45,10 +45,13 @@ module.exports = {
     ]
     ;
     $if[$env[provider]==spotify;
+    $let[tryattempt;0]
     $localFunction[refreshspotify;
     $try[
     $if[$env[refresh]==true;
+    $onlyIf[$get[tryattempt]<5;$return[{}]]
     $callFunction[generateAuthKeys;spotify;;false]
+    $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]

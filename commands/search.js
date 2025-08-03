@@ -66,7 +66,7 @@ module.exports = {
   type: 0,
   code: `
   $onlyIf[$guildID!=;]
-  $if[$option[ephemeral]==true;$ephemeral]
+  $if[$option[ephemeral]!=true;$ephemeral]
 
   $let[check;$getVar[cachesearch_global;$md5[$option[query]$option[provider]];null]]
   $if[$get[check]==null;

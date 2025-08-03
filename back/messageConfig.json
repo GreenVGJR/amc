@@ -43,5 +43,10 @@
     "config_generalFailSeekTrack": "Failed to seek.",
     "config_generalStopTrack": "OK",
     "config_generalSkipTrack": "Skipped.",
-    "config_generalVolumeTrack": "Volume changed to:"
+    "config_generalVolumeTrack": "Volume changed to:",
+
+    "config_generalInvalidLinkDownload": "Must be link.",
+    "config_generalInvalidProviderDownload": "Invalid provider. Only accepts: Youtube, Soundcloud, Spotify",
+    "config_generalEmptyDownload": "Can't download this.",
+    "config_generalOverDownload": "Can't download this track if it's above 10MB."
 }

@@ -31,15 +31,18 @@ module.exports = {
     $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[pullyt;ping]","results":{"provider":"youtube","query":"$encodeURI[$env[query]]","url":"$if[$env[isExclude]!=true;$trackInfo[url];$env[pullyt;results;0;url]]","autocomplete":"$if[$env[isExclude]!=true;$decodeURI[$env[query]];$env[pullyt;results;0;title]]","lyric":"$deflate[$get[ytmusic];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
     $let[http_2;$httpRequest[https://lrclib.net/api/search?q=$env[query];GET;ges1]]
     $if[$env[ges1;0;id]!=;
     $arrayLoad[results;]
     $arrayPushJSON[results;$trimLines[{"status_1":$get[http_2],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"lrclib","query":"$encodeURI[$env[query]]","url":"https://lrclib.net/api/get/$env[ges1;0;id]","autocomplete":"$env[ges1;0;name]","lyric":"$deflate[$if[$env[ges1;0;instrumental];\\[Instrumental\\];$env[ges1;0;plainLyrics]];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
     $let[http_1;$httpRequest[https://genius.com/api/search/song?&per_page=1&q=$env[query];GET;ges]]
     $if[$env[ges;response;sections;0;hits;0]!=;
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
     $let[http2_1;$httpRequest[https://genius.com$env[ges;response;sections;0;hits;0;result;api_path]/embed.js;GET;ges2]]
     $let[a2;$advancedTextSplit[$replace[$replace[$env[ges2];\\\\;];<br>;];<p>;1;</p>;0]]
     $if[$advancedTextSplit[$get[a2];<a href=";1]!=;
@@ -53,6 +56,7 @@ module.exports = {
     $arrayPushJSON[results;$trimLines[{"status_1":$get[http_1],"status_2":$get[http2_1],"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"genius","query":"$encodeURI[$env[query]]","url":"$env[ges;response;sections;0;hits;0;result;url]","autocomplete":"$env[ges;response;sections;0;hits;0;result;title_with_featured]","lyric":"$deflate[$get[a2_filtering];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
     $let[http;$httpRequest[https://search.azlyrics.com/suggest.php?q=$encodeURI[$env[query]]&x=$getGlobalVar[authmusic_azlyrics];GET;res]]
     $let[cacsongs;$advancedTextSplit[$env[res];"songs":;1;\\[;1;\\];0]]
     $onlyIf[$get[cacsongs]!=;$return[{}]]

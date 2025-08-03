@@ -4,7 +4,7 @@ module.exports = {
     code: `
     $onlyIf[$advancedTextSplit[$customID;_;0]==musicplayerhidequeue]
     $onlyIf[$advancedTextSplit[$customID;_;1]==$authorID]
-    $!deferUpdate
+
     $let[nodes;$if[$hasMusicNode;$isPlaying;false]]
     $onlyIf[$get[nodes];$!interactionDelete]
 
