@@ -45,8 +45,6 @@ const music = new ForgeMusic({
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
     logLevel: LogPriority.Low,
-    shards: "auto",
-    shardCount: 3,
     intents: [
         "Guilds",
         "GuildMembers",

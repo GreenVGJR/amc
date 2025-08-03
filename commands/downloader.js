@@ -33,7 +33,6 @@ code: `
 $onlyIf[$guildID!=;]
 
 $ephemeral
-$onlyIf[$hasPerms[$guildID;$clientID;AttachFiles];$callFunction[useCustomMusicMessage;config_errorPerm] **Attach Files** - <@$clientID>]
 $onlyIf[$isValidLink[$option[url]];$callFunction[useCustomMusicMessage;config_generalInvalidLinkDownload]]
 $jsonLoad[musictype;$callFunction[filterMediaID;$option[url]]]
 $onlyIf[$or[$env[musictype;id]!=;$env[musictype;id]!=null;$env[musictype;type]!=null];$callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
