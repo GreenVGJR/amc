@@ -50,7 +50,7 @@ module.exports = {
   $footer[CPU: $round[$math[$cpu/($cpuCores*10)];2]% | RAM: $round[$ram;2]MB;;1]
   $timestamp[;1]
   $addActionRow
-  $addButton[$botInvite;Invite Bot;Link]
+  $addButton[https://discord.com/api/oauth2/authorize?client_id=$clientID&scope=bot+applications.commands&permissions=3263488;Invite Bot;Link]
   $if[$botOwnerID==$authorID;
   $addActionRow
   $addButton[nulloptdonot;-- Developer Options --;Success;;true]
