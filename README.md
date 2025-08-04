@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github-readme-stats.vercel.app/api/pin/?username=greenvgjr&repo=amc-discord-bot&theme=dark&cache=2" alt=""/>
+  <img src="https://github-readme-stats.vercel.app/api/pin/?username=greenvgjr&repo=amc-discord-bot&theme=dark" alt=""/>
   <p><b><br>Discord music bot for <a href="https://github.com/tryforge/ForgeScript">ForgeScript.js</a> and <a href="https://botdesignerdiscord.com/">BDFD</a></b></p>
   <div>
   <a href="https://github.com/tryforge/ForgeScript"><img src="https://github.com/user-attachments/assets/ce7c0de3-1ad2-4d5d-a60b-2bf9c3da1f64" loading="lazy" width=50 height=50 alt="Forgescript"/></a>
@@ -54,7 +54,7 @@ while still offering some cool features. :D
 - [Emoji.gg](https://emoji.gg/) - Emojis source<br>
 - [Cyberghxst/Sora](https://github.com/Cyberghxst/Sora/) - FS & FM configs<br>
 - [skick1234/DisTube](https://github.com/skick1234/DisTube) - Style reference<br>
-- [ForgeYoutube](https://github.com/Zack-911/ForgeYoutube/tree/dev) - Extensions for FS
+- ~~[ForgeYoutube](https://github.com/Zack-911/ForgeYoutube/tree/dev) - Extensions for FS~~
 
 <br>
 <div align="center">
