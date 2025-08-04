@@ -57,15 +57,29 @@ ___
 
 ```js
 - Find Lyrics from current/specific song
-  = Lrclib, Genius, AZLyrics
-- Search a songs
-  = Youtube, Youtube Music, Soundcloud, Spotify, Apple Music, Amazon Music, Deezer
+  Providers:
+  = > Youtube Music
+    > Lrclib
+    > Genius
+    > AZLyrics
+
+- Search a songs (Max. 10 Result)
+  Providers:
+  = > Youtube
+    > Youtube Music
+    > Soundcloud
+    > Spotify
+    > Apple Music
+    > Amazon Music
+    > Deezer
+
 - Auto-generate auth keys needed
-- Dynamic message
+- Dynamic info message
+- Show suggestion song name
 - Controller
 - Queue
-- Seek
 - Skip song
+- Seek to specific duration
 - Change Volume
 - Stop song
 - Show bot information
@@ -81,6 +95,8 @@ ___
 
 </summary>
 
-Not yet testing
+![Preview 1](https://github.com/user-attachments/assets/5cf219b9-f6a2-4a08-bdb2-4df5f8743e21)
+![Preview 2](https://github.com/user-attachments/assets/d75568aa-948d-48bc-a93e-827749a48613)
+![Preview 3](https://github.com/user-attachments/assets/4f99016b-5987-4662-bda0-dc282bca7343)
 
 </details>
