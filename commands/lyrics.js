@@ -1,7 +1,7 @@
 module.exports = {
   data: {
   "name": "lyrics",
-  "description": "Search for lyrics | Providers: Lrclib, Genius, AZLyrics",
+  "description": "Search for lyrics | Providers: YT Music, Lrclib, Genius, AZLyrics",
   "options": [
     {
       "type": 3,
@@ -11,8 +11,12 @@ module.exports = {
     }
   ],
   "description_localizations": {
-    "id": "Mencari lirik | Sumber: Lrclib, Genius, AZLyrics"
+    "id": "Mencari lirik | Sumber: YT Music, Lrclib, Genius, AZLyrics"
   },
+  "integration_types": [
+    0,
+    1
+  ],
   "contexts": [
     0
   ]
@@ -25,12 +29,13 @@ module.exports = {
     $defer
 
     $jsonLoad[result;$callFunction[getLyricsTrack;$option[song_name];;true]]
-    $onlyIf[$env[result;results]!=;No lyrics were available.]
-    $if[$charCount[$env[result;results;lyric]]>3900;$attachment[$env[result;results;lyric];lyrics-$getTimestamp.txt;true]]
+    $onlyIf[$env[result;results]!=;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
+    $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
+    $if[$charCount[$get[loadlyrics]]>3900;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
     $!interactionFollowUp[
     $title[$env[result;results;autocomplete];$env[result;results;url]]
-    $description[$codeBlock[$cropText[$env[result;results;lyric];0;3900;\n\n(Unfortunately, i can't show the rest of them.)]]]
-    $footer[$env[result;results;provider];$callFunction[useIcon;$env[result;results;provider]]]
+    $description[$codeBlock[$cropText[$get[loadlyrics];0;3900;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
+    $footer[$toTitleCase[$env[result;results;provider]];$callFunction[useIcon;$env[result;results;provider]]]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
     ]

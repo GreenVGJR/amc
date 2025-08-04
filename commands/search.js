@@ -44,7 +44,17 @@ module.exports = {
       "name": "query",
       "description": "Search a song",
       "required": true
+    },
+    {
+      "type": 5,
+      "name": "ephemeral",
+      "description": "Respond on ephemeral?",
+      "required": false
     }
+  ],
+  "integration_types": [
+    0,
+    1
   ],
   "contexts": [
     0
@@ -56,25 +66,35 @@ module.exports = {
   type: 0,
   code: `
   $onlyIf[$guildID!=;]
+  $if[$or[$option[ephemeral]==;$option[ephemeral]==true];$ephemeral]
 
-  $ephemeral
+  $let[check;$getVar[cachesearch_global;$md5[$option[query]$option[provider]];null]]
+  $if[$get[check]==null;
   $defer
-
   $jsonLoad[loadser;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
-  $onlyIf[$env[loadser;0]!=;No result.]
-  $arrayLoad[results]
-  $arraySlice[loadser;loadser;0;9]
-  $arrayReverse[loadser;loadser]
-  $let[count;0]
-  $!interactionFollowUp[
-  $arrayForEach[loadser;result;
-  $author[$env[result;title];;;$get[count]]
-  $addField[URL;$env[result;url];true;$get[count]]
-  $addField[Duration;$env[result;duration];true;$get[count]]
-  $thumbnail[$if[$or[$env[result;thumbnail]==null;$env[result;thumbnail]==];$userDefaultAvatar[$authorID];$env[result;thumbnail]];$get[count]]
-  $color[aa$randomBytes[2];$get[count]]
-  $letSum[count;1]
+  $onlyIf[$env[loadser;0]!=;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
+  ;
+  $jsonLoad[loadser;$inflate[$get[check];base64]]
   ]
+  $let[currentping;$round[$executionTime;0]]
+  $interactionReply[
+  $arraySlice[loadser;loadser;0;10]
+  $arrayReverse[loadser;loadser]
+  $addContainer[
+  $addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms\`]
+  $addSeparator[Large;true]
+  $arrayForEach[loadser;result;
+  $addSection[
+  $addTextDisplay[
+  > ### $replace[$env[result;title];#;\\\\#]
+  > $env[result;url]
+
+  Duration: \`$if[$and[$advancedTextSplit[$env[result;duration];:;1]==;$advancedTextSplit[$env[result;duration];:;2]==];$advancedTextSplit[$env[result;duration];:;0];$if[$advancedTextSplit[$env[result;duration];:;0]==00;$advancedTextSplit[$env[result;duration];:;1]:$advancedTextSplit[$env[result;duration];:;2];$env[result;duration]]]\`
+  ]
+  $addThumbnail[$if[$or[$env[result;thumbnail]==null;$env[result;thumbnail]==];$userDefaultAvatar[$authorID];$env[result;thumbnail]]]
+  ]
+  ]
+  ;aa$randomBytes[2]]
   ]
   `
 }

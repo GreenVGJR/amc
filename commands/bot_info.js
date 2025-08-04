@@ -23,12 +23,12 @@ module.exports = {
   $if[$hasPlayer[$env[guilds]];$letSum[countnode;1]]
   ]]
 
-  $let[owner_banner;$userBanner[$botOwnerID;2048]]
+  $let[owner_banner;$try[$userBanner[$botOwnerID;2048]]]
 
   $author[$username[$authorID] / $botOwnerID;;;0]
   $title[Owner;;0]
   $thumbnail[$userAvatar[$botOwnerID];0]
-  $color[$randomBytes[3];0]
+  $color[aa$randomBytes[2];0]
   $addField[Created At;<t:$cropText[$userCreatedAt[$authorID];0;10]:F>;true;0]
   $if[$get[owner_banner]!=;$addField[Banner;\\[Image\\]($get[owner_banner]);true;0]]
   $author[$username[$clientID] / $clientID;;;1]
@@ -45,7 +45,15 @@ module.exports = {
   $addField[Total Connections;\`$get[countnode] / $guildCount\`;true;1]
   $addField[Player Type;\`Lavalink\`;true;1]
   $addField[Version;\`v$version\`, \`v$djsVersion\`, \`$nodeVersion\`;true;1]
-  $footer[CPU: $round[$math[$cpu/($cpuCores*100)];2]% | RAM: $round[$ram;2]MB;;1]
+  $footer[CPU: $round[$math[$cpu/($cpuCores*10)];2]% | RAM: $round[$ram;2]MB;;1]
   $timestamp[;1]
+  $addActionRow
+  $addButton[https://discord.com/api/oauth2/authorize?client_id=$clientID&scope=bot+applications.commands&permissions=3263488;Invite Bot;Link]
+  $if[$botOwnerID==$authorID;
+  $addActionRow
+  $addButton[nulloptdonot;-- Developer Options --;Success;;true]
+  $addActionRow
+  $addButton[botinfoclearcache;Clear Search Caches;Secondary;🗑️]
+  ]
   `
 }

@@ -4,7 +4,7 @@
     "@tryforge/forge.linked": "^1.2.0",
     "@tryforge/forgescript": "github:tryforge/ForgeScript#dev",
     "dotenv": "^16.5.0",
-    "forgeyoutube": "github:zack-911/forgeyoutube#dev",
+    "entities": "^6.0.1",
     "sqlite3": "^5.1.7"
   }
 }

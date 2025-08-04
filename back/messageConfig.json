@@ -1,0 +1,45 @@
+{
+    "_WARNING": [
+        "-- DO NOT CHANGE THE NAMES EACH OF THESE.",
+        "-- ONLY VALUE ARE ALLOWED."
+    ],
+
+    "config_errorJoin": "You must be in a voice channel.",
+    "config_errorClientPlayer": "Nothing is playing.",
+    "config_errorChannelPerm": "Can't join to voice channel.\nReason:",
+    "config_errorPerm": "Missing Permission,",
+    "config_errorIsSameVC": "You must same with {client} in",
+
+    "config_errorAttemptSearch": "[WARNING] Execute this Application in Server.",
+    "config_errorAttemptSearchJoinVC": "[WARNING] You must be on voice channel to use this.",
+    "config_errorAttemptRadioPlayer": "[WARNING] Stop the current active player before switching player.",
+
+    "config_errorNoResult": "No results found.",
+    "config_errorNoResultSearch": "No result.",
+    "config_errorNoResultLyrics": "No lyrics were available.",
+    "config_errorOverResultLyrics": "Unfortunately, i can't show the rest of them.",
+    
+    "config_errorPlayTrack": "Can't process this.\nError:",
+    "config_errorPlayTrackEvents": "Can't process this.",
+    "config_errorNoQueue": "There's no active player.",
+    "config_errorNoQueueList": "There's no track on this queue.",
+
+    "config_errorLiveBeforeSeek": "This track is LIVE.",
+    "config_errorPauseBeforeSeek": "You can't seek while it's paused.",
+    "config_errorProcessSeek": "It's still processing.",
+
+    "config_errorNoTrackBeforeSeek": "Nothing to skip track.",
+    "config_errorPlayerBeforeSeek": "Disable loop mode to skip.",
+    "config_errorPositionBeforeSeek": "Nothing to skip on position:",
+
+    "config_errorStopTrack": "Already disconnect.",
+
+    "config_errorIntervalMessage": "Seems like the current message wasn't exist. This will be use to continue interval.",
+
+    "config_generalForceSkipTrack": "Attempting to Skip...",
+    "config_generalSeekTrack": "Seek to",
+    "config_generalFailSeekTrack": "Failed to seek.",
+    "config_generalStopTrack": "OK",
+    "config_generalSkipTrack": "Skipped.",
+    "config_generalVolumeTrack": "Volume changed to:"
+}

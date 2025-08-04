@@ -8,9 +8,8 @@
         "https://github.com/Cyberghxst/Sora/blob/main/constants.json"
     ],
 
-    "youtube": ["^.*(?:(?:youtu\\.be\\/|v\\/|vi\\/|u\\/\\w\\/|embed\\/|shorts\\/)|(?:(?:watch)?\\?v(?:i)?=|\\&v(?:i)?=))([^#\\&\\?]{11}).*", 1],
+    "youtube": ["^.*(?:(?:youtu\\.be\\/|v\\/|vi\\/|u\\/\\w\\/|embed\\/|shorts\\/|watch\\/|live\\/)|(?:(?:watch)?\\?v(?:i)?=|\\&v(?:i)?=))([^#\\&\\?]{11}).*", 1],
     "soundcloud": ["^((https?:\\/\\/)?(?:(?:www|on)\\.)?(snd\\.sc|soundcloud\\.com)\\/([a-zA-Z0-9_-]+\\/?(?:[a-zA-Z0-9_-]+)?))", 4],
-    "tiktok": ["^(?:https?:\\/\\/)?(?:m|www|vm|vt)?\\.tiktok\\.com\\/((?:(?:@[^\\/]*\\/video\\/)|(?:v\\/))(\\d+)|(\\w+))", 1, 1],
     "spotify": ["^https?:\\/\\/(?:open\\.spotify\\.com\\/|spotify:)(user|episode|playlist|track|album|artist)(?:[:\\/])([a-zA-Z0-9]+)(?:\\?.*)?$", 2],
     "deezer": ["^https?:\\/\\/(?:www\\.)?deezer\\.com\\/(track|album|playlist)\\/(\\d+)$", 2],
     "vimeo": ["^https?:\/\/(?:www\\.)?vimeo\\.com.+?(\\d+).*$", 2]

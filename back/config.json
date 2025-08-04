@@ -1,8 +1,9 @@
 {
-    "_comment": "Currently only YT & SC for searching",
+    "_comment": "Currently only youtube / soundcloud / spotify for searching",
     "default_provider": "youtube",
-    "fallback_provider": "soundcloud",
+    "fallback_provider": "spotify",
 
     "debug_auth": false,
-    "autodelete_nextmessage": true
+    "autodelete_nextmessage": false,
+    "interval_message": false
 }

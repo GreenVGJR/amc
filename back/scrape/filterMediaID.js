@@ -11,7 +11,6 @@ module.exports = {
 
     $if[$checkContains[$get[url];youtube.com;youtu.be];$let[type;youtube]]
     $if[$checkContains[$get[url];soundcloud.com];$let[type;soundcloud]]
-    $if[$checkContains[$get[url];tiktok.com];$let[type;tiktok]]
     $if[$checkContains[$get[url];open.spotify.com];$let[type;spotify]]
     $if[$checkContains[$get[url];deezer.com];$let[type;deezer]]
     $if[$checkContains[$get[url];vimeo.com];$let[type;vimeo]]

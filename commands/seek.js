@@ -21,17 +21,17 @@ module.exports = {
   code: `
     $onlyIf[$guildID!=;]
     $ephemeral
-    $onlyIf[$voiceID!=;You must join a voice channel.]
-    $onlyIf[$voiceID[$guildID;$clientID]!=;Nothing is playing.]
-    $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;You must same with <@$clientID> in <#$voiceID[$guildID;$clientID]>.]
-    $onlyIf[$hasPlayer[$guildID];Nothing is playing.]
-
+    $onlyIf[$voiceID!=;$callFunction[useCustomMusicMessage;config_errorJoin]]
+    $onlyIf[$hasPlayer[$guildID]!=false;$callFunction[useCustomMusicMessage;config_errorClientPlayer]]
+    $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
+    
     $jsonLoad[currenttrackinfo;$currentTrackInfo[$guildID]]
 
     $let[checkdurationms;$env[currenttrackinfo;info;length]]
-    $onlyIf[$get[checkdurationms]!=0;This track is LIVE.]
-    $onlyIf[$isPaused[$guildID]!=true;You can't seek while it's paused.]
-    $onlyIf[$getVar[musicplayer_message;$guildID_attemptseek;false]==false;It's still processing.]
+    $let[checkstream;$env[currenttrackinfo;info;isStream]]
+    $onlyIf[$get[checkstream]!=true;$callFunction[useCustomMusicMessage;config_errorLiveBeforeSeek]]
+    $onlyIf[$isPaused[$guildID]!=true;$callFunction[useCustomMusicMessage;config_errorPauseBeforeSeek]]
+    $onlyIf[$getVar[musicplayer_message;$guildID_attemptseek;false]==false;$callFunction[useCustomMusicMessage;config_errorProcessSeek]]
     
     $defer
 

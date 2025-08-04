@@ -16,12 +16,12 @@ module.exports = {
 
   $let[nodes;$hasPlayer[$guildID]]
   $ephemeral
-  $onlyIf[$get[nodes];There's no active player.]
+  $onlyIf[$get[nodes];$callFunction[useCustomMusicMessage;config_errorNoQueue]]
   $defer
 
   $jsonLoad[rest;$queue[$guildID]]
   $jsonLoad[rest;$env[rest;tracks]]
-  $arraySlice[rest;rest;1;15]
+  $arraySlice[rest;rest;0;15]
   $arrayMap[rest;rest2;$if[$env[rest2;trackTitle]!=;$return[$env[rest2;trackTitle]]];rest]
 
   $let[count;1]

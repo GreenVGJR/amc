@@ -24,6 +24,7 @@ module.exports = {
     $onlyIf[$or[$env[filterid;id]==null;$env[filterid;type]==null]!=true;$return[{}]]
     $arrayLoad[results;]
     
+    $try[
     $if[$env[filterid;type]==youtube;
     
     $httpAddHeader[User-Agent;$get[agent]]
@@ -36,33 +37,45 @@ module.exports = {
             }
         }
     }]
-    $let[http;$httpRequest[https://music.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key];POST;reshttp]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $let[http;$httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=videoDetails;POST;reshttp]]
     $arrayPushJSON[results;{"status":$get[http],"results":$if[$env[reshttp;videoDetails]==;null;$env[reshttp;videoDetails]]}]
 
     ]
     $if[$env[filterid;type]==soundcloud;
     
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
     $let[http;$httpRequest[https://$get[spliturl];GET;reshttp]]
     $let[a;$advancedTextSplit[$env[reshttp];<script>window.__sc_hydration;1;= ;1;\\;</script>;0]]
     $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$replace[$replace[$get[a];/stream/hls;/stream/hls?client_id=$getGlobalVar[authmusic_soundcloud]];/stream/progressive;/stream/progressive?client_id=$getGlobalVar[authmusic_soundcloud]]]}]
     
     ]
-    $if[$env[filterid;type]==tiktok;
-
+    $if[$env[filterid;type]==spotify;
+    $let[tryattempt;0]
+    $localFunction[refreshspotify;
+    $if[$env[refresh]==true;
+    $onlyIf[$get[tryattempt]<5;$return[{}]]
+    $callFunction[generateAuthKeys;spotify;;false]
+    $letSum[tryattempt;1]
+    ]
+    $httpAddHeader[authorization;Bearer $getGlobalVar[authmusic_spotify]]
+    $httpAddHeader[client-token;$getGlobalVar[authmusic_spotify_token]]
+    $httpAddHeader[Accept;application/json]
+    $httpAddHeader[Origin;https://open.spotify.com/]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[app-platform;WebPlayer]
+    $httpAddHeader[spotify-app-version;1.0]
     $httpAddHeader[User-Agent;$get[agent]]
-    $let[http;$httpRequest[https://$get[spliturl];GET;reshttp]]
-    $let[a;$advancedTextSplit[$env[reshttp];"webapp.video-detail":;1;,"webapp.;0]]
-    $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$get[a]]}]
+    $jsonLoad[test;$filterMediaID[$get[url]]]
+    $let[gid;$djsEval[(id => \\[...id\\].reduce((a, c) => a * 62n + BigInt("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(c)), 0n).toString(16).padStart(32, '0'))("$env[test;id]")]]
+    $let[http;$httpRequest[https://spclient.wg.spotify.com/metadata/4/track/$get[gid];GET;a]]
+    $onlyIf[$or[$get[http]==401;$get[http]==400]!=true;$callLocalFunction[refreshspotify;true]]
+    $arrayPushJSON[results;{"status":$get[http],"results":$if[$env[a]==;null;$env[a]]}]
+    ;retry]
+    $callLocalFunction[refreshspotify;false]
 
     ]
-    $if[$env[filterid;type]==spotify;
-    
-    $httpAddHeader[User-Agent;$get[agent]]
-    $let[http;$httpRequest[https://open.spotify.com/embed$advancedTextSplit[$get[url];$advancedTextSplit[$get[url];://;1;/;0];1];GET;reshttp]]
-    $let[a;$advancedTextSplit[$env[reshttp];__NEXT_DATA__;1;">;1;</script>;0]]
-    $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$get[a]]}]
-
     ]
     $let[resultforeturn;$if[$env[results;0]==;{};$env[results;0]]]
     $return[$if[$and[$env[limitChar]==true;$env[limitChar]!=false];$cropText[$get[resultforeturn];1;2000;];$get[resultforeturn]]]

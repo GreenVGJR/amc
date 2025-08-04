@@ -3,6 +3,6 @@ module.exports = {
     type: "messageCreate",
     code: `
     $onlyIf[$botOwnerID==$authorID]
-    $eval[$message]
+    $eval[$message;false]
     `
 }
