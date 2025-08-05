@@ -30,15 +30,15 @@ const music = new ForgeMusic({
         ],
     includeExtractors: DefaultExtractors,
     connectOptions: {
-        bufferingTimeout: 0,
+        bufferingTimeout: 1000,
         connectionTimeout: 300000,
         leaveOnEmpty: true,
         leaveOnEmptyCooldown: 30000,
         pauseOnEmpty: true
     },
     connectionTimeout: 86400000,
-    probeTimeout: 0,
-    lagMonitor: 0
+    probeTimeout: 86400000,
+    lagMonitor: 300000
     // For avoids connect error thing
 });
 
@@ -70,25 +70,23 @@ const client = new ForgeClient({
 client.login();
 
 // Custom Functions, Autocomplete, Events
-client.functions.load("back/scrape")
-client.commands.load("basic/autocomplete") 
-client.commands.load("basic/events")
+client.functions.load("back/scrape");
+client.commands.load("basic/autocomplete"); 
+client.commands.load("basic/events");
 
-client.commands.load("basic/commands") // Basic Command
-client.applicationCommands.load("commands") // Slash Command
+client.commands.load("basic/commands"); // Basic Command
+client.applicationCommands.load("commands"); // Slash Command
 
-music.commands.load("back/events") // Events
+music.commands.load("back/events"); // Events
 
 music.player.extractors.register(SoundcloudExtractor, {});
 music.player.extractors.register(YoutubeiExtractor, {
     generateWithPoToken: true,
-    ignoreSignInErrors: true,
     forceRevalidate: true,
     disablePlayer: false,
     slicePlaylist: true,
     streamOptions: {
-        useClient: "WEB_EMBEDDED",
-        highWaterMark: 1<<25
+        useClient: "YTMUSIC"
     }
 });
 

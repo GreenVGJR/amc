@@ -15,6 +15,7 @@ module.exports = {
     $timestamp
     ]
     ]
+    $!disableComponentsOf[$get[cid];$get[mid]]
     ]
 
     $!deleteVar[musicplayer_message;$guildID_messageid]
