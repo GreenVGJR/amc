@@ -26,7 +26,7 @@ module.exports = {
 
   $let[owner_banner;$try[$userBanner[$botOwnerID;2048]]]
 
-  $author[$username[$authorID] / $botOwnerID;;;0]
+  $author[$username[$botOwnerID] / $botOwnerID;;;0]
   $title[Owner;;0]
   $thumbnail[$userAvatar[$botOwnerID];0]
   $color[aa$randomBytes[2];0]

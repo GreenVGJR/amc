@@ -37,8 +37,8 @@ const music = new ForgeMusic({
         pauseOnEmpty: true
     },
     connectionTimeout: 86400000,
-    probeTimeout: 86400000,
-    lagMonitor: 300000
+    probeTimeout: 30000,
+    lagMonitor: 30000
     // For avoids connect error thing
 });
 
