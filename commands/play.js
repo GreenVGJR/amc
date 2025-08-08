@@ -62,17 +62,11 @@ module.exports = {
   $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
 
   $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
-
-  $let[mid;$interactionReply[
-  $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
-  $footer[Fetching;$callFunction[useIcon;loading]]
-  $color[$callFunction[useIcon;color_embed]]
-  $timestamp
-  ;true]]
   
   $let[default_provider;$callFunction[configMusic;default_provider]]
   $let[fallback_provider;$callFunction[configMusic;fallback_provider]]
   $if[$isValidLink[$option[query]]==false;
+  $defer
   $let[basic_type;true]
   $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$if[$option[provider]!=;$option[provider];$get[default_provider]];null]]
   $let[tempstoreurl;$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtube;https://youtube.com/watch/$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==soundcloud;https://soundcloud.com/$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==spotify;https://open.spotify.com/track/$env[result;id]]]]]
@@ -84,7 +78,7 @@ module.exports = {
   $let[use_provider;$get[fallback_provider]]
   $let[cac2;$env[result;id]]
   $onlyIf[$and[$get[cac1]!=;$get[cac2]!=];
-  $interactionUpdate[
+  $interactionReply[
   $description[$callFunction[useCustomMusicMessage;config_errorNoResult]]
   $color[$callFunction[useIcon;error_color_embed]]
   $footer[slash]
@@ -100,8 +94,7 @@ module.exports = {
   $let[isforcedirect;$option[direct_cdn]]
 
   $if[$get[iscreatedfirst];
-  $async[
-    $!interactionUpdate[
+    $let[mid;$interactionReply[
         $addField[Requested By;$get[music_requestedBy];false]
         $addField[Title;$get[music_title];true]
         $addField[Duration;$if[$get[music_duration]==0;LIVE;$parseDigital[$get[music_duration]]];true]
@@ -110,8 +103,8 @@ module.exports = {
         $timestamp
         $color[$callFunction[useIcon;color_embed]]
         $footer[$if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$get[music_provider]];$callFunction[useIcon;$get[music_provider]]]
-    ]
-  ]]
+    ;true]]
+  ]
 
   $if[$get[isforcedirect]==true;
   $let[music_playurl;$trimLines[$callFunction[fallbackPlaybackTrack;$get[tempstoreurl]]]]
@@ -120,6 +113,16 @@ module.exports = {
   $let[music_playurl;$get[tempstoreurl]]
   ]
   ;
+  $if[$get[iscreatedfirst];
+  $let[mid;$interactionReply[
+  $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
+  $footer[Fetching;$callFunction[useIcon;loading]]
+  $color[$callFunction[useIcon;color_embed]]
+  $timestamp
+  ;true]]
+  ;
+  $defer
+  ]
   $let[basic_type;false]
   $let[music_playurl;$option[query]]
   ]
@@ -160,7 +163,7 @@ module.exports = {
 
   $if[$get[attemptry]>=$get[donetry];
   $async[
-  $!interactionUpdate[
+  $!interactionReply[
   $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack] $codeBlock[$env[causeplayerror]]]
   $color[$callFunction[useIcon;error_color_embed]]
   $timestamp
@@ -180,7 +183,7 @@ module.exports = {
   $wait[1s]
   $if[$get[statusloop]==TRACK;$setLoopMode[TRACK]]
   ]]
-  $!interactionUpdate[
+  $!interactionReply[
   $if[$get[basic_type];
   $author[Add to Track;;;0]
   $addField[Requested By;$get[music_requestedBy];false;0]

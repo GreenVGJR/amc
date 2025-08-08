@@ -48,7 +48,7 @@ module.exports = {
     $httpAddHeader[Accept-Encoding;gzip]
     $let[http;$httpRequest[https://$get[spliturl];GET;reshttp]]
     $let[a;$advancedTextSplit[$env[reshttp];<script>window.__sc_hydration;1;= ;1;\\;</script>;0]]
-    $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$replace[$replace[$get[a];/stream/hls;/stream/hls?client_id=$getGlobalVar[authmusic_soundcloud]];/stream/progressive;/stream/progressive?client_id=$getGlobalVar[authmusic_soundcloud]]]}]
+    $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$replace[$replace[$get[a];/stream/hls;/stream/hls?client_id=$getGlobalVar[authmusic_soundcloud_fall]];/stream/progressive;/stream/progressive?client_id=$getGlobalVar[authmusic_soundcloud_fall]]]}]
     
     ]
     $if[$env[filterid;type]==spotify;

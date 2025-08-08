@@ -15,7 +15,6 @@ module.exports = {
   $onlyIf[$guildID!=;]
   
   $ephemeral
-  $defer
   
   $jsonLoad[test;$applicationCommands]
   

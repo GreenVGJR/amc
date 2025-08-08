@@ -22,7 +22,7 @@ module.exports = {
     $httpSetContentType[Json]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
-    $httpRequest[https://www.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title,thumbnail,richThumbnail,lengthText);POST;res]
+    $!httpRequest[https://www.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title,thumbnail,richThumbnail,lengthText);POST;res]
     $jsonLoad[toindex;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $let[findindex;$arrayFindIndex[toindex;checkindex;$checkCondition[$env[checkindex;videoRenderer]!=]]]
     $jsonLoad[rest2;{
@@ -34,10 +34,19 @@ module.exports = {
     }]
     ;
     $if[$env[provider]==soundcloud;
+    $let[tryattempt;0]
+    $localFunction[refreshsc;
+    $if[$env[refresh]==true;
+    $onlyIf[$get[tryattempt]<5;$return[{}]]
+    $callFunction[generateAuthKeys;soundcloud;;false]
+    $letSum[tryattempt;1]
+    ]
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
-    $!httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getGlobalVar[authmusic_soundcloud]&limit=1;GET]
+    $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getGlobalVar[authmusic_soundcloud]&limit=1;GET]]
+    $onlyIf[$get[http]!=401;$callLocalFunction[refreshsc;true]]
+    $onlyIf[$get[http]!=429;$return[{}]]
     ]
     $jsonLoad[res;$if[$httpResult==;{};$httpResult]]
     $jsonLoad[rest2;{
@@ -47,6 +56,8 @@ module.exports = {
         "duration":$round[$divide[$env[res;collection;0;duration];1000];0],
         "title":"$deflate[$env[res;collection;0;title];base64]"
     }]
+    ;refresh]
+    $callLocalFunction[refreshsc;false]
     ;
     $if[$env[provider]==spotify;
     $let[tryattempt;0]
@@ -63,6 +74,7 @@ module.exports = {
     $httpAddHeader[App-platform;WebPlayer]
     $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1;GET;jsonres]]
     $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;$callLocalFunction[refreshspotify;true]]
+    $onlyIf[$get[httpspo]!=429;$return[{}]]
     ]
     $jsonLoad[res1;$env[jsonres;tracks;items]]
     $jsonLoad[rest2;{

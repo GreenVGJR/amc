@@ -35,7 +35,7 @@ module.exports = {
     $let[getcdnyt;$env[aa;$get[lookindex];url]]
     $let[getcdnytlength;$env[aa;$get[lookindex];contentLength]]
     $onlyIf[$or[$get[getcdnytlength]==;$get[getcdnytlength]==0]!=true;$return[live]]
-    $let[finalurl;$get[getcdnyt]&cpn=$toLowercase[$randomString[16]]]
+    $let[finalurl;$get[getcdnyt]&cpn=$randomString[16]]
     $try[
     $let[httpcode;$httpRequest[$replace[$get[finalurl];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-0;1];GET]]
     $onlyIf[$get[httpcode]==200;$callLocalFunction[oncecode;true]]

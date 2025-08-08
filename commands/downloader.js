@@ -32,11 +32,11 @@ type: 0,
 code: `
 $onlyIf[$guildID!=;]
 
-$ephemeral
-$onlyIf[$isValidLink[$option[url]];$callFunction[useCustomMusicMessage;config_generalInvalidLinkDownload]]
+$onlyIf[$isValidLink[$option[url]];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidLinkDownload]]
 $jsonLoad[musictype;$callFunction[filterMediaID;$option[url]]]
-$onlyIf[$or[$env[musictype;id]!=;$env[musictype;id]!=null;$env[musictype;type]!=null];$callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
-$interactionReply[Testing URL...]
+$onlyIf[$or[$env[musictype;id]!=;$env[musictype;id]!=null;$env[musictype;type]!=null];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
+$try[
+$let[mid;$interactionReply[Testing URL...;true]]
 $let[getcdn;$callFunction[fallbackPlaybackTrack;$option[url]]]
 $onlyIf[$or[$get[getcdn]!=null;$get[getcdn]!=live;$get[getcdn]!=];$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $let[http;$httpRequest[$get[getcdn];HEAD]]
@@ -53,8 +53,14 @@ $addField[Format;\`.$get[contenttype]$if[$get[contenttype]!=$get[converttype]; =
 $addField[File Name;$codeBlock[$get[names]];false]
 $thumbnail[$userAvatar[$authorID;2048]]
 $color[$callFunction[useIcon;color_embed];0]
-$footer[Downloading - Don't close this message.;$callFunction[useIcon;loading]]
+$footer[Downloading;$callFunction[useIcon;loading]]
 ]
 $interactionUpdate[$attachment[$trimLines[$get[getcdn]];$get[names]]]
+$if[$channelExists[$channelID];
+$fetchMessage[$channelID;$get[mid]]
+$if[$messageAttachmentCount[$channelID;$get[mid]]==0;
+$interactionUpdate[$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+]]
+]
 `
 }
