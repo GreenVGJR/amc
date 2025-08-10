@@ -124,7 +124,9 @@ module.exports = {
   $defer
   ]
   $let[basic_type;false]
-  $let[music_playurl;$option[query]]
+  
+  $jsonLoad[retrtype;$callFunction[filterMediaID;$option[query]]]
+  $let[music_playurl;$if[$env[retrtype;type]==youtubeplaylist;https://youtube.com/playlist?list=$env[retrtype;id];$if[$env[retrtype;type]==youtube;https://youtube.com/watch/$env[retrtype;id];$if[$env[retrtype;type]==soundcloud;https://soundcloud.com/$env[retrtype;id];$if[$env[retrtype;type]==spotify;https://open.spotify.com/track/$env[retrtype;id];$option[query]]]]]]
   ]
 
   $let[queue_lengthtemp;$if[$hasMusicNode;$queueLength;0]]
@@ -139,7 +141,7 @@ module.exports = {
   $let[donetry;3]
   $let[found;false]
   $try[
-  $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==soundcloud]!=true;
+  $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
   $playTrack[$voiceID;$get[music_playurl];$env[whatmusictype;type]]
   ;
   $playTrack[$voiceID;$get[music_playurl];auto]
@@ -150,7 +152,7 @@ module.exports = {
 
   $while[$and[$get[attemptry]!=0;$get[attemptry]<=$get[donetry];$get[found]==false];
     $try[
-    $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==soundcloud]!=true;
+    $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
     $playTrack[$voiceID;$get[music_playurl];$env[whatmusictype;type]]
     ;
     $playTrack[$voiceID;$get[music_playurl];auto]
@@ -162,13 +164,16 @@ module.exports = {
   ]
 
   $if[$get[attemptry]>=$get[donetry];
-  $async[
-  $!interactionReply[
+  $if[$get[iscreatedfirst];
+  $!deleteVar[musicplayer_message;$guildID_messageid]
+  $!deleteVar[musicplayer_message;$guildID_channelid]
+  ]
+  $interactionReply[
   $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack] $codeBlock[$env[causeplayerror]]]
   $color[$callFunction[useIcon;error_color_embed]]
   $timestamp
   $footer[slash]
-  ]]
+  ]
   $setTimeout[
   $if[$get[iscreatedfirst]==false;$!interactionDelete]
   ;5s]

@@ -22,6 +22,12 @@ module.exports = {
     $letSum[count;1]
     ]
     ]
+    ;
+    $if[$callFunction[configMusic;fetchMusicTitle_autocomplete];
+    $addChoice[$advancedTextSplit[$focusedOptionValue;/;2] | $callFunction[fetchTitleTrack;$focusedOptionValue];$focusedOptionValue]
+    ;
+    $addChoice[$cropText[$focusedOptionValue;0;100];$focusedOptionValue]
+    ]
     ]
     `
 }

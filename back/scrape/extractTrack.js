@@ -54,7 +54,7 @@ module.exports = {
     $if[$env[filterid;type]==spotify;
     $let[tryattempt;0]
     $localFunction[refreshspotify;
-    $if[$env[refresh]==true;
+    $if[$env[retry]==true;
     $onlyIf[$get[tryattempt]<5;$return[{}]]
     $callFunction[generateAuthKeys;spotify;;false]
     $letSum[tryattempt;1]

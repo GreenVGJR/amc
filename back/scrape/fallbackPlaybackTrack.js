@@ -63,7 +63,7 @@ module.exports = {
     ;
     $if[$env[whattype;type]==spotify;
     $jsonLoad[test;$extractTrack[$env[url]]]
-    $onlyIf[$env[test;results;preview;0;file_id]!=;$return[null]]
+    $onlyIf[$env[test;results;preview;0;file_id]!=;$callLocalFunction[oncecode;true]]
     $let[fileurl;https://p.scdn.co/mp3-preview/$env[test;results;preview;0;file_id]]
     $return[$trimLines[$get[fileurl]]]
     ]]]

@@ -42,10 +42,11 @@ $onlyIf[$or[$get[getcdn]!=null;$get[getcdn]!=live;$get[getcdn]!=];$callFunction[
 $let[http;$httpRequest[$get[getcdn];HEAD]]
 $onlyIf[$or[$get[http]==200;$get[http]==206];$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $onlyIf[$httpGetHeader[Content-Length]<=10000000;$callFunction[useCustomMusicMessage;config_generalOverDownload]]
+$let[gettitle;$callFunction[fetchTitleTrack;$option[url]]]
 $let[contenttype;$advancedTextSplit[$httpGetHeader[Content-Type];/;1]]
 $let[converttype;$if[$get[contenttype]==webm;opus;$if[$get[contenttype]==mp4;m4a;$if[$or[$get[contenttype]==mp3;$get[contenttype]==mpeg];mp3;$get[contenttype]]]]]
 $let[timest;$getTimestamp]
-$let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];audio-$get[timest].$get[converttype]]]
+$let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];$get[gettitle].$get[converttype]]]
 $interactionUpdate[
 $addField[Type;\`$toTitleCase[$env[musictype;type]]\`;true]
 $addField[Length Size;\`$httpGetHeader[Content-Length]\`\n-# $round[$divide[$httpGetHeader[Content-Length];1024;1024];2] MB;true]

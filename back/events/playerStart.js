@@ -53,7 +53,7 @@ module.exports = [{
     $arrayLoad[testmessage;]
     $arrayPushJSON[testmessage;{
     "id": "$trackInfo[id]",
-    "title": "$replace[$trackInfo[title];\\\\;\\\\\\\\]",
+    "title": "$replace[$replace[$trackInfo[title];\\\\;];";\\\\"]",
     "author": "$trackInfo[author]",
     "url": "$trackInfo[url]",
     "thumbnail": "$trackInfo[thumbnail]",

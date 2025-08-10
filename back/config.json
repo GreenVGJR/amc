@@ -5,5 +5,6 @@
 
     "debug_auth": false,
     "autodelete_nextmessage": false,
-    "interval_message": false
+    "interval_message": false,
+    "fetchMusicTitle_autocomplete": true
 }
