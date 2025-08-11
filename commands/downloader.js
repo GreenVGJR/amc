@@ -11,13 +11,18 @@ module.exports = {
       "min_length": 8
     },
     {
+      "type": 5,
+      "name": "lyrics",
+      "description": "Include lyrics?",
+      "required": false
+    },
+    {
       "type": 3,
       "name": "file_name",
       "description": "File name for attachment",
       "required": false
     }
-  ]
-},
+  ],
   "integration_types": [
     0,
     1
@@ -28,6 +33,7 @@ module.exports = {
   "description_localizations": {
     "id": "Unduh sebuah lagu"
   },
+},
 type: 0,
 code: `
 $onlyIf[$guildID!=;]
@@ -43,6 +49,15 @@ $let[http;$httpRequest[$get[getcdn];HEAD]]
 $onlyIf[$or[$get[http]==200;$get[http]==206];$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $onlyIf[$httpGetHeader[Content-Length]<=10000000;$callFunction[useCustomMusicMessage;config_generalOverDownload]]
 $let[gettitle;$callFunction[fetchTitleTrack;$option[url]]]
+$if[$and[$option[lyrics]==true;$env[musictype;type]!=spotify];
+$interactionUpdate[Fetching Lyrics...]
+$let[checklyric;false]
+$jsonLoad[lyricresult;$callFunction[getLyricsTrack;$get[gettitle];;true;true]]
+$if[$env[lyricresult;results]!=;
+$let[loadlyrics;$inflate[$env[lyricresult;results;lyric];hex]] 
+$let[checklyric;true]
+$let[lyricnames;$if[$option[file_name]!=;$option[file_name];$get[gettitle]].lrc]
+]]
 $let[contenttype;$advancedTextSplit[$httpGetHeader[Content-Type];/;1]]
 $let[converttype;$if[$get[contenttype]==webm;opus;$if[$get[contenttype]==mp4;m4a;$if[$or[$get[contenttype]==mp3;$get[contenttype]==mpeg];mp3;$get[contenttype]]]]]
 $let[timest;$getTimestamp]
@@ -51,12 +66,12 @@ $interactionUpdate[
 $addField[Type;\`$toTitleCase[$env[musictype;type]]\`;true]
 $addField[Length Size;\`$httpGetHeader[Content-Length]\`\n-# $round[$divide[$httpGetHeader[Content-Length];1024;1024];2] MB;true]
 $addField[Format;\`.$get[contenttype]$if[$get[contenttype]!=$get[converttype]; => .$get[converttype]]\`;true]
-$addField[File Name;$codeBlock[$get[names]];false]
+$addField[File Name;$if[$and[$option[lyrics]==true;$get[checklyric]];$codeBlock[$get[lyricnames]]]$codeBlock[$get[names]];false]
 $thumbnail[$userAvatar[$authorID;2048]]
 $color[$callFunction[useIcon;color_embed];0]
 $footer[Downloading;$callFunction[useIcon;loading]]
 ]
-$interactionUpdate[$attachment[$trimLines[$get[getcdn]];$get[names]]]
+$interactionUpdate[$if[$and[$option[lyrics]==true;$get[checklyric]];$attachment[$get[loadlyrics];$get[lyricnames];true]]$attachment[$trimLines[$get[getcdn]];$get[names]]]
 $if[$channelExists[$channelID];
 $fetchMessage[$channelID;$get[mid]]
 $if[$messageAttachmentCount[$channelID;$get[mid]]==0;

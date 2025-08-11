@@ -11,5 +11,5 @@
     "youtube": ["(?:[?&]v(?:i)?=|(?:^|/)(?:youtu\\.be|v|vi|u/\\w|embed|shorts|watch|live|source)/)([A-Za-z0-9_-]{11})(?=$|[?#&/])", 1],
     "youtubeplaylist": ["(?:^|[?&])list=([A-Za-z0-9_-]+)(?=$|[&#/])", 1],
     "soundcloud": ["(?:https?:\\/\\/)?(?:[a-z0-9-]+\\.)?(?:soundcloud\\.com|snd\\.sc)\\/((?:[A-Za-z0-9_-]+\\/(?:sets\\/[A-Za-z0-9_-]+|[A-Za-z0-9_-]+))|[A-Za-z0-9]+)(?=$|[?#])", 1],
-    "spotify": ["^(?:https?:\\/\\/)?(?:open\\.spotify\\.com\\/|spotify:)(user|episode|playlist|track|album|artist)(?:[:\\/])([A-Za-z0-9]+)(?:\\?.*)?$", 2]
+    "spotify": ["^(?:https?:\\/\\/)?(?:open\\.spotify\\.com\\/|spotify:)((?:user|episode|playlist|track|album|artist)[\\/:][A-Za-z0-9]+)(?:\\?.*)?$", 1]
 }

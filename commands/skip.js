@@ -43,7 +43,7 @@ module.exports = {
     $let[test;$skipTo[$sub[$option[position];1]]]
     ;
     $let[test;$skipTrack]
-  ]
+    ]
     $if[$get[test];
     $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalSkipTrack]]
     ;

@@ -6,7 +6,7 @@ module.exports = {
         required: true
     },
     {
-        name: "userAgent",
+        name: "userAgent", // string
         description: "Spoof client",
         required: false
     }],

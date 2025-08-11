@@ -8,6 +8,12 @@ module.exports = {
       "name": "song_name",
       "description": "Search for lyrics by typing the name of the song",
       "required": true
+    },
+    {
+      "type": 5,
+      "name": "line_synced",
+      "description": "Get synchronized lyrics?",
+      "required": false
     }
   ],
   "description_localizations": {
@@ -28,16 +34,20 @@ module.exports = {
     $ephemeral
     $defer
 
-    $jsonLoad[result;$callFunction[getLyricsTrack;$option[song_name];;true]]
+    $jsonLoad[result;$callFunction[getLyricsTrack;$option[song_name];;true;$option[line_synced]]]
     $onlyIf[$env[result;results]!=;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
     $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
-    $if[$charCount[$get[loadlyrics]]>3900;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
-    $!interactionFollowUp[
-    $title[$env[result;results;autocomplete];$env[result;results;url]]
-    $description[$codeBlock[$cropText[$get[loadlyrics];0;3900;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
-    $footer[$toTitleCase[$env[result;results;provider]];$callFunction[useIcon;$env[result;results;provider]]]
-    $color[$callFunction[useIcon;color_embed]]
-    $timestamp
+    $interactionReply[
+    $let[filename;$replaceRegex[$env[result;results;autocomplete];\\[^A-Za-z0-9_-\\];g;_]_-_Lyrics.$if[$option[line_synced]==true;lrc;txt]]
+    $attachment[$get[loadlyrics];$get[filename];true]
+    $addContainer[
+    $addTextDisplay[## Download]
+    $addFile[attachment://$get[filename]]
+    $addSeparator[Small;true]
+    $addTextDisplay[## $hyperlink[$env[result;results;autocomplete];$env[result;results;url]]]
+    $addSeparator[Small;true]
+    $addTextDisplay[$codeBlock[$cropText[$get[loadlyrics];0;3800;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
+    ;$callFunction[useIcon;color_embed]]
     ]
     `
 }

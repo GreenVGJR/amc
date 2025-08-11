@@ -19,16 +19,7 @@ module.exports = {
     $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
     $let[typedebug;$callFunction[configMusic;debug_auth]]
 
-    $let[lyric1;$getGlobalVar[authmusic_azlyrics]]
-
-    $let[aa;$getGlobalVar[authmusic_youtube_key]]
-    $let[b;$getGlobalVar[authmusic_soundcloud]]
-    $let[c;$getGlobalVar[authmusic_spotify]]
-    $let[c1;$getGlobalVar[authmusic_spotify_token]]
-    $let[d;$getGlobalVar[authmusic_amazonmusic]]
-    $let[e;$getGlobalVar[authmusic_deezer]]
-
-    $if[$or[$get[aa]==;$env[type]==all;$env[type]==youtube];
+    $if[$or[$env[type]==all;$env[type]==youtube];
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip]
@@ -42,7 +33,7 @@ module.exports = {
     ;$log[Failed to Retrieve - InnerTube (Youtube)]]
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating InnerTube (Youtube) | Key;cyan]]
     ]
-    $if[$or[$get[b]==;$env[type]==all;$env[type]==soundcloud];
+    $if[$or[$env[type]==all;$env[type]==soundcloud];
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip]
@@ -63,7 +54,7 @@ module.exports = {
     ;$log[Failed to Retrieve - Soundcloud]]
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Soundcloud          | ClientID;cyan]]
     ]
-    $if[$or[$get[c]==;$get[c1]==;$env[type]==all;$env[type]==spotify];
+    $if[$or[$env[type]==all;$env[type]==spotify];
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpSetBody[{"client_data":{"client_version":"1.0","client_id":"d8a5ed958d274c2e8ee717e6a4b0971d","js_sdk_data":{}}}]
@@ -84,7 +75,7 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Key;cyan]]
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Token;cyan]]
     ]
-    $if[$or[$get[d]==;$env[type]==all;$env[type]==amazonmusic];
+    $if[$or[$env[type]==all;$env[type]==amazonmusic];
     $try[
         $httpAddHeader[Origin;https://music.amazon.com/]
         $httpAddHeader[User-Agent;$get[agent]]
@@ -95,7 +86,7 @@ module.exports = {
     ;$log[Failed to Retrieve - Amazon Music]]
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Amazon Music        | Config & Token;cyan]]
     ]
-    $if[$or[$get[e]==;$env[type]==all;$env[type]==deezer];
+    $if[$or[$env[type]==all;$env[type]==deezer];
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Origin;https://www.deezer.com]
@@ -107,7 +98,7 @@ module.exports = {
     ;$log[Failed to Retrieve - Deezer]]
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Deezer              | Token;cyan]]
     ]
-    $if[$or[$get[lyric1]==;$env[type]==all;$env[type]==azlyrics];
+    $if[$or[$env[type]==all;$env[type]==azlyrics];
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip]

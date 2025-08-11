@@ -98,7 +98,12 @@ client.commands.add({
     $setInterval[$setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk];1m]
 
     $logger[Info;Attempting to Generate]
-    $callFunction[generateAuthKeys;all;;true]
+    $async[$callFunction[generateAuthKeys;soundcloud;;true]]
+    $async[$callFunction[generateAuthKeys;azlyrics;;true]]
+    $async[$callFunction[generateAuthKeys;spotify;;true]]
+    $async[$callFunction[generateAuthKeys;youtube;;true]]
+    $async[$callFunction[generateAuthKeys;amazonmusic;;true]]
+    $async[$callFunction[generateAuthKeys;deezer;;true]]
     $setInterval[$logger[Info;Attempting to Generate] $callFunction[generateAuthKeys;all;;true];1h]
     ` 
 });

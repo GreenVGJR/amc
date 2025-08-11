@@ -13,6 +13,9 @@
     "config_errorAttemptSearch": "[WARNING] Execute this Application in Server.",
     "config_errorAttemptSearchJoinVC": "[WARNING] You must be on voice channel to use this.",
     "config_errorAttemptRadioPlayer": "[WARNING] Stop the current active player before switching player.",
+    "config_errorAttemptSearchFetchTitle": "[INFO] Can't find the title.",
+    
+    "config_infoSearchFirst": "[INFO] What music you want to find?",
 
     "config_errorNoResult": "No results found.",
     "config_errorNoResultSearch": "No result.",

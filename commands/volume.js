@@ -27,7 +27,7 @@ module.exports = {
     $onlyIf[$voiceID[$guildID;$clientID]!=;$callFunction[useCustomMusicMessage;config_errorStopTrack]]
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
     $defer
-    $setVolume[$option[value]]
+    $async[$setVolume[$option[value]]]
     $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalVolumeTrack] \`$getVolume%\`]
     `
 }
