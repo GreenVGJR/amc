@@ -103,7 +103,7 @@ module.exports = {
 
   $if[$get[isforcedirect]==true;
   $let[music_playurl;$trimLines[$callFunction[fallbackPlaybackTrack;$get[tempstoreurl]]]]
-  $if[$or[$get[music_playurl]==live;$get[music_playurl]==null]==true;$let[music_playurl;$get[tempstoreurl]] $let[isforcedirect;false]]
+  $if[$or[$get[music_playurl]==live;$get[music_playurl]==null;$advancedTextSplit[$get[music_playurl];|;0]==bot]==true;$let[music_playurl;$get[tempstoreurl]] $let[isforcedirect;false]]
   ;
   $let[music_playurl;$get[tempstoreurl]]
   ]
@@ -122,13 +122,14 @@ module.exports = {
     ]]
   ]
   ;
+  $if[$get[iscreatedfirst];
   $async[
   $interactionReply[
   $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
   $footer[Fetching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   $timestamp
-  ]]
+  ]]]
   $let[basic_type;false]
   
   $jsonLoad[retrtype;$callFunction[filterMediaID;$option[query]]]
@@ -165,6 +166,8 @@ module.exports = {
     ;causeplayerror]
   ]
 
+  $let[currentqueuern;$if[$hasMusicNode;$queueLength;0]]
+
   $if[$get[attemptry]>=$get[donetry];
   $if[$get[iscreatedfirst];
   $!deleteVar[musicplayer_message;$guildID_messageid]
@@ -183,11 +186,11 @@ module.exports = {
   $stop
   ]
 
-  $if[$and[$queueLength!=0;$get[iscreatedfirst]==false];
+  $if[$and[$get[currentqueuern]!=0;$get[iscreatedfirst]==false];
   $async[$if[$option[force_skip]==true;
   $let[statusloop;$getLoopMode]
   $if[$get[statusloop]==TRACK;$setLoopMode[OFF] $wait[1s]]
-  $!skipTo[$sub[$queueLength;1]]
+  $!skipTo[$sub[$get[currentqueuern];1]]
   $wait[1s]
   $if[$get[statusloop]==TRACK;$setLoopMode[TRACK]]
   ]]
@@ -201,16 +204,16 @@ module.exports = {
   $color[$callFunction[useIcon;color_embed];0]
   $footer[$if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$get[music_provider]];$callFunction[useIcon;$get[music_provider];0]]
   $author[Queue;;;1]
-  $addField[Added Song;$sub[$queueLength;$get[queue_lengthtemp]];true;1]
-  $addField[Total Song;$queueLength;true;1]
+  $addField[Added Song;$sub[$get[currentqueuern];$get[queue_lengthtemp]];true;1]
+  $addField[Total Song;$get[currentqueuern];true;1]
   $addField[Total Duration;$parseDigital[$queueEstimatedDuration];true;1]
   $if[$option[force_skip]==true;$footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;loading];1]]
   $color[$callFunction[useIcon;color_embed];0]
   $color[$callFunction[useIcon;color_embed];1]
   ;
   $author[Queue;;;0]
-  $addField[Added Song;$sub[$queueLength;$get[queue_lengthtemp]];true;0]
-  $addField[Total Song;$queueLength;true;0]
+  $addField[Added Song;$sub[$get[currentqueuern];$get[queue_lengthtemp]];true;0]
+  $addField[Total Song;$get[currentqueuern];true;0]
   $addField[Total Duration;$parseDigital[$queueEstimatedDuration];true;0]
   $if[$option[force_skip]==true;$footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;loading];0]]
   $color[$callFunction[useIcon;color_embed];0]

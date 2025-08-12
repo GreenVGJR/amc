@@ -44,13 +44,9 @@ module.exports = {
 
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $setVar[musicplayer_message;$guildID_attemptseek;true]
-    $let[test;$seekTrack[$get[pest]]]
-    $if[$get[test];
+    $async[$!seekTrack[$get[pest]]]
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[pest]]]
-    $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalSeekTrack] \`$parseDigital[$get[pest]]\`]
-    ;
-    $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalFailSeekTrack]]
-    ]
+    $interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalSeekTrack] \`$parseDigital[$get[pest]]\`]
     $setTimeout[$!interactionDelete;3s]
   `
 }

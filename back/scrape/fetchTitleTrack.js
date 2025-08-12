@@ -9,17 +9,21 @@ module.exports = {
     $jsonLoad[filtype;$filterMediaID[$env[url]]]
     $if[$env[filtype;type]==youtube;
     $jsonLoad[a;$extractTrack[$env[url]]]
-    $return[$advancedTextSplit[$env[a;results;author]; - Topic;0] - $env[a;results;title]]
+    $let[author;$advancedTextSplit[$env[a;results;author]; - Topic;0]]
+    $let[title;$env[a;results;title]]
     ]
     $if[$env[filtype;type]==soundcloud;
     $jsonLoad[a;$extractTrack[$env[url]]]
     $jsonLoad[b;$env[a;results]]
     $arrayMap[b;bb;$if[$env[bb;hydratable]==sound;$return[$env[bb]]];c]
-    $return[$env[c;0;data;user;username] - $env[c;0;data;title]]
+    $let[author;$env[c;0;data;user;username]]
+    $let[title;$env[c;0;data;title]]
     ]
     $if[$env[filtype;type]==spotify;
     $jsonLoad[a;$extractTrack[$env[url]]]
-    $return[$env[a;results;album;artist;0;name] - $env[a;results;name]]
+    $let[author;$env[a;results;album;artist;0;name]]
+    $let[title;$env[a;results;name]]
     ]
+    $if[$or[$get[author]==;$get[author]==null;$get[author]==undefined;$get[title]==;$get[title]==null;$get[title]==undefined]!=true;$return[$trimLines[$get[author] - $get[title]]];$return]
     `
 }

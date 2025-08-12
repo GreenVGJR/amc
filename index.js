@@ -81,12 +81,12 @@ music.commands.load("back/events"); // Events
 
 music.player.extractors.register(SoundcloudExtractor, {});
 music.player.extractors.register(YoutubeiExtractor, {
-    generateWithPoToken: true,
+    generateWithPoToken: false,
     forceRevalidate: true,
     disablePlayer: false,
-    slicePlaylist: true,
+    slicePlaylist: false,
     streamOptions: {
-        useClient: "YTMUSIC"
+        useClient: "TV"
     }
 });
 

@@ -80,7 +80,7 @@ module.exports = {
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sub[$get[curduration];$get[seeks]]]]
     $setVar[musicplayer_message;$guildID_attemptseek;true]
     $let[resseek;$if[$sub[$get[curduration];$get[seeks]]<0;0;$sub[$get[curduration];$get[seeks]]]]
-    $!seekTrack[$get[resseek]]
+    $async[$!seekTrack[$get[resseek]]]
     $!interactionDelete
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekup;
@@ -93,7 +93,7 @@ module.exports = {
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sum[$get[curduration];$get[seeks]]]]
     $setVar[musicplayer_message;$guildID_attemptseek;true]
     $let[resseek;$if[$sum[$get[curduration];$get[seeks]]<0;0;$sum[$get[curduration];$get[seeks]]]]
-    $!seekTrack[$get[resseek]]
+    $async[$!seekTrack[$get[resseek]]]
     $!interactionDelete
     ]
     

@@ -43,7 +43,6 @@
 
     "config_generalForceSkipTrack": "Attempting to Skip...",
     "config_generalSeekTrack": "Seek to",
-    "config_generalFailSeekTrack": "Failed to seek.",
     "config_generalStopTrack": "OK",
     "config_generalSkipTrack": "Skipped.",
     "config_generalVolumeTrack": "Volume changed to:",

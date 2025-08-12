@@ -23,7 +23,7 @@ module.exports = {
     ;
     $if[$and[$callFunction[configMusic;fetchMusicTitle_autocomplete];$charCount[$focusedOptionValue]<=100];
     $let[fetch;$trim[$callFunction[fetchTitleTrack;$focusedOptionValue]]]
-    $addChoice[$if[$or[$get[fetch]==null;$charCount[$get[fetch]]==0];$callFunction[useCustomMusicMessage;config_errorAttemptSearchFetchTitle];$get[fetch]];$focusedOptionValue]
+    $addChoice[$if[$get[fetch]==;$callFunction[useCustomMusicMessage;config_errorAttemptSearchFetchTitle];$get[fetch]];$focusedOptionValue]
     ;
     $addChoice[$cropText[$focusedOptionValue;0;100];$focusedOptionValue]
     ]

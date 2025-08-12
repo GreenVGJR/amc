@@ -21,6 +21,7 @@ module.exports = {
     $httpAddHeader[Accept-Encoding;gzip]
     $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=streamingData(formats(itag,url,contentLength),adaptiveFormats(itag,url,contentLength));POST;reshttp]
     ]
+    $onlyIf[$env[reshttp;playabilityStatus;status]!=LOGIN_REQUIRED;$return[bot|$env[reshttp;playabilityStatus;reason]]]
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $jsonLoad[fts;$env[reshttp;streamingData;formats]]
     $jsonLoad[aa;$arrayConcat[;afs;fts]]
@@ -29,7 +30,6 @@ module.exports = {
     $let[getindex140;$arrayFindIndex[aa;aaa;$env[aaa;itag]==140]]
     $if[$get[getindex140]==-1;
     $let[getindex18;$arrayFindIndex[aa;aaa;$env[aaa;itag]==18]]
-    $onlyIf[$get[getindex18]==-1;$return[null]]
     ]]
     $let[lookindex;$if[$get[getindex251]!=;$get[getindex251];$if[$get[getindex140]!=;$get[getindex140];$get[getindex18]]]]
     $let[getcdnyt;$env[aa;$get[lookindex];url]]
