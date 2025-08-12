@@ -102,7 +102,7 @@ module.exports = {
   $let[isforcedirect;$option[direct_cdn]]
 
   $if[$get[isforcedirect]==true;
-  $let[music_playurl;$trimLines[$callFunction[fallbackPlaybackTrack;$get[tempstoreurl]]]]
+  $let[music_playurl;$trimLines[$callFunction[fallbackPlaybackTrack;$get[tempstoreurl];va]]]
   $if[$or[$get[music_playurl]==live;$get[music_playurl]==null;$advancedTextSplit[$get[music_playurl];|;0]==bot]==true;$let[music_playurl;$get[tempstoreurl]] $let[isforcedirect;false]]
   ;
   $let[music_playurl;$get[tempstoreurl]]

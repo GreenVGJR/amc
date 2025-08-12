@@ -30,12 +30,19 @@ const music = new ForgeMusic({
         ],
     includeExtractors: DefaultExtractors,
     connectOptions: {
-        bufferingTimeout: 1000,
+        onAfterCreateStream: true,
+        onBeforeCreateStream: false,
+        disableResampler: true,
+        disableEqualizer: true,
+        disableBiquad: true,
+        disableHistory: true,
+        bufferingTimeout: 500,
         connectionTimeout: 300000,
         leaveOnEmpty: true,
         leaveOnEmptyCooldown: 30000,
         pauseOnEmpty: true
     },
+    skipFFmpeg: true,
     connectionTimeout: 86400000,
     probeTimeout: 30000,
     lagMonitor: 30000

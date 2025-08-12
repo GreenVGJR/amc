@@ -21,7 +21,8 @@ module.exports = {
     ]
     ]
     ;
-    $if[$and[$callFunction[configMusic;fetchMusicTitle_autocomplete];$charCount[$focusedOptionValue]<=100];
+    $onlyIf[$charCount[$focusedOptionValue]<100;$autocomplete]
+    $if[$callFunction[configMusic;fetchMusicTitle_autocomplete];
     $let[fetch;$trim[$callFunction[fetchTitleTrack;$focusedOptionValue]]]
     $addChoice[$if[$get[fetch]==;$callFunction[useCustomMusicMessage;config_errorAttemptSearchFetchTitle];$get[fetch]];$focusedOptionValue]
     ;

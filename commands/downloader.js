@@ -43,7 +43,7 @@ $jsonLoad[musictype;$callFunction[filterMediaID;$option[url]]]
 $onlyIf[$or[$env[musictype;id]!=;$env[musictype;id]!=null;$env[musictype;type]!=null];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
 $try[
 $let[mid;$interactionReply[Testing URL...;true]]
-$let[getcdn;$trimLines[$callFunction[fallbackPlaybackTrack;$option[url]]]]
+$let[getcdn;$trimLines[$callFunction[fallbackPlaybackTrack;$option[url];]]]
 $onlyIf[$advancedTextSplit[$get[getcdn];|;0]!=bot;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]\nError: $advancedTextSplit[$get[getcdn];|;1]]
 $onlyIf[$or[$get[getcdn]==null;$get[getcdn]==live;$get[getcdn]==]!=true;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $let[http;$httpRequest[$get[getcdn];HEAD]]

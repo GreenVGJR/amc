@@ -4,12 +4,17 @@ module.exports = {
         name: "url", // string
         description: "URL",
         required: true
+    },
+    {
+        name: "types", // enum
+        description: "Changes quality",
+        required: true
     }],
     code: `
     $onlyIf[$isValidLink[$env[url]];$return[null]]
     $jsonLoad[whattype;$callFunction[filterMediaID;$env[url]]]
-    $localFunction[oncecode;
     $let[trycount;0]
+    $localFunction[oncecode;
     $onlyIf[$get[trycount]<3;$return[null]]
     $if[$env[retry];$letSum[trycount;1]]
     $if[$env[whattype;type]==youtube;
@@ -19,30 +24,42 @@ module.exports = {
     $try[
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID_VR","clientVersion":"1.10.0","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":false,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $httpAddHeader[Accept-Encoding;gzip]
-    $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=streamingData(formats(itag,url,contentLength),adaptiveFormats(itag,url,contentLength));POST;reshttp]
+    $if[$or[$env[types]==;$env[types]==v];
+    $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=streamingData(adaptiveFormats(itag,url,contentLength));POST;reshttp]
     ]
-    $onlyIf[$env[reshttp;playabilityStatus;status]!=LOGIN_REQUIRED;$return[bot|$env[reshttp;playabilityStatus;reason]]]
-    $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
-    $jsonLoad[fts;$env[reshttp;streamingData;formats]]
-    $jsonLoad[aa;$arrayConcat[;afs;fts]]
-    $let[getindex251;$arrayFindIndex[aa;aaa;$env[aaa;itag]==251]]
-    $if[$get[getindex251]==-1;
-    $let[getindex140;$arrayFindIndex[aa;aaa;$env[aaa;itag]==140]]
-    $if[$get[getindex140]==-1;
-    $let[getindex18;$arrayFindIndex[aa;aaa;$env[aaa;itag]==18]]
+    $if[$env[types]==va;
+    $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=streamingData(formats(itag,url));POST;reshttp]
     ]]
-    $let[lookindex;$if[$get[getindex251]!=;$get[getindex251];$if[$get[getindex140]!=;$get[getindex140];$get[getindex18]]]]
-    $let[getcdnyt;$env[aa;$get[lookindex];url]]
-    $let[getcdnytlength;$env[aa;$get[lookindex];contentLength]]
+    $onlyIf[$env[reshttp;playabilityStatus;status]!=LOGIN_REQUIRED;$return[bot|$env[reshttp;playabilityStatus;reason]]]
+    $if[$or[$env[types]==;$env[types]==v];
+    $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
+    $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
+    $if[$get[getindex251]==-1;
+    $let[getindex140;$arrayFindIndex[afs;aaa;$env[aaa;itag]==140]]
+    $onlyIf[$get[getindex140]!=-1;$return[null]]
+    ]
+    $let[lookindex;$if[$get[getindex251]!=;$get[getindex251];$if[$get[getindex140]!=;$get[getindex140];-1]]]
+    $let[getcdnyt;$env[afs;$get[lookindex];url]]
+    $let[getcdnytlength;$env[afs;$get[lookindex];contentLength]]
     $onlyIf[$or[$get[getcdnytlength]==;$get[getcdnytlength]==0]!=true;$return[live]]
+    $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]]
+    ]
+    $if[$env[types]==va;
+    $jsonLoad[fts;$env[reshttp;streamingData;formats]]
+    $let[getindex18;$arrayFindIndex[fts;aaa;$env[aaa;itag]==18]]
+    $onlyIf[$get[getindex18]!=-1;$return[null]]
+    $let[getcdnyt;$env[fts;$get[getindex18];url]]
     $let[finalurl;$get[getcdnyt]&cpn=$randomString[16]]
+    ]
+    $let[checkat;false]
     $try[
-    $let[httpcode;$httpRequest[$replace[$get[finalurl];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-0;1];GET]]
+    $let[httpcode;$httpRequest[$get[finalurl];HEAD]]
     $onlyIf[$get[httpcode]==200;$callLocalFunction[oncecode;true]]
+    $let[checkat;true]
     ;
     $callLocalFunction[oncecode;true]
     ]
-    $return[$trimLines[$replace[$get[finalurl];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]]]
+    $if[$get[checkat];$return[$trimLines[$get[finalurl]]]]
     ;
     $if[$env[whattype;type]==soundcloud;
     $jsonLoad[test;$extractTrack[$env[url]]]
