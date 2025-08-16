@@ -5,7 +5,7 @@ module.exports = {
     $onlyIf[$botOwnerID==$authorID]
     $reply[$channelID;$messageID;true]
     $async[$updateCommands]
-    $async[$updateApplicationCommands]
+    $async[$updateApplicationCommands $!setGlobalVar[listcommands-help;$applicationCommands]]
     OK
     `
 }

@@ -10,6 +10,6 @@ module.exports = {
     $arrayForEach[result2;per;
     $addChoice[$env[per;0];$env[per;0]]]
     ]
-    $autocomplete
+    $if[$env[result2;0]==;$autocomplete]
 `
 }

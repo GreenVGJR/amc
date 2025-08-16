@@ -14,9 +14,11 @@ module.exports = {
   code: `
   $onlyIf[$guildID!=;]
   
+  $let[a;$getGlobalVar[listcommands-help]]
+  $onlyIf[$get[a]!=;]
   $ephemeral
   
-  $jsonLoad[test;$applicationCommands]
+  $jsonLoad[test;$get[a]]
   
   $author[Hello, $username[$authorID];$userAvatar[$authorID;512];;0]
   $title[Apps - Available Commands;;0]

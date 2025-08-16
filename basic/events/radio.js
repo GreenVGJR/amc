@@ -4,12 +4,14 @@ module.exports = [{
     code: `
     $onlyIf[$advancedTextSplit[$customID;_;0]==radioplayerpage]
     $onlyIf[$advancedTextSplit[$customID;_;2]==$authorID]
-    $defer
     $let[mid;$messageID]
 
     $let[thumbnail;$getEmbeds[$channelID;$get[mid];0;thumbnail]]
     $let[co1;$advancedTextSplit[$get[thumbnail];?c=;1;&;0]]
     $let[co2;$advancedTextSplit[$get[thumbnail];&query=;1]]
+
+    $!clearTimeout[checkadt_pta-cv_$get[mid]]
+    $!deferUpdate
 
     $jsonLoad[loadstate;$callFunction[scrapeOnlineRadio;$if[$get[co2]!=;$inflate[$get[co2];base64]];$get[co1];$sub[$advancedTextSplit[$customID;_;1];1];$guildID]]
     $let[store;]
@@ -18,25 +20,24 @@ module.exports = [{
     $let[store;$get[store]$get[count]. $hyperlink[$env[res;radioName];$env[res;url]]\n]
     $letSum[count;1]
     ]
-    $!editMessage[$channelID;$get[mid];
-    
+    $!interactionUpdate[
     $author[Showing $arrayLength[loadstate] results]
     $title[List Stations]
-    $thumbnail[$env[loadstate;0;thumbnail]?c=$get[co1]&query=$get[co2]]
+    $thumbnail[$if[$env[loadstate;0;thumbnail]!=;$env[loadstate;0;thumbnail];$userDefaultAvatar[$clientID]]?c=$get[co1]&query=$get[co2]]
     $description[$get[store]]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
     $addActionRow
     $addStringSelectMenu[radioplayertoplay_$authorID;List Stations;false;1;1]
     $arrayForEach[loadstate;res;
-    $addOption[$env[res;radioName];$env[res;radioName] - $env[res;radioId];$env[res;radioId]]
+    $addOption[$env[res;radioName];$env[res;radioName] - $env[res;radioId];$advancedTextSplit[$customID;_;1]|$env[res;radioId]]
     ]
     $addActionRow
     $addButton[radioplayerpage_$sub[$advancedTextSplit[$customID;_;1];1]_$authorID;Back;$if[$advancedTextSplit[$customID;_;1]==1;Secondary;Primary];;$checkCondition[$advancedTextSplit[$customID;_;1]==1]]
     $addButton[radioplayerpage_null;Page $advancedTextSplit[$customID;_;1];Secondary;;true]
     $addButton[radioplayerpage_$sum[$advancedTextSplit[$customID;_;1];1]_$authorID;Next;$if[$or[$arrayLength[loadstate]==20;$arrayLength[loadstate]==0];Primary;Secondary];;$if[$or[$arrayLength[loadstate]==20;$arrayLength[loadstate]==0];false;true]]
     ]
-    $!interactionDelete
+    $setTimeout[$try[$!disableComponentsOf[$channelID;$get[mid]]];1m;checkadt_pta-cv_$get[mid]]
     `
 },
 {
@@ -45,8 +46,12 @@ module.exports = [{
     code: `
     $onlyIf[$advancedTextSplit[$customID;_;0]==radioplayertoplay]
     $onlyIf[$advancedTextSplit[$customID;_;1]==$authorID]
-    $defer
-    $let[code;$selectMenuValues[0]]
+    $!deferUpdate
+    $!clearTimeout[checkadt_pta-cv_$messageID]
+    $let[currentpage;$advancedTextSplit[$selectMenuValues[0];|;0]]
+    $let[code;$advancedTextSplit[$selectMenuValues[0];|;1]]
+    $let[codethumbnail;?$advancedTextSplit[$getEmbeds[$channelID;$messageID;0;thumbnail];?;1]]
+
     $try[
     $httpAddHeader[Accept-Encoding;gzip]
     $!httpRequest[https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/;GET]
@@ -70,15 +75,18 @@ module.exports = [{
 
     $let[storetags;$arrayJoin[tags2;, ]]
     
-    $!interactionFollowUp[
+    $!interactionUpdate[
     $title[$get[name];https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/]
     $description[$djsEval[require("entities").decodeHTML(ctx.getKeyword("description"))]]
+    $addField[Region;:flag_$advancedTextSplit[$get[code];.;0]: $toUppercase[$advancedTextSplit[$get[code];.;0]];true]
     $addField[Tags;$djsEval[require("entities").decodeHTML(ctx.getKeyword("storetags"))];true]
-    $addField[Rating;$get[rating] / 5;true]
-    $addField[Current Track;$if[$get[current_track]==;Not available;$codeBlock[$djsEval[require("entities").decodeHTML("$get[current_track]")]]];false]
+    $addField[Rating;$get[rating] / 5.0;true]
+    $addField[Current Track;$if[$get[current_track]==;Not available;$codeBlock[$djsEval[require("entities").decodeHTML(ctx.getKeyword("current_track"))]]];true]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
-    $if[$get[validthumbnail]!=;$thumbnail[$get[thumbnail]]]
+    $thumbnail[$if[$get[validthumbnail]!=;$get[thumbnail];$userDefaultAvatar[$clientID]]$get[codethumbnail]]
+    $addActionRow
+    $addButton[radioplayerpage_$get[currentpage]_$authorID;Back to List;Secondary;↩️]
     $addActionRow
     $if[$get[stream]!=;
     $addButton[radioplayerplay_$authorID;Stream;Primary;▶️]
@@ -102,27 +110,23 @@ module.exports = [{
     $onlyIf[$channelHasPerms[$voiceID;$clientID;Connect];$ephemeral $callFunction[useCustomMusicMessage;config_errorChannelPerm] $callFunction[useCustomMusicMessage;config_errorPerm] **Connect** - <@$clientID> (<#$voiceID>)]
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
     
-    $!deferUpdate
-    
-    $try[
+    $let[tempembed;$getEmbeds[$channelID;$messageID]]
+    $let[tempcomponent;$getComponents[$channelID;$messageID]]
 
-    $let[stream;$getComponents[$channelID;$messageID;0;1;url]]
+    $let[stream;$getComponents[$channelID;$messageID;1;1;url]]
     $let[title;$getEmbeds[$channelID;$messageID;0;title]]
     $let[url;$getEmbeds[$channelID;$messageID;0;titleURL]]
     $let[thumbnail;$getEmbeds[$channelID;$messageID;0;thumbnail]]
 
-    $let[tempcomponent;$getComponents[$channelID;$messageReferenceID[$channelID;$messageID]]]
-
-    $!disableComponentsOf[$channelID;$messageReferenceID[$channelID;$messageID]]
-
-    $!editMessage[$channelID;$messageID;
+    $try[
+    $!interactionUpdate[
     $fetchEmbeds[$channelID;$messageID;0]
     $footer[Fetching;$callFunction[useIcon;loading]]
     ]
 
     $arrayLoad[testmessage;]
     $arrayPushJSON[testmessage;{
-    "title": "$replace[$get[title];\\\\;\\\\\\\\]",
+    "title": "$replace[$replace[$get[title];\\\\;];";\\\\"]",
     "url": "$get[url]",
     "thumbnail": "$get[thumbnail]",
     "durationMS": 0,
@@ -133,41 +137,36 @@ module.exports = [{
     $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
     $if[$get[iscreatedfirst];
     $setVar[musicplayer_message;$guildID_channelid;$channelID]
-    $setVar[musicplayer_message;$guildID_messageid;$messageReferenceID[$channelID;$messageID]]
+    $setVar[musicplayer_message;$guildID_messageid;$messageID]
     ]
     $setVar[radioplayer_data;$guildID_playerstatus;true]
     $setVar[radioplayer_data;$guildID_checkplayer;true]
 
     $playTrack[$voiceID;$get[stream]]
     $if[$get[iscreatedfirst]==false;
-    $!editMessage[$channelID;$messageID;
+    $!interactionUpdate[
     $fetchEmbeds[$channelID;$messageID;0]
     $footer[Attempting to Skip;$callFunction[useIcon;loading]]
     ]
     $if[$getLoopMode!=OFF;$setLoopMode[OFF] $wait[1s]]
     $!skipTo[$sub[$queueLength;1]]
-    $!deleteMessage[$channelID;$messageReferenceID[$channelID;$messageID]]
-    ;
-    $!editMessage[$channelID;$messageReferenceID[$channelID;$messageID];...]
-    ]
     $!interactionDelete
+    ]
     ;
     $!interactionUpdate[
-    $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]$codeBlock[Unplayable / Geo-restricted.]]
-    $color[$callFunction[useIcon;error_color_embed]]
-    $footer[event]
-    $timestamp
-    ]
-
-    $setTimeout[
-    $!deleteMessage[$channelID;$messageID]
-    ;3s]
-
-    $!editMessage[$channelID;$messageReferenceID[$channelID;$messageID];
-    $fetchEmbeds[$channelID;$messageReferenceID[$channelID;$messageID]]
+    $loadEmbeds[$get[tempembed]]
     $loadComponents[$get[tempcomponent]]
     ]
 
-    ]
+    $let[mid2;$sendMessage[$channelID;
+    $reply[$channelID;$messageID;true]
+    $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]$codeBlock[$env[whaterrorlog]]]
+    $color[$callFunction[useIcon;error_color_embed]]
+    $footer[event]
+    $timestamp
+    ;true]]
+
+    $setTimeout[$!deleteMessage[$channelID;$get[mid2]];2s]
+    ;whaterrorlog]
     `
 }]

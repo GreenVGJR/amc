@@ -36,7 +36,7 @@ module.exports = {
     $if[$advancedTextSplit[$customID;_;1]==lyrics;
     $ephemeral
     $defer
-    $jsonLoad[result;$callFunction[getLyricsTrack;$if[$charCount[$trackInfo[title];-]==0;$advancedTextSplit[$trackInfo[author];-;0] - $advancedTextSplit[$trackInfo[title];(;0];$advancedTextSplit[$trackInfo[title];(;0]]]]
+    $jsonLoad[result;$callFunction[getLyricsTrack;$if[$charCount[$trackInfo[title];-]==0;$advancedTextSplit[$trackInfo[author];-;0] - $advancedTextSplit[$trackInfo[title];(;0];$advancedTextSplit[$trackInfo[title];(;0]];;false;false]]
     $onlyIf[$env[result;results]!=;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
     $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
     $if[$charCount[$get[loadlyrics]]>3900;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
@@ -64,7 +64,8 @@ module.exports = {
     $ephemeral
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $async[$defer $!interactionDelete]
-    $!stopTrack
+    $leaveVoiceChannel
+    $!deleteMemberVar[cachesearchistory_user_autocomplete;$authorID]
     ]
     $if[$advancedTextSplit[$customID;_;1]==actionplayer;
     $async[$!deferUpdate]

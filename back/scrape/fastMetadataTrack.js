@@ -25,7 +25,7 @@ module.exports = {
     $!httpRequest[https://www.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title,thumbnail,richThumbnail,lengthText);POST;res]
     $jsonLoad[toindex;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $let[findindex;$arrayFindIndex[toindex;checkindex;$checkCondition[$env[checkindex;videoRenderer]!=]]]
-    $jsonLoad[rest2;{
+    $let[rest2;{
     "id": "$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;videoId]",
     "dynamic_thumbnail":"$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url]",
     "thumbnail":"https://i.ytimg.com/vi_webp/$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;videoId]/hq720.webp",
@@ -49,7 +49,7 @@ module.exports = {
     $onlyIf[$get[http]!=429;$return[{}]]
     ]
     $jsonLoad[res;$if[$httpResult==;{};$httpResult]]
-    $jsonLoad[rest2;{
+    $let[rest2;{
         "id":"$advancedTextSplit[$env[res;collection;0;permalink_url];soundcloud.com/;1]",
         "dynamic_thumbnail":"",
         "thumbnail":"$env[res;collection;0;artwork_url]",
@@ -77,7 +77,7 @@ module.exports = {
     $onlyIf[$get[httpspo]!=429;$return[{}]]
     ]
     $jsonLoad[res1;$env[jsonres;tracks;items]]
-    $jsonLoad[rest2;{
+    $let[rest2;{
         "id":"$advancedTextSplit[$env[res1;0;external_urls;spotify];/;4]",
         "dynamic_thumbnail":"",
         "thumbnail":"$env[res1;0;album;images;0;url]",
@@ -87,6 +87,6 @@ module.exports = {
     ;refresh]
     $callLocalFunction[refreshspotify;false]
     ]]]
-    $return[$env[rest2]]
+    $return[$get[rest2]]
     `
 }

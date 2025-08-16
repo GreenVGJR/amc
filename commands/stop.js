@@ -26,6 +26,7 @@ module.exports = {
     $defer
     $!clearInterval[intervalmusicmessage_$guildID_$getVar[musicplayer_message;$guildID_channelid]]
     $if[$option[destroy];$async[$leaveVoiceChannel];$async[$!stopTrack]]
+    $!deleteMemberVar[cachesearchistory_user_autocomplete;$authorID]
     $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalStopTrack]]
     $setTimeout[$!interactionDelete;2s]
     `

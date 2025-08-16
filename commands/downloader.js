@@ -72,7 +72,10 @@ $thumbnail[$userAvatar[$authorID;2048]]
 $color[$callFunction[useIcon;color_embed];0]
 $footer[Downloading;$callFunction[useIcon;loading]]
 ]
-$interactionUpdate[$if[$and[$option[lyrics]==true;$get[checklyric]];$attachment[$get[loadlyrics];$get[lyricnames];true]]$attachment[$trimLines[$get[getcdn]];$get[names]]]
+$interactionUpdate[
+$if[$and[$option[lyrics]==true;$get[checklyric]];$attachment[$get[loadlyrics];$get[lyricnames];true]]
+$attachment[$trimLines[$get[getcdn]];$get[names]]
+]
 $if[$channelExists[$channelID];
 $fetchMessage[$channelID;$get[mid]]
 $if[$messageAttachmentCount[$channelID;$get[mid]]==0;

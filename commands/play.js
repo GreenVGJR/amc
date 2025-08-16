@@ -85,13 +85,15 @@ module.exports = {
   $let[tempstoreurl;$if[$get[fallback_provider]==youtube;https://youtube.com/watch?v=$env[result;id];$if[$get[fallback_provider]==soundcloud;https://soundcloud.com/$env[result;id];$if[$get[fallback_provider]==spotify;https://open.spotify.com/track/$env[result;id]]]]]
   $let[use_provider;$get[fallback_provider]]
   $let[cac2;$env[result;id]]
-  $onlyIf[$and[$get[cac1]!=;$get[cac2]!=];
+  $if[$and[$get[cac1]==;$get[cac2]==];
   $interactionReply[
   $description[$callFunction[useCustomMusicMessage;config_errorNoResult]]
   $color[$callFunction[useIcon;error_color_embed]]
   $footer[slash]
   $timestamp
-  ]]]
+  ]
+  $stop
+  ]]
   $let[music_requestedBy;<@$authorID>]
   $let[music_title;$inflate[$env[result;title];base64]]
   $let[music_id;$env[result;id]]
@@ -105,7 +107,7 @@ module.exports = {
   $let[music_playurl;$trimLines[$callFunction[fallbackPlaybackTrack;$get[tempstoreurl];va]]]
   $if[$or[$get[music_playurl]==live;$get[music_playurl]==null;$advancedTextSplit[$get[music_playurl];|;0]==bot]==true;$let[music_playurl;$get[tempstoreurl]] $let[isforcedirect;false]]
   ;
-  $let[music_playurl;$get[tempstoreurl]]
+  $let[music_playurl;$if[$or[$get[use_provider]==youtube;$get[use_provider]==soundcloud];$get[music_title];$get[tempstoreurl]]]
   ]
 
   $if[$get[iscreatedfirst];
@@ -123,28 +125,34 @@ module.exports = {
   ]
   ;
   $if[$get[iscreatedfirst];
-  $async[
-  $interactionReply[
-  $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
-  $footer[Fetching;$callFunction[useIcon;loading]]
-  $color[$callFunction[useIcon;color_embed]]
-  $timestamp
-  ]]]
+    $async[
+      $interactionReply[
+      $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
+      $author[Fetching;$callFunction[useIcon;loading]]
+      $color[$callFunction[useIcon;color_embed]]
+      $timestamp
+    ]]
+  ]
   $let[basic_type;false]
   
-  $jsonLoad[retrtype;$callFunction[filterMediaID;$option[query]]]
-  $let[music_playurl;$if[$env[retrtype;type]==youtubeplaylist;https://youtube.com/playlist?list=$env[retrtype;id];$if[$env[retrtype;type]==youtube;https://youtube.com/watch?v=$env[retrtype;id];$if[$env[retrtype;type]==soundcloud;https://soundcloud.com/$env[retrtype;id];$if[$env[retrtype;type]==spotify;https://open.spotify.com/$env[retrtype;id];$option[query]]]]]]
+  $jsonLoad[whatmusictype;$callFunction[filterMediaID;$option[query]]]
+  $let[music_playurl;$if[$env[whatmusictype;type]==youtubeplaylist;https://youtube.com/playlist?list=$env[whatmusictype;id];$if[$env[whatmusictype;type]==youtube;https://youtube.com/watch?v=$env[whatmusictype;id];$if[$env[whatmusictype;type]==soundcloud;https://soundcloud.com/$env[whatmusictype;id];$if[$env[whatmusictype;type]==spotify;https://open.spotify.com/$env[whatmusictype;id];$option[query]]]]]]
   ]
 
   $let[queue_lengthtemp;$if[$hasMusicNode;$queueLength;0]]
 
+  $if[$get[basic_type];
+  $if[$get[isforcedirect]!=true;
+  $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[tempstoreurl]]]
+  ;
   $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[music_playurl]]]
+  ]]
 
   $let[attemptry;0]
-  $let[donetry;3]
+  $let[donetry;5]
   $let[found;false]
   $try[
-  $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
+  $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
   $playTrack[$voiceID;$get[music_playurl];$env[whatmusictype;type]]
   ;
   $playTrack[$voiceID;$get[music_playurl];auto]
@@ -218,6 +226,6 @@ module.exports = {
   $if[$option[force_skip]==true;$footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;loading];0]]
   $color[$callFunction[useIcon;color_embed];0]
   ]]
-  $setTimeout[$!interactionDelete;3s]
+  $setTimeout[$!interactionDelete;2s]
   ]`
 }

@@ -1,5 +1,5 @@
 module.exports = {
-    type: "connectionDestroyed" || "disconnect" || "emptyQueue",
+    type: "connectionDestroyed",
     code: `
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]

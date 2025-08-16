@@ -34,7 +34,7 @@ module.exports = {
 
     $let[country;$if[$option[country]==;Global;$option[country]]]
 
-    $interactionReply[
+    $let[mid;$interactionReply[
     $if[$or[$option[country]!=;$option[query]!=];
     $addField[Country;$get[country]$if[$option[country]==;\n-# DEFAULT];true]
     $thumbnail[$userAvatar[$clientID;1024]]
@@ -45,7 +45,7 @@ module.exports = {
     $footer[Fetching;$callFunction[useIcon;loading]]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
-    ]
+    ;true]]
 
     $if[$option[country]!=;
     $jsonLoad[result;$readFile[./back/listRadioCountry.json]]
@@ -53,7 +53,7 @@ module.exports = {
     ]
 
     $jsonLoad[loadstate;$callFunction[scrapeOnlineRadio;$option[query];$if[$option[country]!=;$advancedTextSplit[$env[result2;0;1];/;1]];0;$guildID]]
-    $onlyIf[$env[loadstate;0]!=;$!interactionUpdate[No results.]]
+    $onlyIf[$env[loadstate;0]!=;$!interactionUpdate[$callFunction[useCustomMusicMessage;config_errorNoResult]] $setTimeout[$!interactionDelete;3s]]
     $let[store;]
     $let[count;1]
     $arrayForEach[loadstate;res;
@@ -61,22 +61,22 @@ module.exports = {
     $letSum[count;1]
     ]
     $!interactionUpdate[
-    
     $author[Showing $arrayLength[loadstate] results]
     $title[List Stations]
-    $thumbnail[$env[loadstate;0;thumbnail]?c=$advancedTextSplit[$env[result2;0;1];/;1]&query=$if[$option[query]!=;$deflate[$option[query];base64]]]
+    $thumbnail[$if[$env[loadstate;0;thumbnail]!=;$env[loadstate;0;thumbnail];$userDefaultAvatar[$clientID]]?c=$advancedTextSplit[$env[result2;0;1];/;1]&query=$if[$option[query]!=;$deflate[$option[query];base64]]]
     $description[$get[store]]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
     $addActionRow
     $addStringSelectMenu[radioplayertoplay_$authorID;List Stations;false;1;1]
     $arrayForEach[loadstate;res;
-    $addOption[$env[res;radioName];$env[res;radioName] - $env[res;radioId];$env[res;radioId]]
+    $addOption[$env[res;radioName];$env[res;radioName] - $env[res;radioId];1|$env[res;radioId]]
     ]
     $addActionRow
     $addButton[radioplayerpage_1_$authorID;Back;Secondary;;true]
     $addButton[radioplayerpage_null;Page 1;Secondary;;true]
     $addButton[radioplayerpage_2_$authorID;Next;$if[$arrayLength[loadstate]==20;Primary;Secondary];;$if[$arrayLength[loadstate]==20;false;true]]
     ]
+    $setTimeout[$try[$!disableComponentsOf[$channelID;$get[mid]]];1m;checkadt_pta-cv_$get[mid]]
   `
 }

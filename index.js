@@ -30,12 +30,10 @@ const music = new ForgeMusic({
         ],
     includeExtractors: DefaultExtractors,
     connectOptions: {
-        onAfterCreateStream: true,
-        onBeforeCreateStream: false,
-        disableResampler: true,
         disableEqualizer: true,
         disableBiquad: true,
         disableHistory: true,
+        disableFallbackStream: true,
         bufferingTimeout: 500,
         connectionTimeout: 300000,
         leaveOnEmpty: true,
@@ -88,13 +86,16 @@ music.commands.load("back/events"); // Events
 
 music.player.extractors.register(SoundcloudExtractor, {});
 music.player.extractors.register(YoutubeiExtractor, {
-    generateWithPoToken: false,
+    generateWithPoToken: true,
     forceRevalidate: true,
+    ignoreSignInErrors: true,
     disablePlayer: false,
-    slicePlaylist: false,
+    slicePlaylist: true,
+    useServerAbrStream: false,
     streamOptions: {
-        useClient: "TV"
-    }
+        useClient: "MWEB",
+        highWaterMark: 10 * 1024
+    },
 });
 
 client.commands.add({
@@ -103,7 +104,7 @@ client.commands.add({
     $logger[Info;Ready on client $username[$clientID]]
     $setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk]
     $setInterval[$setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk];1m]
-
+    $async[$!setGlobalVar[listcommands-help;$applicationCommands]]
     $logger[Info;Attempting to Generate]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]
     $async[$callFunction[generateAuthKeys;azlyrics;;true]]
@@ -136,5 +137,6 @@ db.commands.add({
     $!setGlobalVar[authmusic_amazonmusic;]
     $!setGlobalVar[authmusic_deezer;]
     $!setGlobalVar[authmusic_azlyrics;]
+    $!setGlobalVar[listcommands-help;]
     `,
 });

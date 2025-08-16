@@ -25,10 +25,10 @@ module.exports = {
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID_VR","clientVersion":"1.10.0","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":false,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $httpAddHeader[Accept-Encoding;gzip]
     $if[$or[$env[types]==;$env[types]==v];
-    $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=streamingData(adaptiveFormats(itag,url,contentLength));POST;reshttp]
+    $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength));POST;reshttp]
     ]
     $if[$env[types]==va;
-    $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=streamingData(formats(itag,url));POST;reshttp]
+    $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url));POST;reshttp]
     ]]
     $onlyIf[$env[reshttp;playabilityStatus;status]!=LOGIN_REQUIRED;$return[bot|$env[reshttp;playabilityStatus;reason]]]
     $if[$or[$env[types]==;$env[types]==v];
@@ -49,7 +49,8 @@ module.exports = {
     $let[getindex18;$arrayFindIndex[fts;aaa;$env[aaa;itag]==18]]
     $onlyIf[$get[getindex18]!=-1;$return[null]]
     $let[getcdnyt;$env[fts;$get[getindex18];url]]
-    $let[finalurl;$get[getcdnyt]&cpn=$randomString[16]]
+    $try[$let[pullength;$httpRequest[$get[getcdnyt];HEAD]] $let[checklength;$if[$httpGetHeader[Content-Length]!=;$httpGetHeader[Content-Length];0]]]
+    $let[finalurl;$get[getcdnyt]&cpn=$randomString[16]$if[$has[pullength];&range=0-$get[checklength]]]
     ]
     $let[checkat;false]
     $try[
