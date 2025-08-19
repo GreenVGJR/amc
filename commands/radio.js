@@ -37,10 +37,9 @@ module.exports = {
     $let[mid;$interactionReply[
     $if[$or[$option[country]!=;$option[query]!=];
     $addField[Country;$get[country]$if[$option[country]==;\n-# DEFAULT];true]
-    $thumbnail[$userAvatar[$clientID;1024]]
     ]
     $if[$option[query]!=;
-    $addField[Query;$codeBlock[$option[query]];false]
+    $addField[Query;$codeBlock[$option[query]];true]
     ]
     $footer[Fetching;$callFunction[useIcon;loading]]
     $color[$callFunction[useIcon;color_embed]]
@@ -60,7 +59,7 @@ module.exports = {
     $let[store;$get[store]$get[count]. $hyperlink[$env[res;radioName];$env[res;url]]\n]
     $letSum[count;1]
     ]
-    $!interactionUpdate[
+    $interactionUpdate[
     $author[Showing $arrayLength[loadstate] results]
     $title[List Stations]
     $thumbnail[$if[$env[loadstate;0;thumbnail]!=;$env[loadstate;0;thumbnail];$userDefaultAvatar[$clientID]]?c=$advancedTextSplit[$env[result2;0;1];/;1]&query=$if[$option[query]!=;$deflate[$option[query];base64]]]

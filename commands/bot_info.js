@@ -14,36 +14,29 @@ module.exports = {
   code: `
   $onlyIf[$guildID!=;]
   $ephemeral
-  $defer
+
   $let[currentping;$executionTime]
 
-  $arrayLoad[guild;,;$guildIDs[,]]
-  $let[countnode;0]
-  $arrayForEach[guild;guilds;
-  $try[
-  $if[$djsEval[(0, require("discord-player").useMainPlayer)().nodes.has(ctx.client.guilds.cache.get("$env[guilds]"))];$letSum[countnode;1]]
-  ]]
-
-  $let[owner_banner;$try[$userBanner[$botOwnerID;2048]]]
-
-  $author[$username[$botOwnerID] / $botOwnerID;$userAvatar[$botOwnerID];;0]
+  $localFunction[abcd;
+  $interactionReply[
+  $author[$username[$botOwnerID] / $botOwnerID;$get[av1];;0]
   $title[Owner;;0]
   $color[aa$randomBytes[2];0]
-  $addField[Created At;<t:$cropText[$userCreatedAt[$authorID];0;10]:F>;true;0]
+  $addField[Created At;<t:$cropText[$userCreatedAt[$authorID];0;10]:f>;true;0]
   $if[$get[owner_banner]!=;$addField[Banner;\\[Image\\]($get[owner_banner]);true;0]]
-  $author[$username[$clientID] / $clientID;$userAvatar[$clientID];;1]
+  $author[$username[$clientID] / $clientID;$get[av2];;1]
   $title[Client;;1]
   $color[$callFunction[useIcon;color_embed];1]
   $addField[Server Count;\`$guildCount\`;false;1]
-  $addField[Created At;<t:$cropText[$userCreatedAt[$clientID];0;10]:F>;true;1]
-  $addField[Joined At;<t:$cropText[$memberJoinedAt[$guildID;$clientID];0;10]:F>;true;1]
+  $addField[Created At;<t:$cropText[$userCreatedAt[$clientID];0;10]:f>;true;1]
+  $addField[Joined At;<t:$cropText[$memberJoinedAt[$guildID;$clientID];0;10]:f>;true;1]
   $addField[Versions;> ForgeScript.js: \`v$version\`\n> Discord.js: \`v$djsVersion\`\n> Node.js: \`$nodeVersion\`;false;1]
   $addField[Uptime;<t:$sub[$cropText[$getTimestamp;0;10];$round[$divide[$uptime;1000]]]:F>\n-# $parseMS[$uptime];false;1]
   $addField[OS Uptime ($os);<t:$sub[$cropText[$getTimestamp;0;10];$round[$osUptime]]:F>\n-# $parseMS[$multi[$osUptime;1000]];false;1]
   $addField[Ping;\`$pingms / $round[$get[currentping]]ms\`;true;1]
   $addField[DB Ping;\`$round[$dbPing]ms\`;true;1]
   $addField[Player Ping;\`$round[$try[$djsEval[(0, require("discord-player").useQueue)(ctx.interaction.guild).ping];0]]ms\`;true;1]
-  $addField[Total Connections;\`$get[countnode] / $guildCount\`;true;1]
+  $addField[Total Connections;\`$if[$env[connections]==;Loading...;$env[connections] / $guildCount]\`;true;1]
   $addField[Player Type;\`Local\`;true;1]
   $footer[CPU: $round[$math[$cpu/($cpuCores*10)];2]% | RAM: $round[$ram;2]MB;;1]
   $timestamp[;1]
@@ -54,6 +47,20 @@ module.exports = {
   $addButton[nulloptdonot;-- Developer Options --;Success;;true]
   $addActionRow
   $addButton[botinfoclearcache;Clear Search Caches;Secondary;🗑️]
-  ]
+  ]]
+  ;connections]
+  $callLocalFunction[abcd;]
+
+  $let[owner_banner;$try[$userBanner[$botOwnerID;2048]]]
+  $let[av1;$userAvatar[$botOwnerID]]
+  $let[av2;$userAvatar[$clientID]]
+
+  $arrayLoad[guild;,;$guildIDs[,]]
+  $let[countnode;0]
+  $arrayForEach[guild;guilds;
+  $try[
+  $if[$djsEval[(0, require("discord-player").useMainPlayer)().nodes.has(ctx.client.guilds.cache.get("$env[guilds]"))];$letSum[countnode;1]]
+  ]]
+  $callLocalFunction[abcd;$get[countnode]]
   `
 }

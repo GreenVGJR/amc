@@ -71,15 +71,13 @@ module.exports = {
     $if[$env[provider]==applemusic;
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
-    $!httpRequest[https://music.apple.com/us/search?term=$env[query];GET]
-    $jsonLoad[res;$advancedTextSplit[$httpResult;type="application/json";1;data">;1;</script>;0]]
-    $jsonLoad[res2;$env[res;0;data;sections]]
-    $jsonLoad[res3;$env[res2;$arrayFindIndex[res2;result;$checkContains[$env[result;id];song]]]]
-    $jsonLoad[res4;$env[res3;items]]
-    $arraySlice[res4;res4;0;10]
-
+    $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_applemusic]]
+    $httpAddHeader[Origin;https://music.apple.com]
+    $httpAddHeader[Cookie;geo=US]
+    $!httpRequest[https://api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]
+    $jsonLoad[res2;$env[res;results;songs;data]]
     $arrayLoad[results]
-    $arrayForEach[res4;res5;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res5;title];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"$replace[$env[res5;artwork;dictionary;url];{w}x{h}bb.{f};2160x2160bb.webp]","url":"$advancedTextSplit[$env[res5;contentDescriptor;url];?;0]"}]]
+    $arrayForEach[res2;res5;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res5;attributes;name];\\\\;];";\\\\"]","duration":"$parseDigital[$env[res5;attributes;durationInMillis]]","thumbnail":"$replace[$env[res5;attributes;artwork;url];{w}x{h}bb;4320x4320]","url":"$env[res5;attributes;url]"}]]
     ;
     $if[$env[provider]==amazonmusic;
     $let[tryattempt;0]
@@ -90,7 +88,7 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $jsonLoad[a;$if[$getGlobalVar[authmusic_amazonmusic;{}]=={};{};$inflate[$getGlobalVar[authmusic_amazonmusic];base64]]]
-    $httpSetBody[{"keyword":"{\\\\"interface\\\\":\\\\"Web.TemplatesInterface.v1_0.Touch.SearchTemplateInterface.SearchKeywordClientInformation\\\\",\\\\"keyword\\\\":\\\\"$env[query]\\\\"}","userHash":"{\\\\"level\\\\":\\\\"LIBRARY_MEMBER\\\\"}","headers":"{\\\\"x-amzn-authentication\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"ClientAuthenticationInterface.v1_0.ClientTokenElement\\\\\\\\\\\\",\\\\\\\\\\\\"accessToken\\\\\\\\\\\\":\\\\\\\\\\\\"\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-device-model\\\\":\\\\"WEBPLAYER\\\\",\\\\"x-amzn-device-width\\\\":\\\\"1920\\\\",\\\\"x-amzn-device-family\\\\":\\\\"WebPlayer\\\\",\\\\"x-amzn-device-id\\\\":\\\\"$env[a;deviceId]\\\\",\\\\"x-amzn-user-agent\\\\":\\\\"$get[agent]\\\\",\\\\"x-amzn-session-id\\\\":\\\\"$env[a;sessionId]\\\\",\\\\"x-amzn-device-height\\\\":\\\\"1080\\\\",\\\\"x-amzn-request-id\\\\":\\\\"$randomBytes[4]-$randomBytes[2]-$randomBytes[2]-$randomBytes[6]\\\\",\\\\"x-amzn-device-language\\\\":\\\\"$env[a;displayLanguage]\\\\",\\\\"x-amzn-currency-of-preference\\\\":\\\\"USD\\\\",\\\\"x-amzn-os-version\\\\":\\\\"$advancedTextSplit[$env[a;version];.;0].$advancedTextSplit[$env[a;version];.;1]\\\\",\\\\"x-amzn-application-version\\\\":\\\\"$env[a;version]\\\\",\\\\"x-amzn-device-time-zone\\\\":\\\\"$djsEval[Intl.DateTimeFormat().resolvedOptions().timeZone]\\\\",\\\\"x-amzn-timestamp\\\\":\\\\"$getTimestamp\\\\",\\\\"x-amzn-csrf\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"CSRFInterface.v1_0.CSRFHeaderElement\\\\\\\\\\\\",\\\\\\\\\\\\"token\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;token]\\\\\\\\\\\\",\\\\\\\\\\\\"timestamp\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;ts]\\\\\\\\\\\\",\\\\\\\\\\\\"rndNonce\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;rnd]\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-music-domain\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-referer\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-affiliate-tags\\\\":\\\\"\\\\",\\\\"x-amzn-ref-marker\\\\":\\\\"\\\\",\\\\"x-amzn-page-url\\\\":\\\\"https://music.amazon.com/search\\\\",\\\\"x-amzn-weblab-id-overrides\\\\":\\\\"\\\\",\\\\"x-amzn-video-player-token\\\\":\\\\"\\\\",\\\\"x-amzn-feature-flags\\\\":\\\\"\\\\",\\\\"x-amzn-has-profile-id\\\\":\\\\"\\\\"}"}]
+    $httpSetBody[{"keyword":"{\\\\"interface\\\\":\\\\"Web.TemplatesInterface.v1_0.Touch.SearchTemplateInterface.SearchKeywordClientInformation\\\\",\\\\"keyword\\\\":\\\\"$replace[$replace[$env[query];\\\\;];";\\\\\\\\"]\\\\"}","userHash":"{\\\\"level\\\\":\\\\"LIBRARY_MEMBER\\\\"}","headers":"{\\\\"x-amzn-authentication\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"ClientAuthenticationInterface.v1_0.ClientTokenElement\\\\\\\\\\\\",\\\\\\\\\\\\"accessToken\\\\\\\\\\\\":\\\\\\\\\\\\"\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-device-model\\\\":\\\\"WEBPLAYER\\\\",\\\\"x-amzn-device-width\\\\":\\\\"1920\\\\",\\\\"x-amzn-device-family\\\\":\\\\"WebPlayer\\\\",\\\\"x-amzn-device-id\\\\":\\\\"$env[a;deviceId]\\\\",\\\\"x-amzn-user-agent\\\\":\\\\"$get[agent]\\\\",\\\\"x-amzn-session-id\\\\":\\\\"$env[a;sessionId]\\\\",\\\\"x-amzn-device-height\\\\":\\\\"1080\\\\",\\\\"x-amzn-request-id\\\\":\\\\"$randomBytes[4]-$randomBytes[2]-$randomBytes[2]-$randomBytes[6]\\\\",\\\\"x-amzn-device-language\\\\":\\\\"$env[a;displayLanguage]\\\\",\\\\"x-amzn-currency-of-preference\\\\":\\\\"USD\\\\",\\\\"x-amzn-os-version\\\\":\\\\"$advancedTextSplit[$env[a;version];.;0].$advancedTextSplit[$env[a;version];.;1]\\\\",\\\\"x-amzn-application-version\\\\":\\\\"$env[a;version]\\\\",\\\\"x-amzn-device-time-zone\\\\":\\\\"$djsEval[Intl.DateTimeFormat().resolvedOptions().timeZone]\\\\",\\\\"x-amzn-timestamp\\\\":\\\\"$getTimestamp\\\\",\\\\"x-amzn-csrf\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"CSRFInterface.v1_0.CSRFHeaderElement\\\\\\\\\\\\",\\\\\\\\\\\\"token\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;token]\\\\\\\\\\\\",\\\\\\\\\\\\"timestamp\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;ts]\\\\\\\\\\\\",\\\\\\\\\\\\"rndNonce\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;rnd]\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-music-domain\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-referer\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-affiliate-tags\\\\":\\\\"\\\\",\\\\"x-amzn-ref-marker\\\\":\\\\"\\\\",\\\\"x-amzn-page-url\\\\":\\\\"https://music.amazon.com/search\\\\",\\\\"x-amzn-weblab-id-overrides\\\\":\\\\"\\\\",\\\\"x-amzn-video-player-token\\\\":\\\\"\\\\",\\\\"x-amzn-feature-flags\\\\":\\\\"\\\\",\\\\"x-amzn-has-profile-id\\\\":\\\\"\\\\"}"}]
     $httpAddHeader[Origin;https://music.amazon.com]
     $httpAddHeader[Accept-Encoding;gzip]
     $httpAddHeader[User-Agent;$get[agent]]
@@ -128,11 +126,49 @@ module.exports = {
     ]
     ;refresh]
     $callLocalFunction[refreshdeezer;true]
-    ]]]]]]]
-    $async[
+    ;
+    $if[$env[provider]==tiktokvideo;
+    $httpSetContentType[Text]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
+    $!httpRequest[https://m.tiktok.com/api/search/general/full/?keyword=$env[query];GET;a]
+    $onlyIf[$env[a]!=;$return[{}]]
+    $jsonLoad[a;$env[a]]
+    $jsonLoad[a;$env[a;data]]
+    $arrayMap[a;b;$if[$env[b;item]!=;$return[$env[b;item]]];c]
+    $arrayLoad[results]
+    $arrayForEach[c;d;$arrayPushJSON[results;{"title":"$replace[$replace[$if[$trim[$advancedTextSplit[$env[d;desc];#;0]]!=;$trim[$advancedTextSplit[$env[d;desc];#;0]];$env[d;music;title]];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[d;video;duration];1000]]","thumbnail":"$env[d;video;cover]","url":"https://www.tiktok.com/@$env[d;author;uniqueId]/video/$env[d;id]"}]]
+    ;
+    $if[$env[provider]==tiktokmusic;
+    $httpSetContentType[Text]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
+    $!httpRequest[https://tiktokv.com/aweme/v1/music/search/?count=10&cursor=0&aid=1233&device_id=-1&keyword=$env[query];GET;a]
+    $onlyIf[$env[a]!=;$return[{}]]
+    $jsonLoad[a;$env[a]]
+    $jsonLoad[a;$env[a;music_info_list]]
+    $arrayLoad[results]
+    $arrayForEach[a;d;$arrayPushJSON[results;{"title":"$replace[$replace[$env[d;music;title];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[d;music;duration];1000]]","thumbnail":"https://p16.tiktokcdn.com/aweme/1080x1080/$env[d;music;cover_large;uri]","url":"https://www.tiktok.com/music/-$env[d;music;id_str]"}]]
+    ;
+    $if[$env[provider]==ncs;
+    $httpSetContentType[Text]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $!httpRequest[https://ncs.io/music-search?q=$env[query]&genre=&mood=;GET]
+    $arrayLoad[a;class="player-play";$advancedTextSplit[$httpResult;<tbody>;1;</tbody>;0]]
+    $arraySlice[a;a;1]
+    $arrayLoad[results]
+    $arrayForEach[a;b;
+    $arrayPushJSON[results;{"title":"$advancedTextSplit[$env[b];" data-cover=";0;data-track=";1]","duration":"Unknown","thumbnail":"$advancedTextSplit[$env[b];img src=";1;";0]","url":"https://ncs.io$advancedTextSplit[$env[b];href=";1;";0]"}]
+    ]
+    ]]]]]]]]]]
     $if[$env[results;0]!=;
-    $setVar[cachesearch_global;$md5[$env[query]$env[provider]];$deflate[$env[results];base64]]
-    ]]
+    $setVar[cachesearch_global-query;$deflate[$env[provider]$toLowercase[$env[query]];hex];$deflate[$env[results];base64]]
+    ]
     ;
     $arrayLoad[results]
     ]

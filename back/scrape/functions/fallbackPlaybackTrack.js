@@ -22,7 +22,7 @@ module.exports = {
     $let[videoid;$env[whattype;id]]
 
     $try[
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID_VR","clientVersion":"1.10.0","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":false,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
+    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID_VR","clientVersion":"1.10.0","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $httpAddHeader[Accept-Encoding;gzip]
     $if[$or[$env[types]==;$env[types]==v];
     $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength));POST;reshttp]
@@ -33,14 +33,16 @@ module.exports = {
     $onlyIf[$env[reshttp;playabilityStatus;status]!=LOGIN_REQUIRED;$return[bot|$env[reshttp;playabilityStatus;reason]]]
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
-    $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
-    $if[$get[getindex251]==-1;
     $let[getindex140;$arrayFindIndex[afs;aaa;$env[aaa;itag]==140]]
     $onlyIf[$get[getindex140]!=-1;$return[null]]
-    ]
-    $let[lookindex;$if[$get[getindex251]!=;$get[getindex251];$if[$get[getindex140]!=;$get[getindex140];-1]]]
-    $let[getcdnyt;$env[afs;$get[lookindex];url]]
-    $let[getcdnytlength;$env[afs;$get[lookindex];contentLength]]
+    $let[getcdnytlength;$env[afs;$get[getindex140];contentLength]]
+    $if[$get[getcdnytlength]>=10000000;
+    $let[checkindex139;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
+    $if[$get[checkindex139]!=-1;
+    $let[getindex140;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
+    $let[getcdnytlength;$env[afs;$get[getindex140];contentLength]]
+    ]]
+    $let[getcdnyt;$env[afs;$get[getindex140];url]]
     $onlyIf[$or[$get[getcdnytlength]==;$get[getcdnytlength]==0]!=true;$return[live]]
     $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]]
     ]

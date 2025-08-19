@@ -39,8 +39,8 @@ module.exports = {
     $jsonLoad[result;$callFunction[getLyricsTrack;$if[$charCount[$trackInfo[title];-]==0;$advancedTextSplit[$trackInfo[author];-;0] - $advancedTextSplit[$trackInfo[title];(;0];$advancedTextSplit[$trackInfo[title];(;0]];;false;false]]
     $onlyIf[$env[result;results]!=;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
     $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
+    $interactionReply[
     $if[$charCount[$get[loadlyrics]]>3900;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
-    $!interactionUpdate[
     $title[$env[result;results;autocomplete];$env[result;results;url]]
     $description[$codeBlock[$cropText[$get[loadlyrics];0;3900;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
     $footer[$toTitleCase[$env[result;results;provider]];$callFunction[useIcon;$env[result;results;provider]]]
@@ -61,9 +61,8 @@ module.exports = {
     $!setVolume[$if[$getVolume==0;100;0]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==stopplayer;
-    $ephemeral
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $async[$defer $!interactionDelete]
+    $async[$!deferUpdate]
     $leaveVoiceChannel
     $!deleteMemberVar[cachesearchistory_user_autocomplete;$authorID]
     ]

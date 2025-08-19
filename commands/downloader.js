@@ -42,8 +42,18 @@ $onlyIf[$isValidLink[$option[url]];$ephemeral $callFunction[useCustomMusicMessag
 $jsonLoad[musictype;$callFunction[filterMediaID;$option[url]]]
 $onlyIf[$or[$env[musictype;id]!=;$env[musictype;id]!=null;$env[musictype;type]!=null];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
 $try[
+$if[$env[musictype;type]==spotify;
+$defer
+$jsonLoad[a;$callFunction[extractTrack;https://open.spotify.com/$env[musictype;id]]]
+$onlyIf[$env[a;results]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$jsonLoad[b;$callFunction[getYoutubeMusic;$env[a;results;album;artist;0;name] - $env[a;results;name]]]
+$onlyIf[$env[b;results;0]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$let[getcdn;$trimLines[$callFunction[fallbackPlaybackTrack;$env[b;results;0;url];v]]]
+$let[mid;$interactionReply[Testing URL...;true]]
+;
 $let[mid;$interactionReply[Testing URL...;true]]
 $let[getcdn;$trimLines[$callFunction[fallbackPlaybackTrack;$option[url];]]]
+]
 $onlyIf[$advancedTextSplit[$get[getcdn];|;0]!=bot;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]\nError: $advancedTextSplit[$get[getcdn];|;1]]
 $onlyIf[$or[$get[getcdn]==null;$get[getcdn]==live;$get[getcdn]==]!=true;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $let[http;$httpRequest[$get[getcdn];HEAD]]

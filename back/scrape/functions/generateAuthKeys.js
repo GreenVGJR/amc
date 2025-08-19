@@ -98,16 +98,29 @@ module.exports = {
     ;$log[Failed to Retrieve - Deezer]]
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Deezer              | Token;cyan]]
     ]
-    $if[$or[$env[type]==all;$env[type]==azlyrics];
+    $if[$or[$env[type]==all;$env[type]==tiktok];
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip]
-        $!httpRequest[https://www.azlyrics.com/geo.js;GET;g1]
-        $let[a1;$advancedTextSplit[$env[g1];"value",;1;";1;";0]]
-        $if[$get[a1]!=;$!setGlobalVar[authmusic_azlyrics;$get[a1]]]
-        $if[$env[successlog]==true;$log[$if[$get[a1]!=;OK - $cropText[$get[a1];0;12;...];Failed to Retrieve] - AZLyrics]]
-    ;$log[Failed to Retrieve - AZLyrics]]
-    $if[$get[typedebug];$chalkLog[\\[LYRIC\\]  Generating AZLyrics            | Token;cyan]]
+        $httpSetContentType[Text]
+        $!httpRequest[https://www.tiktok.com/;GET]
+        $let[a13;$httpGetHeader[Set-Cookie]]
+        $if[$get[a13]!=;$!setGlobalVar[authmusic_tiktok;$deflate[$get[a13];base64]]]
+        $if[$env[successlog]==true;$log[$if[$get[a13]!=;OK - $cropText[$deflate[$get[a13];base64];0;12;...];Failed to Retrieve] - Tiktok]]
+    ;$log[Failed to Retrieve - Tiktok]]
+    $if[$get[typedebug];$chalkLog[\\[SEARCH\\] Generating Tiktok              | Token;cyan]]
+    ]
+    $if[$or[$env[type]==all;$env[type]==applemusic];
+    $try[
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpAddHeader[Accept-Encoding;gzip]
+        $!httpRequest[https://embed.music.apple.com/build/web-embed.esm.js;GET]
+        $!httpRequest[https://embed.music.apple.com/build/$advancedTextSplit[$httpResult;embed-empty-state;1;embed-;0;";2].entry.js;GET;a14s]
+        $let[a14;$advancedTextSplit[$env[a14s];Ye=";1;";0]]
+        $if[$get[a14]!=;$!setGlobalVar[authmusic_applemusic;$get[a14]]]
+        $if[$env[successlog]==true;$log[$if[$get[a14]!=;OK - $cropText[$get[a14];0;12;...];Failed to Retrieve] - Apple Music]]
+    ;$log[Failed to Retrieve - Apple Music]]
+    $if[$get[typedebug];$chalkLog[\\[SEARCH\\] Generating Apple Music         | Token;cyan]]
     ]
     $return
     `

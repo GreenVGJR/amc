@@ -19,37 +19,23 @@ module.exports = {
     $let[url;$env[url]]
     $let[spliturl;$advancedTextSplit[$get[url];://;1]]
     $let[agent;$if[$env[userAgent]==null;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
-
     $jsonLoad[filterid;$callFunction[filterMediaID;https://$get[spliturl]]]
     $onlyIf[$or[$env[filterid;id]==null;$env[filterid;type]==null]!=true;$return[{}]]
-    $arrayLoad[results;]
-    
+    $arrayLoad[results]
     $try[
     $if[$env[filterid;type]==youtube;
-    
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpSetBody[{
-    "videoId": "$env[filterid;id]",
-        "context": {
-            "client": {
-                "clientName":"TVHTML5_SIMPLY_EMBEDDED_PLAYER",
-                "clientVersion":"2.0"
-            }
-        }
-    }]
+    $httpSetBody[{"videoId":"$env[filterid;id]","context":{"client":{"clientName":"TVHTML5_SIMPLY_EMBEDDED_PLAYER","clientVersion":"2.0"}}}]
     $httpAddHeader[Accept-Encoding;gzip]
     $let[http;$httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=videoDetails;POST;reshttp]]
     $arrayPushJSON[results;{"status":$get[http],"results":$if[$env[reshttp;videoDetails]==;null;$env[reshttp;videoDetails]]}]
-
     ]
     $if[$env[filterid;type]==soundcloud;
-    
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
     $let[http;$httpRequest[https://$get[spliturl];GET;reshttp]]
     $let[a;$advancedTextSplit[$env[reshttp];<script>window.__sc_hydration;1;= ;1;\\;</script>;0]]
-    $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$replace[$replace[$get[a];/stream/hls;/stream/hls?client_id=$getGlobalVar[authmusic_soundcloud_fall]];/stream/progressive;/stream/progressive?client_id=$getGlobalVar[authmusic_soundcloud_fall]]]}]
-    
+    $arrayPushJSON[results;{"status":$get[http],"results":$if[$get[a]==;null;$replace[$replace[$get[a];/preview/progressive;/preview/progressive?client_id=$getGlobalVar[authmusic_soundcloud_fall]];/stream/progressive;/stream/progressive?client_id=$getGlobalVar[authmusic_soundcloud_fall]]]}]
     ]
     $if[$env[filterid;type]==spotify;
     $let[tryattempt;0]
@@ -74,7 +60,6 @@ module.exports = {
     $arrayPushJSON[results;{"status":$get[http],"results":$if[$env[a]==;null;$env[a]]}]
     ;retry]
     $callLocalFunction[refreshspotify;false]
-
     ]
     ]
     $let[resultforeturn;$if[$env[results;0]==;{};$env[results;0]]]

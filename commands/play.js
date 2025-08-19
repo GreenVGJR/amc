@@ -64,8 +64,16 @@ module.exports = {
 
   $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
   
-  $defer
   $async[
+  $if[$isValidLink[$option[query]]==false;
+  $defer
+  ;
+  $interactionReply[
+  $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
+  $author[Fetching;$callFunction[useIcon;loading]]
+  $color[$callFunction[useIcon;color_embed]]
+  $timestamp
+  ]]
   $let[mid;$djsEval[ctx.interaction.channel.messages.fetch({ limit: 5 }).then(a => a?.map(b => { if( b.interactionMetadata?.user.id == $authorID ) { return b.id }}).filter(Boolean)\\[0\\])]]
   $if[$or[$getVar[musicplayer_message;$guildID_channelid;null]==null;$voiceID[$guildID;$clientID]==];
   $setVar[musicplayer_message;$guildID_channelid;$channelID]
@@ -86,12 +94,12 @@ module.exports = {
   $let[use_provider;$get[fallback_provider]]
   $let[cac2;$env[result;id]]
   $if[$and[$get[cac1]==;$get[cac2]==];
-  $interactionReply[
+  $setTimeout[$interactionUpdate[
   $description[$callFunction[useCustomMusicMessage;config_errorNoResult]]
   $color[$callFunction[useIcon;error_color_embed]]
   $footer[slash]
   $timestamp
-  ]
+  ];1s]
   $stop
   ]]
   $let[music_requestedBy;<@$authorID>]
@@ -107,12 +115,11 @@ module.exports = {
   $let[music_playurl;$trimLines[$callFunction[fallbackPlaybackTrack;$get[tempstoreurl];va]]]
   $if[$or[$get[music_playurl]==live;$get[music_playurl]==null;$advancedTextSplit[$get[music_playurl];|;0]==bot]==true;$let[music_playurl;$get[tempstoreurl]] $let[isforcedirect;false]]
   ;
-  $let[music_playurl;$if[$or[$get[use_provider]==youtube;$get[use_provider]==soundcloud];$get[music_title];$get[tempstoreurl]]]
+  $let[music_playurl;$if[$get[use_provider]==youtube;$get[music_title];$get[tempstoreurl]]]
   ]
 
   $if[$get[iscreatedfirst];
-    $async[
-    $interactionReply[
+    $async[$setTimeout[$interactionReply[
         $addField[Requested By;$get[music_requestedBy];false]
         $addField[Title;$get[music_title];true]
         $addField[Duration;$if[$get[music_duration]==0;LIVE;$parseDigital[$get[music_duration]]];true]
@@ -121,18 +128,9 @@ module.exports = {
         $timestamp
         $color[$callFunction[useIcon;color_embed]]
         $footer[$if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$get[music_provider]];$callFunction[useIcon;$get[music_provider]]]
-    ]]
+    ];$executionTime]]
   ]
   ;
-  $if[$get[iscreatedfirst];
-    $async[
-      $interactionReply[
-      $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
-      $author[Fetching;$callFunction[useIcon;loading]]
-      $color[$callFunction[useIcon;color_embed]]
-      $timestamp
-    ]]
-  ]
   $let[basic_type;false]
   
   $jsonLoad[whatmusictype;$callFunction[filterMediaID;$option[query]]]
@@ -152,10 +150,10 @@ module.exports = {
   $let[donetry;5]
   $let[found;false]
   $try[
-  $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
-  $playTrack[$voiceID;$get[music_playurl];$env[whatmusictype;type]]
+  $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
+  $playTrack[$voiceID;$trimLines[$get[music_playurl]];$env[whatmusictype;type]]
   ;
-  $playTrack[$voiceID;$get[music_playurl];auto]
+  $playTrack[$voiceID;$trimLines[$get[music_playurl]];auto]
   ]
   ;
   $letSum[attemptry;1]
@@ -164,9 +162,9 @@ module.exports = {
   $while[$and[$get[attemptry]!=0;$get[attemptry]<=$get[donetry];$get[found]==false];
     $try[
     $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
-    $playTrack[$voiceID;$get[music_playurl];$env[whatmusictype;type]]
+    $playTrack[$voiceID;$trimLines[$get[music_playurl]];$env[whatmusictype;type]]
     ;
-    $playTrack[$voiceID;$get[music_playurl];auto]
+    $playTrack[$voiceID;$trimLines[$get[music_playurl]];auto]
     ]
     $let[found;true]
     ;
@@ -181,13 +179,12 @@ module.exports = {
   $!deleteVar[musicplayer_message;$guildID_messageid]
   $!deleteVar[musicplayer_message;$guildID_channelid]
   ]
-  $async[
-  $interactionUpdate[
+  $interactionReply[
   $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack] $codeBlock[$env[causeplayerror]]]
   $color[$callFunction[useIcon;error_color_embed]]
   $timestamp
   $footer[slash]
-  ]]
+  ]
   $setTimeout[
   $if[$get[iscreatedfirst]==false;$!interactionDelete]
   ;5s]
@@ -202,7 +199,7 @@ module.exports = {
   $wait[1s]
   $if[$get[statusloop]==TRACK;$setLoopMode[TRACK]]
   ]]
-  $!interactionUpdate[
+  $interactionReply[
   $if[$get[basic_type];
   $author[Add to Track;;;0]
   $addField[Requested By;$get[music_requestedBy];false;0]

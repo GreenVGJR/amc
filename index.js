@@ -103,13 +103,14 @@ client.commands.add({
     $logger[Info;Ready on client $username[$clientID]]
     $setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk]
     $setInterval[$setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk];1m]
-    $async[$!setGlobalVar[listcommands-help;$applicationCommands]]
+    $!setGlobalVar[listcommands-help;$applicationCommands]
     $logger[Info;Attempting to Generate]
+    $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]
-    $async[$callFunction[generateAuthKeys;azlyrics;;true]]
     $async[$callFunction[generateAuthKeys;spotify;;true]]
     $async[$callFunction[generateAuthKeys;youtube;;true]]
     $async[$callFunction[generateAuthKeys;amazonmusic;;true]]
+    $async[$callFunction[generateAuthKeys;applemusic;;true]]
     $async[$callFunction[generateAuthKeys;deezer;;true]]
     $setInterval[$logger[Info;Attempting to Generate] $callFunction[generateAuthKeys;all;;true];1h]
     ` 
@@ -120,6 +121,10 @@ db.commands.add({
     code: `
     $logger[Info;Waiting to online]
     $try[
+    $deleteRecords[storecachesearchusersfetch-q]
+    $deleteRecords[storecachesearchusersfetch-p]
+    ]
+    $try[
     $deleteRecords[cachesearchistory_user_autocomplete]
     ]
     $try[
@@ -128,14 +133,6 @@ db.commands.add({
     $try[
     $deleteRecords[radioplayer_data]
     ]
-    $!setGlobalVar[authmusic_youtube_key;]
-    $!setGlobalVar[authmusic_youtube_visitor;]
-    $!setGlobalVar[authmusic_soundcloud;]
-    $!setGlobalVar[authmusic_spotify;]
-    $!setGlobalVar[authmusic_spotify_token;]
-    $!setGlobalVar[authmusic_amazonmusic;]
-    $!setGlobalVar[authmusic_deezer;]
-    $!setGlobalVar[authmusic_azlyrics;]
     $!setGlobalVar[listcommands-help;]
     `,
 });

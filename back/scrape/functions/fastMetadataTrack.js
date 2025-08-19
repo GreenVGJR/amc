@@ -33,6 +33,9 @@ module.exports = {
     "title":"$deflate[$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;title;runs;0;text];base64]"
     }]
     ;
+    $if[$env[provider]==youtubemusic;
+    
+    ;
     $if[$env[provider]==soundcloud;
     $let[tryattempt;0]
     $localFunction[refreshsc;
@@ -86,7 +89,7 @@ module.exports = {
     }]
     ;refresh]
     $callLocalFunction[refreshspotify;false]
-    ]]]
+    ]]]]
     $return[$get[rest2]]
     `
 }

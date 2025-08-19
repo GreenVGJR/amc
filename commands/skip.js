@@ -37,18 +37,12 @@ module.exports = {
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
 
-    $defer
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    $async[$interactionReply[$callFunction[useCustomMusicMessage;config_generalSkipTrack]] $setTimeout[$!interactionDelete;3s]]
     $if[$option[position]!=;
-    $let[test;$skipTo[$sub[$option[position];1]]]
+    $!skipTo[$sub[$option[position];1]]
     ;
-    $let[test;$skipTrack]
+    $!skipTrack
     ]
-    $if[$get[test];
-    $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalSkipTrack]]
-    ;
-    $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalFailSkipTrack]]
-    ]
-    $setTimeout[$!interactionDelete;3s]
     `
 }
