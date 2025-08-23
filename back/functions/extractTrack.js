@@ -77,8 +77,9 @@ module.exports = {
     $if[$env[filterid;type]==tiktokmusic;
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
-    $!httpRequest[http://tiktokv.com/aweme/v1/music/aweme/?music_id=$env[filterid;id]&device_id=$getGlobalVar[authmusic_tiktok_did];GET;a]
+    $!httpRequest[https://api16-normal.tiktokv.com/aweme/v1/music/aweme/?music_id=$env[filterid;id]&aid=1128&device_id=$getGlobalVar[authmusic_tiktok_did];GET;a]
     $onlyIf[$env[a]!=;$return[{}]]
     $jsonLoad[a;$env[a]]
     $jsonLoad[a;$env[a;aweme_list]]

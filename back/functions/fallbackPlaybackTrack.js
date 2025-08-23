@@ -97,7 +97,7 @@ module.exports = {
     $let[findindex;$arrayFindIndex[elindex;ef;$or[$checkContains[$env[ef;GearName];adapt_lowest_1080];$checkContains[$env[ef;GearName];normal_720];$checkContains[$env[ef;GearName];normal_540];$checkContains[$env[ef;GearName];adapt_lower_];$checkContains[$env[ef;GearName];adapt_540];$checkContains[$env[ef;GearName];lowest_540]]]]
     $onlyIf[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList]!=;$return[null]]
     $jsonLoad[b;$env[test;results;video;bitrateInfo;$get[findindex];PlayAddr;UrlList]]
-    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1;www.tiktok.com;api.tiktokv.com]]
+    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1128;www.tiktok.com;api16-normal.tiktokv.com]]
     $return[$trimLines[$get[finalurl]]]
     $stop
     ;
