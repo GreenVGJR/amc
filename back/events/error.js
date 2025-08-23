@@ -5,8 +5,8 @@ module.exports = [{
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
 
     $try[
-    $sendMessage[$get[cid];
-    $reply[$get[cid];$get[mid];true]
+    $sendMessage[$channelID;
+    $if[$messageExists[$channelID;$get[mid]];$reply[$get[cid];$get[mid];true]]
     $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]$codeBlock[$env[error]]]
     $color[$callFunction[useIcon;error_color_embed]]
     $footer[event]
@@ -33,8 +33,8 @@ module.exports = [{
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
 
     $try[
-    $sendMessage[$get[cid];
-    $reply[$get[cid];$get[mid];true]
+    $sendMessage[$channelID;
+    $if[$messageExists[$channelID;$get[mid]];$reply[$get[cid];$get[mid];true]]
     $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]$codeBlock[$env[error]]]
     $color[$callFunction[useIcon;error_color_embed]]
     $footer[event]

@@ -63,6 +63,7 @@ module.exports = {
     $callLocalFunction[oncecode;true]
     ]
     $if[$get[checkat];$return[$trimLines[$get[finalurl]]]]
+    $stop
     ;
     $if[$env[whattype;type]==soundcloud;
     $jsonLoad[test;$extractTrack[$env[url]]]
@@ -80,13 +81,34 @@ module.exports = {
     $callLocalFunction[oncecode;true]
     ]
     $return[$trimLines[$get[finalurl]]]
+    $stop
     ;
     $if[$env[whattype;type]==spotify;
     $jsonLoad[test;$extractTrack[$env[url]]]
     $onlyIf[$env[test;results;preview;0;file_id]!=;$callLocalFunction[oncecode;true]]
     $let[fileurl;https://p.scdn.co/mp3-preview/$env[test;results;preview;0;file_id]]
     $return[$trimLines[$get[fileurl]]]
-    ]]]
+    $stop
+    ;
+    $if[$or[$env[whattype;type]==tiktok;$env[whattype;type]==tiktokmob];
+    $jsonLoad[test;$extractTrack[$env[url]]]
+    $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
+    $jsonLoad[elindex;$env[test;results;video;bitrateInfo]]
+    $let[findindex;$arrayFindIndex[elindex;ef;$or[$checkContains[$env[ef;GearName];adapt_lowest_1080];$checkContains[$env[ef;GearName];normal_720];$checkContains[$env[ef;GearName];normal_540];$checkContains[$env[ef;GearName];adapt_lower_];$checkContains[$env[ef;GearName];adapt_540];$checkContains[$env[ef;GearName];lowest_540]]]]
+    $onlyIf[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList]!=;$return[null]]
+    $jsonLoad[b;$env[test;results;video;bitrateInfo;$get[findindex];PlayAddr;UrlList]]
+    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1;www.tiktok.com;api.tiktokv.com]]
+    $return[$trimLines[$get[finalurl]]]
+    $stop
+    ;
+    $if[$env[whattype;type]==tiktokmusic;
+    $jsonLoad[a;$extractTrack[$env[url]]]
+    $onlyIf[$env[a;results]!=null;$callLocalFunction[oncecode;true]]
+    $let[finalurl;$env[a;results;play_url;uri]]
+    $onlyIf[$get[finalurl]!=;$return[null]]
+    $return[$trimLines[$get[finalurl]]]
+    $stop
+    ]]]]]
     ;retry]
     $callLocalFunction[oncecode;false]
     `

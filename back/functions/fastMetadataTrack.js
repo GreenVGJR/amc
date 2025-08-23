@@ -34,7 +34,15 @@ module.exports = {
     }]
     ;
     $if[$env[provider]==youtubemusic;
-    
+    $jsonLoad[a;$getYoutubeMusic[$env[query]]]
+    $onlyIf[$env[a;results;0]!=;$return[{}]]
+    $let[rest2;{
+    "id": "$advancedTextSplit[$env[a;results;0;url];watch?v=;1]",
+    "dynamic_thumbnail":"",
+    "thumbnail":"$env[a;results;0;thumbnail]",
+    "duration":"$env[a;results;0;duration]",
+    "title":"$deflate[$env[a;results;0;title];base64]"
+    }]
     ;
     $if[$env[provider]==soundcloud;
     $let[tryattempt;0]

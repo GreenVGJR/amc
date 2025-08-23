@@ -30,8 +30,6 @@ module.exports = {
     $onlyIf[$get[checkdurationms]!=0;$callFunction[useCustomMusicMessage;config_errorLiveBeforeSeek]]
     $onlyIf[$isPaused!=true;$callFunction[useCustomMusicMessage;config_errorPauseBeforeSeek]]
     $onlyIf[$getVar[musicplayer_message;$guildID_attemptseek;false]==false;$callFunction[useCustomMusicMessage;config_errorProcessSeek]]
-    
-    $defer
 
     $if[$isNumber[$option[duration]];
     $let[pest;$multi[$if[$option[duration]<0;0;$option[duration]];1000]]

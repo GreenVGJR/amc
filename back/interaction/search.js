@@ -8,7 +8,7 @@ module.exports = {
     $let[provider;$getVar[storecachesearchusersfetch-p;$djsEval[ctx.interaction.message.interaction.id];null]]
 
     $onlyIf[$or[$get[query]==null;$get[provider]==null]!=true;$!interactionDelete]
-    $interactionUpdate[$addTextDisplay[Fetching...]]
+    $interactionUpdate[$addTextDisplay[Fetching.]]
 
     $jsonLoad[loadser;$callFunction[searchSomeTrack;$get[query];$get[provider]]]
     $onlyIf[$env[loadser;0]!=;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]

@@ -160,7 +160,7 @@ module.exports = {
     $httpAddHeader[User-Agent;$get[agent]]
     $!httpRequest[https://ncs.io/music-search?q=$env[query]&genre=&mood=;GET]
     $arrayLoad[a;class="player-play";$advancedTextSplit[$httpResult;<tbody>;1;</tbody>;0]]
-    $arraySlice[a;a;1]
+    $!arrayShift[a]
     $arrayLoad[results]
     $arrayForEach[a;b;
     $arrayPushJSON[results;{"title":"$advancedTextSplit[$env[b];" data-cover=";0;data-track=";1]","duration":"Unknown","thumbnail":"$advancedTextSplit[$env[b];img src=";1;";0]","url":"https://ncs.io$advancedTextSplit[$env[b];href=";1;";0]"}]

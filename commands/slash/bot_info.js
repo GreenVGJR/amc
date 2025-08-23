@@ -14,7 +14,6 @@ module.exports = {
   code: `
   $onlyIf[$guildID!=;]
   $ephemeral
-
   $let[currentping;$executionTime]
 
   $localFunction[abcd;
@@ -38,8 +37,10 @@ module.exports = {
   $addField[Player Ping;\`$round[$try[$djsEval[(0, require("discord-player").useQueue)(ctx.interaction.guild).ping];0]]ms\`;true;1]
   $addField[Total Connections;\`$if[$env[connections]==;Loading...;$env[connections] / $guildCount]\`;true;1]
   $addField[Player Type;\`Local\`;true;1]
+  $if[$env[connections]!=;
   $footer[CPU: $round[$math[$cpu/($cpuCores*10)];2]% | RAM: $round[$ram;2]MB;;1]
   $timestamp[;1]
+  ]
   $addActionRow
   $addButton[https://discord.com/api/oauth2/authorize?client_id=$clientID&scope=bot+applications.commands&permissions=3263488;Invite Bot;Link]
   $if[$botOwnerID==$authorID;

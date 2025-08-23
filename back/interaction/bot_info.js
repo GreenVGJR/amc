@@ -4,8 +4,9 @@ module.exports = {
     allowedInteractionTypes: ["button"],
     code: `
     $onlyIf[$botOwnerID==$authorID]
-    $async[$try[$deleteRecords[cachesearch_global]]]
     $ephemeral
+    $defer
+    $try[$deleteRecords[cachesearch_global-query]]
     $interactionReply[OK]
     `
 }

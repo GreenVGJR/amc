@@ -79,15 +79,13 @@ module.exports = {
   code: `
   $onlyIf[$guildID!=;]
   $if[$or[$option[ephemeral]==;$option[ephemeral]==true];$ephemeral]
-
   $let[check;$getVar[cachesearch_global-query;$deflate[$option[provider]$toLowercase[$option[query]];hex];null]]
-
   $if[$get[check]==null;
-  $async[$defer]
+  $async[$interactionReply[$addTextDisplay[Fetching.]]]
   $jsonLoad[loadser;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
   $let[currentping;$round[$executionTime;0]]
   $if[$env[loadser;0]==;
-  $async[$setTimeout[$interactionReply[$callFunction[useCustomMusicMessage;config_errorNoResultSearch]];$executionTime]]
+  $setTimeout[$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]];$get[currentping]]
   $stop
   ]
   ;
@@ -98,9 +96,8 @@ module.exports = {
   ]
   $arraySlice[loadser;loadser;0;10]
   $arrayReverse[loadser;loadser]
-  $async[$setTimeout[$interactionReply[
-  $addContainer[
-  $addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms$if[$get[check]!=null; - Cached]\`]
+  $setTimeout[$interactionReply[
+  $addContainer[$addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms$if[$get[check]!=null; - Cached]\`]
   $addSeparator[Large;true]
   $arrayForEach[loadser;result;
   $addSection[
@@ -117,7 +114,6 @@ module.exports = {
   $addActionRow
   $addButton[refreshsearchnoca_$authorID;Force Refresh;Secondary;🔄]
   ]
-  ;aa$randomBytes[2]]
-  ];$executionTime]]
+  ;aa$randomBytes[2]]];$get[currentping]]
   `
 }

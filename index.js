@@ -5,9 +5,8 @@ const { ForgeMusic, DefaultExtractors } = require('@tryforge/forge.music');
 
 // Extractor
 const { YoutubeiExtractor } = require("discord-player-youtubei");
-const { SoundcloudExtractor } = require("discord-player-soundcloud");
 
-require('dotenv').config(); // Load Environment
+require('dotenv').config({ quiet: true }); // Load Environment
 
 const db = new ForgeDB({
     events: [
@@ -17,10 +16,7 @@ const db = new ForgeDB({
 
 const music = new ForgeMusic({
     events: [
-     // "connection",
         "connectionDestroyed",
-        "disconnect",
-        "emptyQueue",
         "error",
         "playerError",
         "playerPause",
@@ -75,16 +71,14 @@ const client = new ForgeClient({
 client.login();
 
 // Custom Functions, Autocomplete, Events
-client.functions.load("back/scrape");
-client.commands.load("basic/autocomplete"); 
-client.commands.load("basic/events");
+client.functions.load("back/functions");
+client.commands.load("back/interaction"); 
 
-client.commands.load("basic/commands"); // Basic Command
-client.applicationCommands.load("commands"); // Slash Command
+client.commands.load("commands/basic"); // Basic Command
+client.applicationCommands.load("commands/slash"); // Slash Command
 
 music.commands.load("back/events"); // Events
 
-music.player.extractors.register(SoundcloudExtractor, {});
 music.player.extractors.register(YoutubeiExtractor, {
     forceRevalidate: true,
     ignoreSignInErrors: true,
@@ -100,18 +94,13 @@ music.player.extractors.register(YoutubeiExtractor, {
 client.commands.add({
     type: "ready",
     code: `
-    $logger[Info;Ready on client $username[$clientID]]
+    $logger[Info;Ready on client $username[$clientID] - $sub[$getTimestamp;$getGlobalVar[startuptimebot]]ms]
+    $!deleteGlobalVar[startuptimebot]
     $setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk]
     $setInterval[$setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk];1m]
     $!setGlobalVar[listcommands-help;$applicationCommands]
     $logger[Info;Attempting to Generate]
-    $async[$callFunction[generateAuthKeys;tiktok;;true]]
-    $async[$callFunction[generateAuthKeys;soundcloud;;true]]
-    $async[$callFunction[generateAuthKeys;spotify;;true]]
-    $async[$callFunction[generateAuthKeys;youtube;;true]]
-    $async[$callFunction[generateAuthKeys;amazonmusic;;true]]
-    $async[$callFunction[generateAuthKeys;applemusic;;true]]
-    $async[$callFunction[generateAuthKeys;deezer;;true]]
+    $async[$callFunction[generateAuthKeys;tiktok;;true]] $async[$callFunction[generateAuthKeys;soundcloud;;true]] $async[$callFunction[generateAuthKeys;spotify;;true]] $async[$callFunction[generateAuthKeys;youtube;;true]] $async[$callFunction[generateAuthKeys;amazonmusic;;true]] $async[$callFunction[generateAuthKeys;applemusic;;true]] $async[$callFunction[generateAuthKeys;deezer;;true]]
     $setInterval[$logger[Info;Attempting to Generate] $callFunction[generateAuthKeys;all;;true];1h]
     ` 
 });
@@ -120,6 +109,7 @@ db.commands.add({
     type: "connect",
     code: `
     $logger[Info;Waiting to online]
+    $setGlobalVar[startuptimebot;$getTimestamp]
     $try[
     $deleteRecords[storecachesearchusersfetch-q]
     $deleteRecords[storecachesearchusersfetch-p]

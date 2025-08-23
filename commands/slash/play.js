@@ -21,6 +21,10 @@ module.exports = {
         "value": "youtube"
       },
       {
+        "name": "YouTube Music",
+        "value": "youtubemusic"
+      },
+      {
         "name": "Soundcloud",
         "value": "soundcloud"
       },
@@ -63,16 +67,18 @@ module.exports = {
   $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
 
   $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
-  
+
   $async[
   $if[$isValidLink[$option[query]]==false;
-  $defer
+  $interactionReply[
+  $footer[Searching;$callFunction[useIcon;loading]]
+  $color[$callFunction[useIcon;color_embed]]
+  ]
   ;
   $interactionReply[
   $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
-  $author[Fetching;$callFunction[useIcon;loading]]
+  $footer[Fetching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
-  $timestamp
   ]]
   $let[mid;$djsEval[ctx.interaction.channel.messages.fetch({ limit: 5 }).then(a => a?.map(b => { if( b.interactionMetadata?.user.id == $authorID ) { return b.id }}).filter(Boolean)\\[0\\])]]
   $if[$or[$getVar[musicplayer_message;$guildID_channelid;null]==null;$voiceID[$guildID;$clientID]==];
@@ -85,16 +91,16 @@ module.exports = {
   $if[$isValidLink[$option[query]]==false;
   $let[basic_type;true]
   $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$if[$option[provider]!=;$option[provider];$get[default_provider]];null]]
-  $let[tempstoreurl;$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtube;https://youtube.com/watch?v=$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==soundcloud;https://soundcloud.com/$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==spotify;https://open.spotify.com/track/$env[result;id]]]]]
+  $let[tempstoreurl;$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtube;https://youtube.com/watch?v=$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtubemusic;https://youtube.com/watch?v=$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==soundcloud;https://soundcloud.com/$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==spotify;https://open.spotify.com/track/$env[result;id]]]]]]
   $let[use_provider;$if[$option[provider]!=;$option[provider];$get[default_provider]]]
   $let[cac1;$env[result;id]]
   $if[$get[cac1]==;
   $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$get[fallback_provider];null]]
-  $let[tempstoreurl;$if[$get[fallback_provider]==youtube;https://youtube.com/watch?v=$env[result;id];$if[$get[fallback_provider]==soundcloud;https://soundcloud.com/$env[result;id];$if[$get[fallback_provider]==spotify;https://open.spotify.com/track/$env[result;id]]]]]
+  $let[tempstoreurl;$if[$or[$get[fallback_provider]==youtube;$get[fallback_provider]==youtubemusic];https://youtube.com/watch?v=$env[result;id];$if[$get[fallback_provider]==soundcloud;https://soundcloud.com/$env[result;id];$if[$get[fallback_provider]==spotify;https://open.spotify.com/track/$env[result;id]]]]]
   $let[use_provider;$get[fallback_provider]]
   $let[cac2;$env[result;id]]
   $if[$and[$get[cac1]==;$get[cac2]==];
-  $setTimeout[$interactionUpdate[
+  $setTimeout[$interactionReply[
   $description[$callFunction[useCustomMusicMessage;config_errorNoResult]]
   $color[$callFunction[useIcon;error_color_embed]]
   $footer[slash]
@@ -119,16 +125,14 @@ module.exports = {
   ]
 
   $if[$get[iscreatedfirst];
-    $async[$setTimeout[$interactionReply[
+    $setTimeout[$interactionReply[
         $addField[Requested By;$get[music_requestedBy];false]
         $addField[Title;$get[music_title];true]
         $addField[Duration;$if[$get[music_duration]==0;LIVE;$parseDigital[$get[music_duration]]];true]
         $thumbnail[$get[music_thumbnail]]
-        $author[Fetching;$callFunction[useIcon;loading]]
-        $timestamp
         $color[$callFunction[useIcon;color_embed]]
-        $footer[$if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$get[music_provider]];$callFunction[useIcon;$get[music_provider]]]
-    ];$executionTime]]
+        $footer[Fetching | $if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$replace[$get[use_provider];youtubemusic;youtube music]];$callFunction[useIcon;loading]]
+    ];$executionTime]
   ]
   ;
   $let[basic_type;false]
@@ -179,7 +183,7 @@ module.exports = {
   $!deleteVar[musicplayer_message;$guildID_messageid]
   $!deleteVar[musicplayer_message;$guildID_channelid]
   ]
-  $interactionReply[
+  $!editMessage[$channelID;$get[mid];
   $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack] $codeBlock[$env[causeplayerror]]]
   $color[$callFunction[useIcon;error_color_embed]]
   $timestamp

@@ -23,11 +23,10 @@ module.exports = {
     $onlyIf[$voiceID!=;$callFunction[useCustomMusicMessage;config_errorJoin]]
     $onlyIf[$voiceID[$guildID;$clientID]!=;$callFunction[useCustomMusicMessage;config_errorStopTrack]]
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
-    $defer
     $!clearInterval[intervalmusicmessage_$guildID_$getVar[musicplayer_message;$guildID_channelid]]
     $if[$option[destroy];$async[$leaveVoiceChannel];$async[$!stopTrack]]
-    $!deleteMemberVar[cachesearchistory_user_autocomplete;$authorID]
     $!interactionFollowUp[$callFunction[useCustomMusicMessage;config_generalStopTrack]]
     $setTimeout[$!interactionDelete;2s]
+    $!deleteMemberVar[cachesearchistory_user_autocomplete;$authorID]
     `
 }

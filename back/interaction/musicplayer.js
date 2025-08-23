@@ -10,21 +10,20 @@ module.exports = {
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;]
 
     $if[$advancedTextSplit[$customID;_;1]==nodequeue;
-    $async[$!deferUpdate]
+    
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $if[$selectMenuValues[0]==0;
     $!skipTrack
     ;
     $!skipTo[$selectMenuValues[0]]
     ]
+    $!deferUpdate
     ]
     $if[$advancedTextSplit[$customID;_;1]==loop;
-    $async[$!deferUpdate]
     $if[$getLoopMode==OFF;$setLoopMode[TRACK];
     $if[$getLoopMode==TRACK;$setLoopMode[QUEUE];$setLoopMode[OFF]
     ]]]
     $if[$advancedTextSplit[$customID;_;1]==shuffle;
-    $async[$!deferUpdate]
     $let[statusshuffle;$getVar[musicplayer_message;$guildID_isshuffle;false]]
     $if[$get[statusshuffle];
     $!unShuffleQueue
@@ -49,25 +48,21 @@ module.exports = {
     ]
     ]
     $if[$advancedTextSplit[$customID;_;1]==volumedown;
-    $async[$!deferUpdate]
     $!setVolume[$if[$sub[$getVolume;10]>=0;$sub[$getVolume;10];0]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==volumeup;
-    $async[$!deferUpdate]
     $!setVolume[$if[$sum[$getVolume;10]<=150;$sum[$getVolume;10];150]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==volumemute;
-    $async[$!deferUpdate]
     $!setVolume[$if[$getVolume==0;100;0]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==stopplayer;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $async[$!deferUpdate]
     $leaveVoiceChannel
     $!deleteMemberVar[cachesearchistory_user_autocomplete;$authorID]
+    $!deferUpdate
     ]
     $if[$advancedTextSplit[$customID;_;1]==actionplayer;
-    $async[$!deferUpdate]
     $if[$isPaused;$!resumeTrack;$!pauseTrack]
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekdown;

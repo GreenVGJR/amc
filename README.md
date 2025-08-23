@@ -60,9 +60,8 @@ ___
   = > Youtube Music
     > Lrclib
     > Genius
-    > AZLyrics
 
-- Search a songs (Max. 10 Result)
+- Search a media (Max. 10 Result)
   Providers:
   = > Youtube
     > Youtube Music
@@ -71,10 +70,14 @@ ___
     > Apple Music
     > Amazon Music
     > Deezer
+    > Tiktok Video
+    > Tiktok Music
+    > NCS
 
 - Auto-generate auth keys needed
 - Dynamic info message
 - Show suggestion song name
+- Download media
 - Controller
 - Radio
 - Queue

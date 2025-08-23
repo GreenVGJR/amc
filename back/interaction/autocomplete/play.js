@@ -21,10 +21,14 @@ module.exports = {
     ]
     ]
     ;
-    $onlyIf[$charCount[$focusedOptionValue]<100;$autocomplete]
+    $onlyIf[$charCount[$focusedOptionValue]<=100;$autocomplete]
     $if[$callFunction[configMusic;fetchMusicTitle_autocomplete];
     $let[fetch;$trim[$callFunction[fetchTitleTrack;$focusedOptionValue]]]
-    $addChoice[$if[$get[fetch]==;$callFunction[useCustomMusicMessage;config_errorAttemptSearchFetchTitle];$get[fetch]];$focusedOptionValue]
+    $if[$get[fetch]==;
+    $addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchFetchTitle];$focusedOptionValue]
+    ;
+    $addChoice[$cropText[$get[fetch];0;100];$focusedOptionValue]
+    ]
     ;
     $addChoice[$cropText[$focusedOptionValue;0;100];$focusedOptionValue]
     ]

@@ -20,7 +20,7 @@ module.exports = {
     $textSplit[$advancedTextSplit[$env[test];(\\[;1];\\["] 
     $let[splitcount;$sub[$getTextSplitLength;1]]
     $let[count;1]
-    $arrayLoad[results;]
+    $arrayLoad[results]
     $while[$get[count]<=$get[splitcount];
     $arrayPushJSON[results;$advancedTextSplit[$splitText[$get[count]];",;0]]
     $letSum[count;1]
@@ -28,8 +28,6 @@ module.exports = {
     ;
     $arrayLoad[results]
     ]
-    $arrayLoad[results2;]
-    $arrayPushJSON[results2;{"status":$get[http],"respondTime": "$httpResponseTime", "results":$env[results]}]
-    $return[$env[results2;0]]
+    $return[{"status":$get[http],"respondTime":"$httpResponseTime","results":$env[results]}]
     `
 }
