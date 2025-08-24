@@ -40,7 +40,7 @@ $onlyIf[$guildID!=;]
 
 $onlyIf[$isValidLink[$option[url]];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidLinkDownload]]
 $jsonLoad[musictype;$callFunction[filterMediaID;$option[url]]]
-$onlyIf[$or[$env[musictype;id]!=;$env[musictype;id]!=null;$env[musictype;type]!=null];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
+$onlyIf[$or[$env[musictype;id]==;$env[musictype;id]==null;$env[musictype;type]==null]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
 $onlyIf[$env[musictype;type]!=youtubeplaylist;$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
 $try[
 $if[$env[musictype;type]==spotify;
@@ -64,7 +64,7 @@ $if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]]]
 $!djsEval[(async () => { const c = new AbortController(), r = await fetch(ctx.getKeyword("getcdn"), { signal: c.signal })\\; ctx.setKeyword("clh", r.headers.get('Content-Length') ?? '')\\; ctx.setKeyword("cly", r.headers.get('Content-Type') ?? '')\\; ctx.setKeyword("httpstatus", r.status.toString())\\; r.body?.cancel()\\; c.abort()\\; })()]
 $onlyIf[$or[$get[httpstatus]==200;$get[httpstatus]==206];$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOverDownload]]
-$if[$and[$option[lyrics]==true;$or[$env[musictype;type]!=spotify;$env[musictype;type]!=tiktokmob;$env[musictype;type]!=tiktok;$env[musictype;type]!=tiktokmusic]];
+$if[$and[$option[lyrics]==true;$or[$env[musictype;type]!=tiktokmob;$env[musictype;type]!=tiktok;$env[musictype;type]!=tiktokmusic]];
 $interactionReply[Fetching Lyrics...]
 $let[checklyric;false]
 $jsonLoad[lyricresult;$callFunction[getLyricsTrack;$get[gettitle];;true;true]]

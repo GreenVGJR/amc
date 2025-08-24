@@ -102,7 +102,7 @@ module.exports = {
   $arrayForEach[loadser;result;
   $addSection[
   $addTextDisplay[
-  > ### $replace[$env[result;title];#;\\\\#]
+  > ### $cropText[$replace[$env[result;title];#;\\\\#];0;197;...]
   > -# ### $env[result;url]
   > -# $if[$and[$advancedTextSplit[$env[result;duration];:;1]==;$advancedTextSplit[$env[result;duration];:;2]==];$advancedTextSplit[$env[result;duration];:;0];$if[$advancedTextSplit[$env[result;duration];:;0]==00;$advancedTextSplit[$env[result;duration];:;1]:$advancedTextSplit[$env[result;duration];:;2];$env[result;duration]]]
   ]

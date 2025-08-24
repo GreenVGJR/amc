@@ -20,7 +20,7 @@
     "config_errorNoResult": "No results found.",
     "config_errorNoResultSearch": "No result.",
     "config_errorNoResultLyrics": "No lyrics were available.",
-    "config_errorOverResultLyrics": "Unfortunately, i can't show the rest of them.",
+    "config_errorOverResultLyrics": "Unfortunately, i can't show rest of them.",
     
     "config_errorPlayTrack": "Can't process this.\nError:",
     "config_errorPlayTrackEvents": "Can't process this.",
@@ -41,14 +41,14 @@
 
     "config_errorRadioPlayer": "Stop the current active player before switching player.",
 
-    "config_generalForceSkipTrack": "Attempting to Skip...",
+    "config_generalForceSkipTrack": "Attempting to Skip.",
     "config_generalSeekTrack": "Seek to",
     "config_generalStopTrack": "OK",
     "config_generalSkipTrack": "Skipped.",
     "config_generalVolumeTrack": "Volume changed to:",
 
     "config_generalInvalidLinkDownload": "Must be link.",
-    "config_generalInvalidProviderDownload": "Invalid provider. Only accepts: Youtube, Soundcloud, Spotify",
+    "config_generalInvalidProviderDownload": "Invalid provider. Only accepts:\n`Youtube, Soundcloud, Spotify, Tiktok Video / Music`",
     "config_generalEmptyDownload": "Can't download this.",
-    "config_generalOverDownload": "Can't download this track if it's above 10MB."
+    "config_generalOverDownload": "Can't download this media if it's above 10MB."
 }

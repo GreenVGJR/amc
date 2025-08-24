@@ -80,13 +80,14 @@ client.applicationCommands.load("commands/slash"); // Slash Command
 music.commands.load("back/events"); // Events
 
 music.player.extractors.register(YoutubeiExtractor, {
+    generateWithPoToken: true,
     forceRevalidate: true,
     ignoreSignInErrors: true,
     disablePlayer: false,
     slicePlaylist: true,
     useServerAbrStream: false,
     streamOptions: {
-        useClient: "TV",
+        useClient: "WEB_EMBEDDED",
         highWaterMark: 10 * 1024
     },
 });

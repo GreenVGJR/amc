@@ -94,8 +94,7 @@ module.exports = {
     
     $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown]!=true;]
 
-    $arrayLoad[testmessage;]
-    $arrayPushJSON[testmessage;{
+    $let[testmessage;{
     "id": "$trackInfo[id]",
     "title": "$replace[$replace[$trackInfo[title];\\\\;];";\\\\"]",
     "author": "$trackInfo[author]",
@@ -108,6 +107,7 @@ module.exports = {
     "playlist": null
     }]
 
-    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[testmessage;0];false;intervalmusicmessage_$guildID_$get[cid];$guildID;true;$callFunction[configMusic;interval_message]]
+    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$get[testmessage];false;intervalmusicmessage_$guildID_$get[cid];$guildID;true;$callFunction[configMusic;interval_message]]
+    $!deferUpdate
     `
 }
