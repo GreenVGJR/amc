@@ -62,7 +62,7 @@ module.exports = {
     ]]
     $if[$or[$env[filterid;type]==tiktok;$env[filterid;type]==tiktokmob];
     $if[$env[filterid;type]==tiktokmob;
-    $jsonLoad[filterid;$callFunction[filterMediaID;$djsEval[(async()=>{try{return (await fetch(ctx.getKeyword("url"),{method:"GET",redirect:"manual"})).headers.get("location").split("?")\\[0\\]}catch(e){return null}})()\;]]]
+    $jsonLoad[filterid;$callFunction[filterMediaID;$djsEval[(async()=>{try{return (await fetch(ctx.getKeyword("url").replace('vm.tiktok.com', 'vt.tiktok.com'),{method:"GET",redirect:"manual"})).headers.get("location").split("?")\\[0\\]}catch(e){return null}})()\;]]]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
