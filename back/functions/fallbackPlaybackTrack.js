@@ -15,8 +15,8 @@ module.exports = {
     $jsonLoad[whattype;$callFunction[filterMediaID;$env[url]]]
     $let[trycount;0]
     $localFunction[oncecode;
-    $onlyIf[$get[trycount]<3;$return[null]]
-    $if[$env[retry];$letSum[trycount;1]]
+    $if[$get[trycount]>=3;$return[null] $stop]
+    $if[$env[retry]==true;$letSum[trycount;1]]
     $if[$env[whattype;type]==youtube;
 
     $let[videoid;$env[whattype;id]]
@@ -30,11 +30,11 @@ module.exports = {
     $if[$env[types]==va;
     $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url));POST;reshttp]
     ]]
-    $onlyIf[$env[reshttp;playabilityStatus;status]!=LOGIN_REQUIRED;$return[bot|$env[reshttp;playabilityStatus;reason]]]
+    $if[$env[reshttp;playabilityStatus;status]==LOGIN_REQUIRED;$return[bot|$env[reshttp;playabilityStatus;reason] $stop]]
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $let[getindex140;$arrayFindIndex[afs;aaa;$env[aaa;itag]==140]]
-    $onlyIf[$get[getindex140]!=-1;$return[null]]
+    $if[$get[getindex140]!=-1;$return[null]]
     $let[getcdnytlength;$env[afs;$get[getindex140];contentLength]]
     $if[$get[getcdnytlength]>=10000000;
     $let[checkindex139;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
@@ -59,8 +59,6 @@ module.exports = {
     $let[httpcode;$httpRequest[$get[finalurl];HEAD]]
     $onlyIf[$get[httpcode]==200;$callLocalFunction[oncecode;true]]
     $let[checkat;true]
-    ;
-    $callLocalFunction[oncecode;true]
     ]
     $if[$get[checkat];$return[$trimLines[$get[finalurl]]]]
     $stop
@@ -77,8 +75,6 @@ module.exports = {
     $onlyIf[$get[finalurl]!=;$return[null]]
     $try[
     $onlyIf[$httpRequest[$get[finalurl];HEAD]==200;$callLocalFunction[oncecode;true]]
-    ;
-    $callLocalFunction[oncecode;true]
     ]
     $return[$trimLines[$get[finalurl]]]
     $stop

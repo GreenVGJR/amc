@@ -29,7 +29,6 @@ module.exports = {
     $arrayLoad[tempstore]
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
     $try[
-    
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
     $!httpRequest[https://onlineradiobox.com/search?part=1&q=$env[query]&c=$env[countrycode]&offset=$multi[$env[page];20];GET]

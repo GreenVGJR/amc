@@ -31,11 +31,20 @@ module.exports = {
     $let[results;{"status":$get[http],"results":$if[$env[reshttp;videoDetails]==;null;$env[reshttp;videoDetails]]}]
     ]
     $if[$env[filterid;type]==soundcloud;
+    $let[tryattempt;0]
+    $localFunction[refreshsc;
+    $if[$env[retry]==true;
+    $onlyIf[$get[tryattempt]<5;$return[{}]]
+    $callFunction[generateAuthKeys;soundcloud;;false]
+    $letSum[tryattempt;1]
+    ]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
     $let[http;$httpRequest[https://$get[spliturl];GET;reshttp]]
     $let[a;$advancedTextSplit[$env[reshttp];<script>window.__sc_hydration;1;= ;1;\\;</script>;0]]
     $let[results;{"status":$get[http],"results":$if[$get[a]==;null;$replace[$replace[$get[a];/preview/progressive;/preview/progressive?client_id=$getGlobalVar[authmusic_soundcloud_fall]];/stream/progressive;/stream/progressive?client_id=$getGlobalVar[authmusic_soundcloud_fall]]]}]
+    ;retry]
+    $callLocalFunction[refreshsc;false]
     ]
     $if[$env[filterid;type]==spotify;
     $let[tryattempt;0]
@@ -75,16 +84,24 @@ module.exports = {
     $let[results;{"status":$get[http],"results":$if[$env[b]==;null;$env[b]]}]
     ]
     $if[$env[filterid;type]==tiktokmusic;
+    $let[tryattempt;0]
+    $localFunction[refreshvm;
+    $if[$env[retry]==true;
+    $onlyIf[$get[tryattempt]<10;$return[{}]]
+    $letSum[tryattempt;1]
+    ]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
-    $!httpRequest[https://api16-normal.tiktokv.com/aweme/v1/music/aweme/?music_id=$env[filterid;id]&aid=1128&device_id=$getGlobalVar[authmusic_tiktok_did];GET;a]
+    $!httpRequest[https://api16-normal.tiktokv.com/aweme/v1/music/aweme/?music_id=$env[filterid;id]&aid=1180&device_id=$randomNumber[100000000;999999999;false]$randomNumber[1000000000;9999999999;false];GET;a]
     $onlyIf[$env[a]!=;$return[{}]]
     $jsonLoad[a;$env[a]]
     $jsonLoad[a;$env[a;aweme_list]]
     $let[index;$arrayFindIndex[a;b;$or[$env[b;added_sound_music_info;play_url;uri]!=;$checkCondition[$env[b;added_sound_music_info;mid]==$get[mid]]]]]
     $let[results;{"status":null,"results":$if[$env[a;$get[index]]==;null;$env[a;$get[index];added_sound_music_info]]}]
+    ;retry]
+    $callLocalFunction[refreshvm;false]
     ]
     $let[resultforeturn;$get[results]]
     $return[$if[$and[$env[limitChar]==true;$env[limitChar]!=false];$cropText[$get[resultforeturn];0;2000;];$get[resultforeturn]]]

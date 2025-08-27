@@ -50,5 +50,5 @@
     "config_generalInvalidLinkDownload": "Must be link.",
     "config_generalInvalidProviderDownload": "Invalid provider. Only accepts:\n`Youtube, Soundcloud, Spotify, Tiktok Video / Music`",
     "config_generalEmptyDownload": "Can't download this.",
-    "config_generalOverDownload": "Can't download this media if it's above 10MB."
+    "config_generalOverDownload": "Can't download this media if it's above 10MB.\n\nStill want to download? You can try access this url to direct downloads."
 }
