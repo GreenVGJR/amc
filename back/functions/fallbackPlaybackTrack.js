@@ -34,7 +34,7 @@ module.exports = {
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $let[getindex140;$arrayFindIndex[afs;aaa;$env[aaa;itag]==140]]
-    $if[$get[getindex140]!=-1;$return[null]]
+    $onlyIf[$get[getindex140]!=-1;$return[null]]
     $let[getcdnytlength;$env[afs;$get[getindex140];contentLength]]
     $if[$get[getcdnytlength]>=10000000;
     $let[checkindex139;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
