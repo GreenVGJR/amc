@@ -5,39 +5,72 @@ module.exports = [{
     $onlyIf[$advancedTextSplit[$customID;_;0]==radioplayerpage]
     $onlyIf[$advancedTextSplit[$customID;_;2]==$authorID]
     $let[mid;$messageID]
-
+    $localFunction[loadinteraction;
+    $if[$env[typela]==1;
+    $interactionUpdate[
+    $footer[Fetching;$callFunction[useIcon;loading]]
+    $color[$callFunction[useIcon;color_embed]]
+    ]
+    ]
+    $if[$env[typela]==2;
+    $let[page1;$advancedTextSplit[$customID;_;3]]
+    $let[page2;$sum[$advancedTextSplit[$customID;_;3];1]]
+    $interactionUpdate[
+    $author[List Stations;https://cdn.onlineradiobox.com/img/android-chrome-192x192.png]
+    $thumbnail[$if[$env[loadstate;0;thumbnail]!=;$env[loadstate;0;thumbnail];$userDefaultAvatar[$clientID]]?c=$get[co1]&query=$get[co2]]
+    $if[$get[store2]==;
+    $description[$get[store]]
+    ;
+    $addField[> \`Page $get[page1]\`;$get[store];true]
+    $addField[> \`Page $get[page2]\`;$get[store2];true]
+    ]
+    $color[$callFunction[useIcon;color_embed]]
+    $if[$env[passthr];$footer[Fetching;$callFunction[useIcon;loading]]]
+    $addActionRow
+    $addStringSelectMenu[radioplayertoplay_$authorID;List Stations;$or[$arrayLength[loadstate]==0;$env[passthr]];1;1]
+    $if[$arrayLength[loadstate]==0;
+    $addOption[null;;null]
+    ;
+    $arrayForEach[loadstate;res;
+    $addOption[$env[res;radioName];$env[res;radioName] - $env[res;radioId];$advancedTextSplit[$customID;_;1]|$advancedTextSplit[$customID;_;3]|$env[res;radioId]]
+    ]]
+    $addActionRow
+    $addButton[radioplayerpage_$sub[$advancedTextSplit[$customID;_;1];1]_$authorID_$sub[$advancedTextSplit[$customID;_;3];2];Back;Secondary;◀️;$or[$advancedTextSplit[$customID;_;1]==1;$env[passthr]]]
+    $addButton[radioplayerpage_null;Page $if[$get[store2]==;$get[page1];$get[page1]-$get[page2]];Secondary;;true]
+    $addButton[radioplayerpage_$sum[$advancedTextSplit[$customID;_;1];1]_$authorID_$sum[$advancedTextSplit[$customID;_;3];2];Next;Secondary;▶️;$if[$or[$arrayLength[loadstate]!=20;$env[passthr]];true;false]]
+    ]
+    ]
+    ;typela;passthr]
     $let[thumbnail;$getEmbeds[$channelID;$get[mid];0;thumbnail]]
     $let[co1;$advancedTextSplit[$get[thumbnail];?c=;1;&;0]]
     $let[co2;$advancedTextSplit[$get[thumbnail];&query=;1]]
-
-    $!clearTimeout[checkadt_pta-cv_$get[mid]]
-    $!deferUpdate
-
-    $jsonLoad[loadstate;$callFunction[scrapeOnlineRadio;$if[$get[co2]!=;$inflate[$get[co2];base64]];$get[co1];$sub[$advancedTextSplit[$customID;_;1];1];$guildID]]
+    
+    $jsonLoad[loadstate;$default[$callFunction[scrapeOnlineRadio;$if[$get[co2]!=;$inflate[$get[co2];base64]];$get[co1];$sub[$advancedTextSplit[$customID;_;1];1];$guildID;true;false];$callFunction[scrapeOnlineRadio;$if[$get[co2]!=;$inflate[$get[co2];base64]];$get[co1];$sub[$advancedTextSplit[$customID;_;1];1];$guildID;false;false]]]
     $let[store;]
+    $let[store2;]
     $let[count;$sum[1;$multi[$sub[$advancedTextSplit[$customID;_;1];1];20]]]
+    $let[countper;1]
     $arrayForEach[loadstate;res;
-    $let[store;$get[store]$get[count]. $hyperlink[$env[res;radioName];$env[res;url]]\n]
+    $if[$get[countper]>10;
+    $let[store2;$get[store2]-# $get[count]. $hyperlink[$bold[$env[res;radioName]];$env[res;url]]\n]
+    ;
+    $let[store;$get[store]-# $get[count]. $hyperlink[$bold[$env[res;radioName]];$env[res;url]]\n]
+    ]
     $letSum[count;1]
+    $letSum[countper;1]
     ]
-    $!interactionUpdate[
-    $author[Showing $arrayLength[loadstate] results]
-    $title[List Stations]
-    $thumbnail[$if[$env[loadstate;0;thumbnail]!=;$env[loadstate;0;thumbnail];$userDefaultAvatar[$clientID]]?c=$get[co1]&query=$get[co2]]
-    $description[$get[store]]
-    $color[$callFunction[useIcon;color_embed]]
-    $timestamp
-    $addActionRow
-    $addStringSelectMenu[radioplayertoplay_$authorID;List Stations;false;1;1]
-    $arrayForEach[loadstate;res;
-    $addOption[$env[res;radioName];$env[res;radioName] - $env[res;radioId];$advancedTextSplit[$customID;_;1]|$env[res;radioId]]
+    $let[currentpage;$advancedTextSplit[$customID;_;1]]
+    $let[checkdb;$callFunction[scrapeOnlineRadio;$if[$get[co2]!=;$inflate[$get[co2];base64]];$get[co1];$get[currentpage];$guildID;true;false]]
+    $callLocalFunction[loadinteraction;2;$and[$arrayLength[loadstate]==20;$get[checkdb]==]]
+    $if[$and[$arrayLength[loadstate]==20;$get[checkdb]==];
+    $let[passtr;false]
+    $loop[20;
+    $let[chtoa;$callFunction[scrapeOnlineRadio;$if[$get[co2]!=;$inflate[$get[co2];base64]];$get[co1];$sum[$env[loopcountertest];$get[currentpage]];$guildID;false;false]]
+    $if[$and[$get[passtr]==false;$env[loopcountertest]>5];$let[passtr;true] $callLocalFunction[loadinteraction;2;false]]
+    $if[$charCount[$get[chtoa]]==2;$break]
+    ;loopcountertest;true]
+    $if[$get[passtr]==false;$callLocalFunction[loadinteraction;2;false]]
     ]
-    $addActionRow
-    $addButton[radioplayerpage_$sub[$advancedTextSplit[$customID;_;1];1]_$authorID;Back;$if[$advancedTextSplit[$customID;_;1]==1;Secondary;Primary];;$checkCondition[$advancedTextSplit[$customID;_;1]==1]]
-    $addButton[radioplayerpage_null;Page $advancedTextSplit[$customID;_;1];Secondary;;true]
-    $addButton[radioplayerpage_$sum[$advancedTextSplit[$customID;_;1];1]_$authorID;Next;$if[$or[$arrayLength[loadstate]==20;$arrayLength[loadstate]==0];Primary;Secondary];;$if[$or[$arrayLength[loadstate]==20;$arrayLength[loadstate]==0];false;true]]
-    ]
-    $setTimeout[$try[$!disableComponentsOf[$channelID;$get[mid]]];1m;checkadt_pta-cv_$get[mid]]
     `
 },
 {
@@ -46,16 +79,47 @@ module.exports = [{
     code: `
     $onlyIf[$advancedTextSplit[$customID;_;0]==radioplayertoplay]
     $onlyIf[$advancedTextSplit[$customID;_;1]==$authorID]
-    $!deferUpdate
-    $!clearTimeout[checkadt_pta-cv_$messageID]
+    $localFunction[loadinteraction;
+    $if[$env[typela]==1;
+    $interactionUpdate[
+    $fetchResponse[$channelID;$messageID]
+    $!disableComponents
+    $footer[Fetching;$callFunction[useIcon;loading]]
+    ]
+    ]
+    $if[$env[typela]==2;
+    $interactionReply[
+    $title[$get[name];https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/]
+    $if[$get[description]!=;$description[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("description"))];0;253;...]]]
+    $addField[Region;:flag_$advancedTextSplit[$get[code];.;0]: $toUppercase[$advancedTextSplit[$get[code];.;0]];true]
+    $addField[Tags;$djsEval[require("entities").decodeHTML(ctx.getKeyword("storetags"))];true]
+    $addField[Rating;$get[rating] / 5.0;true]
+    $addField[Current Track;$if[$get[current_track]==;Not available;$codeBlock[$djsEval[require("entities").decodeHTML(ctx.getKeyword("current_track"))]]];true]
+    $color[$callFunction[useIcon;color_embed]]
+    $thumbnail[$if[$get[validthumbnail]!=;$get[thumbnail];$userDefaultAvatar[$clientID]]$get[codethumbnail]]
+    $addActionRow
+    $addButton[radioplayerpage_$get[currentpage]_$authorID_$get[indexpage];Back to List;Secondary;↩️]
+    $addActionRow
+    $if[$get[stream]!=;
+    $addButton[radioplayerplay_$authorID;Stream;Secondary;▶️]
+    ;
+    $addButton[radioplayerplay_null;Not available;Secondary;;true]
+    ]
+    $if[$get[stream]!=;$addButton[$get[stream];Stream Link;Link]]
+    $addButton[https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/;Link;Link]
+    ]
+    ]
+    ;typela]
     $let[currentpage;$advancedTextSplit[$selectMenuValues[0];|;0]]
-    $let[code;$advancedTextSplit[$selectMenuValues[0];|;1]]
+    $let[indexpage;$advancedTextSplit[$selectMenuValues[0];|;1]]
+    $let[code;$advancedTextSplit[$selectMenuValues[0];|;2]]
     $let[codethumbnail;?$advancedTextSplit[$getEmbeds[$channelID;$messageID;0;thumbnail];?;1]]
+    $callLocalFunction[loadinteraction;1]
 
     $try[
     $httpAddHeader[Accept-Encoding;gzip]
     $!httpRequest[https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/;GET]
-    
+    ]
     $let[current_track;$replace[$replace[$replace[$replace[$replace[$replace[$replace[$advancedTextSplit[$httpResult;class="station-onair";1;class="track_history_item";1;class="ajax">;1;</a>;0];<a>;];</a>;];<i>;];</i>;];<b>;];</b>;];";\\\\"]]
     
     $let[thumbnail;https:$advancedTextSplit[$httpResult;class="station";1;src=";1;";0]]
@@ -72,31 +136,8 @@ module.exports = [{
     $return[$toTitleCase[$advancedTextSplit[$env[tag];class="ajax">;1;</a>;0]]]
     ]
     ;tags2]
-
     $let[storetags;$arrayJoin[tags2;, ]]
-    
-    $!interactionUpdate[
-    $title[$get[name];https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/]
-    $description[$djsEval[require("entities").decodeHTML(ctx.getKeyword("description"))]]
-    $addField[Region;:flag_$advancedTextSplit[$get[code];.;0]: $toUppercase[$advancedTextSplit[$get[code];.;0]];true]
-    $addField[Tags;$djsEval[require("entities").decodeHTML(ctx.getKeyword("storetags"))];true]
-    $addField[Rating;$get[rating] / 5.0;true]
-    $addField[Current Track;$if[$get[current_track]==;Not available;$codeBlock[$djsEval[require("entities").decodeHTML(ctx.getKeyword("current_track"))]]];true]
-    $color[$callFunction[useIcon;color_embed]]
-    $timestamp
-    $thumbnail[$if[$get[validthumbnail]!=;$get[thumbnail];$userDefaultAvatar[$clientID]]$get[codethumbnail]]
-    $addActionRow
-    $addButton[radioplayerpage_$get[currentpage]_$authorID;Back to List;Secondary;↩️]
-    $addActionRow
-    $if[$get[stream]!=;
-    $addButton[radioplayerplay_$authorID;Stream;Primary;▶️]
-    ;
-    $addButton[radioplayerplay_null;Not available;Secondary;;true]
-    ]
-    $if[$get[stream]!=;$addButton[$get[stream];Stream Link;Link]]
-    $addButton[https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/;Link;Link]
-    ]
-    ]
+    $callLocalFunction[loadinteraction;2]
     `
 },
 {
@@ -108,8 +149,37 @@ module.exports = [{
 
     $onlyIf[$voiceID!=;$ephemeral $callFunction[useCustomMusicMessage;config_errorJoin]]
     $onlyIf[$channelHasPerms[$voiceID;$clientID;Connect];$ephemeral $callFunction[useCustomMusicMessage;config_errorChannelPerm] $callFunction[useCustomMusicMessage;config_errorPerm] **Connect** - <@$clientID> (<#$voiceID>)]
-    $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
+    $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
+    $if[$get[crdjcs_0f]==false;
+    $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
+    ;
+    $let[crdjcr_0f;$advancedTextSplit[$get[crdjcs_0f];|;1]]
+    $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
+    ]
     
+    $localFunction[loadinteraction;
+    $if[$env[typela]==1;
+    $interactionUpdate[
+    $fetchResponse[$channelID;$messageID]
+    $!disableComponents
+    $footer[Fetching;$callFunction[useIcon;radioplayerload]]
+    ]
+    ]
+    $if[$env[typela]==2;
+    $interactionReply[
+    $fetchResponse[$channelID;$messageID]
+    $!disableComponents
+    $footer[Attempting to Skip;$callFunction[useIcon;radioplayerload]]
+    ]
+    ]
+    $if[$env[typela]==3;
+    $interactionReply[
+    $loadEmbeds[$get[tempembed]]
+    $loadComponents[$get[tempcomponent]]
+    ]
+    ]
+    ;typela]
+
     $let[tempembed;$getEmbeds[$channelID;$messageID]]
     $let[tempcomponent;$getComponents[$channelID;$messageID]]
 
@@ -117,15 +187,10 @@ module.exports = [{
     $let[title;$getEmbeds[$channelID;$messageID;0;title]]
     $let[url;$getEmbeds[$channelID;$messageID;0;titleURL]]
     $let[thumbnail;$getEmbeds[$channelID;$messageID;0;thumbnail]]
+    $callLocalFunction[loadinteraction;1]
 
     $try[
-    $!interactionUpdate[
-    $fetchEmbeds[$channelID;$messageID;0]
-    $footer[Fetching;$callFunction[useIcon;loading]]
-    ]
-
-    $arrayLoad[testmessage;]
-    $arrayPushJSON[testmessage;{
+    $let[testmessage;{
     "title": "$replace[$replace[$get[title];\\\\;];";\\\\"]",
     "url": "$get[url]",
     "thumbnail": "$get[thumbnail]",
@@ -133,31 +198,23 @@ module.exports = [{
     "requestedBy": {"id":"$authorID"}
     }]
 
-    $setVar[radioplayer_data;$guildID_metadata;$env[testmessage;0]]
     $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
+
+    $playTrack[$voiceID;$trimLines[$get[stream]];auto;FILE]
     $if[$get[iscreatedfirst];
     $setVar[musicplayer_message;$guildID_channelid;$channelID]
     $setVar[musicplayer_message;$guildID_messageid;$messageID]
-    ]
-    $setVar[radioplayer_data;$guildID_playerstatus;true]
-    $setVar[radioplayer_data;$guildID_checkplayer;true]
-
-    $playTrack[$voiceID;$get[stream]]
-    $if[$get[iscreatedfirst]==false;
-    $!interactionUpdate[
-    $fetchEmbeds[$channelID;$messageID;0]
-    $footer[Attempting to Skip;$callFunction[useIcon;loading]]
-    ]
+    ;
+    $callLocalFunction[loadinteraction;2]
     $if[$getLoopMode!=OFF;$setLoopMode[OFF] $wait[1s]]
     $!skipTo[$sub[$queueLength;1]]
     $!interactionDelete
     ]
+    $setVar[radioplayer_data;$guildID_checkplayer;true]
+    $setVar[radioplayer_data;$guildID_metadata;$get[testmessage]]
+    $setVar[radioplayer_data;$guildID_playerstatus;true]
     ;
-    $!interactionUpdate[
-    $loadEmbeds[$get[tempembed]]
-    $loadComponents[$get[tempcomponent]]
-    ]
-
+    $callLocalFunction[loadinteraction;3]
     $let[mid2;$sendMessage[$channelID;
     $reply[$channelID;$messageID;true]
     $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]$codeBlock[$env[whaterrorlog]]]
@@ -165,8 +222,8 @@ module.exports = [{
     $footer[event]
     $timestamp
     ;true]]
-
-    $setTimeout[$!deleteMessage[$channelID;$get[mid2]];2s]
+    $wait[3s]
+    $if[$messageExists[$channelID;$get[mid2]];$!deleteMessage[$channelID;$get[mid2]]]
     ;whaterrorlog]
     `
 }]

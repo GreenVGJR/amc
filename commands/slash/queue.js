@@ -19,7 +19,6 @@ module.exports = {
   $let[nodes;$if[$hasMusicNode;$isPlaying;false]]
   $ephemeral
   $onlyIf[$get[nodes];$callFunction[useCustomMusicMessage;config_errorNoQueue]]
-  $defer
 
   $arrayload[rest;
 ;$queue[;16;{track.title} - <@{track.requestedBy.id}>;
@@ -36,16 +35,15 @@ module.exports = {
   ]
 
   $jsonLoad[jsonmedia;$callFunction[filterMediaID;$trackInfo[url]]]
-  $let[provider;$env[jsonmedia;type]]
+  $let[provider;$replace[$env[jsonmedia;type];applemusic;apple music]]
 
-  $author[Currently Playing;;;0]
+  $author[Currently Playing;$callFunction[useIcon;$env[jsonmedia;type]];;0]
   $title[$cropText[$trackInfo[title];0;253;...];$trackInfo[url];0]
-  $addField[Requested By;$trackInfo[requestedBy];true;0]
   $addField[Owner;\`$trackInfo[author]\`;true;0]
   $addField[Duration;$if[$trackInfo[durationMS]==0;LIVE;$parseDigital[$trackInfo[durationMS]]];true;0]
   $thumbnail[$if[$or[$trackInfo[thumbnail]==null;$trackInfo[thumbnail]==];$userDefaultAvatar[$authorID];$trackInfo[thumbnail]];0]
   $color[$callFunction[useIcon;color_embed];0]
-  $footer[$toTitleCase[$if[$get[provider]==null;File;$get[provider]]];$callFunction[useIcon;$get[provider]];0]
+  $footer[$username[$trackInfo[requestedBy;id]];$userAvatar[$trackInfo[requestedBy;id];1024];0]
   $author[Queue ($separateNumber[$queueLength;.]);;;1]
   $description[$if[$queueLength==0;$callFunction[useCustomMusicMessage;config_errorNoQueueList];$get[contains]];1]
   $color[$callFunction[useIcon;color_embed];1]

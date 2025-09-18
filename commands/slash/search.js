@@ -14,6 +14,10 @@ module.exports = {
           "value": "youtube"
         },
         {
+          "name": "YouTube Shorts",
+          "value": "youtubeshorts"
+        },
+        {
           "name": "YouTube Music",
           "value": "youtubemusic"
         },
@@ -34,8 +38,20 @@ module.exports = {
           "value": "amazonmusic"
         },
         {
+          "name": "ITunes",
+          "value": "itunes"
+        },
+        {
           "name": "Deezer",
           "value": "deezer"
+        },
+        {
+          "name": "Tidal",
+          "value": "tidal"
+        },
+        {
+          "name": "Qobuz",
+          "value": "qobuz"
         },
         {
           "name": "Tiktok Video",
@@ -55,6 +71,7 @@ module.exports = {
       "type": 3,
       "name": "query",
       "description": "Search a media",
+      "autocomplete": true,
       "required": true
     },
     {
@@ -79,31 +96,24 @@ module.exports = {
   code: `
   $onlyIf[$guildID!=;]
   $if[$or[$option[ephemeral]==;$option[ephemeral]==true];$ephemeral]
-  $let[check;$getVar[cachesearch_global-query;$deflate[$option[provider]$toLowercase[$option[query]];hex];null]]
-  $if[$get[check]==null;
-  $async[$interactionReply[$addTextDisplay[Fetching.]]]
-  $jsonLoad[loadser;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
-  $let[currentping;$round[$executionTime;0]]
-  $if[$env[loadser;0]==;
-  $setTimeout[$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]];$get[currentping]]
-  $stop
+  $let[colors;aa$randomBytes[2]]
+  $localFunction[loadinteraction;
+  $if[$env[typela]==1;
+  $interactionReply[$addContainer[
+    $addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`Loading\`]
+    $addSeparator[Large;true]
+    ;$get[colors]]
   ]
-  ;
-  $jsonLoad[loadser;$inflate[$get[check];base64]]
-  $let[currentping;$round[$executionTime;0]]
-  $async[$setVar[storecachesearchusersfetch-q;$djsEval[ctx.interaction.id];$option[query]]
-  $setVar[storecachesearchusersfetch-p;$djsEval[ctx.interaction.id];$option[provider]]]
   ]
-  $arraySlice[loadser;loadser;0;10]
-  $arrayReverse[loadser;loadser]
-  $setTimeout[$interactionReply[
+  $if[$env[typela]==2;
+  $interactionReply[
   $addContainer[$addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms$if[$get[check]!=null; - Cached]\`]
   $addSeparator[Large;true]
   $arrayForEach[loadser;result;
   $addSection[
   $addTextDisplay[
   > ### $cropText[$replace[$env[result;title];#;\\\\#];0;197;...]
-  > -# ### $env[result;url]
+  > $env[result;url]
   > -# $if[$and[$advancedTextSplit[$env[result;duration];:;1]==;$advancedTextSplit[$env[result;duration];:;2]==];$advancedTextSplit[$env[result;duration];:;0];$if[$advancedTextSplit[$env[result;duration];:;0]==00;$advancedTextSplit[$env[result;duration];:;1]:$advancedTextSplit[$env[result;duration];:;2];$env[result;duration]]]
   ]
   $addThumbnail[$if[$or[$env[result;thumbnail]==null;$env[result;thumbnail]==];$userDefaultAvatar[$authorID];$env[result;thumbnail]]]
@@ -113,7 +123,33 @@ module.exports = {
   $addSeparator[Large;true]
   $addActionRow
   $addButton[refreshsearchnoca_$authorID;Force Refresh;Secondary;🔄]
+  ];$get[colors]]]
   ]
-  ;aa$randomBytes[2]]];$get[currentping]]
+  $if[$env[typela]==3;
+  $interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]]
+  ]
+  $return
+  ;typela]
+  $let[check;$getVar[cachesearch_global-query;$deflate[$option[provider]$toLowercase[$option[query]];hex];null]]
+  $if[$get[check]==null;
+  $callLocalFunction[loadinteraction;1]
+  $let[a;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
+  $let[currentping;$round[$executionTime;0]]
+  $jsonLoad[loadser;$get[a]]
+  $if[$env[loadser;0]==;
+  $callLocalFunction[loadinteraction;3]
+  $stop
+  ]
+  ;
+  $jsonLoad[loadser;$inflate[$get[check];base64]]
+  $let[currentping;$round[$executionTime;0]]
+  ]
+  $arraySlice[loadser;loadser;0;10]
+  $arrayReverse[loadser;loadser]
+  $callLocalFunction[loadinteraction;2]
+  $if[$get[check]!=null;
+  $setVar[storecachesearchusersfetch-q;$djsEval[ctx.interaction.id];$option[query]]
+  $setVar[storecachesearchusersfetch-p;$djsEval[ctx.interaction.id];$option[provider]]
+  ]
   `
 }

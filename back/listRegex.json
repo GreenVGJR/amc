@@ -12,7 +12,7 @@
     "youtubeplaylist": ["(?:^|[?&])list=([A-Za-z0-9_-]+)(?=$|[&#/])", 1],
     "soundcloud": ["(?:https?:\\/\\/)?(?:[a-z0-9-]+\\.)?(?:soundcloud\\.com|snd\\.sc)\\/((?:[A-Za-z0-9_-]+\\/(?:sets\\/[A-Za-z0-9_-]+|[A-Za-z0-9_-]+))|[A-Za-z0-9]+)(?=$|[?#])", 1],
     "spotify": ["^(?:https?:\\/\\/)?(?:open\\.spotify\\.com\\/|spotify:)((?:user|episode|playlist|track|album|artist)[\\/:][A-Za-z0-9]+)(?:\\?.*)?$", 1],
-    "tiktok": ["(?:www\\.)?(?:m\\.)?tiktok\\.com\/(?:(?:@[^\/]+\/video\/)|v\/)(\\d{18,21})(?:\\.html)?", 1],
-    "tiktokmob": ["^(?:https?:\\/\\/)?(?:vt|vm)\\.tiktok\\.com\\/(\\w+)\\/?$", 1],
+    "tiktok": ["^(?:https?:\\/\\/)?(?:(?:www\\.)?(?:m\\.)?tiktok\\.com\\/(?:(?:@[^\\/]*\\/video\\/)|v\\/)|t\\.tiktok\\.com\\/i18n\\/share\\/video\\/)(\\d{18,21})(?:\\.html)?(?:[\\/\\?#].*)?$", 1],
+    "tiktokmob": ["^(?:https?:\\/\\/)?(?:vt|vm)\\.tiktok\\.com\\/([A-Za-z0-9-]+)\\/?$", 1],
     "tiktokmusic": ["tiktok\\.com\/music\/[^\/]*?(\\d{18,21})(?:$|[\/?])", 1]
 }

@@ -2,7 +2,7 @@ module.exports = {
     type: "interactionCreate",
     allowedInteractionTypes: ["autocomplete"],
     code: `
-    $onlyIf[$and[$applicationCommandName==radio;$focusedOptionName==country];]
+    $onlyIf[$and[$applicationCommandName==radio;$focusedOptionName==country]]
     $onlyIf[$guildID!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearch];__null__]]
     $onlyIf[$charCount[$focusedOptionValue]<=100;$autocomplete]
     $jsonLoad[result;$readFile[./back/listRadioCountry.json]]

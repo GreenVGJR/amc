@@ -7,18 +7,22 @@ module.exports = {
     $onlyIf[$voiceID[$guildID;$authorID]!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchJoinVC];__null1__]]
     $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];__null2__]]
     $onlyIf[$or[$focusedOptionValue!=;$getMemberVar[cachesearchistory_user_autocomplete;$authorID]!=];$addChoice[$callFunction[useCustomMusicMessage;config_infoSearchFirst];__infointer-$authorID__]]
-
     $if[$isValidLink[$focusedOptionValue]==false;
     $jsonLoad[testing;$callFunction[fastSearchTrack;$if[$focusedOptionValue!=;$focusedOptionValue;$getMemberVar[cachesearchistory_user_autocomplete;$authorID]]]]
-    $if[$focusedOptionValue!=;$setMemberVar[cachesearchistory_user_autocomplete;$focusedOptionValue;$authorID]]
-    $let[count;-1]
+    $async[$if[$focusedOptionValue!=;$#setMemberVar[cachesearchistory_user_autocomplete;$focusedOptionValue;$authorID]]]
     $if[$env[testing;results;0]==;
     $addChoice[$if[$focusedOptionValue==;$getMemberVar[cachesearchistory_user_autocomplete;$authorID];$focusedOptionValue];$if[$focusedOptionValue==;$getMemberVar[cachesearchistory_user_autocomplete;$authorID];$focusedOptionValue]]
     ;
-    $while[$charCount[$env[testing;results;$sum[$get[count];1]]]!=0;
-    $addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;$sum[$get[count];1]];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;$sum[$get[count];1]];";\\\\"]\\\`)]]
-    $letSum[count;1]
-    ]
+    $if[$env[testing;results;0]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;0];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;0];";\\\\"]")]]]
+    $if[$env[testing;results;1]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;1];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;1];";\\\\"]")]]]
+    $if[$env[testing;results;2]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;2];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;2];";\\\\"]")]]]
+    $if[$env[testing;results;3]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;3];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;3];";\\\\"]")]]]
+    $if[$env[testing;results;4]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;4];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;4];";\\\\"]")]]]
+    $if[$env[testing;results;5]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;5];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;5];";\\\\"]")]]]
+    $if[$env[testing;results;6]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;6];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;6];";\\\\"]")]]]
+    $if[$env[testing;results;7]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;7];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;7];";\\\\"]")]]]
+    $if[$env[testing;results;8]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;8];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;8];";\\\\"]")]]]
+    $if[$env[testing;results;9]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;9];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;9];";\\\\"]")]]]
     ]
     ;
     $onlyIf[$charCount[$focusedOptionValue]<=100;$autocomplete]
@@ -33,7 +37,6 @@ module.exports = {
     $addChoice[$cropText[$focusedOptionValue;0;100];$focusedOptionValue]
     ]
     ]
-
     $autocomplete
     `
 }

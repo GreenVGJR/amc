@@ -1,6 +1,15 @@
 module.exports = [{
     type: "playerTrigger",
     code: `
+    $if[$and[$getVar[radioplayer_data;$guildID_playerstatus;false]==false;$callFunction[configMusic;autodelete_nextmessage]];
+    $if[$env[reason]!=filters;
+    $wait[500]
+    $onlyIf[$or[$hasMusicNode==false;$if[$hasMusicNode==true;$isPlaying;false]==false]!=true;]
+    $async[$!deleteMessage[$getVar[musicplayer_message;$guildID_channelid];$getVar[musicplayer_message;$guildID_messageid]]]
+    $setVar[musicplayer_message;$guildID_channelid;$channelID]
+    $setVar[musicplayer_message;$guildID_messageid;$sendMessage[$channelID;_ _;true]]
+    ]]
+
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
 
@@ -12,14 +21,7 @@ module.exports = [{
     ]
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$if[$env[reason]!=filters;0]]]
 
-    $if[$try[$messageExists[$get[cid];$get[mid]];false];
     $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[track];false;intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
-    ;
-    $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
-    $setVar[musicplayer_message;$guildID_channelid;$channelID]
-    $setVar[musicplayer_message;$guildID_messageid;$get[secmid]]
-    $callFunction[musicPlayerMessage;$channelID;$get[secmid];$env[track];false;intervalmusicmessage_$guildID_$channelID;$guildID;;$callFunction[configMusic;interval_message]]
-    ]
 
     $if[$callFunction[configMusic;interval_message];
     $setInterval[
@@ -43,7 +45,6 @@ module.exports = [{
 {
     type: "playerResume",
     code: `
-
     $onlyIf[$djsEval[(0, require("discord-player").useMainPlayer)().queues.get(ctx.client.guilds.cache.get("$guildID"))]!=null;]
 
     $if[$callFunction[configMusic;interval_message];
@@ -85,8 +86,6 @@ module.exports = [{
     $if[$callFunction[configMusic;interval_message];
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     ]
-    $try[
-    $if[$messageExists[$get[cid];$get[mid]];$!disableComponentsOf[$get[cid];$get[mid]]]
-    ]
+    $try[$!disableComponentsOf[$get[cid];$get[mid]]]
     `
 }]

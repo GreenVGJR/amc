@@ -39,6 +39,7 @@ ___
 | Youtube       | Youtube       |
 | Soundcloud*   | Soundcloud    |
 | -             | Spotify**     |
+| -             | Apple Music** |
 | Local/HTTP    | Local/HTTP    |
 > *Unstable
 
@@ -64,12 +65,16 @@ ___
 - Search a media (Max. 10 Result)
   Providers:
   = > Youtube
+    > Youtube Shorts
     > Youtube Music
     > Soundcloud
     > Spotify
     > Apple Music
     > Amazon Music
+    > ITunes
     > Deezer
+    > Tidal
+    > Qobuz
     > Tiktok Video
     > Tiktok Music
     > NCS

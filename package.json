@@ -1,13 +1,13 @@
 {
   "dependencies": {
+    "@discordjs/opus": "^0.10.0",
     "@evan/opus": "^1.0.3",
     "@tryforge/forge.db": "^2.1.0",
     "@tryforge/forge.music": "^1.0.0",
-    "@tryforge/forgescript": "^2.4.1",
+    "@tryforge/forgescript": "github:tryforge/ForgeScript#dev",
     "discord-player-youtubei": "^1.5.0",
-    "dotenv": "^17.2.1",
+    "dotenv": "^17.2.2",
     "entities": "^6.0.1",
-    "ffmpeg-static": "^5.2.0",
     "sqlite3": "^5.1.7"
   }
 }

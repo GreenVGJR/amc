@@ -24,7 +24,13 @@ module.exports = {
     $ephemeral
     $onlyIf[$voiceID!=;$callFunction[useCustomMusicMessage;config_errorJoin]]
     $onlyIf[$voiceID[$guildID;$clientID]!=;$callFunction[useCustomMusicMessage;config_errorClientPlayer]]
+    $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
+    $if[$get[crdjcs_0f]==false;
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]
+    ;
+    $let[crdjcr_0f;$advancedTextSplit[$get[crdjcs_0f];|;1]]
+    $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
+    ]
     $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
     $let[nodes;$if[$hasMusicNode;$queueLength;0]]
     $onlyIf[$get[nodes]!=0;$callFunction[useCustomMusicMessage;config_errorNoTrackBeforeSeek]]
@@ -38,11 +44,11 @@ module.exports = {
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
 
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $if[$option[position]!=;
+    $async[$if[$option[position]!=;
     $!skipTo[$sub[$option[position];1]]
     ;
     $!skipTrack
-    ]
+    ]]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalSkipTrack]]
     $setTimeout[$!interactionDelete;3s]
     `

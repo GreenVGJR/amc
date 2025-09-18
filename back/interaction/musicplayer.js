@@ -5,12 +5,16 @@ module.exports = {
     $onlyIf[$advancedTextSplit[$customID;_;0]==musicplayer;]
     $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
     $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
-    $onlyIf[$get[mid]==$messageID;$!disableComponentsOf[$channelID;$messageID] $!deferUpdate]
+    $onlyIf[$get[mid]==$messageID;$async[$!deferUpdate]$!disableComponentsOf[$channelID;$messageID]]
     $onlyIf[$voiceID[$guildID;$clientID]!=;]
+    $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
+    $if[$get[crdjcs_0f]==false;
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;]
-
+    ;
+    $let[crdjcr_0f;$advancedTextSplit[$get[crdjcs_0f];|;1]]
+    $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
+    ]
     $if[$advancedTextSplit[$customID;_;1]==nodequeue;
-    
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $if[$selectMenuValues[0]==0;
     $!skipTrack
@@ -46,6 +50,18 @@ module.exports = {
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
     ]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==lastfm;
+    $ephemeral
+    $interactionReply[
+    $footer[Fetching;$callFunction[useIcon;loading];0]
+    $color[$callFunction[useIcon;color_embed];0]
+    $footer[Fetching;$callFunction[useIcon;loading];1]
+    $color[$callFunction[useIcon;color_embed];1]
+    ]
+    $let[a;$callFunction[discoverArtistLastFm;$advancedTextSplit[$trackInfo[author];- Topic;0]]]
+    $onlyIf[$get[a]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
+    $interactionReply[$get[a]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==volumedown;
     $!setVolume[$if[$sub[$getVolume;10]>=0;$sub[$getVolume;10];0]]
@@ -91,23 +107,8 @@ module.exports = {
     $async[$!seekTrack[$get[resseek]]]
     $!interactionDelete
     ]
-    
-    $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown]!=true;]
-
-    $let[testmessage;{
-    "id": "$trackInfo[id]",
-    "title": "$replace[$replace[$trackInfo[title];\\\\;];";\\\\"]",
-    "author": "$trackInfo[author]",
-    "url": "$trackInfo[url]",
-    "thumbnail": "$trackInfo[thumbnail]",
-    "duration": "$trackInfo[duration]",
-    "durationMS": $trackInfo[durationMS],
-    "views": $trackInfo[views],
-    "requestedBy": {"id":"$advancedTextSplit[$trackInfo[requestedBy];@;1;>;0]"},
-    "playlist": null
-    }]
-
-    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$get[testmessage];false;intervalmusicmessage_$guildID_$get[cid];$guildID;true;$callFunction[configMusic;interval_message]]
-    $!deferUpdate
+    $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown;lastfm]!=true;]
+    $async[$!deferUpdate]
+    $callFunction[updateCurrentMusicPlayer]
     `
 }

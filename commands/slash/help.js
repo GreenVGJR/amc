@@ -15,22 +15,23 @@ module.exports = {
   $onlyIf[$guildID!=;]
   
   $let[a;$getGlobalVar[listcommands-help]]
-  $onlyIf[$get[a]!=;]
   $ephemeral
+  $if[$get[a]==;
+  $defer
+  $updateApplicationCommands
+  $!setGlobalVar[listcommands-help;$applicationCommands]
+  ]
   
   $jsonLoad[test;$get[a]]
+  $arrayMap[test;t1;$if[$env[t1;integrationTypes;1]==1;$return[</$env[t1;name]:$env[t1;id]>]];testuser]
+  $arrayMap[test;t1;$return[</$env[t1;name]:$env[t1;id]>];testguild]
   
   $author[Hello, $username[$authorID];$userAvatar[$authorID;512];;0]
-  $title[Apps - Available Commands;;0]
-  $arrayForEach[test;tests;
-  $if[$env[tests;integrationTypes;1]==1;$addField[</$env[tests;name]:$env[tests;id]>;$advancedTextSplit[$env[tests;description];|;0];true;0]
-  ]]
-  $title[Guild - Available Commands;;1]
-  $arrayForEach[test;tests;
-  $if[$env[tests;name]!=help;$addField[</$env[tests;name]:$env[tests;id]>;$advancedTextSplit[$env[tests;description];|;0];true;1]
-  ]]
+  $footer[Apps - Available Commands;;0]
+  $description[$arrayJoin[testuser;, ];0]
+  $footer[Guild - Available Commands;;1]
+  $description[$arrayJoin[testguild;, ];1]
   $color[$callFunction[useIcon;color_embed];0]
   $color[$callFunction[useIcon;color_embed];1]
-  $timestamp[;1]
   `
 }

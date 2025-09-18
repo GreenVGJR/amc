@@ -9,13 +9,14 @@
     "config_errorChannelPerm": "Can't join to voice channel.\nReason:",
     "config_errorPerm": "Missing Permission,",
     "config_errorIsSameVC": "You must same with {client} in",
+    "config_errorIsSameDJVC": "You must have {role} role to access this command.",
 
     "config_errorAttemptSearch": "[WARNING] Execute this Application in Server.",
     "config_errorAttemptSearchJoinVC": "[WARNING] You must be on voice channel to use this.",
     "config_errorAttemptRadioPlayer": "[WARNING] Stop the current active player before switching player.",
     "config_errorAttemptSearchFetchTitle": "[INFO] Can't find the title.",
     
-    "config_infoSearchFirst": "[INFO] What music you want to find?",
+    "config_infoSearchFirst": "[INFO] What music you want to play?",
 
     "config_errorNoResult": "No results found.",
     "config_errorNoResultSearch": "No result.",
@@ -50,5 +51,11 @@
     "config_generalInvalidLinkDownload": "Must be link.",
     "config_generalInvalidProviderDownload": "Invalid provider. Only accepts:\n`Youtube, Soundcloud, Spotify, Tiktok Video / Music`",
     "config_generalEmptyDownload": "Can't download this.",
-    "config_generalOverDownload": "Can't download this media if it's above 10MB.\n\nStill want to download? You can try access this url to direct downloads."
+    "config_generalOverDownload": "Can't download this media if it's above 10MB.\n\nStill want to download? You can try access this url to direct downloads.",
+
+    "config_generalPlaylistExistsUser": "You already have this playlist.",
+    "config_generalPlaylistNotExistUser": "Can't find the playlist.",
+    "config_generalPlaylistErrorUser": "Can't access this playlist.",
+
+    "config_generalPlaylistTempNotExistUser": "Something just happened. Can't continue this process."
 }
