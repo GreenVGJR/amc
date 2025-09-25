@@ -43,9 +43,9 @@ module.exports = {
     $onlyIf[$env[result;results]!=;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
     $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
     $interactionReply[
-    $if[$charCount[$get[loadlyrics]]>3900;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
+    $if[$charCount[$get[loadlyrics]]>3000;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
     $title[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]
-    $description[$codeBlock[$cropText[$get[loadlyrics];0;3900;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
+    $description[$codeBlock[$cropText[$get[loadlyrics];0;3000;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
     $footer[$toTitleCase[$env[result;results;provider]];$callFunction[useIcon;$env[result;results;provider]]]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp

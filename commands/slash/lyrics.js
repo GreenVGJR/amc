@@ -56,7 +56,7 @@ module.exports = {
     ]
     $addSection[
     $addTextDisplay[> ## $hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]
-    $addTextDisplay[$codeBlock[$cropText[$get[loadlyrics];0;3800;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
+    $addTextDisplay[$codeBlock[$cropText[$get[loadlyrics];0;3000;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
     $if[$checkContains[$env[result;results;url];music.youtube.com];
     $addThumbnail[https://i.ytimg.com/vi/$advancedTextSplit[$env[result;results;url];?v=;1;&;0]/1.jpg]
     ;
