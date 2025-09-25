@@ -97,6 +97,7 @@ module.exports = {
   $onlyIf[$guildID!=;]
   $if[$or[$option[ephemeral]==;$option[ephemeral]==true];$ephemeral]
   $let[colors;aa$randomBytes[2]]
+  $let[check;$getVar[cachesearch_global-query;$deflate[$option[provider]$toLowercase[$option[query]];hex];null]]
   $localFunction[loadinteraction;
   $if[$env[typela]==1;
   $interactionReply[$addContainer[
@@ -130,7 +131,6 @@ module.exports = {
   ]
   $return
   ;typela]
-  $let[check;$getVar[cachesearch_global-query;$deflate[$option[provider]$toLowercase[$option[query]];hex];null]]
   $if[$get[check]==null;
   $callLocalFunction[loadinteraction;1]
   $let[a;$callFunction[searchSomeTrack;$option[query];$option[provider]]]

@@ -7,5 +7,5 @@
     "autodelete_nextmessage": false,
     "interval_message": false,
     "fetchMusicTitle_autocomplete": true,
-    "preFetch_Search": true
+    "preFetch_Search": false
 }

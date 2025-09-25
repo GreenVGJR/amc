@@ -4,8 +4,14 @@ module.exports = {
         name: "query", // string
         description: "query",
         required: true
+    },
+    {
+        name: "userAgent", // string
+        description: "Spoof Client",
+        required: false
     }],
     code: `
+$let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
 $try[
 $httpAddHeader[Accept-Encoding;gzip]
 $httpAddHeader[User-Agent;$get[agent]]

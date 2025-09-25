@@ -22,19 +22,20 @@ module.exports = {
     $let[videoid;$env[whattype;id]]
 
     $try[
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID_VR","clientVersion":"1.60.0","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","androidSdkVersion": 36,"clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
+    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID_VR","clientVersion":"1.00.0","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","androidSdkVersion": 38,"clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $httpAddHeader[Accept-Encoding;gzip]
     $if[$or[$env[types]==;$env[types]==v];
-    $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength));POST;reshttp]
+    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength));POST;reshttp]
     ]
     $if[$env[types]==va;
-    $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url));POST;reshttp]
+    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url));POST;reshttp]
     ]]
-    $if[$env[reshttp;playabilityStatus;status]==LOGIN_REQUIRED;$return[bot|$env[reshttp;playabilityStatus;reason]]]
+    $onlyIf[$env[reshttp;playabilityStatus;status]!=LOGIN_REQUIRED;$let[finalurl;bot|$env[reshttp;playabilityStatus;reason]]]
+    $onlyIf[$env[reshttp;playabilityStatus;liveStreamability]==;$let[finalurl;live]]
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $let[getindex140;$arrayFindIndex[afs;aaa;$env[aaa;itag]==140]]
-    $onlyIf[$get[getindex140]!=-1;$return]
+    $onlyIf[$get[getindex140]!=-1;$let[finalurl;null]]
     $let[getcdnytlength;$env[afs;$get[getindex140];contentLength]]
     $if[$get[getcdnytlength]>=10000000;
     $let[checkindex139;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
@@ -43,13 +44,12 @@ module.exports = {
     $let[getcdnytlength;$env[afs;$get[getindex140];contentLength]]
     ]]
     $let[getcdnyt;$env[afs;$get[getindex140];url]]
-    $onlyIf[$or[$get[getcdnytlength]==;$get[getcdnytlength]==0]!=true;$return[live]]
     $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]]
     ]
     $if[$env[types]==va;
     $jsonLoad[fts;$env[reshttp;streamingData;formats]]
     $let[getindex18;$arrayFindIndex[fts;aaa;$env[aaa;itag]==18]]
-    $onlyIf[$get[getindex18]!=-1;$return]
+    $onlyIf[$get[getindex18]!=-1;$let[finalurl;null]]
     $let[getcdnyt;$env[fts;$get[getindex18];url]]
     $try[$let[pullength;$httpRequest[$get[getcdnyt];HEAD]] $let[checklength;$if[$httpGetHeader[Content-Length]!=;$httpGetHeader[Content-Length];0]]]
     $let[finalurl;$get[getcdnyt]&cpn=$randomString[16]$if[$has[pullength];&range=0-$get[checklength]]]
@@ -61,10 +61,10 @@ module.exports = {
     $arrayMap[loadres;test2;$if[$env[test2;hydratable]==sound;$return[$env[test2]]];test3]
     $jsonLoad[test4;$env[test3;0;data;media;transcodings]]
     $arrayMap[test4;test5;$if[$env[test5;format;protocol]==progressive;$return[$env[test5]]];test6]
-    $onlyIf[$env[test6;0;url]!=;$return]
+    $onlyIf[$env[test6;0;url]!=;$let[finalurl;null]]
     $!httpRequest[$env[test6;0;url]&track_authorization=$env[test3;0;data;track_authorization];GET;rest]
     $let[finalurl;$env[rest;url]]
-    $onlyIf[$get[finalurl]!=;$return]
+    $onlyIf[$get[finalurl]!=;$let[finalurl;null]]
     ;
     $if[$env[whattype;type]==spotify;
     $jsonLoad[test;$extractTrack[$env[url]]]
@@ -91,12 +91,12 @@ module.exports = {
     $let[findindex;$get[ad4]]
     $if[$get[ad4]==-1;
     $let[ad5;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];lowest_540]]]
-    $onlyIf[$get[ad5]!=-1;$return]
+    $onlyIf[$get[ad5]!=-1;$let[finalurl;null]]
     $let[findindex;$get[ad5]]
     ]]]]
     $jsonLoad[b;$env[test;results;video;bitrateInfo;$get[findindex];PlayAddr;UrlList]]
     ]
-    $onlyIf[$env[b;0]!=;$return]
+    $onlyIf[$env[b;0]!=;$let[finalurl;null]]
     $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1322;www.tiktok.com;api16-normal.tiktokv.com]]
     ]
     $if[$env[whattype;type]==tiktokmusic;
@@ -108,7 +108,7 @@ module.exports = {
     ;
     $let[finalurl;$env[a;results;play_url;uri]]
     ]
-    $onlyIf[$get[finalurl]!=;$return]
+    $onlyIf[$get[finalurl]!=;$let[finalurl;null]]
     ]
     $if[$env[whattype;type]==applemusic;
     $try[

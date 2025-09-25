@@ -55,10 +55,10 @@ module.exports = {
     $addSeparator[Small;true]
     ]
     $addSection[
-    $addTextDisplay[> ## $hyperlink[$env[result;results;autocomplete];$env[result;results;url]]]
+    $addTextDisplay[> ## $hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]
     $addTextDisplay[$codeBlock[$cropText[$get[loadlyrics];0;3800;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
     $if[$checkContains[$env[result;results;url];music.youtube.com];
-    $addThumbnail[https://i.ytimg.com/vi/$advancedTextSplit[$env[result;results;url];?v=;1;&;0]/frame0.jpg]
+    $addThumbnail[https://i.ytimg.com/vi/$advancedTextSplit[$env[result;results;url];?v=;1;&;0]/1.jpg]
     ;
     $addThumbnail[$userAvatar[$clientID;1024]]
     ]]
