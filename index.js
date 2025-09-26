@@ -28,8 +28,8 @@ const music = new ForgeMusic({
     connectOptions: {
         disableHistory: true,
         disableResampler: true,
-        bufferingTimeout: 3000,
-        connectionTimeout: 5000,
+        bufferingTimeout: 2000,
+        connectionTimeout: 10000,
         leaveOnEmpty: true,
         leaveOnEmptyCooldown: 15000,
         pauseOnEmpty: true,
