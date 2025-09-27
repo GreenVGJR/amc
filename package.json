@@ -4,7 +4,7 @@
     "@evan/opus": "^1.0.3",
     "@tryforge/forge.db": "^2.1.0",
     "@tryforge/forge.music": "^1.0.0",
-    "@tryforge/forgescript": "github:tryforge/ForgeScript#dev",
+    "@tryforge/forgescript": "^2.5.0",
     "discord-player-youtubei": "^1.5.0",
     "dotenv": "^17.2.2",
     "entities": "^7.0.0",
