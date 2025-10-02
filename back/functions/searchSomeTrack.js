@@ -1,0 +1,217 @@
+module.exports = {
+    name: "searchSomeTrack",
+    params: [{
+        name: "query", // string
+        description: "To show a results",
+        required: true
+    },
+    {
+        name: "provider", // enum
+        description: "Provider to use",
+        required: true
+    },
+    {
+        name: "userAgent", // string
+        description: "Spoof Client",
+        required: false
+    }],
+    code: `
+    $arrayLoad[results]
+    $try[
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
+    $if[$env[provider]==youtube;
+    $jsonLoad[loadser;$try[$getYoutubeVideo[$env[query]];{}]]
+    $jsonLoad[loadser2;$env[loadser;results]]
+    $arrayForEach[loadser2;result;
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$if[$env[result;duration]==0;LIVE;$parseDigital[$multi[$env[result;duration];1000]]]","thumbnail":"$env[result;thumbnail]","url":"$env[result;url]"}]
+    ]
+    ]
+    $if[$env[provider]==youtubeshorts;
+    $jsonLoad[ser;$try[$getYoutubeShorts[$env[query]];{}]]
+    $jsonLoad[loadser;$env[ser;results]]
+    $arrayForEach[loadser;result;
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[result;duration];1000]]","thumbnail":"$env[result;thumbnail]","url":"$env[result;url]"}]
+    ]
+    ]
+    $if[$env[provider]==youtubemusic;
+    $jsonLoad[ser;$try[$getYoutubeMusic[$env[query]];{}]]
+    $jsonLoad[loadser;$env[ser;results]]
+    $arrayForEach[loadser;result;
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[result;duration];1000]]","thumbnail":"$env[result;thumbnail]","url":"$env[result;url]"}]
+    ]
+    ]
+    $if[$env[provider]==soundcloud;
+    $let[tryattempt;0]
+    $localFunction[refreshsc;
+    $if[$env[refresh]==true;
+    $if[$get[tryattempt]>=3;$return]
+    $callFunction[generateAuthKeys;soundcloud;;false]
+    $letSum[tryattempt;1]
+    ]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $let[httpsc;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getGlobalVar[authmusic_soundcloud]&limit=10;GET;tests]]
+    $if[$or[$get[httpsc]==401;$get[httpsc]==403];$callLocalFunction[refreshsc;true] $return]
+    $if[$get[httpsc]==429;$return]
+    $jsonLoad[res;$env[tests;collection]]
+    $arrayForEach[res;result;
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[result;title];\\\\;];";\\\\"]","duration":"$parseDigital[$env[result;full_duration]]$if[$env[result;duration]==30000; - REGION LOCK]","thumbnail":"$env[result;artwork_url]","url":"$env[result;permalink_url]"}]
+    ]
+    ;refresh]
+    $callLocalFunction[refreshsc;false]
+    ]
+    $if[$env[provider]==spotify;
+    $let[tryattempt;0]
+    $localFunction[refreshspotify;
+    $try[
+    $if[$env[refresh]==true;
+    $if[$get[tryattempt]>=3;$return]
+    $callFunction[generateAuthKeys;spotify;;false]
+    $letSum[tryattempt;1]
+    ]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_spotify]]
+    $httpAddHeader[App-platform;WebPlayer]
+    $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=10;GET;jsonres]]
+    $if[$or[$get[httpspo]==401;$get[httpspo]==400];$callLocalFunction[refreshspotify;true] $return]
+    $if[$get[httpspo]==429;$return]
+    $jsonLoad[res1;$env[jsonres;tracks;items]]
+    $arrayForEach[res1;res2;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res2;name];\\\\;];";\\\\"]","duration":"$parseDigital[$env[res2;duration_ms]]","thumbnail":"$env[res2;album;images;0;url]","url":"$env[res2;external_urls;spotify]"}]]
+    ]
+    ;refresh]
+    $callLocalFunction[refreshspotify;false]
+    ]
+    $if[$env[provider]==itunes;
+    $let[tryattempt;0]
+    $localFunction[runitunes;
+    $try[
+    $if[$env[refresh]==true;
+    $if[$get[tryattempt]>=3;$return]
+    $letSum[tryattempt;1]
+    ]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpSetContentType[Text]
+    $!httpRequest[https://itunes.apple.com/search?media=music&limit=10&country=US&term=$env[query];GET;res]
+    ]
+    $onlyIf[$env[res]!=;$callLocalFunction[runitunes;true]]
+    ;refresh]
+    $callLocalFunction[runitunes;false]
+    $jsonLoad[res;$env[res]]
+    $jsonLoad[res2;$env[res;results]]
+    $arrayForEach[res2;res3;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res3;trackName];\\\\;];";\\\\"]","duration":"$parseDigital[$env[res3;trackTimeMillis]]","thumbnail":"$replace[$env[res3;artworkUrl100];100x100bb;1x1ss]","url":"$advancedTextSplit[$env[res3;trackViewUrl];&;0]"}]]
+    ]
+    $if[$env[provider]==applemusic;
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_applemusic]]
+    $httpAddHeader[Origin;https://music.apple.com]
+    $httpAddHeader[Cookie;geo=US]
+    $!httpRequest[https://api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]
+    $jsonLoad[res2;$env[res;results;songs;data]]
+    $arrayForEach[res2;res5;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res5;attributes;name];\\\\;];";\\\\"]","duration":"$parseDigital[$env[res5;attributes;durationInMillis]]","thumbnail":"$replace[$env[res5;attributes;artwork;url];{w}x{h}bb;1x1ss]","url":"$env[res5;attributes;url]"}]]
+    ]
+    $if[$env[provider]==tidal;
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[X-Tidal-Token;$getGlobalVar[authmusic_tidal]]
+    $httpAddHeader[Content-Type;application/json]
+    $!httpRequest[https://api.tidal.com/v1/search/tracks?countryCode=US&locale=en_US&limit=10&offset=0&query=$env[query];GET;res]
+    $jsonLoad[res2;$env[res;items]]
+    $arrayForEach[res2;res3;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res3;title];\\\\;];";\\\\"]","duration":"$parseDigital[$round[$multi[$env[res3;duration];1000]]]","thumbnail":"https://resources.tidal.com/images/$replace[$env[res3;album;cover];-;/]/1080x1080.jpg","url":"https://tidal.com/browse/track/$env[res3;id]"}]]
+    ]
+    $if[$env[provider]==qobuz;
+    $let[tryattempt;0]
+    $localFunction[refreshqob;
+    $if[$env[refresh]==true;
+    $if[$get[tryattempt]>=3;$return]
+    $callFunction[generateAuthKeys;qobuz;;false]
+    $letSum[tryattempt;1]
+    ]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_qobuz];base64]]
+    $httpSetContentType[Text]
+    $!httpRequest[https://www.qobuz.com/us-en/search/tracks/$encodeURI[$env[query]]?ssf%5Bf%5D%5Bq%5D=ih.1;GET;a]
+    $arrayLoad[b;<div class="ListItem">;$advancedTextSplit[$env[a];<section class="product">;1;</section>;0]]
+    $!arrayShift[b]
+    $onlyIf[$env[b;0]!=;$callLocalFunction[refreshqob;true]]
+    $arrayLoad[results]
+    $arrayForEach[b;c;$arrayPushJSON[results;{"title":"$trimLines[$advancedTextSplit[$env[c];class="ListItem__title";1;role="tooltip">;1;</a>;0]]","duration":"Unknown","thumbnail":"$advancedTextSplit[$env[c];<img;1;src=";1;";0]","url":"https://www.qobuz.com$advancedTextSplit[$env[c];href=";1;";0]"}]]
+    ;refresh]
+    $callLocalFunction[refreshqob;false]
+    ]
+    $if[$env[provider]==amazonmusic;
+    $let[tryattempt;0]
+    $localFunction[refreshamz;
+    $if[$env[refresh]==true;
+    $if[$get[tryattempt]>=3;$return]
+    $callFunction[generateAuthKeys;amazonmusic;;false]
+    $letSum[tryattempt;1]
+    ]
+    $jsonLoad[a;$if[$getGlobalVar[authmusic_amazonmusic;{}]=={};{};$inflate[$getGlobalVar[authmusic_amazonmusic];base64]]]
+    $httpSetBody[{"keyword":"{\\\\"interface\\\\":\\\\"Web.TemplatesInterface.v1_0.Touch.SearchTemplateInterface.SearchKeywordClientInformation\\\\",\\\\"keyword\\\\":\\\\"$replace[$replace[$env[query];\\\\;];";\\\\\\\\"]\\\\"}","userHash":"{\\\\"level\\\\":\\\\"LIBRARY_MEMBER\\\\"}","headers":"{\\\\"x-amzn-authentication\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"ClientAuthenticationInterface.v1_0.ClientTokenElement\\\\\\\\\\\\",\\\\\\\\\\\\"accessToken\\\\\\\\\\\\":\\\\\\\\\\\\"\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-device-model\\\\":\\\\"WEBPLAYER\\\\",\\\\"x-amzn-device-width\\\\":\\\\"1920\\\\",\\\\"x-amzn-device-family\\\\":\\\\"WebPlayer\\\\",\\\\"x-amzn-device-id\\\\":\\\\"$env[a;deviceId]\\\\",\\\\"x-amzn-user-agent\\\\":\\\\"$get[agent]\\\\",\\\\"x-amzn-session-id\\\\":\\\\"$env[a;sessionId]\\\\",\\\\"x-amzn-device-height\\\\":\\\\"1080\\\\",\\\\"x-amzn-request-id\\\\":\\\\"$randomBytes[4]-$randomBytes[2]-$randomBytes[2]-$randomBytes[6]\\\\",\\\\"x-amzn-device-language\\\\":\\\\"$env[a;displayLanguage]\\\\",\\\\"x-amzn-currency-of-preference\\\\":\\\\"USD\\\\",\\\\"x-amzn-os-version\\\\":\\\\"$advancedTextSplit[$env[a;version];.;0].$advancedTextSplit[$env[a;version];.;1]\\\\",\\\\"x-amzn-application-version\\\\":\\\\"$env[a;version]\\\\",\\\\"x-amzn-device-time-zone\\\\":\\\\"$djsEval[Intl.DateTimeFormat().resolvedOptions().timeZone]\\\\",\\\\"x-amzn-timestamp\\\\":\\\\"$getTimestamp\\\\",\\\\"x-amzn-csrf\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"CSRFInterface.v1_0.CSRFHeaderElement\\\\\\\\\\\\",\\\\\\\\\\\\"token\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;token]\\\\\\\\\\\\",\\\\\\\\\\\\"timestamp\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;ts]\\\\\\\\\\\\",\\\\\\\\\\\\"rndNonce\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;rnd]\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-music-domain\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-referer\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-affiliate-tags\\\\":\\\\"\\\\",\\\\"x-amzn-ref-marker\\\\":\\\\"\\\\",\\\\"x-amzn-page-url\\\\":\\\\"https://music.amazon.com/search\\\\",\\\\"x-amzn-weblab-id-overrides\\\\":\\\\"\\\\",\\\\"x-amzn-video-player-token\\\\":\\\\"\\\\",\\\\"x-amzn-feature-flags\\\\":\\\\"\\\\",\\\\"x-amzn-has-profile-id\\\\":\\\\"\\\\"}"}]
+    $httpAddHeader[Origin;https://music.amazon.com]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $let[httpa;$httpRequest[https://na.mesk.skill.music.a2z.com/api/showSearch;POST;b]]
+    $if[$or[$get[httpa]==400;$get[httpa]==429];$return]
+    $if[$env[b;methods;0;template;header]!=;$callLocalFunction[refreshamz;true] $return]
+    $jsonLoad[c;$env[b;methods;0;template;widgets]]
+    $arrayMap[c;cd;$if[$toLowercase[$env[cd;header]]==songs;$return[$env[cd;items]]];d]
+    $jsonLoad[e;$env[d;0]]
+    $arrayForEach[e;ef;$arrayPushJSON[results;{"title":"$replace[$replace[$env[ef;primaryText;text];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"$env[ef;image]","url":"https://music.amazon.com$env[ef;primaryLink;deeplink]"}]]
+    ;refresh]
+    $callLocalFunction[refreshamz;false]
+    ]
+    $if[$env[provider]==deezer;
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $let[status;$httpRequest[https://api.deezer.com/search?limit=10&q=$env[query];GET;res]]
+    $jsonLoad[forres;$env[res;data]]
+    $arrayForEach[forres;resat;$arrayPushJSON[results;{"title":"$replace[$replace[$env[resat;title];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[resat;duration];1000]]","thumbnail":"$replace[$env[resat;album;cover_xl];1000x1000-000000-80;1920x1920-000000-100]","url":"$env[resat;link]"}]]
+    ]
+    $if[$env[provider]==tiktokvideo;
+    $httpSetContentType[Text]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
+    $!httpRequest[https://t.tiktok.com/api/search/general/full/?aid=1180&app_language=en&app_name=tiktok_web&browser_language=en-US&from_page=search&cookie_enabled=true&search_source=normal_search&region=US&device_id=$getGlobalVar[authmusic_tiktok_did]&offset=0&keyword=$env[query];GET;a]
+    $if[$env[a]==;$return]
+    $jsonLoad[a;$env[a]]
+    $jsonLoad[a;$env[a;data]]
+    $arrayMap[a;b;$if[$env[b;item]!=;$return[$env[b;item]]];c]
+    $arrayForEach[c;d;$arrayPushJSON[results;{"title":"$replace[$replace[$if[$trim[$advancedTextSplit[$env[d;desc];#;0]]!=;$trim[$advancedTextSplit[$env[d;desc];#;0]];$env[d;music;title]];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[d;video;duration];1000]]","thumbnail":"$env[d;video;cover]","url":"https://www.tiktok.com/@$env[d;author;uniqueId]/video/$env[d;id]"}]]
+    ]
+    $if[$env[provider]==tiktokmusic;
+    $httpSetContentType[Text]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Content-Type;application/json]
+    $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
+    $!httpRequest[https://api16-normal.tiktokv.com/aweme/v1/music/search/?count=10&cursor=0&aid=1180&device_id=$getGlobalVar[authmusic_tiktok_did]&keyword=$env[query];GET;a]
+    $if[$env[a]==;$return]
+    $jsonLoad[a;$env[a]]
+    $jsonLoad[a;$env[a;music_info_list]]
+    $arrayForEach[a;d;$arrayPushJSON[results;{"title":"$replace[$replace[$env[d;music;title];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[d;music;duration];1000]]","thumbnail":"https://p16.tiktokcdn.com/aweme/1080x1080/$env[d;music;cover_large;uri]","url":"https://www.tiktok.com/music/-$env[d;music;id_str]"}]]
+    ]
+    $if[$env[provider]==ncs;
+    $httpSetContentType[Text]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $!httpRequest[https://ncs.io/music-search?q=$env[query]&genre=&mood=;GET]
+    $arrayLoad[a;class="player-play";$advancedTextSplit[$httpResult;<tbody>;1;</tbody>;0]]
+    $!arrayShift[a]
+    $arrayForEach[a;b;
+    $arrayPushJSON[results;{"title":"$advancedTextSplit[$env[b];" data-cover=";0;data-track=";1]","duration":"Unknown","thumbnail":"$advancedTextSplit[$env[b];img src=";1;";0]","url":"https://ncs.io$advancedTextSplit[$env[b];href=";1;";0]"}]
+    ]
+    ]
+    $if[$env[results;0]!=;
+    $setVar[cachesearch_global-query;$deflate[$env[provider]$toLowercase[$env[query]];hex];$deflate[$env[results];base64]]
+    ]]
+    $return[$env[results]]
+    `
+}

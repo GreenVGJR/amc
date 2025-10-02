@@ -1,9 +1,9 @@
 // Main
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
 const { ForgeDB } = require("@tryforge/forge.db");
-const { ForgeLink } = require("@tryforge/forge.linked");
+const { ForgeLinked } = require('ForgeLinked');
 
-require("dotenv").config();
+require("dotenv").config({ quiet: true }); // Load Environment
 
 const db = new ForgeDB({
     events: [
@@ -11,33 +11,33 @@ const db = new ForgeDB({
     ]
 });
 
-const lavalink = new ForgeLink({
-    events: {
-        kazagumo: [
-            "playerClosed",
-            "playerCreate",
-            "playerDestroy",
-            "playerEmpty",
-            "playerResumed",
-            "playerStart",
-        ],
-    },
-    kazagumoOptions: {
-        defaultSearchEngine: "youtube"
-    },
-    nodes: [
-        {
-            name: "Test Node",
-            auth: "hai",
-            url: "localhost:3000",
-            secure: false
-        }
-    ]
+const lavalink = new ForgeLinked({
+  events: [
+    "error",
+    "linkedTrackError",
+    "linkedPlayerDestroy",
+    "linkedPlayerDisconnect",
+    "linkedPlayerUpdate",
+    "linkedTrackStart",
+    "linkedTrackEnd"
+  ],
+  nodes: [
+    {
+      id: "maow",
+      host: "localhost",
+      port: 3000,
+      authorization: "hai",
+      secure: false
+    }    
+  ],
+  playerOptions: {
+    defaultSearchPlatform: "youtube"
+  }
 });
 
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
-    logLevel: LogPriority.Low,
+    logLevel: LogPriority.Medium,
     intents: [
         "Guilds",
         "GuildMembers",
@@ -46,7 +46,7 @@ const client = new ForgeClient({
         "MessageContent"
     ],
     events: [
-        "ready",
+        "clientReady",
         "voiceStateUpdate",
         "interactionCreate",
         "messageCreate"
@@ -62,49 +62,12 @@ const client = new ForgeClient({
 
 client.login();
 
-client.functions.load("back/scrape") // Custom Functions
+client.functions.load("back/functions");
+db.commands.load("back/client/fdb");
+client.applicationCommands.load("commands/slash");
+client.commands.load("back/interaction");
+client.commands.load("back/client/fs");
+client.commands.load("commands/basic");
+lavalink.commands.load("back/events");
 
-// Basic Command, Autocomplete, Events
-client.commands.load("basic/commands")
-client.commands.load("basic/autocomplete")
-client.commands.load("basic/events")
-
-client.applicationCommands.load("commands") // Slash Command
-
-lavalink.commands.kazagumo.load("back/events") // Events
-
-client.commands.add({
-    type: "ready",
-    code: `
-    $logger[Info;Ready on client $username[$clientID]]
-    $setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk]
-    $setInterval[$setStatus[online;Streaming;Music;;https://www.youtube.com/watch?v=jfKfPfyJRdk];1m]
-
-    $logger[Info;Attempting to Generate]
-    $callFunction[generateAuthKeys;all;;true]
-    $setInterval[$logger[Info;Attempting to Generate] $callFunction[generateAuthKeys;all;;true];1h]
-    ` 
-});
-
-db.commands.add({
-    type: "connect",
-    code: `
-    $logger[Info;Waiting to online]
-    $try[
-    $deleteRecords[cachesearchistory_user_autocomplete]
-    ]
-    $try[
-    $deleteRecords[musicplayer_message]
-    ]
-    $try[
-    $deleteRecords[radioplayer_data]
-    ]
-    $!setGlobalVar[authmusic_youtube_key;]
-    $!setGlobalVar[authmusic_soundcloud;]
-    $!setGlobalVar[authmusic_spotify;]
-    $!setGlobalVar[authmusic_spotify_token;]
-    $!setGlobalVar[authmusic_amazonmusic;]
-    $!setGlobalVar[authmusic_deezer;]
-    $!setGlobalVar[authmusic_azlyrics;]
-    `,
-});
+console.clear();

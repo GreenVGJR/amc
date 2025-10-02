@@ -1,9 +1,11 @@
 {
-    "_comment": "Currently only youtube / soundcloud / spotify for searching",
+    "_comment": "Currently only youtube / youtubemusic / soundcloud / spotify / applemusic for searching",
     "default_provider": "youtube",
-    "fallback_provider": "spotify",
+    "fallback_provider": "soundcloud",
 
     "debug_auth": false,
     "autodelete_nextmessage": false,
-    "interval_message": false
+    "interval_message": false,
+    "fetchMusicTitle_autocomplete": true,
+    "preFetch_Search": false
 }

@@ -10,6 +10,9 @@
 
 ___
 
+> [!NOTE]
+> Please change the lavalink server address after install. You can try use [public lavalink available](https://lavalink-list.darrennathanael.com/).
+
 ## Installation
 1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v16.11.0 for node.js
 2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-dev-lavalink.zip) this branch (.zip)
@@ -23,9 +26,6 @@ node .
 > How about for Pterodactyl user?
 
 Ignore first & last installation step.
-
-> [!NOTE]
-> Please change the lavalink server address after install.
 
 ___
 
@@ -41,9 +41,10 @@ ___
 | ------------- | ------------- |
 | Youtube       | Youtube       |
 | Soundcloud    | Soundcloud    |
-| -             | Spotify       |
+| -             | Spotify*      |
+| -             | Apple Music*  |
 | Local/HTTP    | Local/HTTP    |
-
+> *If Available
 
 </details>
 
@@ -61,22 +62,30 @@ ___
   = > Youtube Music
     > Lrclib
     > Genius
-    > AZLyrics
 
-- Search a songs (Max. 10 Result)
+- Search a media (Max. 10 Result)
   Providers:
   = > Youtube
+    > Youtube Shorts
     > Youtube Music
     > Soundcloud
     > Spotify
     > Apple Music
     > Amazon Music
+    > ITunes
     > Deezer
+    > Tidal
+    > Qobuz
+    > Tiktok Video
+    > Tiktok Music
+    > NCS
 
 - Auto-generate auth keys needed
 - Dynamic info message
 - Show suggestion song name
+- Download media
 - Controller
+- Radio
 - Queue
 - Skip song
 - Seek to specific duration

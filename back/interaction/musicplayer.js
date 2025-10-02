@@ -1,0 +1,104 @@
+module.exports = {
+    type: "interactionCreate",
+    allowedInteractionTypes: ["button", "selectMenu"],
+    code: `
+    $onlyIf[$advancedTextSplit[$customID;_;0]==musicplayer;]
+    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
+    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $onlyIf[$get[mid]==$messageID;$async[$!deferUpdate]$!disableComponentsOf[$channelID;$messageID]]
+    $onlyIf[$voiceID[$guildID;$clientID]!=;]
+    $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
+    $if[$get[crdjcs_0f]==false;
+    $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;]
+    ;
+    $let[crdjcr_0f;$advancedTextSplit[$get[crdjcs_0f];|;1]]
+    $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==nodequeue;
+    $if[$selectMenuValues[0]==0;
+    $!skipTrack
+    $!playerSkip[$guildID]
+    ;
+    $!playerSkip[$guildID;$sum[$selectMenuValues[0];1]]
+    ]
+    $!deferUpdate
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==loop;
+    $if[$playerLoopStatus[$guildID]==off;$!playerToggleLoop[$guildID;TRACK];
+    $if[$playerLoopStatus[$guildID]==track;$!playerToggleLoop[$guildID;QUEUE];$!playerToggleLoop[$guildID;OFF]]]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==shuffle;
+    $!playerShuffle[$guildID]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==lyrics;
+    $ephemeral
+    $defer
+    $jsonLoad[trk;$playerCurrentTrack[$guildID]]
+    $jsonLoad[result;$callFunction[getLyricsTrack;$if[$charCount[$env[trk;title];-]==0;$advancedTextSplit[$env[trk;author];-;0] - $advancedTextSplit[$env[trk;title];(;0];$advancedTextSplit[$env[trk;title];(;0]];;false;false]]
+    $onlyIf[$env[result;results]!=;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
+    $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
+    $interactionReply[
+    $if[$charCount[$get[loadlyrics]]>3000;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
+    $title[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]
+    $description[$codeBlock[$cropText[$get[loadlyrics];0;3900;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
+    $footer[$toTitleCase[$env[result;results;provider]];$callFunction[useIcon;$env[result;results;provider]]]
+    $color[$callFunction[useIcon;color_embed]]
+    $timestamp
+    ]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==lastfm;
+    $ephemeral
+    $interactionReply[
+    $footer[Fetching;$callFunction[useIcon;loading];0]
+    $color[$callFunction[useIcon;color_embed];0]
+    $footer[Fetching;$callFunction[useIcon;loading];1]
+    $color[$callFunction[useIcon;color_embed];1]
+    ]
+    $jsonLoad[trk;$playerCurrentTrack[$guildID]]
+    
+    $let[a;$callFunction[discoverArtistLastFm;$advancedTextSplit[$env[trk;author];- Topic;0]]]
+    $onlyIf[$get[a]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
+    $interactionReply[$get[a]]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==volumedown;
+    $!playerSetVolume[$guildID;$if[$sub[$playerGetVolume[$guildID];10]>=0;$sub[$playerGetVolume[$guildID];10];0]]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==volumeup;
+    $!playerSetVolume[$guildID;$if[$sum[$playerGetVolume[$guildID];10]<=150;$sum[$playerGetVolume[$guildID];10];150]]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==volumemute;
+    $!playerSetVolume[$guildID;$if[$playerGetVolume[$guildID]==0;100;0]]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==stopplayer;
+    $!playerDestroy[$guildID]
+    $!deleteMemberVar[cachesearchistory_user_autocomplete;$authorID]
+    $!deferUpdate
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==actionplayer;
+    $if[$playerIsPaused[$guildID];$!playerResume[$guildID];$!playerPause[$guildID]]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==seekdown;
+    $ephemeral
+    $defer
+    $let[curduration;$playerElapsedTime[$guildID]]
+    $let[seeks;10000]
+    $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sub[$get[curduration];$get[seeks]]]]
+    $let[resseek;$if[$sub[$get[curduration];$get[seeks]]<0;0;$sub[$get[curduration];$get[seeks]]]]
+    $async[$!playerSeek[$guildID;$get[resseek]]]
+    $!interactionDelete
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==seekup;
+    $ephemeral
+    $defer
+    $let[curduration;$playerElapsedTime[$guildID]]
+    $let[seeks;10000]
+    $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sum[$get[curduration];$get[seeks]]]]
+    $let[resseek;$if[$sum[$get[curduration];$get[seeks]]<0;0;$sum[$get[curduration];$get[seeks]]]]
+    $async[$!playerSeek[$guildID;$get[resseek]]]
+    $!interactionDelete
+    ]
+    $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown;lastfm]!=true;]
+    $async[$!deferUpdate]
+    $callFunction[updateCurrentMusicPlayer]
+    `
+}
