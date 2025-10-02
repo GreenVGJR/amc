@@ -77,7 +77,7 @@ module.exports = [{
     $arrayPushJSON[results;{
         "title": "$replace[$replace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;];";\\\\"]",
         "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",
-        "thumbnail": "$default[$env[getfetch;videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url];https://i.ytimg.com/vi_webp/$env[getfetch;videoRenderer;videoId]/hq720.webp]",
+        "thumbnail": "$default[$env[getfetch;videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url];https://i.ytimg.com/vi_webp/$env[getfetch;videoRenderer;videoId]/oardefault.webp]",
         "url": "https://youtube.com/shorts/$env[getfetch;videoRenderer;videoId]"
     }]]
     ]]

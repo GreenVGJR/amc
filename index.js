@@ -71,3 +71,5 @@ client.commands.load("back/client/fs");
 client.commands.load("commands/basic");
 music.player.extractors.register(YoutubeiExtractor, youtube);
 music.commands.load("back/events");
+
+console.clear();

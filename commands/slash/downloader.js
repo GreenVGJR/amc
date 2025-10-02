@@ -11,6 +11,20 @@ module.exports = {
       "min_length": 8
     },
     {
+      "type": 3,
+      "name": "yt_option",
+      "description": "Override download options for Youtube",
+      "required": false,
+      "choices": [{
+        "name": "Audio",
+        "value": "1"
+      },
+      {
+        "name": "Audio + Video",
+        "value": "2"
+      }],
+    },
+    {
       "type": 5,
       "name": "lyrics",
       "description": "Include lyrics?",
@@ -66,7 +80,7 @@ $callLocalFunction[runcodessync;Getting CDN;Fetching - This may take longer;true
 $let[getcdn;$callFunction[fallbackPlaybackTrack;$env[b;results;0;url];v]]
 ;
 $callLocalFunction[runcodessync;Getting CDN & Title;Fetching - This may take longer;true]
-$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];v]]
+$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;v]]]
 ]
 $onlyIf[$advancedTextSplit[$trimLines[$get[getcdn]];|;0]!=bot;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]\nError: $advancedTextSplit[$trimLines[$get[getcdn]];|;1]]
 $onlyIf[$or[$trimLines[$get[getcdn]]==null;$trimLines[$get[getcdn]]==live;$trimLines[$get[getcdn]]==]!=true;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
@@ -74,7 +88,7 @@ $if[$has[gettitle]==false;
 $let[gettitle;$callFunction[fetchTitleTrack;$get[url]]]
 $if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]]]
 ]
-$if[$and[$option[lyrics]==true;$or[$env[musictype;type]!=tiktokmob;$env[musictype;type]!=tiktok;$env[musictype;type]!=tiktokmusic]];
+$if[$and[$option[yt_option]!=2;$option[lyrics]==true;$or[$env[musictype;type]!=tiktokmob;$env[musictype;type]!=tiktok;$env[musictype;type]!=tiktokmusic]];
 $let[checklyric;false]
 $jsonLoad[lyricresult;$callFunction[getLyricsTrack;$get[gettitle];;true;true]]
 $callLocalFunction[runcodessync;;Fetching Lyrics;true]
@@ -94,11 +108,33 @@ $let[converttype;mp4]
 $let[converttype;$if[$get[contenttype]==webm;opus;$if[$get[contenttype]==mp4;m4a;$if[$or[$get[contenttype]==mp3;$get[contenttype]==mpeg];mp3;$get[contenttype]]]]]
 ]
 $let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];$get[gettitle].$get[converttype]]]
+$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];
+$let[contenttype;m3u8]
+$let[converttype;ts]
+$let[names;$get[gettitle]]
+$onlyIf[$httpRequest[$get[getcdn];GET]==200;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$let[clh;$charCount[$httpResult]]
+$callLocalFunction[runcodessync;;Fetching Segments;true]
+$let[clh;0]
+$arrayLoad[b;#EXTINF;$httpResult]
+$!arrayShift[b]
+$arrayMap[b;c;$return[$advancedTextSplit[$env[c];
+;1]];b]
+$arrayMap[b;c;$if[$get[clh]<=10000000;$return[$djsEval[fetch("$env[c]").then(r => r.arrayBuffer()).then(d => { (ctx.setKeyword("clh", Number(ctx.getKeyword("clh") ?? 0) + d.byteLength))\\; return Buffer.from(d).toString("base64")}).then(e => e).catch()]]];b]
+$let[ks;$djsEval[Buffer.concat(JSON.parse(\\\`$env[b]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64")]]
+$let[contenttype;ts]
+$let[converttype;mp4]
+$let[names;$get[gettitle].$get[converttype]]
+$callLocalFunction[runcodessync;;Downloading;true]
+$interactionReply[
+$attachment[$get[ks];$get[names];true;base64]
+]
+;
 $callLocalFunction[runcodessync;;Downloading;true]
 $interactionReply[
 $if[$and[$option[lyrics]==true;$get[checklyric]];$attachment[$get[loadlyrics];$get[lyricnames];true]]
 $attachment[$trimLines[$get[getcdn]];$get[names]]
-]
+]]
 $if[$channelExists[$channelID];
 $fetchMessage[$channelID;$get[mid]]
 $if[$messageAttachmentCount[$channelID;$get[mid]]==0;

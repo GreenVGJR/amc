@@ -9,6 +9,7 @@
     "config_errorChannelPerm": "Can't join to voice channel.\nReason:",
     "config_errorPerm": "Missing Permission,",
     "config_errorIsSameVC": "You must same with {client} in",
+    "config_errorIsLimitVC": "Can't join this voice channel.",
     "config_errorIsSameDJVC": "You must have {role} role to access this command.",
 
     "config_errorAttemptSearch": "[WARNING] Execute this Application in Server.",

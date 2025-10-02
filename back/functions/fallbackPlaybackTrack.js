@@ -22,14 +22,19 @@ module.exports = {
     $let[videoid;$env[whattype;id]]
 
     $try[
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID_VR","clientVersion":"1.00.0","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","androidSdkVersion": 38,"clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
+    $if[$env[types]==hls;
+    $httpAddHeader[User-Agent;Mozilla/5.0 (Macintosh\\; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15,gzip(gfe)]
+    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"WEB","clientVersion":"2.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
+    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,videoDetails.lengthSeconds,streamingData.hlsManifestUrl;POST;reshttp]
+    ;
+    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"VISIONOS","clientVersion":"0.1","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $httpAddHeader[Accept-Encoding;gzip]
     $if[$or[$env[types]==;$env[types]==v];
     $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength));POST;reshttp]
     ]
     $if[$env[types]==va;
     $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url));POST;reshttp]
-    ]]
+    ]]]
     $onlyIf[$env[reshttp;playabilityStatus;status]!=LOGIN_REQUIRED;$let[finalurl;bot|$env[reshttp;playabilityStatus;reason]]]
     $onlyIf[$env[reshttp;playabilityStatus;liveStreamability]==;$let[finalurl;live]]
     $if[$or[$env[types]==;$env[types]==v];
@@ -45,6 +50,16 @@ module.exports = {
     ]]
     $let[getcdnyt;$env[afs;$get[getindex140];url]]
     $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]]
+    ]
+    $if[$env[types]==hls;
+    $let[jaghttp;$httpRequest[$env[reshttp;streamingData;hlsManifestUrl];GET;jsbd]]
+    $onlyIf[$get[jaghttp]==200;$let[finalurl;null]]
+    $arrayLoad[jskd;#EXT-X-STREAM-INF:BANDWIDTH=;$env[jsbd]]
+    $!arrayShift[jskd]
+    $let[fskklsv;$arrayFindIndex[jskd;oasb;$checkCondition[$divide[$multi[$advancedTextSplit[$env[oasb];,;0];$env[reshttp;videoDetails;lengthSeconds]];8]>=10000000]]]
+    $let[fsidlsv;$env[jskd;$if[$get[fskklsv]==-1;$sub[$arrayLength[jskd];1];$get[fskklsv]]]]
+    $let[finalurl;$advancedTextSplit[$get[fsidlsv];
+;1]]
     ]
     $if[$env[types]==va;
     $jsonLoad[fts;$env[reshttp;streamingData;formats]]

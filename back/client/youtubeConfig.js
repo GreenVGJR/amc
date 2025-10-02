@@ -1,14 +1,14 @@
 // Test replace yt stream
+let vt;
 async function fallbackYTStream(lstracks) {
     try {
-    const pl={videoId:lstracks.split('watch?v=')[1],context:{client:{clientName:"ANDROID",clientVersion:"19.37.54",clientScreen:"WATCH",clientFormFactor:"UNKNOWN_FORM_FACTOR"},request:{useSsl:true,internalExperimentFlags:[],consistencyTokenJars:[]}},playbackContext:{contentPlaybackContext:{vis:0,splay:true,html5Preference:"HTML5_PREF_WANTS",lactMilliseconds:"-1"}},attestationRequest:{omitBotguardData:true},racyCheckOk:true,contentCheckOk:true};
+    vt=vt?vt:await fetch("https://youtubei.googleapis.com/youtubei/v1/player?prettyPrint=false&fields=responseContext.visitorData", { method: "POST", body: JSON.stringify({context:{client:{clientName:"VISIONOS",clientVersion:"0.1"}}}), headers: { "Content-Type": "application/json", "Accept-Encoding": "gzip"}}).then(a => a.json()).then(b => b.responseContext.visitorData);
+    const pl={videoId:lstracks.split('watch?v=')[1],context:{client:{clientName:"VISIONOS",clientVersion:"0.1",visitorData:vt,clientScreen:"WATCH",clientFormFactor:"UNKNOWN_FORM_FACTOR"},request:{useSsl:true,internalExperimentFlags:[],consistencyTokenJars:[]}},playbackContext:{contentPlaybackContext:{vis:0,splay:true,html5Preference:"HTML5_PREF_WANTS",lactMilliseconds:"-1",signatureTimestamp:"0"}},attestationRequest:{omitBotguardData:true},racyCheckOk:true,contentCheckOk:true};
 
     let a = await fetch('https://youtubei.googleapis.com/youtubei/v1/player?prettyPrint=false&fields=streamingData(hlsManifestUrl,adaptiveFormats(itag,url,contentLength))', { method: "POST", body: JSON.stringify(pl), headers: { "Content-Type": "application/json", "Accept-Encoding": "gzip"}}).then(b => b.json());
 
-    if(a.streamingData?.hlsManifestUrl) { return a.streamingData.hlsManifestUrl; }
-    a = a.streamingData?.adaptiveFormats?.find(c => c.itag === 251 || c.itag === 140); //Known issue, throttled
-    if(!a.url) { throw new Error(); }
-        return a.url + "&ratebypass=true&range=0-" + a.contentLength;
+    if(!a.streamingData?.hlsManifestUrl) { throw new Error(); }
+        return await fetch(a.streamingData.hlsManifestUrl).then(a => a.text()).then(b => b.split('GROUP-ID="234"')[0].split('URI="')[2].split('"')[0]);
     }
     catch {
         throw new Error();
@@ -19,12 +19,16 @@ module.exports = {
     generateWithPoToken: false,
     disablePlayer: true,
     slicePlaylist: true,
-    overrideBridgeMode: "ytmusic",
     createStream: async (q) => {
     try { return await fallbackYTStream(q.url); }
     catch { return; }
-    },
-    streamOptions: {
-        useClient: "ANDROID"
     }
+    /*
+    streamOptions: {
+        useClient: "IOS"
+    },
+    innertubeConfigRaw: {
+        player_id: "0004de42" // https://github.com/LuanRT/YouTube.js/issues/1043#issuecomment-3328154175
+    }
+    */
 }

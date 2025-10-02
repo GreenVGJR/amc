@@ -428,6 +428,7 @@ $let[crdjcr_0f;$advancedTextSplit[$get[crdjcs_0f];|;1]]
 $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
 ]
 
+$onlyIf[$or[$channelUserLimit[$voiceID]==0;$sum[$channelVoiceMemberCount[$voiceID];$if[$voiceID[$guildID;$clientID]==;1;0]]<=$channelUserLimit[$voiceID]];$ephemeral $callFunction[useCustomMusicMessage;config_errorIsLimitVC]]
 $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
 $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
 $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
