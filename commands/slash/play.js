@@ -28,7 +28,6 @@ module.exports = {
         "name": "Soundcloud",
         "value": "soundcloud"
       },
-      /*
       {
         "name": "Spotify",
         "value": "spotify"
@@ -36,8 +35,7 @@ module.exports = {
       {
         "name": "Apple Music",
         "value": "applemusic"
-      },
-      */
+      }
     ]
     },
     {

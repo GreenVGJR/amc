@@ -4,7 +4,7 @@
     "@tryforge/forgescript": "^2.5.0",
     "dotenv": "^17.2.2",
     "entities": "^7.0.0",
-    "ForgeLinked": "github:Zack-911/ForgeLinked#dev",
+    "ForgeLinked": "github:tryforge/ForgeLinked#dev",
     "sqlite3": "^5.1.7"
   }
 }

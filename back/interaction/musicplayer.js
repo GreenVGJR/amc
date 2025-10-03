@@ -16,7 +16,6 @@ module.exports = {
     ]
     $if[$advancedTextSplit[$customID;_;1]==nodequeue;
     $if[$selectMenuValues[0]==0;
-    $!skipTrack
     $!playerSkip[$guildID]
     ;
     $!playerSkip[$guildID;$sum[$selectMenuValues[0];1]]

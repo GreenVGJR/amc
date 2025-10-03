@@ -77,6 +77,12 @@ module.exports = {
     $jsonLoad[res;$env[res]]
     $let[rest2;{"id":"$advancedTextSplit[$env[res;results;0;trackViewUrl];&;0]","dynamic_thumbnail":"","thumbnail":"$replace[$env[res;results;0;artworkUrl100];100x100bb;1x1ss]","duration":$round[$divide[$env[res;results;0;trackTimeMillis];1000];0],"title":"$deflate[$env[res;results;0;trackName];base64]"}]
     ]
+    $if[$env[provider]==deezer;
+    $let[status;$httpRequest[https://api.deezer.com/search?limit=1&q=$env[query];GET;res]]
+    $onlyIf[$env[res]!=;$callLocalFunction[refreshing;true]]
+    $onlyIf[$and[$get[status]==200;$env[res;data;0]!=];$return]
+    $let[rest2;{"id":"$env[res;data;0;id]","dynamic_thumbnail":"","thumbnail":"$env[res;data;0;album;cover]","duration":$env[res;data;0;duration],"title":"$deflate[$env[res;data;0;title];base64]"}]
+    ]
     ;refresh]
     $callLocalFunction[refreshing;false]
     $return[$get[rest2]]

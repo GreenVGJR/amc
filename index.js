@@ -24,14 +24,21 @@ const lavalink = new ForgeLinked({
   nodes: [
     {
       id: "maow",
-      host: "localhost",
-      port: 3000,
-      authorization: "hai",
-      secure: false
+      host: "lava-v4.ajieblogs.eu.org", // https://free.lavalink.rf.gd
+      port: 443,
+      authorization: "https://dsc.gg/ajidevserver",
+      secure: true
     }    
   ],
   playerOptions: {
-    defaultSearchPlatform: "youtube"
+    defaultSearchPlatform: "youtube",
+    onDisconnect: {
+      autoReconnect: true,
+      destroyPlayer: true
+    },
+    onEmptyQueue: {
+      destroyAfterMs: 0
+    }
   }
 });
 

@@ -11,7 +11,7 @@
 ___
 
 > [!NOTE]
-> Please change the lavalink server address after install. You can try use [public lavalink available](https://lavalink-list.darrennathanael.com/).
+> [List Public Lavalink available](https://lavalink-list.darrennathanael.com/).
 
 ## Installation
 1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v16.11.0 for node.js
@@ -60,6 +60,7 @@ ___
 - Find Lyrics from current/specific song
   Providers:
   = > Youtube Music
+    > Deezer
     > Lrclib
     > Genius
 
@@ -79,11 +80,17 @@ ___
     > Tiktok Video
     > Tiktok Music
     > NCS
+    
+- Download media
+  Providers:
+  = > Youtube
+    > Soundcloud
+    > Spotify
+    > Tiktok Video/Music
 
 - Auto-generate auth keys needed
 - Dynamic info message
 - Show suggestion song name
-- Download media
 - Controller
 - Radio
 - Queue

@@ -123,7 +123,7 @@ module.exports = {
     $addButton[musicplayer_loop_$env[messageId];$toTitleCase[$playerLoopStatus[$env[guildId]]];$if[$playerLoopStatus[$env[guildId]]==off;Secondary;Primary];🔁;false]
     $addButton[musicplayer_shuffle_$env[messageId];Shuffle;Secondary;🔀;false]
     $addButton[musicplayer_lyrics_$env[messageId];Lyrics;Secondary;🎶;$or[$get[checkstream];$get[provider]==null]]
-    $addButton[musicplayer_lastfm_$env[messageId];Last.FM;Secondary;1413865849307267112;$or[$get[provider]==null;$get[provider]==applemusic]]
+    $addButton[musicplayer_lastfm_$env[messageId];Last.FM;Secondary;1413865849307267112;$or[$get[provider]==null]]
     $addActionRow
     $addButton[musicplayer_volumedown_$env[messageId];-10%;Secondary;🔉;$checkCondition[$playerGetVolume[$env[guildId]]==0]]
     $addButton[null0;$playerGetVolume[$env[guildId]]%;Secondary;🔈;true]
