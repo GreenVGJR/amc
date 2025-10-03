@@ -64,7 +64,7 @@ module.exports = {
   $let[countnode;0]
   $arrayForEach[guild;guilds;
   $try[
-  $if[$playerQueueLength[$guildID]>=0;$letSum[countnode;1]]
+  $if[$playerQueueLength[$env[guilds]]>=0;$letSum[countnode;1]]
   ]]
   $textSplit[$advancedTextSplit[$httpResult;</div><br>;1;address: ;1;<br>;0];.]
   $callLocalFunction[abcd;$get[countnode];$if[$httpResult!=;$if[$botOwnerID==$authorID;$splitText[0].$splitText[1];xxx.xxx].$splitText[2].$splitText[3]]]
