@@ -11,7 +11,7 @@ module.exports = [{
 
     $jsonLoad[currenttrack;$playerCurrentTrack[$guildID]]
     $let[kltrack;{
-    "title": "$env[currenttrack;title]",
+    "title": "$replace[$env[currenttrack;title];";\\\\"]",
     "description": "",
     "author": "$env[currenttrack;author]",
     "url": "$env[currenttrack;uri]",
