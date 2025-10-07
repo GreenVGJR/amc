@@ -54,6 +54,6 @@ module.exports = {
     $let[author;$env[a;results;artist]]
     $let[title;$env[a;results;title]]
     ]
-    $if[$or[$get[title]==;$get[title]==null;$get[title]==undefined]!=true;$if[$or[$get[author]==;$get[author]==null;$get[author]==undefined];$trimLines[$get[title]];$if[$checkContains[$toLowercase[$trimLines[$get[title]]];$toLowercase[$trimLines[$get[author]]]];$return[$trimLines[$get[title]]];$return[$trimLines[$get[author]] - $trimLines[$get[title]]]]];$return]
+    $if[$or[$get[title]==;$get[title]==null;$get[title]==undefined]!=true;$if[$or[$get[author]==;$get[author]==null;$get[author]==undefined];$return[$trimLines[$get[title]]];$if[$checkContains[$toLowercase[$trimLines[$get[title]]];$toLowercase[$trimLines[$get[author]]]];$return[$trimLines[$get[title]]];$return[$trimLines[$get[author]] - $trimLines[$get[title]]]]];$return]
     `
 }
