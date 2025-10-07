@@ -6,7 +6,7 @@ module.exports = {
     {
       "type": 3,
       "name": "url",
-      "description": "URL song | Youtube / Soundcloud / Spotify / Tiktok Video & Music",
+      "description": "URL media | Youtube / Soundcloud / Spotify / Tiktok / Instagram / Facebook / Bandcamp",
       "required": true,
       "min_length": 8
     },
@@ -56,12 +56,13 @@ $onlyIf[$isValidLink[$get[url]];$ephemeral $callFunction[useCustomMusicMessage;c
 $jsonLoad[musictype;$callFunction[filterMediaID;$get[url]]]
 $onlyIf[$or[$env[musictype;id]==;$env[musictype;id]==null;$env[musictype;type]==null]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
 $onlyIf[$env[musictype;type]!=youtubeplaylist;$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
+$let[uravt;$memberAvatar[$guildID;$authorID;1024]]
 $localFunction[runcodessync;
 $let[mid2;$interactionReply[
-$if[$env[msg1]!=;$author[$env[msg1]]]
+$author[$if[$env[msg1]!=;$env[msg1];None];$get[uravt]]
 $addField[Type;\`$toTitleCase[$advancedReplace[$env[musictype;type];tiktokmusic;tiktok music;tiktokmob;tiktok mobile]]\`;true]
-$addField[Length Size;\`$get[clh]\`\n-# $round[$divide[$get[clh];1024;1024];2] MB;true]
-$addField[Format;\`.$get[contenttype]$if[$get[contenttype]!=$get[converttype]; => .$get[converttype]]\`;true]
+$addField[Length Size;$if[$get[clh]==;\`null\`;\`$get[clh]\`\n-# $round[$divide[$get[clh];1024;1024];2] MB];true]
+$addField[Format;\`$if[$get[converttype]==;null;.$get[contenttype]$if[$get[contenttype]!=$get[converttype]; => .$get[converttype]]]\`;true]
 $addField[File Name;$if[$and[$option[lyrics]==true;$get[checklyric]];$codeBlock[$get[lyricnames]]]$codeBlock[$get[names]]$if[$and[$has[checklyric];$get[checklyric]==false];\n-# WARNING: Lyrics not available];false]
 $color[$callFunction[useIcon;color_embed];0]
 $footer[$env[msg2];$if[$env[togload]==true;$callFunction[useIcon;loading]]]
@@ -79,30 +80,34 @@ $onlyIf[$env[b;results;0]!=;$callFunction[useCustomMusicMessage;config_generalEm
 $callLocalFunction[runcodessync;Getting CDN;Fetching - This may take longer;true]
 $let[getcdn;$callFunction[fallbackPlaybackTrack;$env[b;results;0;url];v]]
 ;
-$callLocalFunction[runcodessync;Getting CDN & Title;Fetching - This may take longer;true]
+$callLocalFunction[runcodessync;Getting CDN;Fetching - This may take longer;true]
 $let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;v]]]
 ]
 $onlyIf[$advancedTextSplit[$trimLines[$get[getcdn]];|;0]!=bot;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]\nError: $advancedTextSplit[$trimLines[$get[getcdn]];|;1]]
 $onlyIf[$or[$trimLines[$get[getcdn]]==null;$trimLines[$get[getcdn]]==live;$trimLines[$get[getcdn]]==]!=true;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $if[$has[gettitle]==false;
+$callLocalFunction[runcodessync;Getting Title;Fetching - This may take longer;true]
 $let[gettitle;$callFunction[fetchTitleTrack;$get[url]]]
 $if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]]]
 ]
 $if[$and[$option[yt_option]!=2;$option[lyrics]==true;$or[$env[musictype;type]!=tiktokmob;$env[musictype;type]!=tiktok;$env[musictype;type]!=tiktokmusic]];
+$callLocalFunction[runcodessync;Getting Lyrics;Fetching;true]
 $let[checklyric;false]
 $jsonLoad[lyricresult;$callFunction[getLyricsTrack;$get[gettitle];;true;true]]
-$callLocalFunction[runcodessync;;Fetching Lyrics;true]
 $if[$env[lyricresult;results]!=;
 $let[loadlyrics;$inflate[$env[lyricresult;results;lyric];hex]] 
 $let[checklyric;true]
 $let[lyricnames;$if[$option[file_name]!=;$option[file_name];$get[gettitle]].lrc]
 ]]
-$callLocalFunction[runcodessync;;Testing URL;false]
+$callLocalFunction[runcodessync;;Sleeping in 1s;false]
+$wait[1s]
+$callLocalFunction[runcodessync;Testing URL;Connecting to: $advancedTextSplit[$get[getcdn];/;2];true]
 $!djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET"}).then(r=>{ctx.setKeyword("clh",r.headers.get("Content-Length")??"")\\;ctx.setKeyword("cly",r.headers.get("Content-Type")??"")\\;ctx.setKeyword("httpstatus",r.status.toString())}).catch()]
 $onlyIf[$or[$get[httpstatus]==200;$get[httpstatus]==206];$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-$onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOverDownload]\n$hyperlink[$get[gettitle];$trimLines[$trimLines[$get[getcdn]]]]]
+$onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOverDownload]\n$hyperlink[$get[gettitle];$trimLines[$get[getcdn]]]]
+$let[mediatype;$advancedTextSplit[$get[cly];/;0]]
 $let[contenttype;$advancedTextSplit[$get[cly];/;1]]
-$if[$or[$env[musictype;type]==tiktok;$env[musictype;type]==tiktokmob];
+$if[$get[mediatype]==video;
 $let[converttype;mp4]
 ;
 $let[converttype;$if[$get[contenttype]==webm;opus;$if[$get[contenttype]==mp4;m4a;$if[$or[$get[contenttype]==mp3;$get[contenttype]==mpeg];mp3;$get[contenttype]]]]]
@@ -122,6 +127,8 @@ $arrayMap[b;c;$return[$advancedTextSplit[$env[c];
 ;1]];b]
 $arrayMap[b;c;$if[$get[clh]<=10000000;$return[$djsEval[fetch("$env[c]").then(r => r.arrayBuffer()).then(d => { (ctx.setKeyword("clh", Number(ctx.getKeyword("clh") ?? 0) + d.byteLength))\\; return Buffer.from(d).toString("base64")}).then(e => e).catch()]]];b]
 $let[ks;$djsEval[Buffer.concat(JSON.parse(\\\`$env[b]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64")]]
+$onlyIf[$get[clh]!=0;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOverDownload]\n$hyperlink[$get[gettitle];$trimLines[$get[getcdn]]]]
 $let[contenttype;ts]
 $let[converttype;mp4]
 $let[names;$get[gettitle].$get[converttype]]

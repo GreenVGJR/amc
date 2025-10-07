@@ -34,7 +34,7 @@ module.exports = {
     ]
     $if[$and[$env[pulltrack;type]==youtube;$get[ytmusic]!=];
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[pullyt;ping]","results":{"provider":"youtube","query":"$encodeURI[$env[query]]","url":"$if[$env[isExclude]!=true;$env[currenttrack;uri];$env[pullyt;results;0;url]]","autocomplete":"$encodeURI[$if[$env[isExclude]!=true;$env[query];$env[pullyt;results;0;title]]]","lyric":"$deflate[$get[ytmusic];hex]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[pullyt;ping]","results":{"provider":"youtube","thumbnail":"https://i.ytimg.com/vi/$advancedTextSplit[$if[$env[isExclude]!=true;$env[currenttrack;uri];$env[pullyt;results;0;url]];?v=;1;&;0]/frame0.jpg","query":"$encodeURI[$env[query]]","url":"$if[$env[isExclude]!=true;$env[currenttrack;uri];$env[pullyt;results;0;url]]","autocomplete":"$encodeURI[$if[$env[isExclude]!=true;$env[query];$env[pullyt;results;0;title]]]","lyric":"$deflate[$get[ytmusic];hex]"}}]]
     ;
     $jsonLoad[drtcp;$callFunction[fastMetadataTrack;$env[query];deezer]]
     $if[$env[drtcp;id]!=;
@@ -63,7 +63,7 @@ module.exports = {
 ]]
     ]
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_3],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"deezer","query":"$encodeURI[$env[query]]","url":"https://www.deezer.com/track/$env[drtcp;id]","autocomplete":"$encodeURI[$inflate[$env[drtcp;title];base64]]","lyric":"$deflate[$if[$and[$env[line]==true;$env[res;data;track;lyrics;synchronizedLines]!=null];$get[finallyde];$env[res;data;track;lyrics;text]];hex]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_3],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"deezer","thumbnail":"$env[drtcp;thumbnail]","query":"$encodeURI[$env[query]]","url":"https://www.deezer.com/track/$env[drtcp;id]","autocomplete":"$encodeURI[$inflate[$env[drtcp;title];base64]]","lyric":"$deflate[$if[$and[$env[line]==true;$env[res;data;track;lyrics;synchronizedLines]!=null];$get[finallyde];$env[res;data;track;lyrics;text]];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
@@ -71,7 +71,7 @@ module.exports = {
     $onlyIf[$and[$env[line]==true;$or[$env[ges1;0;syncedLyrics]==;$env[ges1;0;syncedLyrics]==null]]!=true;$return[{}]]
     $if[$env[ges1;0;id]!=;
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_2],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"lrclib","query":"$encodeURI[$env[query]]","url":"https://lrclib.net/api/get/$env[ges1;0;id]","autocomplete":"$encodeURI[$env[ges1;0;name]]","lyric":"$deflate[$if[$and[$env[line]==true;$env[ges1;0;syncedLyrics]!=];$env[ges1;0;syncedLyrics];$if[$env[ges1;0;instrumental];\\[Instrumental\\];$env[ges1;0;plainLyrics]]];hex]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_2],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"lrclib","thumbnail":"$callFunction[useIcon;lrclib]","query":"$encodeURI[$env[query]]","url":"https://lrclib.net/api/get/$env[ges1;0;id]","autocomplete":"$encodeURI[$env[ges1;0;name]]","lyric":"$deflate[$if[$and[$env[line]==true;$env[ges1;0;syncedLyrics]!=];$env[ges1;0;syncedLyrics];$if[$env[ges1;0;instrumental];\\[Instrumental\\];$env[ges1;0;plainLyrics]]];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
@@ -91,7 +91,7 @@ module.exports = {
     $let[a2_filtering;$trimLines[$advancedReplace[$get[a2];<a>;;</a>;;<i>;;</i>;;<b>;;</b>;;";\\\\";\\\\n;
 ]]]
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_1],"status_2":$get[http2_1],"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"genius","query":"$encodeURI[$env[query]]","url":"$env[ges;response;sections;0;hits;0;result;url]","autocomplete":"$encodeURI[$env[ges;response;sections;0;hits;0;result;title_with_featured]]","lyric":"$deflate[$get[a2_filtering];hex]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_1],"status_2":$get[http2_1],"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"genius","thumbnail":"$callFunction[useIcon;genius]","query":"$encodeURI[$env[query]]","url":"$env[ges;response;sections;0;hits;0;result;url]","autocomplete":"$encodeURI[$env[ges;response;sections;0;hits;0;result;title_with_featured]]","lyric":"$deflate[$get[a2_filtering];hex]"}}]]
     ]
     ]
     ]

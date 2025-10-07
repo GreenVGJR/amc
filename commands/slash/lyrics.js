@@ -38,10 +38,14 @@ module.exports = {
     $onlyIf[$guildID!=;]
 
     $ephemeral
-    $defer
+    $interactionReply[
+    $addContainer[
+    $addTextDisplay[### -# Loading]
+    ;$callFunction[useIcon;color_embed]]
+    ]
 
     $jsonLoad[result;$callFunction[getLyricsTrack;$option[song_name];;true;$option[line_synced]]]
-    $onlyIf[$env[result;results]!=;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
+    $onlyIf[$env[result;results]!=;$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]]]
     $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
     $interactionReply[
     $if[$option[lyric_file]==true;
@@ -54,14 +58,13 @@ module.exports = {
     $addFile[attachment://$get[filename]]
     $addSeparator[Small;true]
     ]
+    $addTextDisplay[> ### -# $round[$executionTime]ms | $toTitleCase[$env[result;results;provider]]]
+    $addSeparator[Small;true]
     $addSection[
     $addTextDisplay[> ## $hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]
     $addTextDisplay[$codeBlock[$cropText[$get[loadlyrics];0;3000;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
-    $if[$checkContains[$env[result;results;url];music.youtube.com];
-    $addThumbnail[https://i.ytimg.com/vi/$advancedTextSplit[$env[result;results;url];?v=;1;&;0]/1.jpg]
-    ;
-    $addThumbnail[$userAvatar[$clientID;1024]]
-    ]]
+    $addThumbnail[$env[result;results;thumbnail]]
+    ]
     ;$callFunction[useIcon;color_embed]]
     ]
     `

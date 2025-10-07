@@ -41,6 +41,7 @@ module.exports = {
     $title[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]
     $description[$codeBlock[$cropText[$get[loadlyrics];0;3900;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
     $footer[$toTitleCase[$env[result;results;provider]];$callFunction[useIcon;$env[result;results;provider]]]
+    $thumbnail[$env[result;results;thumbnail]]
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
     ]

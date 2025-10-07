@@ -24,7 +24,12 @@ module.exports = {
     $let[author;$env[a;results;album;artist;0;name]]
     $let[title;$env[a;results;name]]
     ]
-    $if[$or[$env[filtype;type]==tiktok;$env[filtype;type]==tiktokmob];
+    $if[$env[filtype;type]==tiktokmob;
+    $jsonLoad[a;$extractTrack[$env[url]]]
+    $let[author;$default[$env[a;results;author;uniqueId];$env[a;results;author]]]
+    $let[title;$default[$env[a;results;desc];$env[a;results;title]]]
+    ]
+    $if[$env[filtype;type]==tiktok;
     $jsonLoad[a;$extractTrack[$env[url]]]
     $let[author;$env[a;results;author;uniqueId]]
     $let[title;$env[a;results;desc]]
@@ -34,6 +39,21 @@ module.exports = {
     $let[author;$env[a;results;author]]
     $let[title;$env[a;results;title]]
     ]
-    $if[$or[$get[author]==;$get[author]==null;$get[author]==undefined;$get[title]==;$get[title]==null;$get[title]==undefined]!=true;$return[$trimLines[$get[author] - $get[title]]];$return]
+    $if[$env[filtype;type]==facebook;
+    $jsonLoad[a;$extractTrack[$env[url]]]
+    $let[author;$env[a;results;owner]]
+    $let[title;$default[$env[a;results;text];$env[a;results;video_id]]]
+    ]
+    $if[$env[filtype;type]==instagram;
+    $jsonLoad[a;$extractTrack[$env[url]]]
+    $let[author;$env[a;results;owner;username]]
+    $let[title;$default[$env[a;results;caption;text];$env[a;results;pk]]]
+    ]
+    $if[$env[filtype;type]==bandcamp;
+    $jsonLoad[a;$extractTrack[$env[url]]]
+    $let[author;$env[a;results;artist]]
+    $let[title;$env[a;results;title]]
+    ]
+    $if[$or[$get[title]==;$get[title]==null;$get[title]==undefined]!=true;$if[$or[$get[author]==;$get[author]==null;$get[author]==undefined];$trimLines[$get[title]];$if[$checkContains[$toLowercase[$trimLines[$get[title]]];$toLowercase[$trimLines[$get[author]]]];$return[$trimLines[$get[title]]];$return[$trimLines[$get[author]] - $trimLines[$get[title]]]]];$return]
     `
 }

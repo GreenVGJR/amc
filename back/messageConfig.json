@@ -31,6 +31,7 @@
 
     "config_errorLiveBeforeSeek": "This track is LIVE.",
     "config_errorPauseBeforeSeek": "You can't seek while it's paused.",
+    "config_errorProcessSeek": "It's still processing.",
 
     "config_errorNoTrackBeforeSeek": "Nothing to skip track.",
     "config_errorPlayerBeforeSeek": "Disable loop mode to skip.",
@@ -49,7 +50,7 @@
     "config_generalVolumeTrack": "Volume changed to:",
 
     "config_generalInvalidLinkDownload": "Must be link.",
-    "config_generalInvalidProviderDownload": "Invalid provider. Only accepts:\n`Youtube, Soundcloud, Spotify, Tiktok Video / Music`",
+    "config_generalInvalidProviderDownload": "Invalid provider. Only accepts:\n`Youtube / Soundcloud / Spotify / Tiktok / Instagram / Facebook / Bandcamp`",
     "config_generalEmptyDownload": "Can't download this.",
     "config_generalOverDownload": "Can't download this media if it's above 10MB.\n\nStill want to download? You can try access this url to direct downloads.",
 
