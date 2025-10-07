@@ -30,25 +30,25 @@ module.exports = {
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"VISIONOS","clientVersion":"0.1","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $httpAddHeader[Accept-Encoding;gzip]
     $if[$or[$env[types]==;$env[types]==v];
-    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength));POST;reshttp]
+    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
     ]
     $if[$env[types]==va;
-    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url));POST;reshttp]
+    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
     ]]]
-    $onlyIf[$env[reshttp;playabilityStatus;status]!=LOGIN_REQUIRED;$let[finalurl;bot|$env[reshttp;playabilityStatus;reason]]]
-    $onlyIf[$env[reshttp;playabilityStatus;liveStreamability]==;$let[finalurl;live]]
+    $onlyIf[$env[reshttp;playabilityStatus;status]==OK;$let[finalurl;bot|$env[reshttp;playabilityStatus;reason]]]
+    $onlyIf[$env[reshttp;videoDetails;isLiveContent]!=true;$let[finalurl;live]]
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
-    $let[getindex140;$arrayFindIndex[afs;aaa;$env[aaa;itag]==140]]
-    $onlyIf[$get[getindex140]!=-1;$let[finalurl;null]]
-    $let[getcdnytlength;$env[afs;$get[getindex140];contentLength]]
+    $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
+    $onlyIf[$get[getindex251]!=-1;$let[finalurl;null]]
+    $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
     $if[$get[getcdnytlength]>=10000000;
     $let[checkindex139;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
     $if[$get[checkindex139]!=-1;
-    $let[getindex140;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
-    $let[getcdnytlength;$env[afs;$get[getindex140];contentLength]]
+    $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
+    $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
     ]]
-    $let[getcdnyt;$env[afs;$get[getindex140];url]]
+    $let[getcdnyt;$env[afs;$get[getindex251];url]]
     $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]]
     ]
     $if[$env[types]==hls;
@@ -86,7 +86,12 @@ module.exports = {
     $onlyIf[$env[test;results;preview;0;file_id]!=;$callLocalFunction[oncecode;true]]
     $let[finalurl;https://p.scdn.co/mp3-preview/$env[test;results;preview;0;file_id]]
     ]
-    $if[$or[$env[whattype;type]==tiktok;$env[whattype;type]==tiktokmob];
+    $if[$env[whattype;type]==tiktokmob;
+    $jsonLoad[test;$extractTrack[$env[url]]]
+    $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
+    $jsonLoad[whattype;$callFunction[filterMediaID;$if[$env[test;results;video;id]!=;https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
+    ]
+    $if[$env[whattype;type]==tiktok;
     $jsonLoad[test;$extractTrack[$env[url]]]
     $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
     $if[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList]==;
@@ -134,6 +139,21 @@ module.exports = {
     $onlyIf[$env[a]!=;$callLocalFunction[oncecode;true]]
     $let[finalurl;$advancedTextSplit[$env[a];"contentUrl":";1;";0]]
     ]]
+    $if[$env[whattype;type]==facebook;
+    $jsonLoad[a;$extractTrack[$env[url]]]
+    $onlyIf[$or[$env[a;results]==;$env[a;results;is_live_stream]==true;$env[a;results;is_hls]==true]!=true;$let[finalurl;null]]
+    $let[finalurl;$default[$env[a;results;hd_src];$env[a;results;sd_src]]]
+    ]
+    $if[$env[whattype;type]==instagram;
+    $jsonLoad[a;$extractTrack[$env[url]]]
+    $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
+    $let[finalurl;$env[a;results;video_versions;0;url]]
+    ]
+    if[$env[whattype;type]==bandcamp;
+    $jsonLoad[a;$extractTrack[$env[url]]]
+    $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
+    $let[finalurl;$env[a;results;file;mp3-128]]
+    ]
     ;retry]
     $callLocalFunction[oncecode;false]
     $return[$get[finalurl]]

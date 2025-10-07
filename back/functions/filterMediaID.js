@@ -15,6 +15,9 @@ module.exports = {
     $if[$checkContains[$get[url];tiktok.com/music/];$let[type;tiktokmusic];$if[$checkContains[$get[url];vt.tiktok.com;vm.tiktok.com];$let[type;tiktokmob];$if[$checkContains[$get[url];tiktok.com];$let[type;tiktok]]]]
     $if[$checkContains[$get[url];music.apple.com];$let[type;applemusic]]
     $if[$checkContains[$get[url];deezer.com];$let[type;deezer]]
+    $if[$checkContains[$get[url];instagram.com];$let[type;instagram]]
+    $if[$checkContains[$get[url];facebook.com];$let[type;facebook]]
+    $if[$checkContains[$get[url];bandcamp.com];$let[type;bandcamp]]
 
     $if[$get[type]!=;
     $let[regex;$env[listregex;$get[type];0]]

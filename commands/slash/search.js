@@ -9,62 +9,22 @@ module.exports = {
       "description": "Provider to use for search",
       "required": true,
       "choices": [
-        {
-          "name": "YouTube",
-          "value": "youtube"
-        },
-        {
-          "name": "YouTube Shorts",
-          "value": "youtubeshorts"
-        },
-        {
-          "name": "YouTube Music",
-          "value": "youtubemusic"
-        },
-        {
-          "name": "Soundcloud",
-          "value": "soundcloud"
-        },
-        {
-          "name": "Spotify",
-          "value": "spotify"
-        },
-        {
-          "name": "Apple Music",
-          "value": "applemusic"
-        },
-        {
-          "name": "Amazon Music",
-          "value": "amazonmusic"
-        },
-        {
-          "name": "ITunes",
-          "value": "itunes"
-        },
-        {
-          "name": "Deezer",
-          "value": "deezer"
-        },
-        {
-          "name": "Tidal",
-          "value": "tidal"
-        },
-        {
-          "name": "Qobuz",
-          "value": "qobuz"
-        },
-        {
-          "name": "Tiktok Video",
-          "value": "tiktokvideo"
-        },
-        {
-          "name": "Tiktok Music",
-          "value": "tiktokmusic"
-        },
-        {
-          "name": "NCS",
-          "value": "ncs"
-        }
+        { "name": "YouTube", "value": "youtube" },
+        { "name": "YouTube Shorts", "value": "youtubeshorts" },
+        { "name": "YouTube Music", "value": "youtubemusic" },
+        { "name": "Soundcloud", "value": "soundcloud" },
+        { "name": "Spotify", "value": "spotify" },
+        { "name": "Apple Music", "value": "applemusic" },
+        { "name": "Amazon Music", "value": "amazonmusic" },
+        { "name": "Bandcamp", "value": "bandcamp" },
+        { "name": "ITunes", "value": "itunes" },
+        { "name": "Deezer", "value": "deezer" },
+        { "name": "Tidal", "value": "tidal" },
+        { "name": "Qobuz", "value": "qobuz" },
+        { "name": "Tiktok", "value": "tiktok" },
+        { "name": "Tiktok Music", "value": "tiktokmusic" },
+        { "name": "Tiktok Sound", "value": "tiktoksound" },
+        { "name": "NCS", "value": "ncs" }
       ]
     },
     {
@@ -131,6 +91,7 @@ module.exports = {
   ]
   $return
   ;typela]
+  $onlyIf[$isValidLink[$option[query]]!=true;$callLocalFunction[loadinteraction;3]]
   $if[$get[check]==null;
   $callLocalFunction[loadinteraction;1]
   $let[a;$callFunction[searchSomeTrack;$option[query];$option[provider]]]

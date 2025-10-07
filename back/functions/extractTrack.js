@@ -70,7 +70,6 @@ module.exports = {
     ;retry]
     $callLocalFunction[refreshspotify;false]
     ]]
-    $if[$or[$env[filterid;type]==tiktok;$env[filterid;type]==tiktokmob];
     $if[$env[filterid;type]==tiktokmob;
     $httpAddHeader[Accept-Encoding;gzip]
     $httpAddHeader[Accept-Language;en-US]
@@ -78,8 +77,9 @@ module.exports = {
     $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
     $httpSetContentType[Text]
     $!httpRequest[$replace[$get[url];vm.tiktok.com;vt.tiktok.com];GET]
-    $jsonLoad[filterid;$callFunction[filterMediaID;https://www.tiktok.com/@/video/$advancedTextSplit[$httpResult;"webapp.video-detail";1;"id":";1;";0]]]
+    $jsonLoad[filterid;$callFunction[filterMediaID;$replace[$advancedTextSplit[$httpResult;"seo.abtest":{"canonical":";1;";0];\\\\\\u002F;/]]]
     ]
+    $if[$env[filterid;type]==tiktok;
     $httpAddHeader[Accept-Encoding;gzip]
     $httpAddHeader[Accept-Language;en-US]
     $httpAddHeader[User-Agent;$get[agent]]
@@ -96,8 +96,7 @@ module.exports = {
     $let[tryattempt;0]
     $localFunction[refreshvm;
     $if[$env[retry]==true;
-    $c[Don't ask why lol. Requesting Tiktok Music is tricky]
-    $onlyIf[$get[tryattempt]<100;$return]
+    $onlyIf[$get[tryattempt]<10;$return]
     $letSum[tryattempt;1]
     ]
     $httpSetContentType[Text]
@@ -112,10 +111,63 @@ module.exports = {
     $jsonLoad[a;$env[a]]
     $jsonLoad[a;$env[a;aweme_list]]
     $let[index;$arrayFindIndex[a;b;$checkCondition[$env[b;added_sound_music_info;mid]==$env[filterid;id]]]]
-    $onlyIf[$get[index]!=-1;$return]
+    $if[$get[index]==-1;
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[Accept;*/*]
+    $httpAddHeader[User-Agent;Mozilla/5.0 (compatible\\; Discordbot/2.0\\; +https://discordapp.com)]
+    $httpSetContentType[Text]
+    $onlyIf[$httpRequest[https://www.tiktok.com/music/-$env[filterid;id];GET]==200;$callLocalFunction[refreshvm;true]]
+    $if[$checkContains[$advancedTextSplit[$httpResult;property="al:android:url";1;content=";1;";0];//music/detail/];
+    $let[cl;$djsEval[require("entities").decodeHTML("$advancedTextSplit[$httpResult;<title>;1;</title>;0]")]]
+    $let[stctitle;$toLowercase[$advancedTextSplit[$replace[$get[cl];♬ ;]; | ;0; & ;0] $advancedTextSplit[$replace[$get[cl];♬ ;]; | ;1]]]
+    ;
+    $return
+    ]
+    $!httpRequest[https://api16-normal.tiktokv.com/aweme/v1/music/search/?count=10&cursor=0&aid=1180&device_id=$getGlobalVar[authmusic_tiktok_did]&keyword=$get[stctitle];GET;c]
+    $onlyIf[$env[c]!=;$return]
+    $jsonLoad[c;$env[c]]
+    $jsonLoad[c;$env[c;music_info_list]]
+    $jsonLoad[c;$env[c;$arrayFindIndex[c;k;$checkCondition[$env[k;music;id_str]==$env[filterid;id]]]]]
+    $let[results;{"status":null,"results":$if[$env[c]==;null;$env[c;music]]}]
+    ;
     $let[results;{"status":null,"results":$if[$env[a;$get[index]]==;null;$env[a;$get[index];music]]}]
+    ]
     ;retry]
     $callLocalFunction[refreshvm;false]
+    ]
+    $if[$env[filterid;type]==facebook;
+    $httpAddHeader[Accept;text/html]
+    $httpAddHeader[Accept-Language;en-US]
+    $!httpRequest[https://web.facebook.com/plugins/video.php?href=$get[url]&show_text=true;GET]
+    $let[cs;$default[$advancedTextSplit[$httpResult;"videoData":\\[;1;,"player_version;0];{]]
+    $jsonLoad[b;$get[cs]}]
+    $if[$env[b;video_id]!=;
+    $!jsonSet[b;text;$advancedTextSplit[$httpResult;class="text_exposed_root"><p>;1;<;0]]
+    $!jsonSet[b;owner;$advancedTextSplit[$httpResult;<a title=";1;" target=;0]]
+    ]
+    $let[results;{"status":null,"results":$env[b]}]
+    ]
+    $if[$env[filterid;type]==instagram;
+    $httpAddHeader[Sec-Fetch-Site;none]
+    $httpAddHeader[Accept;text/html]
+    $httpAddHeader[Accept-Language;en-US]
+    $!httpRequest[https://www.instagram.com/$env[filterid;id];GET]
+    $arrayLoad[a;script type="application/json";$httpResult]
+    $let[test;$env[a;$arrayFindIndex[a;b;$checkCondition[$advancedTextSplit[$env[b];xdt_api__v1__media;1;video_versions;1]!=]]]]
+    $jsonLoad[a;$advancedTextSplit[$get[test];data-sjs>;1;</script>;0]]
+    $let[results;{"status":null,"results":$if[$env[a;require]==;null;$env[a;require;0;3;0;__bbox;require;0;3;1;__bbox;result;data;xdt_api__v1__media__shortcode__web_info;items;0]]}]
+    ]
+    $if[$env[filterid;type]==bandcamp;
+    $httpSetContentType[Text]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $!httpRequest[$env[filterid;id];GET]
+    $let[a;$advancedTextSplit[$httpResult;data-tralbum=";1;";0]]
+    $let[a;$djsEval[require("entities").decodeHTML(ctx.getKeyword("a"))]]
+    $jsonLoad[a;$default[$get[a];{}]]
+    $let[results;{"status":null,"results":$if[$env[a;trackinfo]==;null;$env[a;trackinfo;0]]}]
     ]
     $let[resultforeturn;$get[results]]
     $return[$if[$and[$env[limitChar]==true;$env[limitChar]!=false];$cropText[$get[resultforeturn];0;2000;];$get[resultforeturn]]]

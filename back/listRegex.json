@@ -1,7 +1,7 @@
 {   
     "_comment": [
         "--- All Regex are from these Source ---",
-        "Deepseek & Gemini",
+        "Deepseek & ChatGPT",
         "https://stackoverflow.com/a/27728417/29665155",
         "https://stackoverflow.com/a/77178079/29665155",
         "https://regex101.com/r/Mcd4kh/1",
@@ -14,5 +14,8 @@
     "spotify": ["^(?:https?:\\/\\/)?(?:open\\.spotify\\.com\\/|spotify:)((?:user|episode|playlist|track|album|artist)[\\/:][A-Za-z0-9]+)(?:\\?.*)?$", 1],
     "tiktok": ["^(?:https?:\\/\\/)?(?:(?:www\\.)?(?:m\\.)?tiktok\\.com\\/(?:(?:@[^\\/]*\\/video\\/)|v\\/)|t\\.tiktok\\.com\\/i18n\\/share\\/video\\/)(\\d{18,21})(?:\\.html)?(?:[\\/\\?#].*)?$", 1],
     "tiktokmob": ["^(?:https?:\\/\\/)?(?:vt|vm)\\.tiktok\\.com\\/([A-Za-z0-9-]+)\\/?$", 1],
-    "tiktokmusic": ["tiktok\\.com\/music\/[^\/]*?(\\d{18,21})(?:$|[\/?])", 1]
+    "tiktokmusic": ["tiktok\\.com\/music\/[^\/]*?(\\d{18,21})(?:$|[\/?])", 1],
+    "facebook": ["^(?:https?:\\/\\/)?(?:www\\.|web\\.|m\\.)?facebook\\.com\\/([^?#]+)(?:[\\?#].*)?$", 1],
+    "instagram": ["^(?:https?:\\/\\/)?(?:www\\.|m\\.)?instagram\\.com\\/(?!p\\/)((?:[^\\/?#]+\\/reel\\/[A-Za-z0-9_-]+)|(?:reel\\/[A-Za-z0-9_-]+))\\/?(?:[\\?#].*)?$", 1],
+    "bandcamp": ["^((?:https?:\\/\\/)?(?:[A-Za-z0-9-]+\\.)+bandcamp\\.com\\/track\\/[^\\/?#]+(?:[\\/?#].*)?)$", 1]
 }
