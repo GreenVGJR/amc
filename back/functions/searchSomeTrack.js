@@ -108,7 +108,7 @@ module.exports = {
     $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_applemusic]]
     $httpAddHeader[Origin;https://music.apple.com]
     $httpAddHeader[Cookie;geo=US]
-    $!httpRequest[https://api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]
+    $!httpRequest[https://amp-api-edge.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]
     $jsonLoad[res2;$env[res;results;songs;data]]
     $arrayForEach[res2;res5;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res5;attributes;name];\\\\;];";\\\\"]","duration":"$parseDigital[$env[res5;attributes;durationInMillis]]","thumbnail":"$replace[$env[res5;attributes;artwork;url];{w}x{h}bb;1x1ss]","url":"$env[res5;attributes;url]"}]]
     ]
@@ -218,7 +218,7 @@ module.exports = {
     $!httpRequest[https://ncs.io/music-search?q=$env[query]&genre=&mood=;GET]
     $arrayLoad[a;class="player-play";$advancedTextSplit[$httpResult;<tbody>;1;</tbody>;0]]
     $!arrayShift[a]
-    $arrayForEach[a;b;$arrayPushJSON[results;{"title":"$advancedTextSplit[$env[b];" data-cover=";0;data-track=";1]","duration":"Unknown","thumbnail":"$advancedTextSplit[$env[b];img src=";1;";0]","url":"https://ncs.io$advancedTextSplit[$env[b];href=";1;";0]"}]]
+    $arrayForEach[a;b;$arrayPushJSON[results;{"title":"$replace[$replace[$advancedTextSplit[$env[b];" data-cover=";0;data-track=";1];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"$advancedTextSplit[$env[b];img src=";1;";0]","url":"https://ncs.io$advancedTextSplit[$env[b];href=";1;";0]"}]]
     ]
     $if[$env[provider]==bandcamp;
     $httpSetBody[{"search_text":"$replace[$replace[$env[query];\\\\;];";\\\\"]","search_filter":"t","full_page":false}]
@@ -230,7 +230,7 @@ module.exports = {
     $if[$httpResult[auto;results;0]==;$return]
     $jsonLoad[lv;$httpResult[auto;results]]
     $arrayForEach[lv;b;
-    $arrayPushJSON[results;{"title":"$env[b;name]","duration":"Unknown","thumbnail":"$if[$env[b;img_id]==null;$advancedTextSplit[$env[b;img];/img/;0]/img/a$advancedTextSplit[$env[b;img];/img/;1];$env[b;img]]","url":"$env[b;item_url_path]"}]
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[b;name];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"$if[$env[b;img_id]==null;$advancedTextSplit[$env[b;img];/img/;0]/img/a$advancedTextSplit[$env[b;img];/img/;1];$env[b;img]]","url":"$env[b;item_url_path]"}]
     ]
     ]
     $if[$env[results;0]!=;

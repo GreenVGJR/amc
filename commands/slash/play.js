@@ -36,7 +36,6 @@ module.exports = {
         "name": "Apple Music",
         "value": "applemusic"
       },
-      
     ]
     },
     {

@@ -9,6 +9,11 @@ module.exports = {
         name: "types", // enum
         description: "Changes quality",
         required: true
+    },
+    {
+        name: "tempobject", // object
+        description: "Replacement of objects http response",
+        required: false
     }],
     code: `
     $onlyIf[$isValidLink[$env[url]];$return]
@@ -71,7 +76,7 @@ module.exports = {
     ]
     ]
     $if[$env[whattype;type]==soundcloud;
-    $jsonLoad[test;$extractTrack[$env[url]]]
+    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $jsonLoad[loadres;$env[test;results]]
     $arrayMap[loadres;test2;$if[$env[test2;hydratable]==sound;$return[$env[test2]]];test3]
     $jsonLoad[test4;$env[test3;0;data;media;transcodings]]
@@ -82,17 +87,17 @@ module.exports = {
     $onlyIf[$get[finalurl]!=;$let[finalurl;null]]
     ;
     $if[$env[whattype;type]==spotify;
-    $jsonLoad[test;$extractTrack[$env[url]]]
+    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[test;results;preview;0;file_id]!=;$callLocalFunction[oncecode;true]]
     $let[finalurl;https://p.scdn.co/mp3-preview/$env[test;results;preview;0;file_id]]
     ]
     $if[$env[whattype;type]==tiktokmob;
-    $jsonLoad[test;$extractTrack[$env[url]]]
+    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
     $jsonLoad[whattype;$callFunction[filterMediaID;$if[$env[test;results;video;id]!=;https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
     ]
     $if[$env[whattype;type]==tiktok;
-    $jsonLoad[test;$extractTrack[$env[url]]]
+    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
     $if[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList]==;
     $jsonLoad[b;$env[test;results;video;PlayAddrStruct;UrlList]]
@@ -120,7 +125,7 @@ module.exports = {
     $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1322;www.tiktok.com;api16-normal.tiktokv.com]]
     ]
     $if[$env[whattype;type]==tiktokmusic;
-    $jsonLoad[a;$extractTrack[$env[url]]]
+    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$callLocalFunction[oncecode;true]]
     $if[$env[a;results;play_url;uri]==;
     $jsonLoad[b;$env[a;results;extra]]
@@ -140,17 +145,17 @@ module.exports = {
     $let[finalurl;$advancedTextSplit[$env[a];"contentUrl":";1;";0]]
     ]]
     $if[$env[whattype;type]==facebook;
-    $jsonLoad[a;$extractTrack[$env[url]]]
+    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$or[$env[a;results]==;$env[a;results;is_live_stream]==true;$env[a;results;is_hls]==true]!=true;$let[finalurl;null]]
     $let[finalurl;$default[$env[a;results;hd_src];$env[a;results;sd_src]]]
     ]
     $if[$env[whattype;type]==instagram;
-    $jsonLoad[a;$extractTrack[$env[url]]]
+    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
     $let[finalurl;$env[a;results;video_versions;0;url]]
     ]
     if[$env[whattype;type]==bandcamp;
-    $jsonLoad[a;$extractTrack[$env[url]]]
+    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
     $let[finalurl;$env[a;results;file;mp3-128]]
     ]

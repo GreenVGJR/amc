@@ -72,20 +72,25 @@ ___
     > Spotify
     > Apple Music
     > Amazon Music
+    > Bandcamp
     > ITunes
     > Deezer
     > Tidal
     > Qobuz
     > Tiktok Video
     > Tiktok Music
+    > Tiktok Sound
     > NCS
 
 - Download media
   Providers:
   = > Youtube
     > Soundcloud
-    > Spotify
-    > Tiktok Video/Music
+    > Spotify (from Youtube)
+    > Tiktok
+    > Instagram
+    > Facebook
+    > Bandcamp
 
 - Auto-generate auth keys needed
 - Dynamic info message
@@ -93,6 +98,7 @@ ___
 - Controller
 - Radio
 - Queue
+- DJ
 - Skip song
 - Seek to specific duration
 - Change Volume
@@ -110,10 +116,10 @@ ___
 
 </summary>
 
-![Preview 1](https://github.com/user-attachments/assets/8b816b71-9d0a-48cf-8909-ba0f28b15d00)
-![Preview 2](https://github.com/user-attachments/assets/608c5871-6a98-4672-9a48-63a716a85090)
-![Preview 3](https://github.com/user-attachments/assets/dba3cf06-760b-4a6d-a474-674df7d7ffcc)
-![Preview 4](https://github.com/user-attachments/assets/3d35f946-8717-4021-b137-f6b9e73d3409)
-![Preview 5](https://github.com/user-attachments/assets/302d5348-3466-4d5d-bd9c-0bb2153b0e2f)
+![Preview 1](https://github.com/user-attachments/assets/6d80a389-f400-4436-a1aa-cae521a70cf3)
+![Preview 2](https://github.com/user-attachments/assets/863b8268-05b5-42df-a429-c85bf2277b00)
+![Preview 3](https://github.com/user-attachments/assets/b2070b40-5c88-456c-a441-0cb303c73a15)
+![Preview 4](https://github.com/user-attachments/assets/3a14db8c-2a69-4d4a-8084-0aa02ebcf3df)
+![Preview 5](https://github.com/user-attachments/assets/1b3ca4e3-06a6-4434-9548-ef3c870b1e55)
 
 </details>

@@ -25,7 +25,8 @@ $let[firstcovtop;$advancedTextSplit[$httpResult;tbody;1;tbody;0;class="cover-art
 $arrayLoad[l;chartlist-row;$advancedTextSplit[$httpResult;tbody;1;tbody;0]]
 $arrayLoad[res]
 $arrayForEach[l;o;$if[$advancedTextSplit[$env[o];class="chartlist-image";1]!=;
-$arrayPushJSON[res;-# - $hyperlink[$bold[$advancedTextSplit[$env[o];alt=";1;loading=;0;";0]];https://www.last.fm$decodeURI[$advancedTextSplit[$env[o];class="chartlist-name";1;href=";1;";0]]] | $separateNumber[$advancedTextSplit[$env[o];data-stat-value=";1;";0];,] Listeners]
+$let[lrfsmfm;$advancedTextSplit[$env[o];data-stat-value=";1;";0]]
+$arrayPushJSON[res;-# - $hyperlink[$bold[$advancedTextSplit[$env[o];alt=";1;loading=;0;";0]];https://www.last.fm$decodeURI[$advancedTextSplit[$env[o];class="chartlist-name";1;href=";1;";0]]] | $if[$isNumber[$get[lrfsmfm]];$separateNumber[$get[lrfsmfm];,];NaN] Listeners]
 ]]
 $let[conttracks;$arrayJoin[res;
 ]]
