@@ -108,7 +108,7 @@ module.exports = {
     $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_applemusic]]
     $httpAddHeader[Origin;https://music.apple.com]
     $httpAddHeader[Cookie;geo=US]
-    $!httpRequest[https://api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]
+    $!httpRequest[https://amp-api-edge.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]
     $jsonLoad[res2;$env[res;results;songs;data]]
     $arrayForEach[res2;res5;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res5;attributes;name];\\\\;];";\\\\"]","duration":"$parseDigital[$env[res5;attributes;durationInMillis]]","thumbnail":"$replace[$env[res5;attributes;artwork;url];{w}x{h}bb;1x1ss]","url":"$env[res5;attributes;url]"}]]
     ]
@@ -172,7 +172,7 @@ module.exports = {
     $jsonLoad[forres;$env[res;data]]
     $arrayForEach[forres;resat;$arrayPushJSON[results;{"title":"$replace[$replace[$env[resat;title];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[resat;duration];1000]]","thumbnail":"$replace[$env[resat;album;cover_xl];1000x1000-000000-80;1920x1920-000000-100]","url":"$env[resat;link]"}]]
     ]
-    $if[$env[provider]==tiktokvideo;
+    $if[$env[provider]==tiktok;
     $httpSetContentType[Text]
     $httpAddHeader[Accept-Encoding;gzip]
     $httpAddHeader[Accept-Language;en-US]
@@ -198,6 +198,19 @@ module.exports = {
     $jsonLoad[a;$env[a;music_info_list]]
     $arrayForEach[a;d;$arrayPushJSON[results;{"title":"$replace[$replace[$env[d;music;title];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[d;music;duration];1000]]","thumbnail":"https://p16.tiktokcdn.com/aweme/1080x1080/$env[d;music;cover_large;uri]","url":"https://www.tiktok.com/music/-$env[d;music;id_str]"}]]
     ]
+    $if[$env[provider]==tiktoksound;
+    $httpSetContentType[Text]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
+    $!httpRequest[https://t.tiktok.com/api/search/general/full/?aid=1180&app_language=en&app_name=tiktok_web&browser_language=en-US&from_page=search&cookie_enabled=true&search_source=normal_search&region=US&device_id=$getGlobalVar[authmusic_tiktok_did]&offset=0&keyword=$env[query];GET;a]
+    $if[$env[a]==;$return]
+    $jsonLoad[a;$env[a]]
+    $jsonLoad[a;$env[a;data]]
+    $arrayMap[a;b;$if[$env[b;item]!=;$return[$env[b;item]]];c]
+    $arrayForEach[c;d;$if[$checkContains[$env[results];-$env[d;music;id]]==false;$arrayPushJSON[results;{"title":"$replace[$replace[$env[d;music;title];\\\\;];";\\\\"]","duration":"$parseDigital[$multi[$env[d;music;duration];1000]]","thumbnail":"$env[d;music;coverLarge]","url":"https://www.tiktok.com/music/-$env[d;music;id]"}]]]
+    ]
     $if[$env[provider]==ncs;
     $httpSetContentType[Text]
     $httpAddHeader[Accept-Encoding;gzip]
@@ -205,8 +218,19 @@ module.exports = {
     $!httpRequest[https://ncs.io/music-search?q=$env[query]&genre=&mood=;GET]
     $arrayLoad[a;class="player-play";$advancedTextSplit[$httpResult;<tbody>;1;</tbody>;0]]
     $!arrayShift[a]
-    $arrayForEach[a;b;
-    $arrayPushJSON[results;{"title":"$advancedTextSplit[$env[b];" data-cover=";0;data-track=";1]","duration":"Unknown","thumbnail":"$advancedTextSplit[$env[b];img src=";1;";0]","url":"https://ncs.io$advancedTextSplit[$env[b];href=";1;";0]"}]
+    $arrayForEach[a;b;$arrayPushJSON[results;{"title":"$replace[$replace[$advancedTextSplit[$env[b];" data-cover=";0;data-track=";1];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"$advancedTextSplit[$env[b];img src=";1;";0]","url":"https://ncs.io$advancedTextSplit[$env[b];href=";1;";0]"}]]
+    ]
+    $if[$env[provider]==bandcamp;
+    $httpSetBody[{"search_text":"$replace[$replace[$env[query];\\\\;];";\\\\"]","search_filter":"t","full_page":false}]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Content-Type;application/json]
+    $httpAddHeader[Origin;https://bandcamp.com]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $!httpRequest[https://bandcamp.com/api/bcsearch_public_api/1/autocomplete_elastic;POST]
+    $if[$httpResult[auto;results;0]==;$return]
+    $jsonLoad[lv;$httpResult[auto;results]]
+    $arrayForEach[lv;b;
+    $arrayPushJSON[results;{"title":"$replace[$replace[$env[b;name];\\\\;];";\\\\"]","duration":"Unknown","thumbnail":"$if[$env[b;img_id]==null;$advancedTextSplit[$env[b;img];/img/;0]/img/a$advancedTextSplit[$env[b;img];/img/;1];$env[b;img]]","url":"$env[b;item_url_path]"}]
     ]
     ]
     $if[$env[results;0]!=;

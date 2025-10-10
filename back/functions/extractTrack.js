@@ -18,7 +18,7 @@ module.exports = {
     code: `
     $let[url;$env[url]]
     $let[spliturl;$advancedTextSplit[$get[url];://;1]]
-    $let[agent;$if[$env[userAgent]==null;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
     $jsonLoad[filterid;$callFunction[filterMediaID;https://$get[spliturl]]]
     $onlyIf[$or[$env[filterid;id]==null;$env[filterid;type]==null]!=true;$return]
     $arrayLoad[results]
@@ -124,7 +124,7 @@ module.exports = {
     ;
     $return
     ]
-    $!httpRequest[https://api16-normal.tiktokv.com/aweme/v1/music/search/?count=10&cursor=0&aid=1180&device_id=$getGlobalVar[authmusic_tiktok_did]&keyword=$get[stctitle];GET;c]
+    $!httpRequest[https://api16-normal-quic.tiktokv.com/aweme/v1/music/search/?count=10&cursor=0&aid=1180&device_id=$getGlobalVar[authmusic_tiktok_did]&keyword=$get[stctitle];GET;c]
     $onlyIf[$env[c]!=;$return]
     $jsonLoad[c;$env[c]]
     $jsonLoad[c;$env[c;music_info_list]]
@@ -157,6 +157,17 @@ module.exports = {
     $let[test;$env[a;$arrayFindIndex[a;b;$checkCondition[$advancedTextSplit[$env[b];xdt_api__v1__media;1;video_versions;1]!=]]]]
     $jsonLoad[a;$advancedTextSplit[$get[test];data-sjs>;1;</script>;0]]
     $let[results;{"status":null,"results":$if[$env[a;require]==;null;$env[a;require;0;3;0;__bbox;require;0;3;1;__bbox;result;data;xdt_api__v1__media__shortcode__web_info;items;0]]}]
+    ]
+    $if[$env[filterid;type]==bandcamp;
+    $httpSetContentType[Text]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $!httpRequest[$env[filterid;id];GET]
+    $let[a;$advancedTextSplit[$httpResult;data-tralbum=";1;";0]]
+    $let[a;$djsEval[require("entities").decodeHTML(ctx.getKeyword("a"))]]
+    $jsonLoad[a;$default[$get[a];{}]]
+    $let[results;{"status":null,"results":$if[$env[a;trackinfo]==;null;$env[a;trackinfo;0]]}]
     ]
     $let[resultforeturn;$get[results]]
     $return[$if[$and[$env[limitChar]==true;$env[limitChar]!=false];$cropText[$get[resultforeturn];0;2000;];$get[resultforeturn]]]

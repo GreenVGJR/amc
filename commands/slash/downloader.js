@@ -73,25 +73,27 @@ $return
 $try[
 $if[$env[musictype;type]==spotify;
 $callLocalFunction[runcodessync;Converting;Processing;true]
-$let[gettitle;$callFunction[fetchTitleTrack;https://open.spotify.com/track/$advancedTextSplit[$env[musictype;id];/;1]]]
+$let[storeobjecthttp;$callFunction[extractTrack;$env[b;results;0;url]]]
+$let[gettitle;$callFunction[fetchTitleTrack;https://open.spotify.com/track/$advancedTextSplit[$env[musictype;id];/;1];$default[$get[storeobjecthttp];]]]
 $onlyIf[$get[gettitle]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $jsonLoad[b;$callFunction[getYoutubeMusic;$get[gettitle]]]
 $onlyIf[$env[b;results;0]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $callLocalFunction[runcodessync;Getting CDN;Fetching - This may take longer;true]
-$let[getcdn;$callFunction[fallbackPlaybackTrack;$env[b;results;0;url];v]]
+$let[getcdn;$callFunction[fallbackPlaybackTrack;$env[b;results;0;url];v;$default[$get[storeobjecthttp];]]]
 ;
-$callLocalFunction[runcodessync;Getting CDN;Fetching - This may take longer;true]
-$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;v]]]
+$callLocalFunction[runcodessync;Getting CDN & Title;Fetching - This may take longer;true]
+$let[storeobjecthttp;$callFunction[extractTrack;$get[url]]]
+$jsonLoad[preobject;$get[storeobjecthttp]]
+$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;v];$default[$get[storeobjecthttp];]]]
 ]
 $onlyIf[$advancedTextSplit[$trimLines[$get[getcdn]];|;0]!=bot;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]\nError: $advancedTextSplit[$trimLines[$get[getcdn]];|;1]]
 $onlyIf[$or[$trimLines[$get[getcdn]]==null;$trimLines[$get[getcdn]]==live;$trimLines[$get[getcdn]]==]!=true;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $if[$has[gettitle]==false;
-$callLocalFunction[runcodessync;Getting Title;Fetching - This may take longer;true]
-$let[gettitle;$callFunction[fetchTitleTrack;$get[url]]]
+$let[gettitle;$callFunction[fetchTitleTrack;$get[url];$default[$get[storeobjecthttp];]]]
 $if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]]]
 ]
-$if[$and[$option[yt_option]!=2;$option[lyrics]==true;$or[$env[musictype;type]!=tiktokmob;$env[musictype;type]!=tiktok;$env[musictype;type]!=tiktokmusic]];
-$callLocalFunction[runcodessync;Getting Lyrics;Fetching;true]
+$if[$and[$option[yt_option]!=2;$option[lyrics]==true;$or[$env[musictype;type]==youtube;$env[musictype;type]==soundcloud;$env[musictype;type]==spotify]];
+$callLocalFunction[runcodessync;Getting Lyrics;Fetching - This may take longer;true]
 $let[checklyric;false]
 $jsonLoad[lyricresult;$callFunction[getLyricsTrack;$get[gettitle];;true;true]]
 $if[$env[lyricresult;results]!=;
@@ -99,8 +101,10 @@ $let[loadlyrics;$inflate[$env[lyricresult;results;lyric];hex]]
 $let[checklyric;true]
 $let[lyricnames;$if[$option[file_name]!=;$option[file_name];$get[gettitle]].lrc]
 ]]
+$if[$or[$env[musictype;type]==youtube;$env[musictype;type]==spotify];
 $callLocalFunction[runcodessync;;Sleeping in 1s;false]
 $wait[1s]
+]
 $callLocalFunction[runcodessync;Testing URL;Connecting to: $advancedTextSplit[$get[getcdn];/;2];true]
 $!djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET"}).then(r=>{ctx.setKeyword("clh",r.headers.get("Content-Length")??"")\\;ctx.setKeyword("cly",r.headers.get("Content-Type")??"")\\;ctx.setKeyword("httpstatus",r.status.toString())}).catch()]
 $onlyIf[$or[$get[httpstatus]==200;$get[httpstatus]==206];$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]

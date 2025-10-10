@@ -35,7 +35,7 @@ const lavalink = new ForgeLinked({
       port: 443,
       authorization: "https://dsc.gg/ajidevserver", // https://free.lavalink.rf.gd
       secure: true
-	}
+	  }
   ],
   playerOptions: {
     defaultSearchPlatform: "youtube",

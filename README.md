@@ -73,20 +73,25 @@ ___
     > Spotify
     > Apple Music
     > Amazon Music
+    > Bandcamp
     > ITunes
     > Deezer
     > Tidal
     > Qobuz
     > Tiktok Video
     > Tiktok Music
+    > Tiktok Sound
     > NCS
-    
+
 - Download media
   Providers:
   = > Youtube
     > Soundcloud
-    > Spotify
-    > Tiktok Video/Music
+    > Spotify (from Youtube)
+    > Tiktok
+    > Instagram
+    > Facebook
+    > Bandcamp
 
 - Auto-generate auth keys needed
 - Dynamic info message
@@ -94,6 +99,7 @@ ___
 - Controller
 - Radio
 - Queue
+- DJ
 - Skip song
 - Seek to specific duration
 - Change Volume
