@@ -108,7 +108,7 @@ module.exports = {
     $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_applemusic]]
     $httpAddHeader[Origin;https://music.apple.com]
     $httpAddHeader[Cookie;geo=US]
-    $!httpRequest[https://amp-api-edge.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]
+    $!httpRequest[https://amp-api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]
     $jsonLoad[res2;$env[res;results;songs;data]]
     $arrayForEach[res2;res5;$arrayPushJSON[results;{"title":"$replace[$replace[$env[res5;attributes;name];\\\\;];";\\\\"]","duration":"$parseDigital[$env[res5;attributes;durationInMillis]]","thumbnail":"$replace[$env[res5;attributes;artwork;url];{w}x{h}bb;1x1ss]","url":"$env[res5;attributes;url]"}]]
     ]

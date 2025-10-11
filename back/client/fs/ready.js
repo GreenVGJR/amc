@@ -14,6 +14,7 @@ module.exports = {
     $async[$callFunction[generateAuthKeys;applemusic;;true]]
     $async[$callFunction[generateAuthKeys;tidal;;true]]
     $async[$callFunction[generateAuthKeys;deezer;;true]]
+    $async[$callFunction[generateAuthKeys;twitter;;true]]
     $setInterval[$logger[Info;Re-generating keys - $getTimestamp] $callFunction[generateAuthKeys;all;;false] $logger[Info;Done - $getTimestamp];6h]
     `
 }

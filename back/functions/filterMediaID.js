@@ -18,6 +18,7 @@ module.exports = {
     $if[$checkContains[$get[url];instagram.com];$let[type;instagram]]
     $if[$checkContains[$get[url];facebook.com];$let[type;facebook]]
     $if[$checkContains[$get[url];bandcamp.com];$let[type;bandcamp]]
+    $if[$checkContains[$get[url];x.com;twitter.com];$let[type;twitter]]
 
     $if[$get[type]!=;
     $let[regex;$env[listregex;$get[type];0]]

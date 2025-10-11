@@ -177,6 +177,28 @@ module.exports = {
     ;$logger[Info;Failed to Retrieve - Deezer]]
     $if[$get[hgk]==;$logger[Warn;Re-trying - Deezer] $callFunction[generateAuthKeys;deezer;;true]]
     ]
+    $if[$or[$env[type]==all;$env[type]==twitter];
+    $if[$get[typedebug];$chalkLog[\\[OTHER\\] Generating Twitter              | Token & ID;cyan]]
+    $try[
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpAddHeader[Accept-Encoding;gzip]
+        $httpSetContentType[Text]
+        $!httpRequest[https://x.com;GET]
+        $arrayLoad[a;crossorigin="anonymous";$httpResult]
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpAddHeader[Accept-Encoding;gzip]
+        $httpSetContentType[Text]
+        $!httpRequest[$advancedTextSplit[$env[a;$arrayFindIndex[a;b;$checkCondition[$advancedTextSplit[$env[b];client-web/main;1]!=]]];href=";1;";0];GET]
+        $let[ts;$advancedTextSplit[$httpResult;operationName:"TweetResultByRestId";0]]
+        $let[xts_ot;$advancedTextSplit[$httpResult;return"Bearer ;1;";0]]
+        $let[xts_qi;$advancedTextSplit[$get[ts];queryId:;$charCount[$get[ts];queryId:];";1]]
+        $if[$get[xts_ot]!=;$!setGlobalVar[authmusic_twitter;$get[xts_ot]]]
+        $if[$get[xts_qi]!=;$!setGlobalVar[authmusic_twitter_qid;$get[xts_qi]]]
+        $if[$env[successlog]==true;$logger[Info;$if[$get[xts_ot]!=;$cropText[$get[xts_ot];0;12;...];Failed to Retrieve] | Twitter / Token]]
+        $if[$env[successlog]==true;$logger[Info;$if[$get[xts_qi]!=;$cropText[$get[xts_qi];0;12;...];Failed to Retrieve] | Twitter / QueryID]]
+    ;$logger[Info;Failed to Retrieve - Twitter]]
+    $if[$and[$get[xts_ot]==;$get[xts_qi]==];$logger[Warn;Re-trying - Twitter] $callFunction[generateAuthKeys;twitter;;true]]
+    ]
     $return
     `
 }

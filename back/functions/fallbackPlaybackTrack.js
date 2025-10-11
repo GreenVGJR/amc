@@ -154,10 +154,17 @@ module.exports = {
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
     $let[finalurl;$env[a;results;video_versions;0;url]]
     ]
-    if[$env[whattype;type]==bandcamp;
+    $if[$env[whattype;type]==bandcamp;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
     $let[finalurl;$env[a;results;file;mp3-128]]
+    ]
+    $if[$env[whattype;type]==twitter;
+    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
+    $jsonLoad[b;$env[a;results;legacy;entities;media;0;video_info;variants]]
+    $arrayMap[b;c;$if[$env[c;bitrate]!=;$return[$env[c]]];b]
+    $let[finalurl;$env[b;$sub[$arrayLength[b];1];url]]
     ]
     ;retry]
     $callLocalFunction[oncecode;false]
