@@ -6,7 +6,7 @@ module.exports = {
     {
       "type": 3,
       "name": "url",
-      "description": "URL media | Youtube / Soundcloud / Spotify / Tiktok / Instagram / Facebook / Bandcamp",
+      "description": "URL media | Youtube, Soundcloud, Spotify, Tiktok, Twitter, Instagram, Facebook, Bandcamp",
       "required": true,
       "min_length": 8
     },
