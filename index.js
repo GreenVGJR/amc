@@ -6,6 +6,7 @@ const { ForgeDB } = require("@tryforge/forge.db");
 // Extractor & Config
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const youtube = require('./back/client/youtubeConfig');
+const toggles = require('./back/config.json');
 
 require('dotenv').config({ quiet: true }); // Load Environment
 
@@ -25,15 +26,16 @@ const music = new ForgeMusic({
         GuildQueueEvent.PlayerFinish
     ],
     includeExtractors: DefaultExtractors,
+    blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
-        disableHistory: true,
         disableResampler: true,
+        disableFallbackStream: true,
         bufferingTimeout: 1000,
-        defaultFFmpegFilters: ["surrounding"],
+        volume: 50,
         connectionTimeout: 10000,
         leaveOnEmpty: true,
         leaveOnEmptyCooldown: 15000,
-        pauseOnEmpty: true,
+        pauseOnEmpty: true
     },
     skipFFmpeg: true
 });

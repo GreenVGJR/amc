@@ -38,14 +38,24 @@ module.exports = {
     $onlyIf[$guildID!=;]
 
     $ephemeral
+    $let[fsearch;false]
+    $async[
+    $jsonLoad[result;$callFunction[getLyricsTrack;$option[song_name];;true;$option[line_synced]]]
+    $if[$env[result;results]==;$let[fsearch;null];$let[fsearch;true]]
+    $let[latencyrs;$round[$executionTime]]
+    ]
     $interactionReply[
     $addContainer[
     $addTextDisplay[### -# Loading]
     ;$callFunction[useIcon;color_embed]]
     ]
 
-    $jsonLoad[result;$callFunction[getLyricsTrack;$option[song_name];;true;$option[line_synced]]]
-    $onlyIf[$env[result;results]!=;$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]]]
+    $loop[-1;
+    $if[$get[fsearch]!=false;$break]
+    $wait[4]
+    ]
+
+    $onlyIf[$get[fsearch]!=null;$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]]]
     $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
     $interactionReply[
     $if[$option[lyric_file]==true;
@@ -58,7 +68,7 @@ module.exports = {
     $addFile[attachment://$get[filename]]
     $addSeparator[Small;true]
     ]
-    $addTextDisplay[> ### -# $round[$executionTime]ms | $toTitleCase[$env[result;results;provider]]]
+    $addTextDisplay[> ### -# $get[latencyrs]ms | $toTitleCase[$env[result;results;provider]]]
     $addSeparator[Small;true]
     $addSection[
     $addTextDisplay[> ## $hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]

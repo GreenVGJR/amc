@@ -3,6 +3,10 @@ module.exports = {
     code: `
     $logger[Info;Ready on client $username[$clientID]]
     $async[$!setGlobalVar[listcommands-help;$applicationCommands]]
+    $if[$callFunction[configMusic;cacheAllContextNeed];
+    $logger[Info;Caching Discord Context]
+    $callFunction[fetchDiscordContext]
+    ]
     $logger[Info;Attempting to Generate]
     $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;youtube;;true]]

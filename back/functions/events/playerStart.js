@@ -95,7 +95,7 @@ module.exports = {
     $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]LIVE;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]$parseDigital[$env[jsonmusicdata;durationMS]]];true;0]
     $addField[Songs;$separateNumber[$sum[$queueLength;1];.];true;0]
     $color[$callFunction[useIcon;color_embed];0]
-    $thumbnail[$if[$or[$get[thumbnail]==null;$get[thumbnail]==];$userDefaultAvatar[$clientID];$get[thumbnail]];0]
+    $if[$get[provider]!=spotify;$thumbnail[$if[$or[$get[thumbnail]==null;$get[thumbnail]==];$userDefaultAvatar[$clientID];$if[$endsWith[$get[owner]; - Topic];$replace[$get[thumbnail];hq720.jpg;frame0.jpg];$get[thumbnail]]];0]]
     $footer[$username[$get[requestedBy]];$userAvatar[$get[requestedBy];1024];0]
     ;
     $author[Now Playing;$callFunction[useIcon;$get[provider]];;0]
@@ -104,7 +104,7 @@ module.exports = {
     $addField[Owner;\`$env[jsonmusicdata;author]\`;true;0]
     $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]LIVE;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]$parseDigital[$env[jsonmusicdata;durationMS]]];true;0]
     $addField[Songs;$separateNumber[$sum[$queueLength;1];.];true;0]
-    $thumbnail[$if[$or[$env[jsonmusicdata;thumbnail]==null;$env[jsonmusicdata;thumbnail]==];$userDefaultAvatar[$clientID];$env[jsonmusicdata;thumbnail]];0]
+    $if[$get[provider]!=spotify;$thumbnail[$if[$or[$env[jsonmusicdata;thumbnail]==null;$env[jsonmusicdata;thumbnail]==];$userDefaultAvatar[$clientID];$if[$endsWith[$env[jsonmusicdata;author]; - Topic];$replace[$env[jsonmusicdata;thumbnail];hq720.jpg;frame0.jpg];$env[jsonmusicdata;thumbnail]]];0]]
     $color[$callFunction[useIcon;color_embed];0]
     $footer[$username[$env[jsonmusicdata;requestedBy;id]];$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];0]
     ]

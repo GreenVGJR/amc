@@ -85,7 +85,7 @@ module.exports = {
   $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
   $footer[Searching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
-  ;true]]
+  ;$get[iscreatedfirst]]]
   $if[$or[$getVar[musicplayer_message;$guildID_channelid;null]==null;$voiceID[$guildID;$clientID]==];
   $setVar[musicplayer_message;$guildID_channelid;$channelID]
   $setVar[musicplayer_message;$guildID_messageid;$get[mid]]
@@ -97,7 +97,7 @@ module.exports = {
   $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
   $footer[Fetching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
-  ;true]]
+  ;$get[iscreatedfirst]]]
   $if[$or[$getVar[musicplayer_message;$guildID_channelid;null]==null;$voiceID[$guildID;$clientID]==];
   $setVar[musicplayer_message;$guildID_channelid;$channelID]
   $setVar[musicplayer_message;$guildID_messageid;$get[mid]]
@@ -113,7 +113,6 @@ module.exports = {
   ]
   ]
   $if[$env[typesload]==3;
-  $let[checkinter-4;true]
   $interactionReply[
   $if[$get[basic_type];
   $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
@@ -138,7 +137,6 @@ module.exports = {
   ]]
   ]
   $if[$env[typesload]==error-1;
-  $let[checkinter-5;true]
   $interactionReply[
   $description[$callFunction[useCustomMusicMessage;config_errorNoResult]]
   $color[$callFunction[useIcon;error_color_embed]]
@@ -147,7 +145,6 @@ module.exports = {
   ]
   ]
   $if[$env[typesload]==error-2;
-  $let[checkinter-6;true]
   $interactionReply[
   $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack] $codeBlock[$env[causeplayerror]]]
   $color[$callFunction[useIcon;error_color_embed]]
@@ -157,25 +154,39 @@ module.exports = {
   ]
   ;typesload]
 
-  $if[$isValidLink[$option[query]]==false;$callLocalFunction[loadinteraction;1-1];$callLocalFunction[loadinteraction;1-2]]
+  $if[$isValidLink[$option[query]];$callLocalFunction[loadinteraction;1-2]]
   
   $let[default_provider;$callFunction[configMusic;default_provider]]
   $let[fallback_provider;$callFunction[configMusic;fallback_provider]]
   $if[$isValidLink[$option[query]]==false;
   $let[basic_type;true]
+  $let[fsearch;false]
+  $async[
   $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$if[$option[provider]!=;$option[provider];$get[default_provider]];null]]
   $let[tempstoreurl;$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtube;https://youtube.com/watch?v=$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtubemusic;https://youtube.com/watch?v=$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==soundcloud;https://soundcloud.com/$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==spotify;https://open.spotify.com/track/$env[result;id];$env[result;id]]]]]]
   $let[use_provider;$if[$option[provider]!=;$option[provider];$get[default_provider]]]
   $let[cac1;$env[result;id]]
+  $if[$get[cac1]!=;$let[fsearch;true]]
   $if[$get[cac1]==;
   $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$get[fallback_provider];null]]
   $let[tempstoreurl;$if[$or[$get[fallback_provider]==youtube;$get[fallback_provider]==youtubemusic];https://youtube.com/watch?v=$env[result;id];$if[$get[fallback_provider]==soundcloud;https://soundcloud.com/$env[result;id];$if[$get[fallback_provider]==spotify;https://open.spotify.com/track/$env[result;id];$env[result;id]]]]]
   $let[use_provider;$get[fallback_provider]]
   $let[cac2;$env[result;id]]
+  $if[$get[cac2]!=;$let[fsearch;true]]
   $if[$and[$get[cac1]==;$get[cac2]==];
+  $let[fsearch;null]
+  ]
+  ]
+  ]
+  $callLocalFunction[loadinteraction;1-1]
+  $loop[-1;
+  $if[$get[fsearch]!=false;$break]
+  $wait[4]
+  ]
+  $if[$get[fsearch]==null;
   $callLocalFunction[loadinteraction;error-1]
   $stop
-  ]]
+  ]
   $let[music_title;$inflate[$env[result;title];base64]]
   $let[music_id;$env[result;id]]
   $let[music_duration;$multi[$env[result;duration];1000]]
@@ -255,8 +266,8 @@ module.exports = {
   $wait[1s]
   $if[$get[statusloop]==TRACK;$setLoopMode[TRACK]]
   ]]
-  $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer]]
   $callLocalFunction[loadinteraction;3]
   $setTimeout[$!interactionDelete;2s]
+  $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer]]
   ]`
 }

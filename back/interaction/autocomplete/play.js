@@ -7,6 +7,7 @@ module.exports = {
     $onlyIf[$voiceID[$guildID;$authorID]!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchJoinVC];__null1__]]
     $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];__null2__]]
     $onlyIf[$or[$focusedOptionValue!=;$getMemberVar[cachesearchistory_user_autocomplete;$authorID]!=];$addChoice[$callFunction[useCustomMusicMessage;config_infoSearchFirst];__infointer-$authorID__]]
+    $autocomplete
     $if[$isValidLink[$focusedOptionValue]==false;
     $jsonLoad[testing;$callFunction[fastSearchTrack;$if[$focusedOptionValue!=;$focusedOptionValue;$getMemberVar[cachesearchistory_user_autocomplete;$authorID]]]]
     $async[$if[$focusedOptionValue!=;$#setMemberVar[cachesearchistory_user_autocomplete;$focusedOptionValue;$authorID]]]
@@ -25,7 +26,7 @@ module.exports = {
     $if[$env[testing;results;9]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;9];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;9];";\\\\"]")]]]
     ]
     ;
-    $onlyIf[$charCount[$focusedOptionValue]<=100;$autocomplete]
+    $onlyIf[$charCount[$focusedOptionValue]<=100]
     $if[$callFunction[configMusic;fetchMusicTitle_autocomplete];
     $let[fetch;$trim[$callFunction[fetchTitleTrack;$focusedOptionValue]]]
     $if[$get[fetch]==;
@@ -37,6 +38,5 @@ module.exports = {
     $addChoice[$cropText[$focusedOptionValue;0;100];$focusedOptionValue]
     ]
     ]
-    $autocomplete
     `
 }

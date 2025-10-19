@@ -45,7 +45,11 @@ module.exports = {
         $arrayLoad[conres;widget.sndcdn.com;$httpResult]
         $arrayMap[conres;conrest;$if[$checkContains[$env[conrest];.js];$return[https://widget.sndcdn.com$advancedTextSplit[$env[conrest];</script>;0;";0]]];conres2]
         $arrayForEach[conres2;conres3;
-        $try[$!httpRequest[$env[conres3];GET]]
+        $try[
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpAddHeader[Accept-Encoding;gzip]
+        $!httpRequest[$env[conres3];GET]
+        ]
         $if[$charCount[$advancedTextSplit[$httpResult;location.search;1;AlwaysAllowSeekStrategy;0;client_id;1;";1]]==32;
         $arrayPushJSON[storeclientid;$advancedTextSplit[$httpResult;location.search;1;AlwaysAllowSeekStrategy;0;client_id;1;";1]]
         $arrayPushJSON[storeclientid;$advancedTextSplit[$httpResult;location.search;1;AlwaysAllowSeekStrategy;0;client_id;1;";3]]
@@ -157,9 +161,9 @@ module.exports = {
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip]
         $!httpRequest[https://music.apple.com$advancedTextSplit[$httpResult;script type="module" cross;1;";1;";0];GET;a14s]
-        $let[a14;$advancedTextSplit[$env[a14s];ote="x-apple;0;throw gd("cl;1;const;1;=";1;";0]]
-        $if[$get[a14]!=;$!setGlobalVar[authmusic_applemusic;$get[a14]]]
-        $if[$env[successlog]==true;$logger[Info;$if[$get[a14]!=;$cropText[$get[a14];0;12;...];Failed to Retrieve] | Apple Music]]
+        $let[a14;$advancedTextSplit[$env[a14s];"ey;1;";0]]
+        $if[$get[a14]!=;$!setGlobalVar[authmusic_applemusic;ey$get[a14]]]
+        $if[$env[successlog]==true;$logger[Info;$if[$get[a14]!=;$cropText[ey$get[a14];0;12;...];Failed to Retrieve] | Apple Music]]
     ;$logger[Info;Failed to Retrieve - Apple Music]]
     $if[$get[a14]==;$logger[Warn;Re-trying - Apple Music] $callFunction[generateAuthKeys;applemusic;;true]]
     ]
