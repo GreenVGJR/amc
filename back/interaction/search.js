@@ -8,14 +8,22 @@ module.exports = {
     $let[provider;$getVar[storecachesearchusersfetch-p;$djsEval[ctx.interaction.message.interaction.id];null]]
 
     $onlyIf[$or[$get[query]==null;$get[provider]==null]!=true;$!deferUpdate $!interactionDelete]
-    $interactionUpdate[$addContainer[
-    $addTextDisplay[-# Query:\n\`$get[query]\`\n-# Provider:\n\`$get[provider]\`\n-# Ping:\n\`Loading\`]
-    $addSeparator[Large;true]
-    ;aa$randomBytes[2]]
+    $let[fsearch;false]
+    $async[
+    $jsonLoad[loadser;$callFunction[searchSomeTrack;$get[query];$get[provider]]]
+    $if[$env[loadser;0]==;$let[fsearch;null];$let[fsearch;true]]
+    ]
+    $!deferUpdate
+
+    $loop[-1;
+    $if[$get[fsearch]!=false;$break]
+    $wait[4]
     ]
 
-    $jsonLoad[loadser;$callFunction[searchSomeTrack;$get[query];$get[provider]]]
-    $onlyIf[$env[loadser;0]!=;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
+    $if[$get[fsearch]==null;
+    $interactionReply[$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
+    $stop
+    ]
 
     $let[currentping;$round[$executionTime;0]]
     $interactionUpdate[

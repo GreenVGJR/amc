@@ -92,6 +92,7 @@ ___
     > Instagram
     > Facebook
     > Bandcamp
+    > Twitter
 
 - Auto-generate auth keys needed
 - Dynamic info message

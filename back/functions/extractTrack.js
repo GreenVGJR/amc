@@ -1,173 +1,188 @@
 module.exports = {
-    name: "fallbackPlaybackTrack",
+    name: "extractTrack",
     params: [{
         name: "url", // string
-        description: "URL",
+        description: "To provide a information",
         required: true
     },
     {
-        name: "types", // enum
-        description: "Changes quality",
-        required: true
+        name: "userAgent", // string
+        description: "Spoof Client",
+        required: false
     },
     {
-        name: "tempobject", // object
-        description: "Replacement of objects http response",
+        name: "limitChar", // int
+        description: "Limit Character to 2000",
         required: false
     }],
     code: `
-    $onlyIf[$isValidLink[$env[url]];$return]
-    $jsonLoad[whattype;$callFunction[filterMediaID;$env[url]]]
-    $let[trycount;0]
-    $localFunction[oncecode;
-    $if[$get[trycount]>=3;$return]
-    $if[$env[retry]==true;$letSum[trycount;1]]
-    $if[$env[whattype;type]==youtube;
-
-    $let[videoid;$env[whattype;id]]
-
+    $let[url;$env[url]]
+    $let[spliturl;$advancedTextSplit[$get[url];://;1]]
+    $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
+    $jsonLoad[filterid;$callFunction[filterMediaID;https://$get[spliturl]]]
+    $onlyIf[$or[$env[filterid;id]==null;$env[filterid;type]==null]!=true;$return]
+    $arrayLoad[results]
     $try[
-    $if[$env[types]==hls;
-    $httpAddHeader[User-Agent;Mozilla/5.0 (Macintosh\\; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15,gzip(gfe)]
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"WEB","clientVersion":"2.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,videoDetails.lengthSeconds,streamingData.hlsManifestUrl;POST;reshttp]
-    ;
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"VISIONOS","clientVersion":"0.1","visitorData":"$getGlobalVar[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
-    $httpAddHeader[Accept-Encoding;gzip]
-    $if[$or[$env[types]==;$env[types]==v];
-    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
+    $if[$env[filterid;type]==youtube;
+    $let[tryattempt;0]
+    $localFunction[refreshyt;
+    $if[$env[retry]==true;
+    $onlyIf[$get[tryattempt]<5;$return]
+    $letSum[tryattempt;1]
     ]
-    $if[$env[types]==va;
-    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
-    ]]]
-    $onlyIf[$env[reshttp;playabilityStatus;status]==OK;$let[finalurl;bot|$env[reshttp;playabilityStatus;reason]]]
-    $onlyIf[$env[reshttp;videoDetails;isLiveContent]!=true;$let[finalurl;live]]
-    $if[$or[$env[types]==;$env[types]==v];
-    $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
-    $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
-    $onlyIf[$get[getindex251]!=-1;$let[finalurl;null]]
-    $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
-    $if[$get[getcdnytlength]>=10000000;
-    $let[checkindex139;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
-    $if[$get[checkindex139]!=-1;
-    $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
-    $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpSetBody[{"videoId":"$env[filterid;id]","context":{"client":{"clientName":"TVHTML5_SIMPLY_EMBEDDED_PLAYER","clientVersion":"2.0"}}}]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $let[http;$httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getGlobalVar[authmusic_youtube_key]&prettyPrint=false&fields=videoDetails(videoId,title,lengthSeconds,channelId,isCrawlable,viewCount,author,isPrivate,isLiveContent);POST;reshttp]]
+    $onlyIf[$env[reshttp;videoDetails]!=;$callLocalFunction[refreshyt;true]]
+    $let[results;{"status":$get[http],"results":$if[$env[reshttp;videoDetails]==;null;$env[reshttp;videoDetails]]}]
+    ;retry]
+    $callLocalFunction[refreshyt;false]
+    ]
+    $if[$env[filterid;type]==soundcloud;
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $let[http;$httpRequest[https://$get[spliturl];GET;reshttp]]
+    $let[a;$advancedTextSplit[$env[reshttp];<script>window.__sc_hydration;1;= ;1;\\;</script>;0]]
+    $let[results;{"status":$get[http],"results":$if[$get[a]==;null;$replace[$replace[$get[a];/preview/progressive;/preview/progressive?client_id=$getGlobalVar[authmusic_soundcloud_fall]];/stream/progressive;/stream/progressive?client_id=$getGlobalVar[authmusic_soundcloud_fall]]]}]
+    ]
+    $if[$env[filterid;type]==spotify;
+    $let[tryattempt;0]
+    $localFunction[refreshspotify;
+    $if[$env[retry]==true;
+    $onlyIf[$get[tryattempt]<5;$return]
+    $callFunction[generateAuthKeys;spotify;;false]
+    $callFunction[generateAuthKeys;spotify_token;;false]
+    $letSum[tryattempt;1]
+    ]
+    $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_spotify]]
+    $httpAddHeader[Client-Token;$getGlobalVar[authmusic_spotify_token]]
+    $httpAddHeader[Accept;application/json]
+    $httpAddHeader[Origin;https://open.spotify.com/]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[app-platform;WebPlayer]
+    $httpAddHeader[spotify-app-version;1.0]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $let[gid;$djsEval[(id => \\[...id\\].reduce((a, c) => a * 62n + BigInt("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(c)), 0n).toString(16).padStart(32, '0'))("$advancedTextSplit[$env[filterid;id];/;1]")]]
+    $let[http;$httpRequest[https://spclient.wg.spotify.com/metadata/4/track/$get[gid];GET;a]]
+    $onlyIf[$or[$get[http]==401;$get[http]==400]!=true;$callLocalFunction[refreshspotify;true]]
+    $let[results;{"status":$get[http],"results":$if[$env[a]==;null;$env[a]]}]
+    ;retry]
+    $callLocalFunction[refreshspotify;false]
     ]]
-    $let[getcdnyt;$env[afs;$get[getindex251];url]]
-    $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]]
-    ]
-    $if[$env[types]==hls;
-    $let[jaghttp;$httpRequest[$env[reshttp;streamingData;hlsManifestUrl];GET;jsbd]]
-    $onlyIf[$get[jaghttp]==200;$let[finalurl;null]]
-    $arrayLoad[jskd;#EXT-X-STREAM-INF:BANDWIDTH=;$env[jsbd]]
-    $!arrayShift[jskd]
-    $let[fskklsv;$arrayFindIndex[jskd;oasb;$checkCondition[$divide[$multi[$advancedTextSplit[$env[oasb];,;0];$env[reshttp;videoDetails;lengthSeconds]];8]>=10000000]]]
-    $let[fsidlsv;$env[jskd;$if[$get[fskklsv]==-1;$sub[$arrayLength[jskd];1];$get[fskklsv]]]]
-    $let[finalurl;$advancedTextSplit[$get[fsidlsv];
-;1]]
-    ]
-    $if[$env[types]==va;
-    $jsonLoad[fts;$env[reshttp;streamingData;formats]]
-    $let[getindex18;$arrayFindIndex[fts;aaa;$env[aaa;itag]==18]]
-    $onlyIf[$get[getindex18]!=-1;$let[finalurl;null]]
-    $let[getcdnyt;$env[fts;$get[getindex18];url]]
-    $try[$let[pullength;$httpRequest[$get[getcdnyt];HEAD]] $let[checklength;$if[$httpGetHeader[Content-Length]!=;$httpGetHeader[Content-Length];0]]]
-    $let[finalurl;$get[getcdnyt]&cpn=$randomString[16]$if[$has[pullength];&range=0-$get[checklength]]]
-    ]
-    ]
-    $if[$env[whattype;type]==soundcloud;
-    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $jsonLoad[loadres;$env[test;results]]
-    $arrayMap[loadres;test2;$if[$env[test2;hydratable]==sound;$return[$env[test2]]];test3]
-    $jsonLoad[test4;$env[test3;0;data;media;transcodings]]
-    $arrayMap[test4;test5;$if[$env[test5;format;protocol]==progressive;$return[$env[test5]]];test6]
-    $onlyIf[$env[test6;0;url]!=;$let[finalurl;null]]
-    $!httpRequest[$env[test6;0;url]&track_authorization=$env[test3;0;data;track_authorization];GET;rest]
-    $let[finalurl;$env[rest;url]]
-    $onlyIf[$get[finalurl]!=;$let[finalurl;null]]
-    ;
-    $if[$env[whattype;type]==spotify;
-    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$env[test;results;preview;0;file_id]!=;$callLocalFunction[oncecode;true]]
-    $let[finalurl;https://p.scdn.co/mp3-preview/$env[test;results;preview;0;file_id]]
-    ]
-    $if[$env[whattype;type]==tiktokmob;
-    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
-    $jsonLoad[whattype;$callFunction[filterMediaID;$if[$env[test;results;video;id]!=;https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
-    ]
-    $if[$env[whattype;type]==tiktok;
-    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
-    $if[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList]==;
-    $jsonLoad[b;$env[test;results;video;PlayAddrStruct;UrlList]]
-    ;
-    $jsonLoad[elindex;$env[test;results;video;bitrateInfo]]
-    $let[ad1;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];adapt_lowest_1080]]]
-    $let[findindex;$get[ad1]]
-    $if[$get[ad1]==-1;
-    $let[ad2;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];adapt_lower_]]]
-    $let[findindex;$get[ad2]]
-    $if[$get[ad2]==-1;
-    $let[ad3;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];normal_]]]
-    $let[findindex;$get[ad3]]
-    $if[$get[ad3]==-1;
-    $let[ad4;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];adapt_540]]]
-    $let[findindex;$get[ad4]]
-    $if[$get[ad4]==-1;
-    $let[ad5;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];lowest_540]]]
-    $onlyIf[$get[ad5]!=-1;$let[finalurl;null]]
-    $let[findindex;$get[ad5]]
-    ]]]]
-    $jsonLoad[b;$env[test;results;video;bitrateInfo;$get[findindex];PlayAddr;UrlList]]
-    ]
-    $onlyIf[$env[b;0]!=;$let[finalurl;null]]
-    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1322;www.tiktok.com;api16-normal.tiktokv.com]]
-    ]
-    $if[$env[whattype;type]==tiktokmusic;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$env[a;results]!=null;$callLocalFunction[oncecode;true]]
-    $if[$env[a;results;play_url;uri]==;
-    $jsonLoad[b;$env[a;results;extra]]
-    $let[finalurl;$env[b;original_song_url]]
-    ;
-    $let[finalurl;$env[a;results;play_url;uri]]
-    ]
-    $onlyIf[$get[finalurl]!=;$let[finalurl;null]]
-    ]
-    $if[$env[whattype;type]==applemusic;
-    $try[
+    $if[$env[filterid;type]==tiktokmob;
     $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
     $httpSetContentType[Text]
-    $!httpRequest[$env[url];GET;a]
+    $!httpRequest[$replace[$get[url];vm.tiktok.com;vt.tiktok.com];GET]
+    $jsonLoad[filterid;$callFunction[filterMediaID;$replace[$advancedTextSplit[$httpResult;"seo.abtest":{"canonical":";1;";0];\\\\\\u002F;/]]]
     ]
-    $onlyIf[$env[a]!=;$callLocalFunction[oncecode;true]]
-    $let[finalurl;$advancedTextSplit[$env[a];"contentUrl":";1;";0]]
-    ]]
-    $if[$env[whattype;type]==facebook;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$or[$env[a;results]==;$env[a;results;is_live_stream]==true;$env[a;results;is_hls]==true]!=true;$let[finalurl;null]]
-    $let[finalurl;$default[$env[a;results;hd_src];$env[a;results;sd_src]]]
+    $if[$env[filterid;type]==tiktok;
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
+    $httpSetContentType[Text]
+    $let[http;$httpRequest[https://www.tiktok.com/@/video/$env[filterid;id];GET]]
+    $onlyIf[$get[http]==200;$return]
+    $let[web;$advancedTextSplit[$httpResult;"webapp.video-detail":;1;,"webapp;0]]
+    $jsonLoad[a;$get[web]]
+    $jsonLoad[b;$env[a;itemInfo;itemStruct]]
+    $let[results;{"status":$get[http],"results":$if[$env[b]==;null;$env[b]]}]
     ]
-    $if[$env[whattype;type]==instagram;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
-    $let[finalurl;$env[a;results;video_versions;0;url]]
+    $if[$env[filterid;type]==tiktokmusic;
+    $let[tryattempt;0]
+    $localFunction[refreshvm;
+    $if[$env[retry]==true;
+    $onlyIf[$get[tryattempt]<10;$return]
+    $letSum[tryattempt;1]
     ]
-    $if[$env[whattype;type]==bandcamp;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
-    $let[finalurl;$env[a;results;file;mp3-128]]
+    $httpSetContentType[Text]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Content-Type;application/json]
+    $httpAddHeader[Accept;application/json]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[Cookie;$inflate[$getGlobalVar[authmusic_tiktok];base64]]
+    $!httpRequest[https://api16-normal-quic.tiktokv.com/aweme/v1/music/aweme/?music_id=$env[filterid;id]&aid=1322&device_id=$randomNumber[100000000;999999999;false]$randomNumber[1000000000;9999999999;false];GET;a]
+    $onlyIf[$env[a]!=;$callLocalFunction[refreshvm;true]]
+    $jsonLoad[a;$env[a]]
+    $jsonLoad[a;$env[a;aweme_list]]
+    $let[index;$arrayFindIndex[a;b;$checkCondition[$env[b;added_sound_music_info;mid]==$env[filterid;id]]]]
+    $if[$get[index]==-1;
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[Accept;*/*]
+    $httpAddHeader[User-Agent;Mozilla/5.0 (compatible\\; Discordbot/2.0\\; +https://discordapp.com)]
+    $httpSetContentType[Text]
+    $onlyIf[$httpRequest[https://www.tiktok.com/music/-$env[filterid;id];GET]==200;$callLocalFunction[refreshvm;true]]
+    $if[$checkContains[$advancedTextSplit[$httpResult;property="al:android:url";1;content=";1;";0];//music/detail/];
+    $let[cl;$djsEval[require("entities").decodeHTML("$advancedTextSplit[$httpResult;<title>;1;</title>;0]")]]
+    $let[stctitle;$toLowercase[$advancedTextSplit[$replace[$get[cl];♬ ;]; | ;0; & ;0] $advancedTextSplit[$replace[$get[cl];♬ ;]; | ;1]]]
+    ;
+    $return
     ]
-    $if[$env[whattype;type]==twitter;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
-    $jsonLoad[b;$env[a;results;legacy;entities;media;0;video_info;variants]]
-    $arrayMap[b;c;$if[$env[c;bitrate]!=;$return[$env[c]]];b]
-    $let[finalurl;$env[b;$sub[$arrayLength[b];1];url]]
+    $!httpRequest[https://api16-normal-quic.tiktokv.com/aweme/v1/music/search/?count=10&cursor=0&aid=1180&device_id=$getGlobalVar[authmusic_tiktok_did]&keyword=$get[stctitle];GET;c]
+    $onlyIf[$env[c]!=;$return]
+    $jsonLoad[c;$env[c]]
+    $jsonLoad[c;$env[c;music_info_list]]
+    $jsonLoad[c;$env[c;$arrayFindIndex[c;k;$checkCondition[$env[k;music;id_str]==$env[filterid;id]]]]]
+    $let[results;{"status":null,"results":$if[$env[c]==;null;$env[c;music]]}]
+    ;
+    $let[results;{"status":null,"results":$if[$env[a;$get[index]]==;null;$env[a;$get[index];music]]}]
     ]
     ;retry]
-    $callLocalFunction[oncecode;false]
-    $return[$get[finalurl]]
+    $callLocalFunction[refreshvm;false]
+    ]
+    $if[$env[filterid;type]==facebook;
+    $httpAddHeader[Accept;text/html]
+    $httpAddHeader[Accept-Language;en-US]
+    $!httpRequest[https://web.facebook.com/plugins/video.php?href=$get[url]&show_text=true;GET]
+    $let[cs;$default[$advancedTextSplit[$httpResult;"videoData":\\[;1;,"player_version;0];{]]
+    $jsonLoad[b;$get[cs]}]
+    $if[$env[b;video_id]!=;
+    $!jsonSet[b;text;$advancedTextSplit[$httpResult;class="text_exposed_root"><p>;1;<;0]]
+    $!jsonSet[b;owner;$advancedTextSplit[$httpResult;<a title=";1;" target=;0]]
+    ]
+    $let[results;{"status":null,"results":$env[b]}]
+    ]
+    $if[$env[filterid;type]==instagram;
+    $httpAddHeader[Sec-Fetch-Site;none]
+    $httpAddHeader[Accept;text/html]
+    $httpAddHeader[Accept-Language;en-US]
+    $!httpRequest[https://www.instagram.com/$env[filterid;id];GET]
+    $arrayLoad[a;script type="application/json";$httpResult]
+    $let[test;$env[a;$arrayFindIndex[a;b;$checkCondition[$advancedTextSplit[$env[b];xdt_api__v1__media;1;video_versions;1]!=]]]]
+    $jsonLoad[a;$advancedTextSplit[$get[test];data-sjs>;1;</script>;0]]
+    $let[results;{"status":null,"results":$if[$env[a;require]==;null;$env[a;require;0;3;0;__bbox;require;0;3;1;__bbox;result;data;xdt_api__v1__media__shortcode__web_info;items;0]]}]
+    ]
+    $if[$env[filterid;type]==bandcamp;
+    $httpSetContentType[Text]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Language;en-US]
+    $!httpRequest[$env[filterid;id];GET]
+    $let[a;$advancedTextSplit[$httpResult;data-tralbum=";1;";0]]
+    $let[a;$djsEval[require("entities").decodeHTML(ctx.getKeyword("a"))]]
+    $jsonLoad[a;$default[$get[a];{}]]
+    $let[results;{"status":null,"results":$if[$env[a;trackinfo]==;null;$env[a;trackinfo;0]]}]
+    ]
+    $if[$env[filterid;type]==twitter;
+    $let[xr_variables;{"tweetId":"$env[filterid;id]","includePromotedContent":false,"withBirdwatchNotes":false,"withVoice":false,"withCommunity":false}]
+    $let[xr_features;{"creator_subscriptions_tweet_preview_api_enabled":false,"premium_content_api_read_enabled":false,"communities_web_enable_tweet_community_results_fetch":false,"c9s_tweet_anatomy_moderator_badge_enabled":false,"responsive_web_grok_analyze_button_fetch_trends_enabled":false,"responsive_web_grok_analyze_post_followups_enabled":false,"responsive_web_jetfuel_frame":false,"responsive_web_grok_share_attachment_enabled":false,"articles_preview_enabled":false,"responsive_web_edit_tweet_api_enabled":false,"graphql_is_translatable_rweb_tweet_is_translatable_enabled":false,"view_counts_everywhere_api_enabled":false,"longform_notetweets_consumption_enabled":false,"responsive_web_twitter_article_tweet_consumption_enabled":false,"tweet_awards_web_tipping_enabled":false,"responsive_web_grok_show_grok_translated_post":false,"responsive_web_grok_analysis_button_from_backend":false,"creator_subscriptions_quote_tweet_preview_enabled":false,"freedom_of_speech_not_reach_fetch_enabled":false,"standardized_nudges_misinfo":false,"tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled":false,"longform_notetweets_rich_text_read_enabled":false,"longform_notetweets_inline_media_enabled":false,"payments_enabled":false,"profile_label_improvements_pcf_label_in_post_enabled":false,"responsive_web_profile_redirect_enabled":false,"rweb_tipjar_consumption_enabled":false,"verified_phone_label_enabled":false,"responsive_web_grok_image_annotation_enabled":false,"responsive_web_grok_imagine_annotation_enabled":false,"responsive_web_grok_community_note_auto_translation_is_enabled":false,"responsive_web_graphql_skip_user_profile_image_extensions_enabled":false,"responsive_web_graphql_timeline_navigation_enabled":false,"responsive_web_enhance_cards_enabled":false}]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Sec-Fetch-Site;same-site]
+    $httpAddHeader[Origin;https://x.com]
+    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_twitter]]
+    $httpSetContentType[Text]
+    $!httpRequest[https://api.x.com/graphql/$getGlobalVar[authmusic_twitter_qid]/TweetResultByRestId?variables=$encodeURI[$get[xr_variables]]&features=$encodeURI[$get[xr_features]];GET]
+    $jsonLoad[thers;$httpResult]
+    $let[results;{"status":null,"results":$if[$env[thers;data;tweetResult]==;null;$env[thers;data;tweetResult;result]]}]
+    ]
+    $let[resultforeturn;$get[results]]
+    $return[$if[$and[$env[limitChar]==true;$env[limitChar]!=false];$cropText[$get[resultforeturn];0;2000;];$get[resultforeturn]]]
     `
 }

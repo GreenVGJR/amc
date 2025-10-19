@@ -86,7 +86,7 @@ module.exports = {
   $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
   $footer[Searching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
-  ;true]]
+  ;$get[iscreatedfirst]]]
   $if[$or[$getVar[musicplayer_message;$guildID_channelid;null]==null;$voiceID[$guildID;$clientID]==];
   $setVar[musicplayer_message;$guildID_channelid;$channelID]
   $setVar[musicplayer_message;$guildID_messageid;$get[mid]]
@@ -98,7 +98,7 @@ module.exports = {
   $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
   $footer[Fetching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
-  ;true]]
+  ;$get[iscreatedfirst]]]
   $if[$or[$getVar[musicplayer_message;$guildID_channelid;null]==null;$voiceID[$guildID;$clientID]==];
   $setVar[musicplayer_message;$guildID_channelid;$channelID]
   $setVar[musicplayer_message;$guildID_messageid;$get[mid]]

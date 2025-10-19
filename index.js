@@ -24,18 +24,11 @@ const lavalink = new ForgeLinked({
   nodes: [
     {
       id: "maow",
-      host: "lava-v4.ajieblogs.eu.org", // https://free.lavalink.rf.gd
-      port: 443,
-      authorization: "https://dsc.gg/ajidevserver",
-      secure: true
-    },
-    {
-      id: "maow2",
-      host: "lavalinkv4.serenetia.com",
-      port: 443,
-      authorization: "https://dsc.gg/ajidevserver", // https://free.lavalink.rf.gd
-      secure: true
-	  }
+      host: "localhost",
+      port: 3000,
+      authorization: "hai",
+      secure: false
+    }
   ],
   playerOptions: {
     defaultSearchPlatform: "youtube",

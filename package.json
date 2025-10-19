@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@tryforge/forge.db": "^2.1.0",
+    "@tryforge/forge.db": "^2.1.1",
     "@tryforge/forgescript": "^2.5.0",
-    "dotenv": "^17.2.2",
+    "dotenv": "^17.2.3",
     "entities": "^7.0.0",
     "ForgeLinked": "github:tryforge/ForgeLinked#dev",
     "sqlite3": "^5.1.7"

@@ -31,7 +31,6 @@ module.exports = {
       "type": 3,
       "name": "query",
       "description": "Search a media",
-      "autocomplete": true,
       "required": true
     },
     {
@@ -60,11 +59,7 @@ module.exports = {
   $let[check;$getVar[cachesearch_global-query;$deflate[$option[provider]$toLowercase[$option[query]];hex];null]]
   $localFunction[loadinteraction;
   $if[$env[typela]==1;
-  $interactionReply[$addContainer[
-    $addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`Loading\`]
-    $addSeparator[Large;true]
-    ;$get[colors]]
-  ]
+  $defer
   ]
   $if[$env[typela]==2;
   $interactionReply[
@@ -92,15 +87,23 @@ module.exports = {
   $return
   ;typela]
   $onlyIf[$isValidLink[$option[query]]!=true;$callLocalFunction[loadinteraction;3]]
+  $let[fsearch;false]
   $if[$get[check]==null;
-  $callLocalFunction[loadinteraction;1]
+  $async[
   $let[a;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
-  $let[currentping;$round[$executionTime;0]]
   $jsonLoad[loadser;$get[a]]
-  $if[$env[loadser;0]==;
+  $if[$env[loadser;0]==;$let[fsearch;null];$let[fsearch;true]]
+  ]
+  $callLocalFunction[loadinteraction;1]
+  $loop[-1;
+  $if[$get[fsearch]!=false;$break]
+  $wait[4]
+  ]
+  $if[$get[fsearch]==null;
   $callLocalFunction[loadinteraction;3]
   $stop
   ]
+  $let[currentping;$round[$executionTime;0]]
   ;
   $jsonLoad[loadser;$inflate[$get[check];base64]]
   $let[currentping;$round[$executionTime;0]]
