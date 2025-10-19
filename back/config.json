@@ -8,7 +8,5 @@
     "debug_auth": false,
     "autodelete_nextmessage": false,
     "interval_message": true,
-    "fetchMusicTitle_autocomplete": true,
-
-    "disable_YT": false
+    "fetchMusicTitle_autocomplete": true
 }
