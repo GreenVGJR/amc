@@ -6,6 +6,9 @@ module.exports = {
   "description_localizations": {
     "id": "Lihat informasi bot"
   },
+  "integration_types": [
+    0
+  ],
   "contexts": [
     0
   ]

@@ -12,6 +12,9 @@ module.exports = {
       "required": true
     }
   ],
+  "integration_types": [
+    0
+  ],
   "contexts": [
     0
   ],

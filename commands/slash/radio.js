@@ -17,6 +17,9 @@ module.exports = {
       "autocomplete": true
     },
   ],
+  "integration_types": [
+    0
+  ],
   "contexts": [
     0
   ],

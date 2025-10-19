@@ -3,6 +3,9 @@ module.exports = {
   "type": 1,
   "name": "help",
   "description": "List all commands",
+  "integration_types": [
+    0
+  ],
   "contexts": [
     0
   ],

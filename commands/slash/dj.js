@@ -5,6 +5,9 @@ module.exports = {
     "integration_types": [
         0
     ],
+    "integration_types": [
+        0
+    ],
     "contexts": [
         0
     ],

@@ -2,6 +2,9 @@ module.exports = {
   data: {
   "name": "stop",
   "description": "Stop a track",
+  "integration_types": [
+    0
+  ],
   "contexts": [
     0
   ],
