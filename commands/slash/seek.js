@@ -13,6 +13,9 @@ module.exports = {
   "description_localizations": {
     "id": "Pindah durasi lagu ke bagian tertentu"
   },
+  "integration_types": [
+    0
+  ],
   "contexts": [
     0
   ]

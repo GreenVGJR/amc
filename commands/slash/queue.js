@@ -3,6 +3,9 @@ module.exports = {
   "type": 1,
   "name": "queue",
   "description": "Show all tracks info",
+  "integration_types": [
+    0
+  ],
   "contexts": [
     0
   ],

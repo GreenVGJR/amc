@@ -9,6 +9,9 @@ module.exports = {
       "description": "Destroy the music player?"
     }
   ],
+  "integration_types": [
+    0
+  ],
   "contexts": [
     0
   ],
