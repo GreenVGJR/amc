@@ -2,12 +2,12 @@
   "dependencies": {
     "@discordjs/opus": "^0.10.0",
     "@evan/opus": "^1.0.3",
-    "@tryforge/forge.db": "^2.1.1",
+    "@quoriel/db": "^1.7.1",
     "@tryforge/forge.music": "^1.0.0",
     "@tryforge/forgescript": "^2.5.0",
     "discord-player-youtubei": "^1.5.0",
     "dotenv": "^17.2.3",
     "entities": "^7.0.0",
-    "sqlite3": "^5.1.7"
+    "lmdb": "^3.4.3"
   }
 }

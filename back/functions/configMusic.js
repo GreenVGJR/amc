@@ -5,7 +5,7 @@ module.exports = {
         description: "Config name",
         required: true
     }],
-    code: `$jsonLoad[result;$readFile[./back/config.json]]
+    code: `$jsonLoad[result;$getCache[system_file-config]]
     $let[name;$env[name]]
     $let[res;$env[result;$get[name]]]
     $return[$get[res]]`

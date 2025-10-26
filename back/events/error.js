@@ -1,8 +1,8 @@
 module.exports = [{
     type: "error",
     code: `
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $try[
     $sendMessage[$channelID;
@@ -19,19 +19,19 @@ module.exports = [{
     $if[$voiceID[$guildID;$clientID]!=;$!leaveVoiceChannel]
     ]
     
-    $!deleteVar[musicplayer_message;$guildID_messageid]
-    $!deleteVar[musicplayer_message;$guildID_channelid]
-    $!deleteVar[musicplayer_message;$guildID_isshuffle]
-    $!deleteVar[musicplayer_message;$guildID_attemptseek]
-    $!deleteVar[radioplayer_data;$guildID_playerstatus]
-    $!deleteVar[radioplayer_data;$guildID_metadata]
+    $!deleteCache[musicplayer_message_$guildID_messageid]
+    $!deleteCache[musicplayer_message_$guildID_channelid]
+    $!deleteCache[musicplayer_message_$guildID_isshuffle]
+    $!deleteCache[musicplayer_message_$guildID_attemptseek]
+    $!deleteCache[radioplayer_data_$guildID_playerstatus]
+    $!deleteCache[radioplayer_data_$guildID_metadata]
     `
 },
 {
     type: "playerError",
     code: `
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $try[
     $sendMessage[$channelID;
@@ -47,11 +47,11 @@ module.exports = [{
     $if[$voiceID[$guildID;$clientID]!=;$!leaveVoiceChannel]
     ]
     
-    $!deleteVar[musicplayer_message;$guildID_messageid]
-    $!deleteVar[musicplayer_message;$guildID_channelid]
-    $!deleteVar[musicplayer_message;$guildID_isshuffle]
-    $!deleteVar[musicplayer_message;$guildID_attemptseek]
-    $!deleteVar[radioplayer_data;$guildID_playerstatus]
-    $!deleteVar[radioplayer_data;$guildID_metadata]
+    $!deleteCache[musicplayer_message_$guildID_messageid]
+    $!deleteCache[musicplayer_message_$guildID_channelid]
+    $!deleteCache[musicplayer_message_$guildID_isshuffle]
+    $!deleteCache[musicplayer_message_$guildID_attemptseek]
+    $!deleteCache[radioplayer_data_$guildID_playerstatus]
+    $!deleteCache[radioplayer_data_$guildID_metadata]
     `
 }]

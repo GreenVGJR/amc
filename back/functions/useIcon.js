@@ -5,7 +5,7 @@ module.exports = {
         description: "Icon's name",
         required: true
     }],
-    code: `$jsonLoad[result;$readFile[./back/iconsURL.json]]
+    code: `$jsonLoad[result;$getCache[system_file-useIcon]]
     $let[name;$env[nameicon]]
     $let[res;$env[result;$get[name]]]
     $return[$get[res]]`

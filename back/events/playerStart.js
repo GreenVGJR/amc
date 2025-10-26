@@ -1,17 +1,17 @@
 module.exports = [{
     type: "playerTrigger",
     code: `
-    $if[$and[$getVar[radioplayer_data;$guildID_playerstatus;false]==false;$callFunction[configMusic;autodelete_nextmessage]];
+    $if[$and[$default[$getCache[radioplayer_data_$guildID_playerstatus];false]==false;$callFunction[configMusic;autodelete_nextmessage]];
     $if[$env[reason]!=filters;
     $wait[500]
     $onlyIf[$or[$hasMusicNode==false;$if[$hasMusicNode==true;$isPlaying;false]==false]!=true;]
-    $async[$!deleteMessage[$getVar[musicplayer_message;$guildID_channelid];$getVar[musicplayer_message;$guildID_messageid]]]
-    $setVar[musicplayer_message;$guildID_channelid;$channelID]
-    $setVar[musicplayer_message;$guildID_messageid;$sendMessage[$channelID;_ _;true]]
+    $async[$!deleteMessage[$getCache[musicplayer_message_$guildID_channelid];$getCache[musicplayer_message_$guildID_messageid]]]
+    $setCache[musicplayer_message_$guildID_channelid;$channelID]
+    $setCache[musicplayer_message_$guildID_messageid;$sendMessage[$channelID;_ _;true]]
     ]]
 
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $let[interval_time;1000]
     $let[nextmessage_time;16000]
@@ -25,8 +25,8 @@ module.exports = [{
 
     $if[$callFunction[configMusic;interval_message];
     $setInterval[
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $let[calculatetime;$sum[$callFunction[musicVirtualDuration;$guildID;$get[cid]];$get[interval_time]]]
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[calculatetime]];0]]
@@ -37,8 +37,8 @@ module.exports = [{
 { 
     type: "playerPause",
     code: `
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
     $try[$if[$callFunction[configMusic;interval_message];$!clearInterval[intervalmusicmessage_$guildID_$get[cid]]]]
     `
 },
@@ -48,11 +48,10 @@ module.exports = [{
     $onlyIf[$djsEval[(0, require("discord-player").useMainPlayer)().queues.get(ctx.client.guilds.cache.get("$guildID"))]!=null;]
 
     $if[$callFunction[configMusic;interval_message];
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
-    $arrayLoad[testmessage;]
-    $arrayPushJSON[testmessage;{
+    $let[testmessage;{
     "id": "$trackInfo[id]",
     "title": "$replace[$replace[$trackInfo[title];\\\\;];";\\\\"]",
     "author": "$trackInfo[author]",
@@ -60,7 +59,6 @@ module.exports = [{
     "thumbnail": "$trackInfo[thumbnail]",
     "duration": "$trackInfo[duration]",
     "durationMS": $trackInfo[durationMS],
-    "views": $trackInfo[views],
     "requestedBy": {"id":"$advancedTextSplit[$trackInfo[requestedBy];@;1;>;0]"},
     "playlist": null
     }]
@@ -69,20 +67,20 @@ module.exports = [{
     $let[nextmessage_time;16000]
 
     $setInterval[
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $let[calculatetime;$sum[$callFunction[musicVirtualDuration;$guildID;$get[cid]];$get[interval_time]]]
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[calculatetime]];0]]
-    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[testmessage;0];$checkCondition[$sum[$get[elapsedtime];$get[nextmessage_time]]>=$env[track;durationMS]];intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]];$get[interval_time];intervalmusicmessage_$guildID_$get[cid]]
+    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$get[testmessage];$checkCondition[$sum[$get[elapsedtime];$get[nextmessage_time]]>=$env[track;durationMS]];intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]];$get[interval_time];intervalmusicmessage_$guildID_$get[cid]]
     ]
     `
 },
 {
     type: "playerFinish",
     code: `
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
     $if[$callFunction[configMusic;interval_message];
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     ]

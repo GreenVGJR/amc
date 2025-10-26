@@ -35,10 +35,10 @@ module.exports = {
     ]
 
     $let[checkdurationms;$if[$hasMusicNode;$if[$isPlaying;$trackInfo[durationMS];0];0]]
-    $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
+    $onlyIf[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
     $onlyIf[$get[checkdurationms]!=0;$callFunction[useCustomMusicMessage;config_errorLiveBeforeSeek]]
     $onlyIf[$isPaused!=true;$callFunction[useCustomMusicMessage;config_errorPauseBeforeSeek]]
-    $onlyIf[$getVar[musicplayer_message;$guildID_attemptseek;false]==false;$callFunction[useCustomMusicMessage;config_errorProcessSeek]]
+    $onlyIf[$getCache[musicplayer_message_$guildID_attemptseek]!=true;$callFunction[useCustomMusicMessage;config_errorProcessSeek]]
 
     $if[$isNumber[$option[duration]];
     $let[pest;$multi[$if[$option[duration]<0;0;$option[duration]];1000]]
@@ -46,11 +46,11 @@ module.exports = {
     $let[pest;$if[$parseString[$replace[$option[duration]; ;]]<0;0;$parseString[$replace[$option[duration]; ;]]]]
     ]
 
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $setVar[musicplayer_message;$guildID_attemptseek;true]
+    $setCache[musicplayer_message_$guildID_attemptseek;true]
     $async[$!seekTrack[$get[pest]]]
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[pest]]]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalSeekTrack] \`$parseDigital[$get[pest]]\`]

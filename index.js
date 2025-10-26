@@ -1,7 +1,8 @@
 // Main
 const { ForgeMusic, DefaultExtractors, GuildQueueEvent } = require('@tryforge/forge.music');
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
-const { ForgeDB } = require("@tryforge/forge.db");
+const { QuorielDB } = require("@quoriel/db");
+// const { ForgeDB } = require("@tryforge/forge.db");
 
 // Extractor & Config
 const { YoutubeiExtractor } = require("discord-player-youtubei");
@@ -10,11 +11,12 @@ const toggles = require('./back/config.json');
 
 require('dotenv').config({ quiet: true }); // Load Environment
 
-const db = new ForgeDB({
+const quorielDb = new QuorielDB({
     events: [
-        "connect"
+        "dbConnect"
     ]
 });
+
 const music = new ForgeMusic({
     events: [
         GuildQueueEvent.ConnectionDestroyed,
@@ -29,8 +31,8 @@ const music = new ForgeMusic({
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
         disableResampler: true,
-        disableFallbackStream: true,
-        bufferingTimeout: 1000,
+        disableFallbackStream: toggles.disable_YT,
+        bufferingTimeout: 500,
         volume: 50,
         connectionTimeout: 10000,
         leaveOnEmpty: true,
@@ -59,15 +61,16 @@ const client = new ForgeClient({
         "?"
     ],
     extensions: [
+     // new ForgeDB(),
+        quorielDb,
         music,
-        db
     ]
 });
 
 client.login();
 
+quorielDb.commands.load("back/client/fdb");
 client.functions.load("back/functions");
-db.commands.load("back/client/fdb");
 client.applicationCommands.load("commands/slash");
 client.commands.load("back/interaction");
 client.commands.load("back/client/fs");

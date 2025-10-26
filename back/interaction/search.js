@@ -4,10 +4,10 @@ module.exports = {
     code: `
     $onlyIf[$advancedTextSplit[$customID;_;0]==refreshsearchnoca]
     $onlyIf[$advancedTextSplit[$customID;_;1]==$authorID]
-    $let[query;$getVar[storecachesearchusersfetch-q;$djsEval[ctx.interaction.message.interaction.id];null]]
-    $let[provider;$getVar[storecachesearchusersfetch-p;$djsEval[ctx.interaction.message.interaction.id];null]]
+    $let[query;$getCache[storecachesearchusersfetch-q_$djsEval[ctx.interaction.message.interaction.id]]]
+    $let[provider;$getCache[storecachesearchusersfetch-p_$djsEval[ctx.interaction.message.interaction.id]]]
 
-    $onlyIf[$or[$get[query]==null;$get[provider]==null]!=true;$!deferUpdate $!interactionDelete]
+    $onlyIf[$or[$get[query]==;$get[provider]==]!=true;$!deferUpdate $!interactionDelete]
     $let[fsearch;false]
     $async[
     $jsonLoad[loadser;$callFunction[searchSomeTrack;$get[query];$get[provider]]]
@@ -44,7 +44,7 @@ module.exports = {
     ]
     ;aa$randomBytes[2]]
     ]
-    $!deleteVar[storecachesearchusersfetch-q;$djsEval[ctx.interaction.message.interaction.id]]
-    $!deleteVar[storecachesearchusersfetch-p;$djsEval[ctx.interaction.message.interaction.id]]
+    $!deleteCache[storecachesearchusersfetch-q_$djsEval[ctx.interaction.message.interaction.id]]
+    $!deleteCache[storecachesearchusersfetch-p_$djsEval[ctx.interaction.message.interaction.id]]
     `
 }

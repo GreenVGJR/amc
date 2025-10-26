@@ -5,7 +5,7 @@ module.exports = {
         description: "To gets a ID and Type",
         required: true
     }],
-    code: `$let[list;$readFile[./back/listRegex.json]]
+    code: `$let[list;$getCache[system_file-filterMedia]]
     $jsonLoad[listregex;$get[list]]
     $let[url;$env[url]]
 

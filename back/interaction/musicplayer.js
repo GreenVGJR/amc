@@ -3,8 +3,8 @@ module.exports = {
     allowedInteractionTypes: ["button", "selectMenu"],
     code: `
     $onlyIf[$advancedTextSplit[$customID;_;0]==musicplayer;]
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
     $onlyIf[$get[mid]==$messageID;$async[$!deferUpdate]$!disableComponentsOf[$channelID;$messageID]]
     $onlyIf[$voiceID[$guildID;$clientID]!=;]
     $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
@@ -28,13 +28,13 @@ module.exports = {
     $if[$getLoopMode==TRACK;$setLoopMode[QUEUE];$setLoopMode[OFF]
     ]]]
     $if[$advancedTextSplit[$customID;_;1]==shuffle;
-    $let[statusshuffle;$getVar[musicplayer_message;$guildID_isshuffle;false]]
+    $let[statusshuffle;$getCache[musicplayer_message_$guildID_isshuffle]]
     $if[$get[statusshuffle];
     $!unShuffleQueue
-    $setVar[musicplayer_message;$guildID_isshuffle;false]
+    $setCache[musicplayer_message_$guildID_isshuffle;false]
     ;
     $!shuffleQueue
-    $setVar[musicplayer_message;$guildID_isshuffle;true]
+    $setCache[musicplayer_message_$guildID_isshuffle;true]
     ]]
     $if[$advancedTextSplit[$customID;_;1]==lyrics;
     $ephemeral
@@ -76,34 +76,34 @@ module.exports = {
     $if[$advancedTextSplit[$customID;_;1]==stopplayer;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $leaveVoiceChannel
-    $!deleteMemberVar[cachesearchistory_user_autocomplete;$authorID]
+    $!deleteCache[cachesearchistory_user_autocomplete_$authorID]
     $!deferUpdate
     ]
     $if[$advancedTextSplit[$customID;_;1]==actionplayer;
     $if[$isPaused;$!resumeTrack;$!pauseTrack]
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekdown;
-    $if[$getVar[musicplayer_message;$guildID_attemptseek;false]==true;$ephemeral $interactionReply[It's still processing.] $stop]
+    $if[$getCache[musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
     $ephemeral
     $defer
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $let[curduration;$if[$callFunction[configMusic;interval_message];$callFunction[musicVirtualDuration;$guildID;$get[cid]];$playerElapsedTime]]
     $let[seeks;10000]
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sub[$get[curduration];$get[seeks]]]]
-    $setVar[musicplayer_message;$guildID_attemptseek;true]
+    $setCache[musicplayer_message_$guildID_attemptseek;true]
     $let[resseek;$if[$sub[$get[curduration];$get[seeks]]<0;0;$sub[$get[curduration];$get[seeks]]]]
     $async[$!seekTrack[$get[resseek]]]
     $!interactionDelete
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekup;
-    $if[$getVar[musicplayer_message;$guildID_attemptseek;false]==true;$ephemeral $interactionReply[It's still processing.] $stop]
+    $if[$getCache[musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
     $ephemeral
     $defer
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $let[curduration;$if[$callFunction[configMusic;interval_message];$callFunction[musicVirtualDuration;$guildID;$get[cid]];$playerElapsedTime]]
     $let[seeks;10000]
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sum[$get[curduration];$get[seeks]]]]
-    $setVar[musicplayer_message;$guildID_attemptseek;true]
+    $setCache[musicplayer_message_$guildID_attemptseek;true]
     $let[resseek;$if[$sum[$get[curduration];$get[seeks]]<0;0;$sum[$get[curduration];$get[seeks]]]]
     $async[$!seekTrack[$get[resseek]]]
     $!interactionDelete

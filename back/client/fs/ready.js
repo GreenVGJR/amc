@@ -2,7 +2,7 @@ module.exports = {
     type: "clientReady",
     code: `
     $logger[Info;Ready on client $username[$clientID]]
-    $async[$!setGlobalVar[listcommands-help;$applicationCommands]]
+    $async[$setCache[listcommands-help;$applicationCommands]]
     $if[$callFunction[configMusic;cacheAllContextNeed];
     $logger[Info;Caching Discord Context]
     $callFunction[fetchDiscordContext]

@@ -42,7 +42,7 @@ module.exports = {
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
-    $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getGlobalVar[authmusic_soundcloud]&limit=1;GET;res]]
+    $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[authmusic_soundcloud]&limit=1;GET;res]]
     $onlyIf[$get[http]!=401;
     $callFunction[generateAuthKeys;soundcloud;;false]
     $callLocalFunction[refreshing;true]]
@@ -53,7 +53,7 @@ module.exports = {
     $if[$env[provider]==spotify;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_spotify]]
+    $httpAddHeader[Authorization;Bearer $getCache[authmusic_spotify]]
     $httpAddHeader[Accept-Encoding;gzip]
     $httpAddHeader[App-platform;WebPlayer]
     $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1;GET;jsonres]]

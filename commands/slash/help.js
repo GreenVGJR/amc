@@ -17,12 +17,12 @@ module.exports = {
   code: `
   $onlyIf[$guildID!=;]
   
-  $let[a;$getGlobalVar[listcommands-help]]
+  $let[a;$getCache[listcommands-help]]
   $ephemeral
   $if[$get[a]==;
   $defer
   $updateApplicationCommands
-  $!setGlobalVar[listcommands-help;$applicationCommands]
+  $setCache[listcommands-help;$applicationCommands]
   ]
   
   $jsonLoad[test;$get[a]]

@@ -37,7 +37,7 @@ module.exports = {
   $addField[Uptime;<t:$sub[$cropText[$getTimestamp;0;10];$round[$divide[$uptime;1000]]]:F>\n-# $parseMS[$uptime];false;1]
   $addField[OS Uptime ($os);<t:$sub[$cropText[$getTimestamp;0;10];$round[$osUptime]]:F>\n-# $parseMS[$multi[$osUptime;1000]];false;1]
   $addField[Ping;\`$pingms / $round[$get[currentping]]ms\`;true;1]
-  $addField[DB Ping;\`$round[$dbPing]ms\`;true;1]
+  $addField[DB Ping;\`$round[$pingDB[global]]ms\`;true;1]
   $addField[Player Ping;\`$round[$try[$djsEval[(0, require("discord-player").useQueue)(ctx.interaction.guild).ping];0]]ms\`;true;1]
   $addField[Total Connections;\`$if[$env[connections]==;Loading;$env[connections] / $guildCount]\`;true;1]
   $addField[Player Type;\`Local\`;true;1]

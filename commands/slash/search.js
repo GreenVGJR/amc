@@ -56,14 +56,14 @@ module.exports = {
   $onlyIf[$guildID!=;]
   $if[$or[$option[ephemeral]==;$option[ephemeral]==true];$ephemeral]
   $let[colors;aa$randomBytes[2]]
-  $let[check;$getVar[cachesearch_global-query;$deflate[$option[provider]$toLowercase[$option[query]];hex];null]]
+  $let[check;$getRecord[global;cachesearch_global-query_$deflate[$option[provider]$toLowercase[$option[query]];hex]]]
   $localFunction[loadinteraction;
   $if[$env[typela]==1;
   $defer
   ]
   $if[$env[typela]==2;
   $interactionReply[
-  $addContainer[$addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms$if[$get[check]!=null; - Cached]\`]
+  $addContainer[$addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms$if[$get[check]!={}; - Cached]\`]
   $addSeparator[Large;true]
   $arrayForEach[loadser;result;
   $addSection[
@@ -75,7 +75,7 @@ module.exports = {
   $addThumbnail[$if[$or[$env[result;thumbnail]==null;$env[result;thumbnail]==];$userDefaultAvatar[$authorID];$env[result;thumbnail]]]
   ]
   ]
-  $if[$get[check]!=null;
+  $if[$get[check]!={};
   $addSeparator[Large;true]
   $addActionRow
   $addButton[refreshsearchnoca_$authorID;Force Refresh;Secondary;🔄]
@@ -88,7 +88,7 @@ module.exports = {
   ;typela]
   $onlyIf[$isValidLink[$option[query]]!=true;$callLocalFunction[loadinteraction;3]]
   $let[fsearch;false]
-  $if[$get[check]==null;
+  $if[$get[check]=={};
   $async[
   $let[a;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
   $jsonLoad[loadser;$get[a]]
@@ -105,15 +105,16 @@ module.exports = {
   ]
   $let[currentping;$round[$executionTime;0]]
   ;
-  $jsonLoad[loadser;$inflate[$get[check];base64]]
+  $jsonLoad[loadser;$get[check]]
+  $jsonLoad[loadser;$env[loadser;playlist]]
   $let[currentping;$round[$executionTime;0]]
   ]
   $arraySlice[loadser;loadser;0;10]
   $arrayReverse[loadser;loadser]
   $callLocalFunction[loadinteraction;2]
-  $if[$get[check]!=null;
-  $setVar[storecachesearchusersfetch-q;$djsEval[ctx.interaction.id];$option[query]]
-  $setVar[storecachesearchusersfetch-p;$djsEval[ctx.interaction.id];$option[provider]]
+  $if[$get[check]!={};
+  $setCache[storecachesearchusersfetch-q_$djsEval[ctx.interaction.id];$option[query]]
+  $setCache[storecachesearchusersfetch-p_$djsEval[ctx.interaction.id];$option[provider]]
   ]
   `
 }

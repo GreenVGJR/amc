@@ -19,9 +19,10 @@ params: [{
 }],
 code: `
 $if[$env[useToggle]==true;
-$let[0;$getUserVar[configplaylistuser_vgjra9f_title;$authorID;false]]
-$let[1;$getUserVar[configplaylistuser_vgjra9f_slice;$authorID;false]]
-$let[2;$getUserVar[configplaylistuser_vgjra9f_confirm;$authorID;true]]
+$jsonLoad[confplaylistdb;$getRecord[user;configplaylistuser_vgjra9f_$authorID]]
+$let[0;$default[$env[confplaylistdb;title];false]]
+$let[1;$default[$env[confplaylistdb;slice];false]]
+$let[2;$default[$env[confplaylistdb;confirm];true]]
 $author[Config Playlist;$userAvatar[$authorID;1024]]
 $addField[\`$if[$get[0];✅;❌]\` | Fetch Music;-# Retrieve title or url music;true]
 $addField[\`$if[$get[1];✅;❌]\` | Slice Playlist;-# **(Youtube only)**\n-# Fetch playlist and put one by one;true]
@@ -34,8 +35,8 @@ $addButton[toggleplaylistuser_fp;Slice Playlist;$if[$get[1];Success;Secondary]]
 $addButton[toggleplaylistuser_sc;Show Confirm;$if[$get[2];Success;Secondary]]
 $return
 ]
-$jsonLoad[a;$searchDB[;$authorID;user]]
-$arrayMap[a;ah;$if[$and[$env[ah;id]==$authorID;$startsWith[$env[ah;name];storeplaylist_user-]];$return[$env[ah]]];a]
+$jsonLoad[a;$searchDB[user]]
+$arrayMap[a;ah;$if[$and[$endsWith[$env[ah;key];$authorID];$startsWith[$env[ah;key];storeplaylist_user-]];$return[$env[ah]]];a]
 $arrayMap[a;b;$if[$isJSON[$env[b;value]];$return[$env[b;value]]];b]
 $let[lastvar;$arrayLength[b]]
 $let[curpage;$advancedTextSplit[$divide[$arrayLength[b];25];.;0]]
@@ -60,7 +61,7 @@ $addOption[null;;null]
 ;
 $let[counter;$sum[1;$multi[25;$env[page]]]]
 $arrayForEach[b;l;
-$addOption[$get[counter]. $cropText[$env[l;title];0;80;...];$cropText[$env[l;description];0;80;...];$advancedTextSplit[$env[a;$sub[$get[counter];1];name];storeplaylist_user-;1]]
+$addOption[$get[counter]. $cropText[$env[l;title];0;80;...];$cropText[$env[l;description];0;80;...];$advancedTextSplit[$env[a;$sub[$get[counter];1];key];storeplaylist_user-;1;_;0]]
 $letSum[counter;1]
 ]
 ]

@@ -54,16 +54,16 @@ module.exports = {
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$env[guildId];$env[channelId]];0]]
     $let[changeevery_time;5000]
 
-    $if[$or[$getVar[musicplayer_message;$env[guildId]_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[elapsedtime];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$return]
-    $async[$if[$getVar[musicplayer_message;$env[guildId]_attemptseek]!=;$!deleteVar[musicplayer_message;$env[guildId]_attemptseek]]]
-    $async[$if[$getVar[radioplayer_data;$env[guildId]_checkplayer]!=;$!deleteVar[radioplayer_data;$env[guildId]_checkplayer]]]
+    $if[$or[$getCache[musicplayer_message_$env[guildId]_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[elapsedtime];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$return]
+    $async[$if[$getCache[musicplayer_message_$env[guildId]_attemptseek]!=;$!deleteCache[musicplayer_message_$env[guildId]_attemptseek]]]
+    $async[$if[$getCache[radioplayer_data_$env[guildId]_checkplayer]!=;$!deleteCache[radioplayer_data_$env[guildId]_checkplayer]]]
     $if[$try[$messageExists[$env[channelId];$env[messageId]];false]==false;
     $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
-    $setVar[musicplayer_message;$env[guildId]_channelid;$env[channelId]]
-    $setVar[musicplayer_message;$env[guildId]_messageid;$get[secmid]]
+    $setCache[musicplayer_message_$env[guildId]_channelid;$env[channelId]]
+    $setCache[musicplayer_message_$env[guildId]_messageid;$get[secmid]]
     ]
 
-    $if[$getVar[radioplayer_data;$env[guildId]_playerstatus;false]==false;
+    $if[$getCache[radioplayer_data_$env[guildId]_playerstatus]!=true;
 
     $jsonLoad[jsonmusicdata;$env[musicInfo]]
     $jsonLoad[jsonmedia;$callFunction[filterMediaID;$env[jsonmusicdata;url]]]
@@ -72,7 +72,7 @@ module.exports = {
 ;$queue[;23;{track.title};
 ]]
 
-    $let[statusshuffle;$getVar[musicplayer_message;$env[guildId]_isshuffle;false]]
+    $let[statusshuffle;$default[$getCache[musicplayer_message_$env[guildId]_isshuffle];false]]
 
     $let[delayping;$checkCondition[$round[$executionTime;0]>=250]]
     $let[checkdurationms;$if[$hasMusicNode;$if[$isPlaying;$trackInfo[durationMS];0];0]]
@@ -138,7 +138,7 @@ module.exports = {
     ]
     ]
     ;
-    $jsonLoad[aradio;$getVar[radioplayer_data;$guildID_metadata;{}]]
+    $jsonLoad[aradio;$default[$getCache[radioplayer_data_$guildID_metadata];{}]]
     
     $try[
     $!#editMessage[$env[channelId];$env[messageId];

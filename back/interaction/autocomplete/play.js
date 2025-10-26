@@ -5,14 +5,14 @@ module.exports = {
     $onlyIf[$and[$applicationCommandName==play;$focusedOptionName==query]]
     $onlyIf[$guildID!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearch];__null__]]
     $onlyIf[$voiceID[$guildID;$authorID]!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchJoinVC];__null1__]]
-    $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];__null2__]]
-    $onlyIf[$or[$focusedOptionValue!=;$getMemberVar[cachesearchistory_user_autocomplete;$authorID]!=];$addChoice[$callFunction[useCustomMusicMessage;config_infoSearchFirst];__infointer-$authorID__]]
+    $onlyIf[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];__null2__]]
+    $onlyIf[$or[$focusedOptionValue!=;$getCache[cachesearchistory_user_autocomplete_$authorID]!=];$addChoice[$callFunction[useCustomMusicMessage;config_infoSearchFirst];__infointer-$authorID__]]
     $autocomplete
     $if[$isValidLink[$focusedOptionValue]==false;
-    $jsonLoad[testing;$callFunction[fastSearchTrack;$if[$focusedOptionValue!=;$focusedOptionValue;$getMemberVar[cachesearchistory_user_autocomplete;$authorID]]]]
-    $async[$if[$focusedOptionValue!=;$#setMemberVar[cachesearchistory_user_autocomplete;$focusedOptionValue;$authorID]]]
+    $jsonLoad[testing;$callFunction[fastSearchTrack;$if[$focusedOptionValue!=;$focusedOptionValue;$getCache[cachesearchistory_user_autocomplete_$authorID]]]]
+    $async[$if[$focusedOptionValue!=;$setCache[cachesearchistory_user_autocomplete_$authorID;$focusedOptionValue]]]
     $if[$env[testing;results;0]==;
-    $addChoice[$if[$focusedOptionValue==;$getMemberVar[cachesearchistory_user_autocomplete;$authorID];$focusedOptionValue];$if[$focusedOptionValue==;$getMemberVar[cachesearchistory_user_autocomplete;$authorID];$focusedOptionValue]]
+    $addChoice[$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue]]
     ;
     $if[$env[testing;results;0]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;0];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;0];";\\\\"]")]]]
     $if[$env[testing;results;1]!=;$addChoice[$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;1];";\\\\"]")];$djsEval[require("entities").decodeHTML("$replace[$env[testing;results;1];";\\\\"]")]]]

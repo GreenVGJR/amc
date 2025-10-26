@@ -8,7 +8,7 @@ module.exports = {
     $!editMessage[$channelID;$get[mid];$nomention Updating Slash.]
     $setTimeout[
     $updateApplicationCommands
-    $!setGlobalVar[listcommands-help;$applicationCommands]
+    $setCache[listcommands-help;$applicationCommands]
     ;0]
     $!editMessage[$channelID;$get[mid];$nomention OK]
     `
