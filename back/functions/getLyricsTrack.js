@@ -21,7 +21,7 @@ module.exports = {
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
     $let[time;$getTimestamp]
     $if[$env[isExclude]!=true;
     $jsonLoad[pulltrack;$callFunction[filterMediaID;$trackInfo[url]]]
@@ -33,7 +33,7 @@ module.exports = {
     ]
     $if[$and[$env[pulltrack;type]==youtube;$get[ytmusic]!=];
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[pullyt;ping]","results":{"provider":"youtube","thumbnail":"https://i.ytimg.com/vi/$advancedTextSplit[$if[$env[isExclude]!=true;$trackInfo[url];$env[pullyt;results;0;url]];?v=;1;&;0]/frame0.jpg","query":"$encodeURI[$env[query]]","url":"$if[$env[isExclude]!=true;$trackInfo[url];$env[pullyt;results;0;url]]","autocomplete":"$encodeURI[$if[$env[isExclude]!=true;$env[query];$env[pullyt;results;0;title]]]","lyric":"$deflate[$get[ytmusic];hex]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[pullyt;ping]","results":{"provider":"youtube","thumbnail":"https://i.ytimg.com/vi/$advancedTextSplit[$if[$env[isExclude]!=true;$trackInfo[url];$env[pullyt;results;0;url]];?v=;1;&;0]/hq720.jpg","query":"$encodeURI[$env[query]]","url":"$if[$env[isExclude]!=true;$trackInfo[url];$env[pullyt;results;0;url]]","autocomplete":"$encodeURI[$if[$env[isExclude]!=true;$env[query];$env[pullyt;results;0;title]]]","lyric":"$deflate[$get[ytmusic];hex]"}}]]
     ;
     $jsonLoad[drtcp;$callFunction[fastMetadataTrack;$env[query];deezer]]
     $if[$env[drtcp;id]!=;

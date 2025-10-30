@@ -52,7 +52,7 @@ module.exports = {
 
     $loop[-1;
     $if[$get[fsearch]!=false;$break]
-    $wait[4]
+    $wait[5]
     ]
 
     $onlyIf[$get[fsearch]!=null;$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]]]

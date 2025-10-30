@@ -18,7 +18,7 @@ module.exports = {
     code: `
     $let[url;$env[url]]
     $let[spliturl;$advancedTextSplit[$get[url];://;1]]
-    $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
     $jsonLoad[filterid;$callFunction[filterMediaID;https://$get[spliturl]]]
     $onlyIf[$or[$env[filterid;id]==null;$env[filterid;type]==null]!=true;$return]
     $arrayLoad[results]
@@ -31,7 +31,7 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpSetBody[{"videoId":"$env[filterid;id]","context":{"client":{"clientName":"TVHTML5_SIMPLY_EMBEDDED_PLAYER","clientVersion":"2.0"}}}]
+    $httpSetBody[{"videoId":"$env[filterid;id]","context":{"client":{"clientName":"WEB","clientVersion":"2.20261231"}}}]
     $httpAddHeader[Accept-Encoding;gzip]
     $let[http;$httpRequest[https://youtubei.googleapis.com/youtubei/v1/player?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=videoDetails(videoId,title,lengthSeconds,channelId,isCrawlable,viewCount,author,isPrivate,isLiveContent);POST;reshttp]]
     $onlyIf[$env[reshttp;videoDetails]!=;$callLocalFunction[refreshyt;true]]

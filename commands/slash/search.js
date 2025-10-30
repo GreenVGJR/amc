@@ -97,7 +97,7 @@ module.exports = {
   $callLocalFunction[loadinteraction;1]
   $loop[-1;
   $if[$get[fsearch]!=false;$break]
-  $wait[4]
+  $wait[5]
   ]
   $if[$get[fsearch]==null;
   $callLocalFunction[loadinteraction;3]

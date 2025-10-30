@@ -1,6 +1,8 @@
+require('dotenv').config(); // Load Environment
+
 // Main
-const { ForgeMusic, DefaultExtractors, GuildQueueEvent } = require('@tryforge/forge.music');
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
+const { ForgeMusic, DefaultExtractors, GuildQueueEvent } = require('@tryforge/forge.music');
 const { QuorielDB } = require("@quoriel/db");
 // const { ForgeDB } = require("@tryforge/forge.db");
 
@@ -9,7 +11,6 @@ const { YoutubeiExtractor } = require("discord-player-youtubei");
 const youtube = require('./back/client/youtubeConfig');
 const toggles = require('./back/config.json');
 
-require('dotenv').config({ quiet: true }); // Load Environment
 
 const quorielDb = new QuorielDB({
     events: [
@@ -67,8 +68,6 @@ const client = new ForgeClient({
     ]
 });
 
-client.login();
-
 quorielDb.commands.load("back/client/fdb");
 client.functions.load("back/functions");
 client.applicationCommands.load("commands/slash");
@@ -79,3 +78,4 @@ music.player.extractors.register(YoutubeiExtractor, youtube);
 music.commands.load("back/events");
 
 console.clear();
+client.login();

@@ -18,7 +18,7 @@ module.exports = {
     code: `
     $arrayLoad[results]
     $try[
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
     $if[$env[provider]==youtube;
     $jsonLoad[loadser;$try[$getYoutubeVideo[$env[query]];{}]]
     $jsonLoad[loadser2;$env[loadser;results]]
