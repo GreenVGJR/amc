@@ -71,13 +71,7 @@ module.exports = {
     $callLocalFunction[refreshspotify;false]
     ]]
     $if[$env[filterid;type]==tiktokmob;
-    $httpAddHeader[Accept-Encoding;gzip]
-    $httpAddHeader[Accept-Language;en-US]
-    $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
-    $httpSetContentType[Text]
-    $!httpRequest[$replace[$get[url];vm.tiktok.com;vt.tiktok.com];GET]
-    $jsonLoad[filterid;$callFunction[filterMediaID;$replace[$advancedTextSplit[$httpResult;"seo.abtest":{"canonical":";1;";0];\\\\\\u002F;/]]]
+    $jsonLoad[filterid;$callFunction[filterMediaID;$djsEval[require("undici").request("$replace[$get[url];vm.tiktok.com;vt.tiktok.com]", { method: 'HEAD' }).then(a => a.headers.location)]]]
     ]
     $if[$env[filterid;type]==tiktok;
     $httpAddHeader[Accept-Encoding;gzip]

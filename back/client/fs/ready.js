@@ -8,8 +8,14 @@ module.exports = {
     $callFunction[fetchDiscordContext]
     ]
     $logger[Info;Attempting to Generate]
-    $async[$callFunction[generateAuthKeys;tiktok;;true]]
+    $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
+    $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
+    $callFunction[generateAuthKeys;youtube;;true]
+    $setInterval[$callFunction[generateAuthKeys;youtube;;false];9m]
+    ;
     $async[$callFunction[generateAuthKeys;youtube;;true]]
+    ]
+    $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]
     $async[$callFunction[generateAuthKeys;spotify;;true]]
     $async[$callFunction[generateAuthKeys;spotify_token;;true]]

@@ -36,8 +36,8 @@ module.exports = {
     ]
     $if[$env[filtype;type]==tiktok;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $let[author;$env[a;results;author;uniqueId]]
-    $let[title;$env[a;results;desc]]
+    $let[author;$default[$env[a;results;author;uniqueId];$env[a;results;author]]]
+    $let[title;$default[$env[a;results;desc];$env[a;results;title]]]
     ]
     $if[$env[filtype;type]==tiktokmusic;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]

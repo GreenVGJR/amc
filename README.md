@@ -51,6 +51,27 @@ ___
 
 <summary>
 
+## Find Youtube Cookies
+
+</summary>
+
+1. Open a new private browsing/incognito window and login your youtube account
+2. If that done, navigate to `https://www.youtube.com/robots.txt` then open developers tools (`Ctrl + Shift + I`)
+3. Go to "Network" tab and find `robots.txt` request
+4. Copy the `Cookie` from Request Headers
+> Doesn't show? do `Ctrl + F5`
+5. Put inside `.env` at `YOUTUBE_COOKIES=put_cookies_here`
+
+</details>
+
+> [!WARNING]
+> By doing this you're risking your account getting temporary / permanent banned if you use for massive requests / users.<br>
+> Consider to use throwaway account. Only use this for certain cases.
+
+<details close>
+
+<summary>
+
 ## Features
 
 </summary>
