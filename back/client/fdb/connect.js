@@ -1,12 +1,16 @@
 module.exports = {
-    type: "connect",
+    type: "dbConnect",
     code: `
     $logger[Info;Waiting to online]
     $logger[Debug;Refreshing cache data]
-    $try[$deleteRecords[storecachesearchusersfetch-q]]
-    $try[$deleteRecords[storecachesearchusersfetch-p]]
-    $try[$deleteRecords[cachesearchistory_user_autocomplete]]
-    $try[$deleteRecords[musicplayer_message]]
-    $try[$deleteRecords[radioplayer_data]]
+    $!openDB[user;guild;global]
+    $!prefetchDB[user;]
+    $!prefetchDB[guild;]
+    $!prefetchDB[global;]
+    $setCache[system_file-config;$readFile[./back/config.json]]
+    $setCache[system_file-filterMedia;$readFile[./back/listRegex.json]]
+    $setCache[system_file-useCustom;$readFile[./back/messageConfig.json]]
+    $setCache[system_file-useIcon;$readFile[./back/iconsURL.json]]
+    $setCache[system_file-listRadio;$readFile[./back/listRadioCountry.json]]
     `
 }

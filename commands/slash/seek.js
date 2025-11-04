@@ -34,7 +34,7 @@ module.exports = {
     $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
     ]
 
-    $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
+    $onlyIf[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
     $jsonLoad[curtrack;$try[$playerCurrentTrack[$guildID];{}]]
     $let[checkdurationms;$env[curtrack;isStream]]
     $onlyIf[$get[checkdurationms]!=true;$callFunction[useCustomMusicMessage;config_errorLiveBeforeSeek]]
@@ -46,8 +46,8 @@ module.exports = {
     $let[pest;$if[$parseString[$replace[$option[duration]; ;]]<0;0;$parseString[$replace[$option[duration]; ;]]]]
     ]
 
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $async[
     $!playerSeek[$guildID;$get[pest]]

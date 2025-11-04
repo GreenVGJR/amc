@@ -1,13 +1,14 @@
 module.exports = [{
     type: "error",
     code: `
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $try[
     $sendMessage[$channelID;
     $if[$messageExists[$channelID;$get[mid]];$reply[$get[cid];$get[mid];true]]
-    $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]]
+    
+    $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]$codeBlock[$env[error]]]
     $color[$callFunction[useIcon;error_color_embed]]
     $footer[event]
     $timestamp
@@ -15,25 +16,26 @@ module.exports = [{
     ]
     
     $try[
-    $if[$voiceID[$guildID;$clientID]!=;$try[$!playerDestroy[$guildID]]]
+    $if[$voiceID[$guildID;$clientID]!=;$!leaveVoiceChannel]
     ]
     
-    $!deleteVar[musicplayer_message;$guildID_messageid]
-    $!deleteVar[musicplayer_message;$guildID_channelid]
-    $!deleteVar[radioplayer_data;$guildID_playerstatus]
-    $!deleteVar[radioplayer_data;$guildID_metadata]
+    $!deleteCache[musicplayer_message_$guildID_messageid]
+    $!deleteCache[musicplayer_message_$guildID_channelid]
+    $!deleteCache[musicplayer_message_$guildID_attemptseek]
+    $!deleteCache[radioplayer_data_$guildID_playerstatus]
+    $!deleteCache[radioplayer_data_$guildID_metadata]
     `
 },
 {
     type: "linkedTrackError",
     code: `
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $try[
     $sendMessage[$channelID;
     $if[$messageExists[$channelID;$get[mid]];$reply[$get[cid];$get[mid];true]]
-    $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]]
+    $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]$codeBlock[$env[error]]]
     $color[$callFunction[useIcon;error_color_embed]]
     $footer[event]
     $timestamp
@@ -41,12 +43,13 @@ module.exports = [{
     ]
     
     $try[
-    $if[$voiceID[$guildID;$clientID]!=;$try[$!playerDestroy[$guildID]]]
+    $if[$voiceID[$guildID;$clientID]!=;$!leaveVoiceChannel]
     ]
     
-    $!deleteVar[musicplayer_message;$guildID_messageid]
-    $!deleteVar[musicplayer_message;$guildID_channelid]
-    $!deleteVar[radioplayer_data;$guildID_playerstatus]
-    $!deleteVar[radioplayer_data;$guildID_metadata]
+    $!deleteCache[musicplayer_message_$guildID_messageid]
+    $!deleteCache[musicplayer_message_$guildID_channelid]
+    $!deleteCache[musicplayer_message_$guildID_attemptseek]
+    $!deleteCache[radioplayer_data_$guildID_playerstatus]
+    $!deleteCache[radioplayer_data_$guildID_metadata]
     `
 }]

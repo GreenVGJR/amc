@@ -17,7 +17,7 @@ module.exports = {
   code: `
   $onlyIf[$guildID!=;]
 
-  $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
+  $onlyIf[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
 
   $let[nodes;$try[$checkCondition[$playerQueueLength[$guildID]>=0];false]]
   $ephemeral

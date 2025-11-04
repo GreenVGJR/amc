@@ -16,7 +16,7 @@ module.exports = {
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
     $let[tryattempt;0]
     $localFunction[refreshing;
     $if[$env[refresh]==true;
@@ -42,18 +42,18 @@ module.exports = {
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
-    $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getGlobalVar[authmusic_soundcloud]&limit=1;GET;res]]
+    $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[authmusic_soundcloud]&limit=1;GET;res]]
     $onlyIf[$get[http]!=401;
     $callFunction[generateAuthKeys;soundcloud;;false]
     $callLocalFunction[refreshing;true]]
     $onlyIf[$get[http]!=429;$return]
     ]
-    $let[rest2;{"id":"$advancedTextSplit[$env[res;collection;0;permalink_url];soundcloud.com/;1]","dynamic_thumbnail":"","thumbnail":"$env[res;collection;0;artwork_url]","duration":$round[$divide[$env[res;collection;0;full_duration];1000];0],"title":"$deflate[$env[res;collection;0;title];base64]"}]
+    $let[rest2;{"id":"$advancedTextSplit[$env[res;collection;0;permalink_url];soundcloud.com/;1]","dynamic_thumbnail":"","thumbnail":"$env[res;collection;0;artwork_url]","duration":$round[$divide[$env[res;collection;0;duration];1000];0],"title":"$deflate[$env[res;collection;0;title];base64]"}]
     ]
     $if[$env[provider]==spotify;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_spotify]]
+    $httpAddHeader[Authorization;Bearer $getCache[authmusic_spotify]]
     $httpAddHeader[Accept-Encoding;gzip]
     $httpAddHeader[App-platform;WebPlayer]
     $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1;GET;jsonres]]

@@ -6,12 +6,17 @@ module.exports = {
     $onlyIf[$or[$customID==botinfoclearcache;$customID==botinfoclearcacheradio]]
     $ephemeral
     $defer
+    $jsonLoad[idkth;$keysDB[global]]
     $if[$customID==botinfoclearcache;
-    $try[$deleteRecords[cachesearch_global-query]]
-    ]
+    $arrayForEach[idkth;th;
+    $if[$startsWith[$env[th];cachesearch_global-query];
+    $try[$!removeRecord[global;$env[th]]]
+    ]]]
     $if[$customID==botinfoclearcacheradio;
-    $try[$deleteRecords[cachesearch_global-radio]]
-    ]
+    $arrayForEach[idkth;th;
+    $if[$startsWith[$env[th];cachesearch_global-radio];
+    $try[$!removeRecord[global;$env[th]]]
+    ]]]
     $interactionReply[OK]
     `
 }

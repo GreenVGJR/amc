@@ -156,7 +156,7 @@ module.exports = [{
     $let[crdjcr_0f;$advancedTextSplit[$get[crdjcs_0f];|;1]]
     $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
     ]
-    $onlyIf[$or[$channelUserLimit[$voiceID[$guildID;$authorID]]==0;$sum[$channelVoiceMemberCount[$voiceID[$guildID;$authorID]];$if[$voiceID[$guildID;$clientID]==;1;0]]<=$channelUserLimit[$voiceID[$guildID;$authorID]]];$ephemeral $callFunction[useCustomMusicMessage;config_errorIsLimitVC]]
+    $onlyIf[$or[$channelUserLimit[$voiceID]==0;$sum[$channelVoiceMemberCount[$voiceID];$if[$voiceID[$guildID;$clientID]==;1;0]]<=$channelUserLimit[$voiceID]];$ephemeral $callFunction[useCustomMusicMessage;config_errorIsLimitVC]]
     
     $localFunction[loadinteraction;
     $if[$env[typela]==1;
@@ -203,19 +203,19 @@ module.exports = [{
     $!playerCreate[$guildID;$voiceID;$channelID;100;true]
     $disableConsoleErrors
     $if[$get[iscreatedfirst];
-    $setVar[musicplayer_message;$guildID_channelid;$channelID]
-    $setVar[musicplayer_message;$guildID_messageid;$messageID]
-    $setVar[radioplayer_data;$guildID_checkplayer;true]
-    $setVar[radioplayer_data;$guildID_playerstatus;true]
+    $setCache[musicplayer_message_$guildID_channelid;$channelID]
+    $setCache[musicplayer_message_$guildID_messageid;$messageID]
+    $setCache[radioplayer_data_$guildID_checkplayer;true]
+    $setCache[radioplayer_data_$guildID_playerstatus;true]
     $!playerAddTrack[$guildID;$trimLines[$get[stream]]]
-    $setVar[radioplayer_data;$guildID_metadata;$get[testmessage]]
+    $setCache[radioplayer_data_$guildID_metadata;$get[testmessage]]
     ;
     $callLocalFunction[loadinteraction;2]
     $!playerAddTrack[$guildID;$trimLines[$get[stream]]]
     $if[$playerLoopStatus[$guildID]!=off;$!playerToggleLoop[$guildID;OFF] $wait[1s]]
-    $setVar[radioplayer_data;$guildID_metadata;$get[testmessage]]
+    $setCache[radioplayer_data_$guildID_metadata;$get[testmessage]]
     $!playerSkip[$guildID;$playerQueueLength[$guildID]]
-    $setVar[radioplayer_data;$guildID_checkplayer;true]
+    $setCache[radioplayer_data_$guildID_checkplayer;true]
     $!interactionDelete
     ]
     $enableConsoleErrors

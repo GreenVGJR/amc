@@ -54,14 +54,15 @@ module.exports = {
     $let[changeevery_time;10]
 
     $if[$or[$get[elapsedtime]>$get[changeevery_time];$env[bypassRestrict]==true]==false;$return]
-    $async[$if[$getVar[radioplayer_data;$env[guildId]_checkplayer]!=;$!deleteVar[radioplayer_data;$env[guildId]_checkplayer]]]
+    $async[$if[$getCache[musicplayer_message_$env[guildId]_attemptseek]!=;$!deleteCache[musicplayer_message_$env[guildId]_attemptseek]]]
+    $async[$if[$getCache[radioplayer_data_$env[guildId]_checkplayer]!=;$!deleteCache[radioplayer_data_$env[guildId]_checkplayer]]]
     $if[$try[$messageExists[$env[channelId];$env[messageId]];false]==false;
     $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
-    $setVar[musicplayer_message;$env[guildId]_channelid;$env[channelId]]
-    $setVar[musicplayer_message;$env[guildId]_messageid;$get[secmid]]
+    $setCache[musicplayer_message_$env[guildId]_channelid;$env[channelId]]
+    $setCache[musicplayer_message_$env[guildId]_messageid;$get[secmid]]
     ]
 
-    $if[$getVar[radioplayer_data;$env[guildId]_playerstatus;false]==false;
+    $if[$getCache[radioplayer_data_$env[guildId]_playerstatus]!=true;
 
     $jsonLoad[jsonmusicdata;$env[musicInfo]]
     $jsonLoad[jsonmedia;$callFunction[filterMediaID;$env[jsonmusicdata;url]]]
@@ -137,7 +138,7 @@ module.exports = {
     ]
     ]
     ;
-    $jsonLoad[aradio;$getVar[radioplayer_data;$env[guildId]_metadata;{}]]
+    $jsonLoad[aradio;$default[$getCache[radioplayer_data_$guildID_metadata];{}]]
     
     $try[
     $!#editMessage[$env[channelId];$env[messageId];

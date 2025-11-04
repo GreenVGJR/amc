@@ -4,17 +4,19 @@ module.exports = {
     code: `
     $onlyIf[$or[$customID==toggledjrolepick_clear;$customID==toggledjrolepick;$customID==toggledjrolemode]]
     $onlyIf[$hasPerms[$guildID;$authorID;ManageChannels;ManageRoles]]
+    $jsonLoad[test;$getRecord[guild;musicplayer_data_djft;$guildID]]
     $if[$customID==toggledjrolepick_clear;
-    $setGuildVar[musicplayer_data_djft-role;]
-    $setGuildVar[musicplayer_data_djft-mode;0]
+    $!jsonSet[test;role;]
+    $!jsonSet[test;mode;0]
     ]
     $if[$customID==toggledjrolepick;
-    $setGuildVar[musicplayer_data_djft-role;$selectMenuValues[0]]
-    $setGuildVar[musicplayer_data_djft-mode;0]
+    $!jsonSet[test;role;$selectMenuValues[0]]
+    $!jsonSet[test;mode;0]
     ]
     $if[$customID==toggledjrolemode;
-    $setGuildVar[musicplayer_data_djft-mode;$selectMenuValues[0]]
+    $!jsonSet[test;mode;$selectMenuValues[0]]
     ]
+    $!putRecord[guild;$env[test];musicplayer_data_djft;$guildID]
     $interactionUpdate[$callFunction[loadDJUser]]
     `
 }

@@ -37,7 +37,7 @@ module.exports = {
     }],
     code: `
     $arrayLoad[tempstore]
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
     $if[$env[checkCache]==false;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
@@ -57,9 +57,13 @@ module.exports = {
     ]]
     ]
     $let[results;$env[tempstore]]
-    $if[$env[tempstore;0]!=;$setVar[cachesearch_global-radio;$md5[$env[query]$env[countrycode]$env[page]];$env[tempstore]]]
+    $jsonLoad[lf;{}]
+    $!jsonSet[lf;list_radio;$get[results]]
+    $if[$env[tempstore;0]!=;$!putRecord[global;$env[lf];cachesearch_global-radio_$md5[$env[query]$env[countrycode]$env[page]]]]
     ;
-    $let[results;$getVar[cachesearch_global-radio;$md5[$env[query]$env[countrycode]$env[page]]]]
+    $let[results;$getRecord[global;cachesearch_global-radio_$md5[$env[query]$env[countrycode]$env[page]]]]
+    $jsonLoad[listradio;$get[results]]
+    $let[results;$env[listradio;list_radio]]
     ]
     $return[$if[$env[disableRes]==false;$get[results]]]
     `

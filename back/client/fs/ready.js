@@ -2,14 +2,20 @@ module.exports = {
     type: "clientReady",
     code: `
     $logger[Info;Ready on client $username[$clientID]]
-    $async[$!setGlobalVar[listcommands-help;$applicationCommands]]
+    $async[$setCache[listcommands-help;$applicationCommands]]
     $if[$callFunction[configMusic;cacheAllContextNeed];
     $logger[Info;Caching Discord Context]
     $callFunction[fetchDiscordContext]
     ]
     $logger[Info;Attempting to Generate]
-    $async[$callFunction[generateAuthKeys;tiktok;;true]]
+    $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
+    $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
+    $callFunction[generateAuthKeys;youtube;;true]
+    $setInterval[$callFunction[generateAuthKeys;youtube;;false];9m]
+    ;
     $async[$callFunction[generateAuthKeys;youtube;;true]]
+    ]
+    $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]
     $async[$callFunction[generateAuthKeys;spotify;;true]]
     $async[$callFunction[generateAuthKeys;spotify_token;;true]]

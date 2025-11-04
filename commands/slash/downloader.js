@@ -90,6 +90,10 @@ $let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictyp
 $onlyIf[$advancedTextSplit[$trimLines[$get[getcdn]];|;0]!=bot;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]\nError: $advancedTextSplit[$trimLines[$get[getcdn]];|;1]]
 $onlyIf[$or[$trimLines[$get[getcdn]]==null;$trimLines[$get[getcdn]]==live;$trimLines[$get[getcdn]]==]!=true;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $!djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET"}).then(r=>{ctx.setKeyword("clh",r.headers.get("Content-Length")??"")\\;ctx.setKeyword("cly",r.headers.get("Content-Type")??"")\\;ctx.setKeyword("httpstatus",r.status.toString())}).catch()]
+$if[$has[gettitle]==false;
+$let[gettitle;$cropText[$callFunction[fetchTitleTrack;$get[url];$default[$get[storeobjecthttp];]];0;479;]]
+$if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]]]
+]
 $onlyIf[$or[$get[httpstatus]==200;$get[httpstatus]==206];$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOverDownload]\n$hyperlink[$get[gettitle];$trimLines[$get[getcdn]]]]
 $let[mediatype;$advancedTextSplit[$get[cly];/;0]]
@@ -98,10 +102,6 @@ $if[$get[mediatype]==video;
 $let[converttype;mp4]
 ;
 $let[converttype;$if[$get[contenttype]==webm;opus;$if[$get[contenttype]==mp4;m4a;$if[$or[$get[contenttype]==mp3;$get[contenttype]==mpeg];mp3;$get[contenttype]]]]]
-]
-$if[$has[gettitle]==false;
-$let[gettitle;$cropText[$callFunction[fetchTitleTrack;$get[url];$default[$get[storeobjecthttp];]];0;479;]]
-$if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]]]
 ]
 $if[$get[isactivelyric];
 $let[checklyric;false]
@@ -118,7 +118,7 @@ $let[converttype;ts]
 $let[names;$get[gettitle]]
 $onlyIf[$httpRequest[$get[getcdn];GET]==200;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $let[clh;$charCount[$httpResult]]
-$callLocalFunction[runcodessync;;Fetching Segments;true]
+$callLocalFunction[runcodessync;Fetching Segments;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
 $let[clh;0]
 $arrayLoad[b;#EXTINF;$httpResult]
 $!arrayShift[b]
@@ -131,15 +131,24 @@ $onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOv
 $let[contenttype;ts]
 $let[converttype;mp4]
 $let[names;$get[gettitle].$get[converttype]]
-$callLocalFunction[runcodessync;;Downloading;true]
+$callLocalFunction[runcodessync;;Uploading;true]
 $interactionReply[
 $attachment[$get[ks];$get[names];true;base64]
 ]
 ;
-$callLocalFunction[runcodessync;;Downloading;true]
+$let[condownbytes_headers;{
+"Accept": "*/*",
+"Range": "bytes=0-$get[clh]",
+"Sec-Fetch-Site": "none",
+"User-Agent": "Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+}]
+$callLocalFunction[runcodessync;Downloading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$let[condownbytes;$djsEval[fetch("$trimLines[$get[getcdn]]", { method: "GET", headers: JSON.parse(ctx.getKeyword("condownbytes_headers")) }).then(a => a.arrayBuffer()).then(b => Buffer.from(b).toString("base64")).then(e => e).catch()]]
+$onlyIf[$get[condownbytes]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$callLocalFunction[runcodessync;;Uploading;true]
 $interactionReply[
 $if[$and[$option[lyrics]==true;$get[checklyric]];$attachment[$get[loadlyrics];$get[lyricnames];true]]
-$attachment[$trimLines[$get[getcdn]];$get[names]]
+$attachment[$get[condownbytes];$get[names];true;base64]
 ]]
 $if[$channelExists[$channelID];
 $fetchMessage[$channelID;$get[mid]]

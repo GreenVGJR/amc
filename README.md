@@ -14,7 +14,7 @@ ___
 > [List Public Lavalink available](https://lavalink-list.darrennathanael.com/).
 
 ## Installation
-1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v16.11.0 for node.js
+1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v21.7.3 for node.js
 2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-dev-lavalink.zip) this branch (.zip)
 3. Extract it, and rename `.env.example` file to `.env` inside folder you did extract
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
@@ -47,6 +47,27 @@ ___
 > *If Available
 
 </details>
+
+<details close>
+
+<summary>
+
+## Find Youtube Cookies
+
+</summary>
+
+1. Open a new private browsing/incognito window and login your youtube account
+2. If that done, navigate to `https://www.youtube.com/robots.txt` then open developers tools (`Ctrl + Shift + I`)
+3. Go to "Network" tab and find `robots.txt` request
+4. Copy the `Cookie` from Request Headers
+> Doesn't show? do `Ctrl + F5`
+5. Put inside `.env` at `YOUTUBE_COOKIES=put_cookies_here`
+
+</details>
+
+> [!WARNING]
+> By doing this you're risking your account getting temporary / permanent banned if you use for massive requests / users.<br>
+> Consider to use throwaway account. Only use this for certain cases.
 
 <details close>
 

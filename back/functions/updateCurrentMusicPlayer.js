@@ -1,8 +1,8 @@
 module.exports = {
     name: "updateCurrentMusicPlayer",
     code: `
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $jsonLoad[currenttrack;$playerCurrentTrack[$guildID]]
     $let[testmessage;{

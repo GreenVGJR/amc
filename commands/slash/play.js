@@ -79,7 +79,7 @@ module.exports = {
   ]
 
   $onlyIf[$or[$channelUserLimit[$voiceID]==0;$sum[$channelVoiceMemberCount[$voiceID];$if[$voiceID[$guildID;$clientID]==;1;0]]<=$channelUserLimit[$voiceID]];$ephemeral $callFunction[useCustomMusicMessage;config_errorIsLimitVC]]
-  $onlyIf[$getVar[radioplayer_data;$guildID_playerstatus;false]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
+  $onlyIf[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
 
   $let[iscreatedfirst;$checkCondition[$try[$checkCondition[$playerQueueLength[$guildID]>=0];false]==false]]
 
@@ -90,9 +90,9 @@ module.exports = {
   $footer[Searching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
-  $if[$or[$getVar[musicplayer_message;$guildID_channelid;null]==null;$voiceID[$guildID;$clientID]==];
-  $setVar[musicplayer_message;$guildID_channelid;$channelID]
-  $setVar[musicplayer_message;$guildID_messageid;$get[mid]]
+  $if[$or[$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
+  $setCache[musicplayer_message_$guildID_channelid;$channelID]
+  $setCache[musicplayer_message_$guildID_messageid;$get[mid]]
   ]
   ]
   $if[$env[typesload]==1-2;
@@ -102,9 +102,9 @@ module.exports = {
   $footer[Fetching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
-  $if[$or[$getVar[musicplayer_message;$guildID_channelid;null]==null;$voiceID[$guildID;$clientID]==];
-  $setVar[musicplayer_message;$guildID_channelid;$channelID]
-  $setVar[musicplayer_message;$guildID_messageid;$get[mid]]
+  $if[$or[$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
+  $setCache[musicplayer_message_$guildID_channelid;$channelID]
+  $setCache[musicplayer_message_$guildID_messageid;$get[mid]]
   ]
   ]
   $if[$env[typesload]==2;
@@ -227,8 +227,8 @@ module.exports = {
 
   $if[$get[attemptry]>=$get[donetry];
   $if[$get[iscreatedfirst];
-  $!deleteVar[musicplayer_message;$guildID_messageid]
-  $!deleteVar[musicplayer_message;$guildID_channelid]
+  $!deleteCache[musicplayer_message_$guildID_messageid]
+  $!deleteCache[musicplayer_message_$guildID_channelid]
   $!playerDestroy[$guildID]
   ]
   $callLocalFunction[loadinteraction;error-2]

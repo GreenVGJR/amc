@@ -3,8 +3,8 @@ module.exports = {
     allowedInteractionTypes: ["button", "selectMenu"],
     code: `
     $onlyIf[$advancedTextSplit[$customID;_;0]==musicplayer;]
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
     $onlyIf[$get[mid]==$messageID;$async[$!deferUpdate]$!disableComponentsOf[$channelID;$messageID]]
     $onlyIf[$voiceID[$guildID;$clientID]!=;]
     $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
@@ -71,7 +71,7 @@ module.exports = {
     ]
     $if[$advancedTextSplit[$customID;_;1]==stopplayer;
     $!playerDestroy[$guildID]
-    $!deleteMemberVar[cachesearchistory_user_autocomplete;$authorID]
+    $!deleteCache[cachesearchistory_user_autocomplete_$authorID]
     $!deferUpdate
     ]
     $if[$advancedTextSplit[$customID;_;1]==actionplayer;

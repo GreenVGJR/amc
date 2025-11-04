@@ -1,13 +1,14 @@
+require('dotenv').config(); // Load Environment
+
 // Main
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
-const { ForgeDB } = require("@tryforge/forge.db");
 const { ForgeLinked } = require('ForgeLinked');
+const { QuorielDB } = require("@quoriel/db");
+// const { ForgeDB } = require("@tryforge/forge.db");
 
-require("dotenv").config({ quiet: true }); // Load Environment
-
-const db = new ForgeDB({
+const quorielDb = new QuorielDB({
     events: [
-        "connect"
+        "dbConnect"
     ]
 });
 
@@ -63,14 +64,15 @@ const client = new ForgeClient({
     ],
     extensions: [
         lavalink,
-        db
+     // new ForgeDB(),
+        quorielDb
     ]
 });
 
 client.login();
 
 client.functions.load("back/functions");
-db.commands.load("back/client/fdb");
+quorielDb.commands.load("back/client/fdb");
 client.applicationCommands.load("commands/slash");
 client.commands.load("back/interaction");
 client.commands.load("back/client/fs");

@@ -26,7 +26,7 @@ module.exports = {
     $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
     ]
     $async[$!playerDestroy[$guildID]]
-    $!deleteMemberVar[cachesearchistory_user_autocomplete;$authorID]
+    $!deleteCache[cachesearchistory_user_autocomplete_$authorID]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalStopTrack]]
     $setTimeout[$!interactionDelete;2s]
     `

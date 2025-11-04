@@ -44,7 +44,7 @@ module.exports = {
     $httpSetBody[{"operationName":"GetLyrics","variables":{"trackId":"$env[drtcp;id]"},"query":"$inflate[789c2b2c4d2daa54704f2df1a92cca4c2ed65029294a4ccef64cb152082e29cacc4b57d454a88ec953008b6ac0e560aa20923960ad1075a9152531790ac59579c91945f9799955a9293e9979a910c99ca2e490ccdcd4e292c4dc021037332f35264fa116816b01498b33f5;hex]"}]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip]
-    $httpAddHeader[Authorization;Bearer $getGlobalVar[authmusic_deezer]]
+    $httpAddHeader[Authorization;Bearer $getCache[authmusic_deezer]]
     $httpAddHeader[Accept;application/json]
     $httpAddHeader[Content-Type;application/json]
     $httpSetContentType[Text]

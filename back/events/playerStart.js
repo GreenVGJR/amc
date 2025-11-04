@@ -3,8 +3,8 @@ const cf = require("../config.json");
 module.exports = [{
     type: cf.interval_message ? "linkedPlayerUpdate" : "linkedTrackStart",
     code: `
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $let[interval_time;1000]
     $let[nextmessage_time;16000]
@@ -26,8 +26,8 @@ module.exports = [{
 {
     type: "linkedTrackEnd",
     code: `
-    $let[cid;$getVar[musicplayer_message;$guildID_channelid]]
-    $let[mid;$getVar[musicplayer_message;$guildID_messageid]]
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
     $try[$!disableComponentsOf[$get[cid];$get[mid]]]
     `
 }]

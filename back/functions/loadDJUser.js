@@ -1,8 +1,9 @@
 module.exports = {
 name: "loadDJUser",
 code: `
-$let[hasrole;$getGuildVar[musicplayer_data_djft-role;$guildID]]
-$let[hasdj;$getGuildVar[musicplayer_data_djft-mode;$guildID]]
+$jsonLoad[djks;$getRecord[guild;musicplayer_data_djft;$guildID]]
+$let[hasrole;$env[djks;role]]
+$let[hasdj;$env[djks;mode]]
 $addContainer[
 $addTextDisplay[## DJ]
 $addSeparator[Small;true]
