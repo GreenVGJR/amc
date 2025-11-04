@@ -16,7 +16,7 @@ module.exports = [{
     ]
     
     $try[
-    $if[$voiceID[$guildID;$clientID]!=;$!leaveVoiceChannel]
+    $if[$voiceID[$guildID;$clientID]!=;$try[$!playerDestroy[$guildID]]]
     ]
     
     $!deleteCache[musicplayer_message_$guildID_messageid]
@@ -43,7 +43,7 @@ module.exports = [{
     ]
     
     $try[
-    $if[$voiceID[$guildID;$clientID]!=;$!leaveVoiceChannel]
+    $if[$voiceID[$guildID;$clientID]!=;$try[$!playerDestroy[$guildID]]]
     ]
     
     $!deleteCache[musicplayer_message_$guildID_messageid]

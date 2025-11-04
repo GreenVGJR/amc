@@ -27,7 +27,7 @@ module.exports = {
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip]
         $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
-        $if[$env[successlog]==true;$logger[Info;Using Youtube Cookies for Player. Checking Cookies for possible rotating]]
+        $if[$env[successlog]==true;$logger[Info;Using Youtube Cookies for Player. Attempting to rotating]]
         $httpAddHeader[Cookie;$get[ytinitcookies]]
         ;
         $if[$env[successlog]==true;$logger[Warn;Missing Youtube Cookies. Some features might not available]]
@@ -36,17 +36,67 @@ module.exports = {
         $!httpRequest[https://www.youtube.com/embed?html5=1;GET;g3]
         $if[$and[$or[$get[ytinitcookies]!=;$get[ytinitcookies]!=undefined]==false;$advancedTextSplit[$env[g3];"LOGIN_INFO":";1;";0]==];
         $let[abortproscookies;true]
-        $logger[Error;Cookies Expired. Please put a new one]
+        $logger[Error;Cookies no longer active. Please put a new one]
         $logger[Info;Continuing process]
-        ;
-        $if[$and[$or[$get[ytinitcookies]!=;$get[ytinitcookies]!=undefined]==false;$advancedTextSplit[$get[ytinitcookies];LOGIN_INFO=;1;\\;;0]==];
-        $let[ytinitcookies_replacement;$get[ytinitcookies]\\; LOGIN_INFO=$advancedTextSplit[$env[g3];"LOGIN_INFO":";1;";0]]
         ]
-        $if[$and[$get[abortproscookies]!=true;$or[$get[ytinitcookies]!=;$get[ytinitcookies]!=undefined]==false];
-        $let[ytinitcookies_replacement;$advancedReplace[$if[$has[ytinitcookies_replacement];$get[ytinitcookies_replacement];$get[ytinitcookies]];__Secure-3PSIDCC=$advancedTextSplit[$get[ytinitcookies];__Secure-3PSIDCC=;1;\\;;0];__Secure-3PSIDCC=$advancedTextSplit[$httpGetHeader[Set-Cookie];__Secure-3PSIDCC=;1;\\;;0];__Secure-1PSIDCC=$advancedTextSplit[$get[ytinitcookies];__Secure-1PSIDCC=;1;\\;;0];__Secure-1PSIDCC=$advancedTextSplit[$httpGetHeader[Set-Cookie];__Secure-1PSIDCC=;1;\\;;0];SIDCC=$advancedTextSplit[$get[ytinitcookies];SIDCC=;1;\\;;0];SIDCC=$advancedTextSplit[$httpGetHeader[Set-Cookie];SIDCC=;1;\\;;0]]]
+        $if[$and[$get[abortproscookies]!=true;$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false];
+        $localFunction[cookiessid;
+        $let[tempytinitcs;$if[$has[ytinitcookies_replacement];$get[ytinitcookies_replacement];$get[ytinitcookies]]]
+        $let[ytinitcookies_replacement;$advancedReplace[$get[tempytinitcs];__Secure-3PSIDCC=$advancedTextSplit[$get[tempytinitcs];__Secure-3PSIDCC=;1;\\;;0];__Secure-3PSIDCC=$advancedTextSplit[$env[ab84830609467438272d];__Secure-3PSIDCC=;1;\\;;0];__Secure-1PSIDCC=$advancedTextSplit[$get[tempytinitcs];__Secure-1PSIDCC=;1;\\;;0];__Secure-1PSIDCC=$advancedTextSplit[$env[ab84830609467438272d];__Secure-1PSIDCC=;1;\\;;0];SIDCC=$advancedTextSplit[$get[tempytinitcs];SIDCC=;1;\\;;0];SIDCC=$advancedTextSplit[$env[ab84830609467438272d];SIDCC=;1;\\;;0];LOGIN_INFO=$advancedTextSplit[$get[tempytinitcs];LOGIN_INFO=;1;\\;;0];LOGIN_INFO=$advancedTextSplit[$env[g3];"LOGIN_INFO":";1;";0]]]
+        $if[$env[findtsidexist]==true;
+        $let[ytinitcookies_replacement;$advancedReplace[$get[ytinitcookies_replacement];__Secure-1PSIDTS=$advancedTextSplit[$get[ytinitcookies_replacement];__Secure-1PSIDTS=;1;\\;;0];__Secure-1PSIDTS=$advancedTextSplit[$env[ab84830609467438272d];__Secure-1PSIDTS=;1;\\;;0];__Secure-3PSIDTS=$advancedTextSplit[$get[ytinitcookies_replacement];__Secure-3PSIDTS=;1;\\;;0];__Secure-3PSIDTS=$advancedTextSplit[$env[ab84830609467438272d];__Secure-3PSIDTS=;1;\\;;0]]]
+        ]
+        $return
+        ;ab84830609467438272d;findtsidexist]
+        $callLocalFunction[cookiessid;$httpGetHeader[Set-Cookie];false]
+        $localFunction[attytrotate-1;
+        $try[
+        $httpSetContentType[Text]
+        $httpAddHeader[Accept;*/*]
+        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Referer;https://www.youtube.com]
+        $httpAddHeader[Cookie;$get[ytinitcookies_replacement]]
+        $httpAddHeader[User-Agent;$get[agent]]
+        $let[httpytrotate;$httpRequest[https://accounts.youtube.com/RotateCookiesPage?origin=https://www.youtube.com&yt_pid=1;GET;g3_1]]
+        ]
+        $onlyIf[$get[httpytrotate]==200;$return[0]]
+        $callLocalFunction[cookiessid;$httpGetHeader[Set-Cookie];false]
+        $let[ytinitrotateid+hp_init;$advancedTextSplit[$env[g3_1];init(';1;';0]]
+        $let[ytinitrotatetd+up_init;$round[$trim[$advancedTextSplit[$env[g3_1];init(';1;,;2]]]]
+        $return[$get[httpytrotate]]
+        ]
+        $localFunction[attytrotate-2;
+        $try[
+        $httpSetContentType[Text]
+        $httpAddHeader[Accept;*/*]
+        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Content-Type;application/json]
+        $httpAddHeader[Origin;https://accounts.youtube.com]
+        $httpAddHeader[Referer;https://www.youtube.com]
+        $httpAddHeader[Sec-Fetch-Site;same-origin]
+        $httpAddHeader[Cookie;$get[ytinitcookies_replacement]]
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpSetBody[\\[null,"$get[ytinitrotateid+hp_init]",$get[ytinitrotatetd+up_init]\\]]
+        $let[httpytrotate_2;$httpRequest[https://accounts.youtube.com/RotateCookies;POST;g3_2]]
+        ]
+        $onlyIf[$get[httpytrotate_2]==200;$return[0]]
+        $callLocalFunction[cookiessid;$httpGetHeader[Set-Cookie];$checkContains[$httpGetHeader[Set-Cookie];__Secure-1PSIDTS;__Secure-3PSIDTS]]
+        $return[$get[httpytrotate_2]]
+        ]
+        $wait[1s]
+        $let[checkrotate-1;$callLocalFunction[attytrotate-1]]
+        $if[$get[checkrotate-1]!=200;$let[abortproscookies;true]]
+        $if[$get[abortproscookies]!=true;
+        $wait[1s]
+        $let[checkrotate-2;$callLocalFunction[attytrotate-2]]
+        $if[$get[checkrotate-2]!=200;$let[abortproscookies;true]]
+        $if[$get[abortproscookies]==true;$logger[Error;Cookie doesn't appear. Can't continue this process.];
         $writeFile[.env;$replace[$readFile[.env];YOUTUBE_COOKIES=$get[ytinitcookies];YOUTUBE_COOKIES=$get[ytinitcookies_replacement]]]
-        $if[$env[successlog]==true;$logger[Info;Rotated. Continuing process]]
         $!djsEval[require('dotenv').config({ override: true, quiet: true })]
+        $if[$env[successlog]==true;$logger[Info;Rotated. Continuing process]]
+        ]
+        ;
+        $logger[Error;Cookie doesn't appear. Can't continue this process.]
         ]]
         $let[a3;$advancedTextSplit[$env[g3];"INNERTUBE_API_KEY":";1;";0]]
         $let[a32;$advancedTextSplit[$env[g3];"visitorData":";1;";0]]
@@ -54,7 +104,7 @@ module.exports = {
         $if[$get[a32]!=;$setCache[authmusic_youtube_visitor;$get[a32]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[a3]!=;$cropText[$get[a3];0;12;...];Failed to Retrieve] | Youtube / Key]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[a32]!=;$cropText[$get[a32];0;12;...];Failed to Retrieve] | Youtube / Visitor]]
-    ;$logger[Info;Failed to Retrieve - Youtube] $logger[Error;$env[ioasnioasniog]];ioasnioasniog]
+    ;$logger[Info;Failed to Retrieve - Youtube]]
     $if[$and[$get[a3]==;$get[a32]==];$logger[Warn;Re-trying - Youtube] $callFunction[generateAuthKeys;youtube;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==soundcloud];
