@@ -2,15 +2,16 @@ require('dotenv').config(); // Load Environment
 
 // Main
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
-const { ForgeMusic, DefaultExtractors, GuildQueueEvent } = require('@tryforge/forge.music');
+const { ForgeMusic, GuildQueueEvent } = require('@tryforge/forge.music');
 const { QuorielDB } = require("@quoriel/db");
 // const { ForgeDB } = require("@tryforge/forge.db");
 
 // Extractor & Config
 const { YoutubeiExtractor } = require("discord-player-youtubei");
+const { SoundcloudExtractor } = require("discord-player-soundcloud");
+const { SpotifyExtractor, AppleMusicExtractor, AttachmentExtractor } = require("@discord-player/extractor");
 const youtube = require('./back/client/youtubeConfig');
 const toggles = require('./back/config.json');
-
 
 const quorielDb = new QuorielDB({
     events: [
@@ -28,12 +29,12 @@ const music = new ForgeMusic({
         GuildQueueEvent.PlayerTrigger,
         GuildQueueEvent.PlayerFinish
     ],
-    includeExtractors: DefaultExtractors,
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
         disableResampler: true,
         disableFallbackStream: toggles.disable_YT,
         bufferingTimeout: 500,
+        preferBridgedMetadata: true,
         volume: 50,
         connectionTimeout: 10000,
         leaveOnEmpty: true,
@@ -74,6 +75,10 @@ client.applicationCommands.load("commands/slash");
 client.commands.load("back/interaction");
 client.commands.load("back/client/fs");
 client.commands.load("commands/basic");
+music.player.extractors.register(SoundcloudExtractor);
+music.player.extractors.register(SpotifyExtractor);
+music.player.extractors.register(AppleMusicExtractor);
+music.player.extractors.register(AttachmentExtractor);
 music.player.extractors.register(YoutubeiExtractor, youtube);
 music.commands.load("back/events");
 

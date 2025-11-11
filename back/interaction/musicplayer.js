@@ -71,7 +71,7 @@ module.exports = {
     $!setVolume[$if[$sum[$getVolume;10]<=150;$sum[$getVolume;10];150]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==volumemute;
-    $!setVolume[$if[$getVolume==0;100;0]]
+    $!setVolume[$if[$getVolume==0;50;0]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==stopplayer;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
