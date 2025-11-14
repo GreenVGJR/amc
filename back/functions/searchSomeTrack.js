@@ -18,7 +18,7 @@ module.exports = {
     code: `
     $arrayLoad[results]
     $try[
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
     $if[$env[provider]==youtube;
     $jsonLoad[loadser;$try[$getYoutubeVideo[$env[query]];{}]]
     $jsonLoad[loadser2;$env[loadser;results]]
@@ -49,7 +49,7 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $let[httpsc;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[authmusic_soundcloud]&limit=10;GET;tests]]
     $if[$or[$get[httpsc]==401;$get[httpsc]==403];$callLocalFunction[refreshsc;true] $return]
     $if[$get[httpsc]==429;$return]
@@ -70,7 +70,7 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_spotify]]
     $httpAddHeader[App-platform;WebPlayer]
     $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=10;GET;jsonres]]
@@ -91,7 +91,7 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpSetContentType[Text]
     $!httpRequest[https://itunes.apple.com/search?media=music&limit=10&country=US&term=$env[query];GET;res]
     ]
@@ -104,7 +104,7 @@ module.exports = {
     ]
     $if[$env[provider]==applemusic;
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_applemusic]]
     $httpAddHeader[Origin;https://music.apple.com]
     $httpAddHeader[Cookie;geo=US]
@@ -114,7 +114,7 @@ module.exports = {
     ]
     $if[$env[provider]==tidal;
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[X-Tidal-Token;$getCache[authmusic_tidal]]
     $httpAddHeader[Content-Type;application/json]
     $!httpRequest[https://api.tidal.com/v1/search/tracks?countryCode=US&locale=en_US&limit=10&offset=0&query=$env[query];GET;res]
@@ -130,7 +130,7 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[Cookie;$inflate[$getCache[authmusic_qobuz];base64]]
     $httpSetContentType[Text]
     $!httpRequest[https://www.qobuz.com/us-en/search/tracks/$encodeURI[$env[query]]?ssf%5Bf%5D%5Bq%5D=ih.1;GET;a]
@@ -153,7 +153,7 @@ module.exports = {
     $jsonLoad[a;$if[$default[$getCache[authmusic_amazonmusic];{}]=={};{};$inflate[$getCache[authmusic_amazonmusic];base64]]]
     $httpSetBody[{"keyword":"{\\\\"interface\\\\":\\\\"Web.TemplatesInterface.v1_0.Touch.SearchTemplateInterface.SearchKeywordClientInformation\\\\",\\\\"keyword\\\\":\\\\"$replace[$replace[$env[query];\\\\;];";\\\\\\\\"]\\\\"}","userHash":"{\\\\"level\\\\":\\\\"LIBRARY_MEMBER\\\\"}","headers":"{\\\\"x-amzn-authentication\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"ClientAuthenticationInterface.v1_0.ClientTokenElement\\\\\\\\\\\\",\\\\\\\\\\\\"accessToken\\\\\\\\\\\\":\\\\\\\\\\\\"\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-device-model\\\\":\\\\"WEBPLAYER\\\\",\\\\"x-amzn-device-width\\\\":\\\\"1920\\\\",\\\\"x-amzn-device-family\\\\":\\\\"WebPlayer\\\\",\\\\"x-amzn-device-id\\\\":\\\\"$env[a;deviceId]\\\\",\\\\"x-amzn-user-agent\\\\":\\\\"$get[agent]\\\\",\\\\"x-amzn-session-id\\\\":\\\\"$env[a;sessionId]\\\\",\\\\"x-amzn-device-height\\\\":\\\\"1080\\\\",\\\\"x-amzn-request-id\\\\":\\\\"$randomBytes[4]-$randomBytes[2]-$randomBytes[2]-$randomBytes[6]\\\\",\\\\"x-amzn-device-language\\\\":\\\\"$env[a;displayLanguage]\\\\",\\\\"x-amzn-currency-of-preference\\\\":\\\\"USD\\\\",\\\\"x-amzn-os-version\\\\":\\\\"$advancedTextSplit[$env[a;version];.;0].$advancedTextSplit[$env[a;version];.;1]\\\\",\\\\"x-amzn-application-version\\\\":\\\\"$env[a;version]\\\\",\\\\"x-amzn-device-time-zone\\\\":\\\\"$djsEval[Intl.DateTimeFormat().resolvedOptions().timeZone]\\\\",\\\\"x-amzn-timestamp\\\\":\\\\"$getTimestamp\\\\",\\\\"x-amzn-csrf\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"CSRFInterface.v1_0.CSRFHeaderElement\\\\\\\\\\\\",\\\\\\\\\\\\"token\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;token]\\\\\\\\\\\\",\\\\\\\\\\\\"timestamp\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;ts]\\\\\\\\\\\\",\\\\\\\\\\\\"rndNonce\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;rnd]\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-music-domain\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-referer\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-affiliate-tags\\\\":\\\\"\\\\",\\\\"x-amzn-ref-marker\\\\":\\\\"\\\\",\\\\"x-amzn-page-url\\\\":\\\\"https://music.amazon.com/search\\\\",\\\\"x-amzn-weblab-id-overrides\\\\":\\\\"\\\\",\\\\"x-amzn-video-player-token\\\\":\\\\"\\\\",\\\\"x-amzn-feature-flags\\\\":\\\\"\\\\",\\\\"x-amzn-has-profile-id\\\\":\\\\"\\\\"}"}]
     $httpAddHeader[Origin;https://music.amazon.com]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[User-Agent;$get[agent]]
     $let[httpa;$httpRequest[https://na.mesk.skill.music.a2z.com/api/showSearch;POST;b]]
     $if[$or[$get[httpa]==400;$get[httpa]==429];$return]
@@ -166,7 +166,7 @@ module.exports = {
     $callLocalFunction[refreshamz;false]
     ]
     $if[$env[provider]==deezer;
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[User-Agent;$get[agent]]
     $let[status;$httpRequest[https://api.deezer.com/search?limit=10&q=$env[query];GET;res]]
     $jsonLoad[forres;$env[res;data]]
@@ -174,7 +174,7 @@ module.exports = {
     ]
     $if[$env[provider]==tiktok;
     $httpSetContentType[Text]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[Accept-Language;en-US]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
@@ -187,7 +187,7 @@ module.exports = {
     ]
     $if[$env[provider]==tiktokmusic;
     $httpSetContentType[Text]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[Accept-Language;en-US]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Content-Type;application/json]
@@ -200,7 +200,7 @@ module.exports = {
     ]
     $if[$env[provider]==tiktoksound;
     $httpSetContentType[Text]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[Accept-Language;en-US]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
@@ -213,7 +213,7 @@ module.exports = {
     ]
     $if[$env[provider]==ncs;
     $httpSetContentType[Text]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[User-Agent;$get[agent]]
     $!httpRequest[https://ncs.io/music-search?q=$env[query]&genre=&mood=;GET]
     $arrayLoad[a;class="player-play";$advancedTextSplit[$httpResult;<tbody>;1;</tbody>;0]]
@@ -222,7 +222,7 @@ module.exports = {
     ]
     $if[$env[provider]==bandcamp;
     $httpSetBody[{"search_text":"$replace[$replace[$env[query];\\\\;];";\\\\"]","search_filter":"t","full_page":false}]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Origin;https://bandcamp.com]
     $httpAddHeader[User-Agent;$get[agent]]

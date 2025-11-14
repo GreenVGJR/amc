@@ -140,7 +140,7 @@ $let[condownbytes_headers;{
 "Accept": "*/*",
 "Range": "bytes=0-$get[clh]",
 "Sec-Fetch-Site": "none",
-"User-Agent": "Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+"User-Agent": "Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
 }]
 $callLocalFunction[runcodessync;Downloading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
 $let[condownbytes;$djsEval[fetch("$trimLines[$get[getcdn]]", { method: "GET", headers: JSON.parse(ctx.getKeyword("condownbytes_headers")) }).then(a => a.arrayBuffer()).then(b => Buffer.from(b).toString("base64")).then(e => e).catch()]]

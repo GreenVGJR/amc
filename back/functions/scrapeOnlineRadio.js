@@ -37,11 +37,11 @@ module.exports = {
     }],
     code: `
     $arrayLoad[tempstore]
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
     $if[$env[checkCache]==false;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $!httpRequest[https://onlineradiobox.com/search?part=1&q=$env[query]&c=$env[countrycode]&offset=$multi[$env[page];20];GET]
     $arrayLoad[res;"stations__station";$advancedTextSplit[$httpResult;class="stations-list";1]]
     $arrayForEach[res;rest;

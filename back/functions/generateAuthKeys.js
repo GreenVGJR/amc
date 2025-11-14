@@ -16,7 +16,7 @@ module.exports = {
         required: true
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
     $let[typedebug;$callFunction[configMusic;debug_auth]]
 
     $if[$or[$env[type]==all;$env[type]==youtube];
@@ -25,7 +25,7 @@ module.exports = {
     $try[
         $httpAddHeader[Accept;*/*]
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
         $if[$env[successlog]==true;$logger[Info;Using Youtube Cookies for Player. Attempting to rotating]]
         $httpAddHeader[Cookie;$get[ytinitcookies]]
@@ -53,7 +53,7 @@ module.exports = {
         $try[
         $httpSetContentType[Text]
         $httpAddHeader[Accept;*/*]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $httpAddHeader[Referer;https://www.youtube.com]
         $httpAddHeader[Cookie;$get[ytinitcookies_replacement]]
         $httpAddHeader[User-Agent;$get[agent]]
@@ -69,20 +69,20 @@ module.exports = {
         $try[
         $httpSetContentType[Text]
         $httpAddHeader[Accept;*/*]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $httpAddHeader[Content-Type;application/json]
         $httpAddHeader[Origin;https://accounts.youtube.com]
         $httpAddHeader[Referer;https://www.youtube.com]
         $httpAddHeader[Sec-Fetch-Site;same-origin]
         $httpAddHeader[Cookie;$get[ytinitcookies_replacement]]
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpSetBody[\\[null,"$default[$getCache[tempres-ytinitrotateid_0];$get[ytinitrotateid+hp_init]]",$default[$getCache[tempres-ytinitrotateid_1];$get[ytinitrotatetd+up_init]]\\]]
+        $httpSetBody[\\[null,"$default[$get[ytinitrotateid+hp_init];$getCache[tempres-ytinitrotateid_0]]",$default[$get[ytinitrotatetd+up_init];$getCache[tempres-ytinitrotateid_1]]\\]]
         $let[httpytrotate_2;$httpRequest[https://accounts.youtube.com/RotateCookies;POST;g3_2]]
         ]
         $onlyIf[$get[httpytrotate_2]==200;$return[0]]
         $callLocalFunction[cookiessid;$httpGetHeader[Set-Cookie];$checkContains[$httpGetHeader[Set-Cookie];__Secure-1PSIDTS;__Secure-3PSIDTS]]
-        $setCache[tempres-ytinitrotateid_0;$get[ytinitrotateid+hp_init]]
-        $setCache[tempres-ytinitrotateid_1;$get[ytinitrotatetd+up_init]]
+        $setCache[tempres-ytinitrotateid_0;$default[$get[ytinitrotateid+hp_init];$getCache[tempres-ytinitrotateid_0]]]
+        $setCache[tempres-ytinitrotateid_1;$default[$get[ytinitrotatetd+up_init];$getCache[tempres-ytinitrotateid_1]]]
         $return[$get[httpytrotate_2]]
         ]
         $if[$env[successlog]==true;
@@ -115,7 +115,7 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Soundcloud          | ClientID;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $!httpRequest[https://w.soundcloud.com/player/;GET]
         $arrayLoad[storeclientid]
         $arrayLoad[conres;widget.sndcdn.com;$httpResult]
@@ -123,7 +123,7 @@ module.exports = {
         $arrayForEach[conres2;conres3;
         $try[
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $!httpRequest[$env[conres3];GET]
         ]
         $if[$charCount[$advancedTextSplit[$httpResult;location.search;1;AlwaysAllowSeekStrategy;0;client_id;1;";1]]==32;
@@ -141,7 +141,7 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Key;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $httpSetContentType[Text]
         $!httpRequest[https://open.spotify.com/embed/track/$randomText[4PTG3Z6ehGkBFwjybzWkR8;2yR2sziCF4WEs3klW1F38d;0IuVhCflrQPMGRrOyoY5RW;2yWlGEgEfPot0lv3OAjuG3;4Xfp9BcKrKYmxJPxn68Yb8;7uuJqaRjSXzja6VGgDpWem;3BP1klbHxsOf6IxscNIX0r;6BYzwbWg1Z2EB6VUXTYnhm];GET]
         $let[token;$advancedTextSplit[$httpResult;"accessToken":";1;";0]]
@@ -157,7 +157,7 @@ module.exports = {
         $httpSetBody[{"client_data":{"client_version":"5.0","client_id":"d8a5ed958d274c2e8ee717e6a4b0971d","js_sdk_data":{}}}]
         $httpAddHeader[Accept;application/json]
         $httpAddHeader[Content-type;application/json]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $httpAddHeader[Origin;https://open.spotify.com/]
         $!httpRequest[https://clienttoken.spotify.com/v1/clienttoken;POST]
         $let[granted_token;$httpResult[granted_token;token]]
@@ -171,7 +171,7 @@ module.exports = {
     $try[
         $httpAddHeader[Origin;https://music.amazon.com/]
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $!httpRequest[https://music.amazon.com/config.json;GET;tokens]
         $if[$env[tokens;csrf;token]!=;$setCache[authmusic_amazonmusic;$deflate[$env[tokens];base64]]]
         $if[$env[successlog]==true;$logger[Info;$if[$env[tokens;csrf;token]!=;$cropText[$env[tokens;csrf;token];0;12;...];Failed to Retrieve] | Amazon Music]]
@@ -182,7 +182,7 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Tidal               | Token;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $httpSetContentType[Text]
         $!httpRequest[https://embed.tidal.com/tracks/$randomText[230917825;432597859;355309145;416356151;434875762];GET;tokens]
         $let[embti;$advancedTextSplit[$env[tokens];type="module";0;script src=";1;";0]]
@@ -201,7 +201,7 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Qobuz               | Cookie;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $httpSetContentType[Text]
         $!httpRequest[https://www.qobuz.com/;HEAD;lskort]
         $let[a30;$httpGetHeader[Set-Cookie]]
@@ -215,7 +215,7 @@ module.exports = {
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Content-Type;application/json]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $httpSetContentType[Text]
         $!httpRequest[https://www.tiktok.com/node/common/location;GET]
         $let[a13;$httpGetHeader[Set-Cookie]]
@@ -232,10 +232,10 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[\\[SEARCH\\] Generating Apple Music         | Token;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $!httpRequest[https://music.apple.com/us/new;GET]
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $!httpRequest[https://music.apple.com$advancedTextSplit[$httpResult;script type="module" cross;1;";1;";0];GET;a14s]
         $let[a14;$advancedTextSplit[$env[a14s];"ey;1;";0]]
         $if[$get[a14]!=;$setCache[authmusic_applemusic;ey$get[a14]]]
@@ -247,7 +247,7 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[\\[LYRIC\\] Generating Deezer               | Token;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $httpAddHeader[Accept;application/json]
         $httpSetContentType[Text]
         $!httpRequest[https://auth.deezer.com/login/anonymous?jo=p&rto=p;GET]
@@ -261,12 +261,12 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[\\[OTHER\\] Generating Twitter              | Token & ID;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $httpSetContentType[Text]
         $!httpRequest[https://x.com;GET]
         $arrayLoad[a;crossorigin="anonymous";$httpResult]
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Accept-Encoding;gzip]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
         $httpSetContentType[Text]
         $!httpRequest[$advancedTextSplit[$env[a;$arrayFindIndex[a;b;$checkCondition[$advancedTextSplit[$env[b];client-web/main;1]!=]]];href=";1;";0];GET]
         $let[ts;$advancedTextSplit[$httpResult;operationName:"TweetResultByRestId";0]]

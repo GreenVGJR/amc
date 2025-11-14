@@ -11,13 +11,13 @@ module.exports = [{
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
     $arrayLoad[results]
     $try[
     $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","params":"EgWKAQIIAWoQEAMQCRAFEAQQChAVEBAQEQ%3D%3D", "context":{"client":{"clientName":"WEB_REMIX","clientVersion":"1.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","hl":"en","gl":"US"}}}]
     $httpSetContentType[Json]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $!httpRequest[https://music.youtube.com/youtubei/v1/search?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=contents.tabbedSearchResultsRenderer.tabs.tabRenderer.content.sectionListRenderer.contents.musicShelfRenderer.contents.musicResponsiveListItemRenderer(flexColumns(musicResponsiveListItemFlexColumnRenderer(text(runs(text,navigationEndpoint(watchEndpoint/videoId))))),thumbnail(musicThumbnailRenderer(thumbnail(thumbnails(url)))));POST;res]
     $jsonLoad[testfetch;$env[res;contents;tabbedSearchResultsRenderer;tabs;0;tabRenderer;content;sectionListRenderer;contents]]
     $jsonLoad[dofetch;$env[res;contents;tabbedSearchResultsRenderer;tabs;0;tabRenderer;content;sectionListRenderer;contents;$arrayFindIndex[testfetch;resfetch;$checkCondition[$env[resfetch;musicShelfRenderer]!=]];musicShelfRenderer;contents]]
@@ -25,7 +25,7 @@ module.exports = [{
     $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","context":{"client":{"clientName":"WEB","clientVersion":"2.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","hl":"en","gl":"US"}}}]
     $httpSetContentType[Json]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $!httpRequest[https://www.youtube.com/youtubei/v1/search?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title(runs/text),longBylineText(runs/text),ownerBadges(metadataBadgeRenderer/icon/iconType),lengthText(simpleText));POST;res]
     $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $arrayForEach[dofetch;getfetch;
@@ -64,12 +64,12 @@ module.exports = [{
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
     $arrayLoad[results]
     $try[
     $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","context":{"client":{"clientName":"WEB","clientVersion":"2.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","hl":"en","gl":"US"}}}]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpSetContentType[Text]
     $!httpRequest[https://www.youtube.com/youtubei/v1/search?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title(runs/text),richThumbnail(movingThumbnailRenderer/movingThumbnailDetails/thumbnails/url),lengthText(simpleText),navigationEndpoint(commandMetadata/webCommandMetadata(webPageType))),header.searchHeaderRenderer.chipBar.chipCloudRenderer.chips.chipCloudChipRenderer(text,navigationEndpoint/continuationCommand/token);POST]
     $let[tokens;$advancedTextSplit[$httpResult;"Shorts";1;"token":";1;";0]]
@@ -80,7 +80,7 @@ module.exports = [{
     ;
     $httpSetBody[{"continuation": "$get[tokens]","context":{"client":{"clientName":"WEB","clientVersion":"2.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","hl":"en","gl":"US"}}}]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpSetContentType[Json]
     $!httpRequest[https://www.youtube.com/youtubei/v1/search?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=onResponseReceivedCommands.reloadContinuationItemsCommand.continuationItems.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title(runs/text),richThumbnail(movingThumbnailRenderer/movingThumbnailDetails/thumbnails/url),lengthText(simpleText));POST;res]
     $jsonLoad[dofetch;$env[res;onResponseReceivedCommands;0;reloadContinuationItemsCommand;continuationItems;0;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
@@ -110,13 +110,13 @@ module.exports = [{
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
     $arrayLoad[results]
     $try[
     $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","context":{"client":{"clientName":"WEB","clientVersion":"2.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","hl":"en","gl":"US"}}}]
     $httpSetContentType[Json]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $!httpRequest[https://www.youtube.com/youtubei/v1/search?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title(runs/text),richThumbnail(movingThumbnailRenderer/movingThumbnailDetails/thumbnails/url),lengthText(simpleText));POST;res]
     $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $arrayForEach[dofetch;getfetch;
@@ -149,18 +149,18 @@ module.exports = [{
        required: false 
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
     $try[
     $httpSetBody[{"videoId":"$env[videoId]","context":{"client":{"clientName":"WEB_REMIX","clientVersion":"1.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","hl":"en","gl":"US"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $!httpRequest[https://music.youtube.com/youtubei/v1/next?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer(tabs.tabRenderer.endpoint.browseEndpoint.browseId);POST;res]
     $let[browseid;$advancedTextSplit[$env[res];"browseId":";1;";0]]
     $if[$env[line]==true;
     $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":"ANDROID_MUSIC","clientVersion":"8.36","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
     $httpSetContentType[Json]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $!httpRequest[https://music.youtube.com/youtubei/v1/browse?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=contents.elementRenderer.newElement.type.componentType.model.timedLyricsModel.lyricsData(timedLyricsData(lyricLine,cueRange(startTimeMilliseconds)));POST]
     $jsonLoad[er;$httpResult[contents;elementRenderer;newElement;type;componentType;model;timedLyricsModel;lyricsData;timedLyricsData]]
     $arrayMap[er;ers;$return[\\[$djsEval[new Date($if[$env[ers;cueRange;startTimeMilliseconds]==;0;$env[ers;cueRange;startTimeMilliseconds]]).toISOString().slice(14,19) + '.' + new Date($if[$env[ers;cueRange;startTimeMilliseconds]==;0;$env[ers;cueRange;startTimeMilliseconds]]).toISOString().slice(20,22)]\\] $env[ers;lyricLine]];er]
@@ -170,7 +170,7 @@ module.exports = [{
     $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":"WEB_REMIX","clientVersion":"1.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","hl":"en","gl":"US"}}}]
     $httpSetContentType[Json]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $!httpRequest[https://music.youtube.com/youtubei/v1/browse?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=contents.sectionListRenderer.contents.musicDescriptionShelfRenderer.description(runs/text);POST;res2]
     ]]
     $return[$if[$env[line]==true;$get[finalyric];$env[res2;contents;sectionListRenderer;contents;0;musicDescriptionShelfRenderer;description;runs;0;text]]]
@@ -189,13 +189,13 @@ module.exports = [{
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
     $arrayLoad[results]
     $localFunction[runfuncytpl;
     $let[checktoken;$or[$env[lotoken]==;$env[lotoken]==null]]
     $httpSetBody[{"context":{"client":{"hl":"en","gl":"US","clientName":"WEB","clientVersion":"2.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]"}},$if[$get[checktoken];"browseId":"VL$env[playlistId]";"continuation":"$env[lotoken]"]}]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $if[$get[checktoken];
     $!httpRequest[https://www.youtube.com/youtubei/v1/browse?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=contents.twoColumnBrowseResultsRenderer.tabs.tabRenderer.content.sectionListRenderer.contents(itemSectionRenderer(contents(playlistVideoListRenderer(contents(playlistVideoRenderer(videoId,title(runs(text)),lengthText(simpleText)),continuationItemRenderer(continuationEndpoint(commandExecutorCommand(commands/continuationCommand/token))))))));POST;a]
     ;
