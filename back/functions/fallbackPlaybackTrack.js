@@ -28,23 +28,28 @@ module.exports = {
     $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
 
     $try[
-    $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;$httpAddHeader[Cookie;$get[ytinitcookies]]]
+    $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
+    $let[ytinitauth;$djsEval[const GTH = (sapisid = "$advancedTextSplit[$get[ytinitcookies];SAPISID=;1;\\;;0]", secure1psid = "$advancedTextSplit[$get[ytinitcookies];__Secure-1PAPISID=;1;\\;;0]", secure3psid = "$advancedTextSplit[$get[ytinitcookies];__Secure-3PAPISID=;1;\\;;0]", origin_url = "https://www.youtube.com") => { const t = Math.floor(Date.now() / 1000).toString()\\; return "SAPISIDHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + sapisid + " " + origin_url).digest('hex') + "_u" + " SAPISID1PHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + secure1psid + " " + origin_url).digest('hex') + "_u" + " SAPISID3PHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + secure3psid + " " + origin_url).digest('hex') + "_u"\\; }\\; GTH()]]
+    $httpAddHeader[Authorization;$get[ytinitauth]]
+    $httpAddHeader[Cookie;$get[ytinitcookies]]
+    $httpAddHeader[X-Goog-Visitor-Id;$getCache[authmusic_youtube_visitor]]
+    ]
     $if[$env[types]==hls;
     $httpAddHeader[User-Agent;Mozilla/5.0 (Macintosh\\; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15,gzip(gfe)]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"WEB","clientVersion":"2.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,videoDetails.lengthSeconds,streamingData.hlsManifestUrl;POST;reshttp]
     ;
     $if[$or[$env[types]==;$env[types]==v];
-    $httpAddHeader[Accept-Encoding;gzip]
-    $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
+    $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36]
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"VISIONOS","clientVersion":"0.1","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
     ]
     $if[$env[types]==va;
-    $httpAddHeader[Accept-Encoding;gzip]
-    $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36]
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID","clientVersion":"20.05.46","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
+    $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36]
+    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID_VR","clientVersion":"1.00.0","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $!httpRequest[https://www.youtube.com/youtubei/v1/player?key=$getCache[authmusic_youtube_key]&prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
     ]]]
     $onlyIf[$env[reshttp;playabilityStatus;status]==OK;$let[finalurl;bot|$env[reshttp;playabilityStatus;reason]]]
@@ -110,26 +115,30 @@ module.exports = {
     $jsonLoad[b;$env[test;results;video;PlayAddrStruct;UrlList]]
     ;
     $jsonLoad[elindex;$env[test;results;video;bitrateInfo]]
-    $let[ad1;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];adapt_lowest_1080]]]
+    $let[ad1;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];adapt_lowest_]]]
     $let[findindex;$get[ad1]]
     $if[$get[ad1]==-1;
-    $let[ad2;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];adapt_lower_]]]
+    $let[ad2;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];adapt_lower_]]]
     $let[findindex;$get[ad2]]
     $if[$get[ad2]==-1;
-    $let[ad3;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];normal_]]]
+    $let[ad3;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];normal_]]]
     $let[findindex;$get[ad3]]
     $if[$get[ad3]==-1;
-    $let[ad4;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];adapt_540]]]
+    $let[ad4;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];adapt_]]]
     $let[findindex;$get[ad4]]
     $if[$get[ad4]==-1;
-    $let[ad5;$arrayFindIndex[elindex;ef;$checkContains[$env[ef;GearName];lowest_540]]]
-    $onlyIf[$get[ad5]!=-1;$let[finalurl;null]]
+    $let[ad5;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];lowest_]]]
     $let[findindex;$get[ad5]]
-    ]]]]
+    $if[$get[ad5]==-1;
+    $let[ad6;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];lower_]]]
+    $onlyIf[$get[ad6]!=-1;$let[finalurl;null]]
+    $let[findindex;$get[ad6]]
+    ]]]]]
     $jsonLoad[b;$env[test;results;video;bitrateInfo;$get[findindex];PlayAddr;UrlList]]
     ]
     $onlyIf[$env[b;0]!=;$let[finalurl;null]]
-    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1322;www.tiktok.com;api16-normal.tiktokv.com]]
+    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1180;www.tiktok.com;api2.musical.ly]]
+    $let[finalurl;$djsEval[require("undici").request(ctx.getKeyword("finalurl"),{method:"GET"}).then(a => a.headers.location).catch()]]
     ]
     $if[$env[whattype;type]==tiktokmusic;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
@@ -144,7 +153,8 @@ module.exports = {
     ]
     $if[$env[whattype;type]==applemusic;
     $try[
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
+    $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36]
     $httpSetContentType[Text]
     $!httpRequest[$env[url];GET;a]
     ]

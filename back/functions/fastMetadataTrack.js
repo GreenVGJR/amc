@@ -16,7 +16,7 @@ module.exports = {
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
     $let[tryattempt;0]
     $localFunction[refreshing;
     $if[$env[refresh]==true;
@@ -27,8 +27,8 @@ module.exports = {
     $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","context":{"client":{"clientName":"WEB","clientVersion":"2.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","hl":"en","gl":"US"}}}]
     $httpSetContentType[Json]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
-    $!httpRequest[https://youtubei.googleapis.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title,richThumbnail,lengthText);POST;res]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
+    $!httpRequest[https://www.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title,richThumbnail,lengthText);POST;res]
     $jsonLoad[toindex;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $let[findindex;$arrayFindIndex[toindex;checkindex;$checkCondition[$env[checkindex;videoRenderer]!=]]]
     $let[rest2;{"id": "$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;videoId]","dynamic_thumbnail":"$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url]","thumbnail":"https://i.ytimg.com/vi/$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;videoId]/hq720.jpg","duration":"$round[$divide[$unparseDigital[$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;lengthText;simpleText]];1000];0]","title":"$deflate[$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;title;runs;0;text];base64]"}]
@@ -41,7 +41,7 @@ module.exports = {
     $if[$env[provider]==soundcloud;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[authmusic_soundcloud]&limit=1;GET;res]]
     $onlyIf[$get[http]!=401;
     $callFunction[generateAuthKeys;soundcloud;;false]
@@ -54,7 +54,7 @@ module.exports = {
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_spotify]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpAddHeader[App-platform;WebPlayer]
     $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1;GET;jsonres]]
     $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;
@@ -69,7 +69,7 @@ module.exports = {
     $if[$env[provider]==applemusic;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $httpSetContentType[Text]
     $!httpRequest[https://itunes.apple.com/search?media=music&limit=1&country=US&term=$env[query];GET;res]
     ]

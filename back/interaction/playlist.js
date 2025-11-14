@@ -468,7 +468,7 @@ $setCache[musicplayer_message_$guildID_channelid;$channelID]
 $setCache[musicplayer_message_$guildID_messageid;$get[mid2]]
 ]
 
-$!playerCreate[$guildID;$voiceID;$channelID;100;true]
+$!playerCreate[$guildID;$voiceID;$channelID;50;true]
 $loop[$arrayLength[a];
 $let[ctrs;$sub[$env[sdgk];1]]
 

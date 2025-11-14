@@ -21,7 +21,7 @@ module.exports = {
     ]
 
     $if[$get[fsearch]==null;
-    $interactionReply[$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
+    $interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]]
     $stop
     ]
 

@@ -117,7 +117,7 @@ module.exports = [{
     $callLocalFunction[loadinteraction;1]
 
     $try[
-    $httpAddHeader[Accept-Encoding;gzip]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
     $!httpRequest[https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/;GET]
     ]
     $let[current_track;$replace[$replace[$replace[$replace[$replace[$replace[$replace[$advancedTextSplit[$httpResult;class="station-onair";1;class="track_history_item";1;class="ajax">;1;</a>;0];<a>;];</a>;];<i>;];</i>;];<b>;];</b>;];";\\\\"]]
@@ -200,7 +200,7 @@ module.exports = [{
     }]
 
     $let[iscreatedfirst;$checkCondition[$try[$checkCondition[$playerQueueLength[$guildID]>=0];false]==false]]
-    $!playerCreate[$guildID;$voiceID;$channelID;100;true]
+    $!playerCreate[$guildID;$voiceID;$channelID;50;true]
     $disableConsoleErrors
     $if[$get[iscreatedfirst];
     $setCache[musicplayer_message_$guildID_channelid;$channelID]

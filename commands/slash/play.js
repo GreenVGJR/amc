@@ -162,7 +162,7 @@ module.exports = {
   ;typesload]
 
   $if[$isValidLink[$option[query]]==false;$callLocalFunction[loadinteraction;1-1];$callLocalFunction[loadinteraction;1-2]]
-  $!playerCreate[$guildID;$voiceID;$channelID;100;true]
+  $!playerCreate[$guildID;$voiceID;$channelID;50;true]
   
   $let[default_provider;$callFunction[configMusic;default_provider]]
   $let[fallback_provider;$callFunction[configMusic;fallback_provider]]
