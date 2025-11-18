@@ -1,62 +1,66 @@
 <div align="center">
-  <img src="https://github-readme-stats.vercel.app/api/pin/?username=greenvgjr&repo=amc-discord-bot&theme=dark" alt=""/>
-  <p><b><br>Discord music bot for <a href="https://github.com/tryforge/ForgeScript">ForgeScript.js</a> and <a href="https://botdesignerdiscord.com/">BDFD</a></b></p>
-  <div>
-  <a href="https://github.com/tryforge/ForgeScript"><img src="https://github.com/user-attachments/assets/ce7c0de3-1ad2-4d5d-a60b-2bf9c3da1f64" loading="lazy" width=50 height=50 alt="Forgescript"/></a>
-  <a href="https://botdesignerdiscord.com/"><img src="https://github.com/user-attachments/assets/c1f59eee-9fec-4b95-8365-eb21422668e3" loading="lazy" width=50 height=50 alt="Bdfd"/></a>
-  </div>
-</div>
-
-> [!NOTE]
-> This project is still on progress.
-
-<details open>
-
-<summary>
-
-## Forgescript.js
   
-</summary>
-
-#### Dev
-> [Local](https://github.com/GreenVGJR/amc-discord-bot/tree/fs-dev-local)<br>
-> [Lavalink](https://github.com/GreenVGJR/amc-discord-bot/tree/fs-dev-lavalink)
-
-#### Main (stable)
-> [Local](https://github.com/GreenVGJR/amc-discord-bot/tree/fs-main-local)<br>
-> Lavalink (Waiting V2)
-
-</details>
-<details close>
-
-<summary>
-
-## BDFD
-  
-</summary>
-
-#### Dev
-> API (Soon)
-
-#### Main (stable)
-> API (Soon)
-
-</details>
-
-___
-
-## What is this?
-This project is designed for users who want an instant setup without any weird configuration,<br>
-while still offering some cool features. :D
-
-## Credits
-
-- [Emoji.gg](https://emoji.gg/) - Emojis source<br>
-- [Cyberghxst/Sora](https://github.com/Cyberghxst/Sora/) - FS & FM configs<br>
-- [skick1234/DisTube](https://github.com/skick1234/DisTube) - Style reference<br>
-- ~~[ForgeYoutube](https://github.com/Zack-911/ForgeYoutube/tree/dev) - Extensions for FS~~
+# 🌠 AMC
+Simple yet powerful Discord music bot. Built with [Forgescript](https://github.com/tryForge/ForgeScript)<br>
+[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/quoriel/db/main?label=@quoriel/db&color=2596be)](https://github.com/quoriel/db) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![ForgeLinked](https://img.shields.io/github/package-json/v/tryforge/ForgeLinked/dev?label=ForgeLinked&color=caa500)](https://github.com/tryforge/ForgeLinked/tree/dev) [![License](https://img.shields.io/github/license/GreenVGJR/amc-discord-bot)](LICENSE)
 
 <br>
-<div align="center">
-<p><h4>(づ•́ ᵔ •̀)づ</h4></p>
+
+# Choose Version
+|ForgeMusic|ForgeLinked|
+|:-:|:-:|
+|||
+|<b><a href="https://github.com/GreenVGJR/amc-discord-bot/tree/fs-main-local">Main (Stable)</a></b>|<b><a href="https://github.com/GreenVGJR/amc-discord-bot/tree/fs-main-lavalink">Main (Stable)</a></b>|
+|||
+|<b><a href="https://github.com/GreenVGJR/amc-discord-bot/tree/fs-dev-local">Dev</a></b>|<b><a href="https://github.com/GreenVGJR/amc-discord-bot/tree/fs-dev-lavalink">Dev</a></b>|
+
+ForgeMusic: Made with [discord-player](https://www.npmjs.com/package/discord-player)<br>
+ForgeLinked: Made with [lavalink-client](https://www.npmjs.com/package/lavalink-client)
+
 </div>
+
+## Features
+- Lyrics<br>
+  ```:: Youtube Music, Deezer, Lrclib, Genius```
+- Search Media (Max. 10 Results)<br>
+  ```:: Youtube, Youtube Shorts, Youtube Music, Soundcloud, Spotify, Apple Music, Amazon Music, Bandcamp, ITunes, Deezer, Tidal, Qobuz, Tiktok Video, Tiktok Music, Tiktok Sound, NCS```
+- Download Media<br>
+  ```:: Youtube, Soundcloud, Spotify*, Tiktok, Instagram, Facebook, Bandcamp, Twitter```<br>
+`*from Youtube`<br><br>
+- Auto-generate auth keys needed
+- Dynamic info message
+- Autocomplete song name
+- Music Controller
+- Playlist
+- Radio
+- DJ
+
+## Source Supports
+![Youtube](https://img.shields.io/badge/YouTube-%23FF2D20.svg?style=for-the-badge&logo=youtube&logoColor=white) ![Soundcloud](https://img.shields.io/badge/Soundcloud-000000.svg?style=for-the-badge&logo=soundcloud&logoColor=white) ![Spotify](https://img.shields.io/badge/Spotify-1ed760.svg?style=for-the-badge&logo=spotify&logoColor=white) ![Apple Music](https://img.shields.io/badge/Apple%20Music-ff0436.svg?style=for-the-badge&logo=applemusic&logoColor=white) ![HTTP](https://img.shields.io/badge/http-358eaf.svg?style=for-the-badge&logo=itunes&logoColor=white)
+
+## Commands
+|Name|Description|
+|-|-|
+|`/bot-info`|Show bot info|
+|`/dj`|Tweak DJ features|
+|`/download`|Download a media|
+|`/help`|List commands|
+|`/lyrics`|Search for lyrics \| Providers: Youtube Music, Deezer, Lrclib, Genius|
+|`/play`|Play a track|
+|`/playlist`|Show playlist you made|
+|`/queue`|Show all tracks info|
+|`/radio`|Show list of station digital radio. Powered by onlineradiobox|
+|`/search`|Search a media|
+|`/seek`|Seek a track to specific duration|
+|`/skip`|Skip a track|
+|`/stop`|Stop a track|
+|`/volume`|Set volume of music player|
+|`?eval`|(Owner only) Evaluates Forgescript code|
+|`?update`|(Owner only) Update/Refresh all commands|
+
+[Back to top](https://github.com/GreenVGJR/amc-discord-bot?tab=readme-ov-file#choose-version)
+
+## Credits
+- [Emoji.gg](https://emoji.gg/) - Emojis source<br>
+- [Cyberghxst/Sora](https://github.com/Cyberghxst/Sora/) - FS & FM configs<br>
+- [skick1234/DisTube](https://github.com/skick1234/DisTube) - Style reference
