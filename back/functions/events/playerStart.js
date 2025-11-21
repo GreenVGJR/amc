@@ -61,6 +61,8 @@ module.exports = {
     $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
     $setCache[musicplayer_message_$env[guildId]_channelid;$env[channelId]]
     $setCache[musicplayer_message_$env[guildId]_messageid;$get[secmid]]
+    $callFunction[updateCurrentMusicPlayer]
+    $stop
     ]
 
     $if[$getCache[radioplayer_data_$env[guildId]_playerstatus]!=true;
@@ -86,35 +88,32 @@ module.exports = {
     $jsonLoad[jsonmedia;$callFunction[filterMediaID;$get[url]]]
     ]
     $let[provider;$env[jsonmedia;type]]
-    $try[$!#editMessage[$env[channelId];$env[messageId];
+    $try[$!editMessage[$env[channelId];$env[messageId];
     $if[$get[looknextsong];
-    $author[Next Playing;$callFunction[useIcon;$get[provider]];;0]
+    $author[» Next Playing\n$get[owner];$callFunction[useIcon;$get[provider]];;0]
     $title[$cropText[$get[title];0;253;...];$get[url];0]
-    $thumbnail[$if[$or[$get[thumbnail]==null;$get[thumbnail]==];$userDefaultAvatar[$clientID];$get[thumbnail]]]
-    $addField[Owner;\`$get[owner]\`;true;0]
-    $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]LIVE;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]$parseDigital[$env[jsonmusicdata;durationMS]]];true;0]
+    $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]LIVE;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]$if[$advancedTextSplit[$parseDigital[$env[jsonmusicdata;durationMS]];:;0]==00;$cropText[$parseDigital[$env[jsonmusicdata;durationMS]];3;];$parseDigital[$env[jsonmusicdata;durationMS]]]];true;0]
     $addField[Songs;$separateNumber[$sum[$queueLength;1];.];true;0]
-    $color[$callFunction[useIcon;color_embed];0]
-    $if[$get[provider]!=spotify;$thumbnail[$if[$or[$get[thumbnail]==null;$get[thumbnail]==];$userDefaultAvatar[$clientID];$if[$endsWith[$get[owner]; - Topic];$replace[$get[thumbnail];hq720.jpg;frame0.jpg];$get[thumbnail]]];0]]
-    $footer[$username[$get[requestedBy]];$userAvatar[$get[requestedBy];1024];0]
+    $color[$default[$memberDisplayColor[$guildID;$get[requestedBy]];$callFunction[useIcon;color_embed]];0]
+    $thumbnail[$if[$isValidLink[$get[thumbnail]]==false;$userAvatar[$get[requestedBy];1024];$if[$endsWith[$get[owner]; - Topic];$replace[$get[thumbnail];hq720.jpg;frame0.jpg];$get[thumbnail]]];0]
+    $footer[$userDisplayName[$get[requestedBy]];$userAvatar[$get[requestedBy];1024];0]
     ;
-    $author[Now Playing;$callFunction[useIcon;$get[provider]];;0]
+    $author[» Now Playing\n$env[jsonmusicdata;author];$callFunction[useIcon;$get[provider]];;0]
     $title[$cropText[$env[jsonmusicdata;title];0;253;...];$env[jsonmusicdata;url];0]
     $if[$and[$get[delayping];$env[toggleInterval]];$description[Bad connection.\nThe current music playing may be sound robotic.;0]]
-    $addField[Owner;\`$env[jsonmusicdata;author]\`;true;0]
-    $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]LIVE;$if[$env[toggleInterval];$parseDigital[$get[elapsedtime]] - ]$parseDigital[$env[jsonmusicdata;durationMS]]];true;0]
+    $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]LIVE;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]$if[$advancedTextSplit[$parseDigital[$env[jsonmusicdata;durationMS]];:;0]==00;$cropText[$parseDigital[$env[jsonmusicdata;durationMS]];3;];$parseDigital[$env[jsonmusicdata;durationMS]]]];true;0]
     $addField[Songs;$separateNumber[$sum[$queueLength;1];.];true;0]
-    $if[$get[provider]!=spotify;$thumbnail[$if[$or[$env[jsonmusicdata;thumbnail]==null;$env[jsonmusicdata;thumbnail]==];$userDefaultAvatar[$clientID];$if[$endsWith[$env[jsonmusicdata;author]; - Topic];$replace[$env[jsonmusicdata;thumbnail];hq720.jpg;frame0.jpg];$env[jsonmusicdata;thumbnail]]];0]]
-    $color[$callFunction[useIcon;color_embed];0]
-    $footer[$username[$env[jsonmusicdata;requestedBy;id]];$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];0]
+    $thumbnail[$if[$isValidLink[$env[jsonmusicdata;thumbnail]]==false;$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];$if[$endsWith[$env[jsonmusicdata;author]; - Topic];$replace[$env[jsonmusicdata;thumbnail];hq720.jpg;frame0.jpg];$env[jsonmusicdata;thumbnail]]];0]
+    $color[$default[$memberDisplayColor[$guildID;$env[jsonmusicdata;requestedBy;id]];$callFunction[useIcon;color_embed]];0]
+    $footer[$userDisplayName[$env[jsonmusicdata;requestedBy;id]];$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];0]
     ]
     $addActionRow
-    $addStringSelectMenu[musicplayer_nodequeue_$env[messageId];$cropText[Queue | $djsEval[require("entities").decodeHTML("$replace[$trackInfo[title];";\\\\"]")];0;61;...];$or[$queueLength==0;$getLoopMode==TRACK];1;1]
+    $addStringSelectMenu[musicplayer_nodequeue_$env[messageId];$cropText[Queue | $djsEval[require("entities").decodeHTML(\\\`$replace[$trackInfo[title];";\\\\"]\\\`)];0;61;...];$or[$queueLength==0;$getLoopMode==TRACK];1;1]
 
     $let[countqueue;0]
     $if[$queueLength!=0;
     $arrayForEach[rest;yesnt;
-    $addOption[$djsEval[require("entities").decodeHTML("$replace[$cropText[$env[yesnt];0;97;...];";\\\\"]")];;$get[countqueue]]
+    $addOption[$djsEval[require("entities").decodeHTML(\\\`$replace[$cropText[$env[yesnt];0;97;...];";\\\\"]\\\`)];;$get[countqueue]]
     $letSum[countqueue;1]
     ]
     ;
@@ -124,7 +123,7 @@ module.exports = {
     $addButton[musicplayer_loop_$env[messageId];$toTitleCase[$getLoopMode];$if[$getLoopMode==OFF;Secondary;Primary];🔁;false]
     $addButton[musicplayer_shuffle_$env[messageId];$if[$get[statusshuffle];On;Off];$if[$get[statusshuffle];Primary;Secondary];🔀;false]
     $addButton[musicplayer_lyrics_$env[messageId];Lyrics;Secondary;🎶;$or[$env[jsonmusicdata;durationMS]==0;$get[provider]==null]]
-    $addButton[musicplayer_lastfm_$env[messageId];Last.FM;Secondary;1413865849307267112;$or[$get[provider]==null;$get[provider]==applemusic]]
+    $addButton[musicplayer_lastfm_$env[messageId];Last.FM;Secondary;1413865849307267112;$or[$get[provider]==null]]
     $addActionRow
     $addButton[musicplayer_volumedown_$env[messageId];-10%;Secondary;🔉;$checkCondition[$getVolume==0]]
     $addButton[null0;$getVolume%;Secondary;🔈;true]
@@ -144,10 +143,10 @@ module.exports = {
     $!#editMessage[$env[channelId];$env[messageId];
     $author[Streaming Radio;https://cdn.onlineradiobox.com/img/android-chrome-192x192.png;;0]
     $title[$cropText[$env[aradio;title];0;253;...];$env[aradio;url];0]
-    $if[$callFunction[configMusic;interval_message];$addField[Session Duration;$parseDigital[$get[elapsedtime]]]]
-    $thumbnail[$if[$or[$env[aradio;thumbnail]==null;$env[aradio;thumbnail]==];$userDefaultAvatar[$clientID];$env[aradio;thumbnail]];0]
-    $footer[$username[$env[aradio;requestedBy;id]];$userAvatar[$env[aradio;requestedBy;id];1024];0]
-    $color[$callFunction[useIcon;color_embed];0]
+    $if[$callFunction[configMusic;interval_message];$addField[Session Duration;$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]]]]
+    $thumbnail[$if[$isValidLink[$env[aradio;thumbnail]]==false;$userAvatar[$env[aradio;requestedBy;id];1024];$env[aradio;thumbnail]];0]
+    $footer[$userDisplayName[$env[aradio;requestedBy;id]];$userAvatar[$env[aradio;requestedBy;id];1024];0]
+    $color[$default[$memberDisplayColor[$guildID;$env[aradio;requestedBy;id]];$callFunction[useIcon;color_embed]];0]
     $addActionRow
     $addButton[musicplayer_volumemute_$env[messageId];$if[$getVolume==0;Unmute;Mute];Secondary;🔈;false]
     $addButton[null0;$getVolume%;Secondary;🔈;true]

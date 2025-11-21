@@ -1,12 +1,12 @@
 module.exports = {
   data: {
   "name": "lyrics",
-  "description": "Search for lyrics | Providers: YT Music, Deezer, Lrclib, Genius",
+  "description": "Search for lyrics | Providers: Youtube Music, Deezer, Shazam, Lrclib, Genius",
   "options": [
     {
       "type": 3,
       "name": "song_name",
-      "description": "Search for lyrics by typing the name of the song",
+      "description": "Search lyrics by typing song name",
       "required": true
     },
     {
@@ -23,7 +23,7 @@ module.exports = {
     },
   ],
   "description_localizations": {
-    "id": "Mencari lirik | Sumber: YT Music, Deezer, Lrclib, Genius"
+    "id": "Cari lirik lagu | Sumber: Youtube Music, Deezer, Shazam, Lrclib, Genius"
   },
   "integration_types": [
     0,
@@ -68,13 +68,12 @@ module.exports = {
     $addFile[attachment://$get[filename]]
     $addSeparator[Small;true]
     ]
-    $addTextDisplay[> ### -# $get[latencyrs]ms | $toTitleCase[$env[result;results;provider]]]
-    $addSeparator[Small;true]
     $addSection[
-    $addTextDisplay[> ## $hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]
-    $addTextDisplay[$codeBlock[$cropText[$get[loadlyrics];0;3000;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
-    $addThumbnail[$env[result;results;thumbnail]]
+    $addTextDisplay[- $get[latencyrs]ms | $toTitleCase[$env[result;results;provider]]\n»   $bold[$hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]]
+    $addButton[$env[result;results;thumbnail];Thumbnail;Link;🖼️]
     ]
+    $addSeparator[Small;true]
+    $addTextDisplay[$codeBlock[$cropText[$get[loadlyrics];0;3000;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
     ;$callFunction[useIcon;color_embed]]
     ]
     `

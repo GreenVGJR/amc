@@ -44,13 +44,13 @@ module.exports = {
   $title[$cropText[$trackInfo[title];0;253;...];$trackInfo[url];0]
   $addField[Owner;\`$trackInfo[author]\`;true;0]
   $addField[Duration;$if[$trackInfo[durationMS]==0;LIVE;$parseDigital[$trackInfo[durationMS]]];true;0]
-  $thumbnail[$if[$or[$trackInfo[thumbnail]==null;$trackInfo[thumbnail]==];$userDefaultAvatar[$authorID];$trackInfo[thumbnail]];0]
+  $thumbnail[$if[$isValidLink[$trackInfo[thumbnail]]==false;$userAvatar[$trackInfo[requestedBy;id];1024];$trackInfo[thumbnail]];0]
   $color[$callFunction[useIcon;color_embed];0]
-  $footer[$username[$trackInfo[requestedBy;id]];$userAvatar[$trackInfo[requestedBy;id];1024];0]
+  $footer[$userDisplayName[$trackInfo[requestedBy;id]];$userAvatar[$trackInfo[requestedBy;id];1024];0]
   $author[Queue ($separateNumber[$queueLength;.]);;;1]
   $description[$if[$queueLength==0;$callFunction[useCustomMusicMessage;config_errorNoQueueList];$get[contains]];1]
   $color[$callFunction[useIcon;color_embed];1]
-  $if[$queueLength!=0;$thumbnail[$if[$or[$queue[0;1;{track.thumbnail}]==null;$queue[0;1;{track.thumbnail}]==];$userDefaultAvatar[$authorID];$queue[0;1;{track.thumbnail}]];1]]
+  $if[$queueLength!=0;$thumbnail[$if[$isValidLink[$queue[0;1;{track.thumbnail}]]==false;$userAvatar[$clientID;1024];$queue[0;1;{track.thumbnail}]];1]]
   $timestamp[;1]
   $if[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;
   $addActionRow

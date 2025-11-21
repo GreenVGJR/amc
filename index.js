@@ -1,17 +1,23 @@
 require('dotenv').config(); // Load Environment
 
+// Config
+const youtube = require('./back/client/youtubeConfig');
+const toggles = require('./back/config.json');
+
 // Main
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
 const { ForgeMusic, GuildQueueEvent } = require('@tryforge/forge.music');
 const { QuorielDB } = require("@quoriel/db");
 // const { ForgeDB } = require("@tryforge/forge.db");
 
-// Extractor & Config
+// Extractor
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const { SoundcloudExtractor } = require("discord-player-soundcloud");
-const { SpotifyExtractor, AppleMusicExtractor, AttachmentExtractor } = require("@discord-player/extractor");
-const youtube = require('./back/client/youtubeConfig');
-const toggles = require('./back/config.json');
+const { SpotifyExtractor } = require("discord-player-spotify");
+const { AppleMusicExtractor } = require("discord-player-applemusic");
+const { AttachmentExtractor } = require("@discord-player/extractor");
+
+console.clear();
 
 const quorielDb = new QuorielDB({
     events: [
@@ -31,10 +37,9 @@ const music = new ForgeMusic({
     ],
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
-        disableResampler: true,
+        disableResampler: false,
         disableFallbackStream: toggles.disable_YT,
         bufferingTimeout: 500,
-        preferBridgedMetadata: true,
         volume: 50,
         connectionTimeout: 10000,
         leaveOnEmpty: true,
@@ -43,6 +48,7 @@ const music = new ForgeMusic({
     },
     skipFFmpeg: true
 });
+
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
     logLevel: LogPriority.Medium,
@@ -65,9 +71,11 @@ const client = new ForgeClient({
     extensions: [
      // new ForgeDB(),
         quorielDb,
-        music,
+        music
     ]
 });
+
+client.login();
 
 quorielDb.commands.load("back/client/fdb");
 client.functions.load("back/functions");
@@ -81,6 +89,3 @@ music.player.extractors.register(AppleMusicExtractor);
 music.player.extractors.register(AttachmentExtractor);
 music.player.extractors.register(YoutubeiExtractor, youtube);
 music.commands.load("back/events");
-
-console.clear();
-client.login();

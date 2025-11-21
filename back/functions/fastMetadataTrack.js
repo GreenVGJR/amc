@@ -24,10 +24,10 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $if[$env[provider]==youtube;
-    $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","context":{"client":{"clientName":"WEB","clientVersion":"2.$djsEval[new Date().toISOString().slice(0,10).replace(/-/g,'')]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","context":{"client":{"clientName":"WEB","clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","hl":"en","gl":"US"}}}]
     $httpSetContentType[Json]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
     $!httpRequest[https://www.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title,richThumbnail,lengthText);POST;res]
     $jsonLoad[toindex;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $let[findindex;$arrayFindIndex[toindex;checkindex;$checkCondition[$env[checkindex;videoRenderer]!=]]]
@@ -41,7 +41,7 @@ module.exports = {
     $if[$env[provider]==soundcloud;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
     $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[authmusic_soundcloud]&limit=1;GET;res]]
     $onlyIf[$get[http]!=401;
     $callFunction[generateAuthKeys;soundcloud;;false]
@@ -54,14 +54,14 @@ module.exports = {
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_spotify]]
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
     $httpAddHeader[App-platform;WebPlayer]
     $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1;GET;jsonres]]
     $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;
     $callFunction[generateAuthKeys;spotify;;false]
     $callLocalFunction[refreshing;true]
     ]
-    $onlyIf[$get[httpspo]!=429;$return]
+    $onlyIf[$or[$get[httpspo]==429;$get[httpspo]==403]!=true;$return]
     ]
     $jsonLoad[res1;$env[jsonres;tracks;items]]
     $let[rest2;{"id":"$advancedTextSplit[$env[res1;0;external_urls;spotify];/;4]","dynamic_thumbnail":"","thumbnail":"$env[res1;0;album;images;0;url]","duration":$round[$divide[$env[res1;0;duration_ms];1000];0],"title":"$deflate[$env[res1;0;name];base64]"}]
@@ -69,7 +69,7 @@ module.exports = {
     $if[$env[provider]==applemusic;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
     $httpSetContentType[Text]
     $!httpRequest[https://itunes.apple.com/search?media=music&limit=1&country=US&term=$env[query];GET;res]
     ]

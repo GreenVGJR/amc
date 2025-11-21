@@ -105,7 +105,7 @@ module.exports = {
     $callLocalFunction[loadinteraction;3;$and[$arrayLength[loadstate]==20;$get[checkdb]==]]
     $if[$and[$arrayLength[loadstate]==20;$get[checkdb]==];
     $let[passtr;false]
-    $loop[20;
+    $loop[10;
     $let[chtoa;$callFunction[scrapeOnlineRadio;$toLowercase[$option[query]];$if[$option[country]!=;$advancedTextSplit[$env[result2;0;1];/;1]];$env[loopcountertest];$guildID;false;false]]
     $if[$and[$get[passtr]==false;$env[loopcountertest]>5];$let[passtr;true] $callLocalFunction[loadinteraction;3;false]]
     $if[$charCount[$get[chtoa]]==2;$break]

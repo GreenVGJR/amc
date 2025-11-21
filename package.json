@@ -1,15 +1,17 @@
 {
   "dependencies": {
-    "@discordjs/opus": "^0.10.0",
     "@evan/opus": "^1.0.3",
     "@quoriel/db": "^1.7.3",
     "@tryforge/forge.music": "^1.0.0",
     "@tryforge/forgescript": "^2.5.0",
+    "discord-player-applemusic": "^1.0.3",
     "discord-player-soundcloud": "^1.0.7",
+    "discord-player-spotify": "^1.1.7",
     "discord-player-youtubei": "^1.5.0",
     "dotenv": "^17.2.3",
     "entities": "^7.0.0",
-    "lmdb": "^3.4.4"
+    "lmdb": "^3.4.4",
+    "mediaplex": "^1.0.0"
   },
   "devDependencies": {
     "patch-package": "^8.0.1"

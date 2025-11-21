@@ -16,9 +16,7 @@ module.exports = [{
     $let[interval_time;1000]
     $let[nextmessage_time;16000]
 
-    $if[$callFunction[configMusic;interval_message];
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    ]
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$if[$env[reason]!=filters;0]]]
 
     $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[track];false;intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
@@ -39,7 +37,7 @@ module.exports = [{
     code: `
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
-    $try[$if[$callFunction[configMusic;interval_message];$!clearInterval[intervalmusicmessage_$guildID_$get[cid]]]]
+    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     `
 },
 {
@@ -58,9 +56,8 @@ module.exports = [{
     "url": "$trackInfo[url]",
     "thumbnail": "$trackInfo[thumbnail]",
     "duration": "$trackInfo[duration]",
-    "durationMS": $trackInfo[durationMS],
-    "requestedBy": {"id":"$advancedTextSplit[$trackInfo[requestedBy];@;1;>;0]"},
-    "playlist": null
+    "durationMS": "$trackInfo[durationMS]",
+    "requestedBy": {"id":"$trackInfo[requestedBy;id]"}
     }]
     
     $let[interval_time;1000]
@@ -81,9 +78,7 @@ module.exports = [{
     code: `
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
-    $if[$callFunction[configMusic;interval_message];
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    ]
     $try[$!disableComponentsOf[$get[cid];$get[mid]]]
     `
 }]
