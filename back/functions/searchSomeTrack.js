@@ -133,7 +133,6 @@ module.exports = {
     $localFunction[refreshqob;
     $if[$env[refresh]==true;
     $if[$get[tryattempt]>=3;$return]
-    $callFunction[generateAuthKeys;qobuz;;false]
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
