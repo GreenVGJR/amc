@@ -6,6 +6,8 @@ const { ForgeLinked } = require('ForgeLinked');
 const { QuorielDB } = require("@quoriel/db");
 // const { ForgeDB } = require("@tryforge/forge.db");
 
+console.clear();
+
 const quorielDb = new QuorielDB({
     events: [
         "dbConnect"
@@ -78,5 +80,3 @@ client.commands.load("back/interaction");
 client.commands.load("back/client/fs");
 client.commands.load("commands/basic");
 lavalink.commands.load("back/events");
-
-console.clear();

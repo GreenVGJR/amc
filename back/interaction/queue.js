@@ -35,13 +35,13 @@ module.exports = {
     $title[$cropText[$env[currenttrack;info;title];0;253;...];$env[currenttrack;info;uri];0]
     $addField[Owner;\`$env[currenttrack;info;author]\`;true;0]
     $addField[Duration;$if[$env[currenttrack;info;isStream];LIVE;$parseDigital[$env[currenttrack;info;duration]]];true;0]
-    $thumbnail[$if[$or[$env[currenttrack;info;artworkUrl]==null;$env[currenttrack;info;artworkUrl]==];$userDefaultAvatar[$authorID];$env[currenttrack;info;artworkUrl]];0]
+    $thumbnail[$if[$isValidLink[$env[currenttrack;info;artworkUrl]]==false;$userAvatar[$env[currenttrack;userData;requester;userId];1024];$env[currenttrack;info;artworkUrl]];0]
     $color[$callFunction[useIcon;color_embed];0]
-    $footer[$username[$env[currenttrack;userData;requester;userId]];$userAvatar[$env[currenttrack;userData;requester;userId];1024];0]
+    $footer[$userDisplayName[$env[currenttrack;userData;requester;userId]];$userAvatar[$env[currenttrack;userData;requester;userId];1024];0]
     $author[Queue ($separateNumber[$playerQueueLength[$guildID];.]);;;1]
     $description[$if[$playerQueueLength[$guildID]==0;$callFunction[useCustomMusicMessage;config_errorNoQueueList];$get[contains]];1]
     $color[$callFunction[useIcon;color_embed];1]
-    $if[$playerQueueLength[$guildID]!=0;$thumbnail[$if[$or[$env[rest;0;info;artworkUrl]==null;$env[rest;0;info;artworkUrl]==];$userDefaultAvatar[$authorID];$env[rest;0;info;artworkUrl]];1]]
+    $if[$playerQueueLength[$guildID]!=0;$thumbnail[$if[$or[$env[rest;0;info;artworkUrl]==null;$env[rest;0;info;artworkUrl]==];$userAvatar[$clientID;1024];$env[rest;0;info;artworkUrl]];1]]
     $timestamp[;1]
     $if[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;
     $addActionRow

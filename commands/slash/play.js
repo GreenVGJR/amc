@@ -86,7 +86,7 @@ module.exports = {
   $localFunction[loadinteraction;
   $if[$env[typesload]==1-1;
   $let[mid;$interactionReply[
-  $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
+  $author[$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
   $footer[Searching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
@@ -97,7 +97,7 @@ module.exports = {
   ]
   $if[$env[typesload]==1-2;
   $let[mid;$interactionReply[
-  $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
+  $author[$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
   $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
   $footer[Fetching;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
@@ -109,8 +109,8 @@ module.exports = {
   ]
   $if[$env[typesload]==2;
   $interactionReply[
-  $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
-  $addField[$get[music_title];-# $if[$get[music_duration]==0;LIVE;$parseDigital[$get[music_duration]]];true]
+  $author[$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
+  $addField[$get[music_title];-# $if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]];true]
   $thumbnail[$get[music_thumbnail]]
   $color[$callFunction[useIcon;color_embed]]
   $footer[Fetching | $if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]];$callFunction[useIcon;loading]]
@@ -120,8 +120,8 @@ module.exports = {
   $let[checkinter-4;true]
   $interactionReply[
   $if[$get[basic_type];
-  $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
-  $addField[$get[music_title];-# $if[$get[music_duration]==0;LIVE;$parseDigital[$get[music_duration]]];true]
+  $author[$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
+  $addField[$get[music_title];-# $if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]];true]
   $thumbnail[$get[music_thumbnail];0]
   $color[$callFunction[useIcon;color_embed];0]
   $footer[$if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]];$callFunction[useIcon;$get[use_provider];0]]
@@ -185,6 +185,7 @@ module.exports = {
   $let[music_id;$env[result;id]]
   $let[music_duration;$multi[$env[result;duration];1000]]
   $let[music_thumbnail;$if[$env[result;dynamic_thumbnail]==;$env[result;thumbnail];$env[result;dynamic_thumbnail]]]
+  $let[music_thumbnail;$if[$isValidLink[$get[music_thumbnail]];$get[music_thumbnail];$userAvatar[$authorID;1024]]]
   $let[music_provider;$get[use_provider]]
 
   $let[isforcedirect;$option[direct_cdn]]
@@ -208,13 +209,7 @@ module.exports = {
   $let[attemptry;0]
   $let[donetry;5]
   $let[found;false]
-  $try[
-  $!playerAddTrack[$guildID;$trimLines[$get[music_playurl]]]
-  ;
-  $letSum[attemptry;1]
-  ]
-
-  $while[$and[$get[attemptry]!=0;$get[attemptry]<=$get[donetry];$get[found]==false];
+  $while[$and[$get[attemptry]<=$get[donetry];$get[found]==false];
     $try[
     $!playerAddTrack[$guildID;$trimLines[$get[music_playurl]]]
     $let[found;true]

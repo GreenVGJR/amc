@@ -62,13 +62,13 @@ module.exports = {
   $addButton[botinfoclearcacheradio;Clear /radio Cache;Secondary;]
   ]]
   ;connections]
-  $callLocalFunction[abcd;;]
   $let[owner_banner;$try[$userBanner[$botOwnerID;2048]]]
   $let[client_banner;$try[$userBanner[$clientID;2048]]]
   $let[av1;$userAvatar[$botOwnerID;2048]]
   $let[av2;$userAvatar[$clientID;2048]]
   $arrayLoad[guild;,;$guildIDs[,]]
   $let[countnode;0]
+  $callLocalFunction[abcd;;]
   $arrayForEach[guild;guilds;
   $try[
   $if[$playerQueueLength[$env[guilds]]>=0;$letSum[countnode;1]]

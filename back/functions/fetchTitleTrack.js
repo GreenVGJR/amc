@@ -26,18 +26,18 @@ module.exports = {
     ]
     $if[$env[filtype;type]==spotify;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $let[author;$env[a;results;album;artist;0;name]]
+    $let[author;$env[a;results;artists;0;name]]
     $let[title;$env[a;results;name]]
     ]
     $if[$env[filtype;type]==tiktokmob;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $let[author;$default[$env[a;results;author;uniqueId];$env[a;results;author]]]
-    $let[title;$default[$env[a;results;desc];$env[a;results;title]]]
+    $let[title;$default[$env[a;results;desc];$env[a;results;id]]]
     ]
     $if[$env[filtype;type]==tiktok;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $let[author;$default[$env[a;results;author;uniqueId];$env[a;results;author]]]
-    $let[title;$default[$env[a;results;desc];$env[a;results;title]]]
+    $let[title;$default[$env[a;results;desc];$env[a;results;id]]]
     ]
     $if[$env[filtype;type]==tiktokmusic;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
@@ -64,6 +64,7 @@ module.exports = {
     $let[author;$env[a;results;core;user_results;result;core;screen_name]]
     $let[title;$default[$advancedTextSplit[$env[a;results;legacy;full_text];https://t.co;0];$env[a;results;post_video_description]]]
     ]
-    $if[$or[$get[title]==;$get[title]==null;$get[title]==undefined]!=true;$if[$or[$get[author]==;$get[author]==null;$get[author]==undefined];$return[$trimLines[$get[title]]];$if[$checkContains[$toLowercase[$trimLines[$get[title]]];$toLowercase[$trimLines[$get[author]]]];$return[$trimLines[$get[title]]];$return[$trimLines[$get[author]] - $trimLines[$get[title]]]]];$return]
+    $let[finaltitle;$default[$get[author];null] - $default[$get[title];null]]
+    $return[$get[finaltitle]]
     `
 }

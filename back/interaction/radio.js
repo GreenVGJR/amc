@@ -64,7 +64,7 @@ module.exports = [{
     $callLocalFunction[loadinteraction;2;$and[$arrayLength[loadstate]==20;$get[checkdb]==]]
     $if[$and[$arrayLength[loadstate]==20;$get[checkdb]==];
     $let[passtr;false]
-    $loop[20;
+    $loop[10;
     $let[chtoa;$callFunction[scrapeOnlineRadio;$if[$get[co2]!=;$inflate[$get[co2];base64]];$get[co1];$sum[$env[loopcountertest];$get[currentpage]];$guildID;false;false]]
     $if[$and[$get[passtr]==false;$env[loopcountertest]>5];$let[passtr;true] $callLocalFunction[loadinteraction;2;false]]
     $if[$charCount[$get[chtoa]]==2;$break]
@@ -117,7 +117,7 @@ module.exports = [{
     $callLocalFunction[loadinteraction;1]
 
     $try[
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
     $!httpRequest[https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/;GET]
     ]
     $let[current_track;$replace[$replace[$replace[$replace[$replace[$replace[$replace[$advancedTextSplit[$httpResult;class="station-onair";1;class="track_history_item";1;class="ajax">;1;</a>;0];<a>;];</a>;];<i>;];</i>;];<b>;];</b>;];";\\\\"]]

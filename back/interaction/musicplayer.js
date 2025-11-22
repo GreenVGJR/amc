@@ -5,7 +5,7 @@ module.exports = {
     $onlyIf[$advancedTextSplit[$customID;_;0]==musicplayer;]
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
-    $onlyIf[$get[mid]==$messageID;$async[$!deferUpdate]$!disableComponentsOf[$channelID;$messageID]]
+    $onlyIf[$get[mid]==$messageID;$async[$!disableComponentsOf[$channelID;$messageID]] $!deferUpdate]
     $onlyIf[$voiceID[$guildID;$clientID]!=;]
     $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
     $if[$get[crdjcs_0f]==false;
@@ -80,21 +80,25 @@ module.exports = {
     $if[$advancedTextSplit[$customID;_;1]==seekdown;
     $ephemeral
     $defer
+    $async[
     $let[curduration;$playerElapsedTime[$guildID]]
     $let[seeks;10000]
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sub[$get[curduration];$get[seeks]]]]
     $let[resseek;$if[$sub[$get[curduration];$get[seeks]]<0;0;$sub[$get[curduration];$get[seeks]]]]
-    $async[$!playerSeek[$guildID;$get[resseek]]]
+    $!playerSeek[$guildID;$get[resseek]]
+    ]
     $!interactionDelete
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekup;
     $ephemeral
     $defer
+    $async[
     $let[curduration;$playerElapsedTime[$guildID]]
     $let[seeks;10000]
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sum[$get[curduration];$get[seeks]]]]
     $let[resseek;$if[$sum[$get[curduration];$get[seeks]]<0;0;$sum[$get[curduration];$get[seeks]]]]
-    $async[$!playerSeek[$guildID;$get[resseek]]]
+    $!playerSeek[$guildID;$get[resseek]]
+    ]
     $!interactionDelete
     ]
     $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown;lastfm]!=true;]

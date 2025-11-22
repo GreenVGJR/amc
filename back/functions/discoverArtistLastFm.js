@@ -14,7 +14,7 @@ module.exports = {
 $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
 $try[
 $let[authorurl;https://www.last.fm/music/$env[query]]
-$httpAddHeader[Accept-Encoding;gzip, deflate, br, zstd]
+$httpAddHeader[Accept-Encoding;gzip, deflate, br]
 $httpAddHeader[Accept;text/html]
 $httpAddHeader[User-Agent;$get[agent]]
 $httpAddHeader[Sec-Fetch-Site;none]

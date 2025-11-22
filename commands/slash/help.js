@@ -29,12 +29,10 @@ module.exports = {
   $arrayMap[test;t1;$if[$env[t1;integrationTypes;1]==1;$return[</$env[t1;name]:$env[t1;id]>]];testuser]
   $arrayMap[test;t1;$return[</$env[t1;name]:$env[t1;id]>];testguild]
   
-  $author[Hello, $username[$authorID];$userAvatar[$authorID;512];;0]
-  $footer[Apps - Available Commands;;0]
-  $description[$arrayJoin[testuser;, ];0]
-  $footer[Guild - Available Commands;;1]
-  $description[$arrayJoin[testguild;, ];1]
+  $author[List Commands;$userAvatar[$clientID;1024];;0]
+  $addField[Apps;-# - $arrayJoin[testuser;\n-# - ];true;0]
+  $addField[Guild;-# - $arrayJoin[testguild;\n-# - ];true;0]
   $color[$callFunction[useIcon;color_embed];0]
-  $color[$callFunction[useIcon;color_embed];1]
+  $footer[$userDisplayName[$authorID];$userAvatar[$authorID;1024];0]
   `
 }

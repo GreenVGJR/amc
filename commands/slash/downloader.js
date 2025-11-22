@@ -22,6 +22,10 @@ module.exports = {
       {
         "name": "Audio + Video",
         "value": "2"
+      },
+      {
+        "name": "Audio + Video (Legacy)",
+        "value": "3"
       }],
     },
     {
@@ -70,11 +74,12 @@ $footer[$env[msg2];$if[$env[togload]==true;$callFunction[useIcon;loading]]]
 $if[$has[mid]==false;$let[mid;$get[mid2]]]
 $return
 ;msg1;msg2;togload]
-$let[isactivelyric;$and[$option[yt_option]!=2;$option[lyrics]==true;$or[$env[musictype;type]==youtube;$env[musictype;type]==soundcloud;$env[musictype;type]==spotify]]]
+$let[agent;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36]
+$let[isactivelyric;$and[$option[yt_option]!=2;$option[yt_option]!=3;$option[lyrics]==true;$or[$env[musictype;type]==youtube;$env[musictype;type]==soundcloud;$env[musictype;type]==spotify;$env[musictype;type]==bandcamp]]]
 $try[
 $if[$env[musictype;type]==spotify;
 $callLocalFunction[runcodessync;Converting;Processing;true]
-$let[storeobjecthttp;$callFunction[extractTrack;$env[b;results;0;url]]]
+$let[storeobjecthttp;$callFunction[extractTrack;https://open.spotify.com/track/$advancedTextSplit[$env[musictype;id];/;1]]]
 $let[gettitle;$cropText[$callFunction[fetchTitleTrack;https://open.spotify.com/track/$advancedTextSplit[$env[musictype;id];/;1];$default[$get[storeobjecthttp];]];0;479;]]
 $onlyIf[$get[gettitle]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $jsonLoad[b;$callFunction[getYoutubeMusic;$get[gettitle]]]
@@ -85,11 +90,16 @@ $let[getcdn;$callFunction[fallbackPlaybackTrack;$env[b;results;0;url];v;$default
 $callLocalFunction[runcodessync;Getting CDN & Title$if[$get[isactivelyric]; & Lyrics];Fetching - This may take longer;true]
 $let[storeobjecthttp;$callFunction[extractTrack;$get[url]]]
 $jsonLoad[preobject;$get[storeobjecthttp]]
-$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;v];$default[$get[storeobjecthttp];]]]
+$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;$if[$and[$env[musictype;type]==youtube;$option[yt_option]==3];va;v]];$default[$get[storeobjecthttp];]]]
 ]
 $onlyIf[$advancedTextSplit[$trimLines[$get[getcdn]];|;0]!=bot;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]\nError: $advancedTextSplit[$trimLines[$get[getcdn]];|;1]]
 $onlyIf[$or[$trimLines[$get[getcdn]]==null;$trimLines[$get[getcdn]]==live;$trimLines[$get[getcdn]]==]!=true;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-$!djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET"}).then(r=>{ctx.setKeyword("clh",r.headers.get("Content-Length")??"")\\;ctx.setKeyword("cly",r.headers.get("Content-Type")??"")\\;ctx.setKeyword("httpstatus",r.status.toString())}).catch()]
+$let[checkcdn_headers;{
+"Accept": "*/*",
+"Sec-Fetch-Site": "none",
+"User-Agent": "$get[agent]"
+}]
+$!djsEval[require("undici").request(ctx.getKeyword("getcdn"),{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).then(r=>{ctx.setKeyword("clh",r.headers?.\\['content-length'\\]??"")\\;ctx.setKeyword("cly",r.headers?.\\['content-type'\\]??"")\\;ctx.setKeyword("httpstatus",r.statusCode)}).catch()]
 $if[$has[gettitle]==false;
 $let[gettitle;$cropText[$callFunction[fetchTitleTrack;$get[url];$default[$get[storeobjecthttp];]];0;479;]]
 $if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]]]
@@ -116,6 +126,8 @@ $if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];
 $let[contenttype;m3u8]
 $let[converttype;ts]
 $let[names;$get[gettitle]]
+$httpAddHeader[User-Agent;$get[agent]]
+$httpSetContentType[Text]
 $onlyIf[$httpRequest[$get[getcdn];GET]==200;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $let[clh;$charCount[$httpResult]]
 $callLocalFunction[runcodessync;Fetching Segments;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
@@ -124,29 +136,37 @@ $arrayLoad[b;#EXTINF;$httpResult]
 $!arrayShift[b]
 $arrayMap[b;c;$return[$advancedTextSplit[$env[c];
 ;1]];b]
-$arrayMap[b;c;$if[$get[clh]<=10000000;$return[$djsEval[fetch("$env[c]").then(r => r.arrayBuffer()).then(d => { (ctx.setKeyword("clh", Number(ctx.getKeyword("clh") ?? 0) + d.byteLength))\\; return Buffer.from(d).toString("base64")}).then(e => e).catch()]]];b]
+$arrayMap[b;c;$if[$get[clh]<=10000000;$return[$djsEval[fetch("$env[c]", { method: "GET", headers: JSON.parse(ctx.getKeyword("checkcdn_headers")) }).then(r => r.arrayBuffer()).then(d => { (ctx.setKeyword("clh", Number(ctx.getKeyword("clh") ?? 0) + d.byteLength))\\; return Buffer.from(d).toString("base64")}).then(e => e).catch()]]];b]
 $let[ks;$djsEval[Buffer.concat(JSON.parse(\\\`$env[b]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64")]]
 $onlyIf[$get[clh]!=0;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOverDownload]\n$hyperlink[$get[gettitle];$trimLines[$get[getcdn]]]]
 $let[contenttype;ts]
 $let[converttype;mp4]
 $let[names;$get[gettitle].$get[converttype]]
-$callLocalFunction[runcodessync;;Uploading;true]
 $interactionReply[
+$callLocalFunction[runcodessync;;Uploading;true]
 $attachment[$get[ks];$get[names];true;base64]
 ]
 ;
+$let[f-fetch;false]
 $let[condownbytes_headers;{
 "Accept": "*/*",
 "Range": "bytes=0-$get[clh]",
 "Sec-Fetch-Site": "none",
-"User-Agent": "Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+"User-Agent": "$get[agent]"
 }]
-$callLocalFunction[runcodessync;Downloading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$async[
 $let[condownbytes;$djsEval[fetch("$trimLines[$get[getcdn]]", { method: "GET", headers: JSON.parse(ctx.getKeyword("condownbytes_headers")) }).then(a => a.arrayBuffer()).then(b => Buffer.from(b).toString("base64")).then(e => e).catch()]]
+$let[f-fetch;$if[$get[condownbytes]==;null;true]]
+]
+$callLocalFunction[runcodessync;Downloading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$loop[-1;
+$if[$get[f-fetch]!=false;$break]
+$wait[5]
+]
 $onlyIf[$get[condownbytes]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-$callLocalFunction[runcodessync;;Uploading;true]
 $interactionReply[
+$callLocalFunction[runcodessync;;Uploading;true]
 $if[$and[$option[lyrics]==true;$get[checklyric]];$attachment[$get[loadlyrics];$get[lyricnames];true]]
 $attachment[$get[condownbytes];$get[names];true;base64]
 ]]
