@@ -6,7 +6,7 @@ Simple yet powerful Discord music bot. Built with [Forgescript](https://github.c
 
 <br>
 
-# Choose Version
+## Choose Version
 |ForgeMusic|ForgeLinked|
 |:-:|:-:|
 |||
@@ -20,13 +20,9 @@ ForgeLinked: Made with [lavalink-client](https://www.npmjs.com/package/lavalink-
 </div>
 
 ## Features
-- Lyrics<br>
-  ```:: Youtube Music, Deezer, Lrclib, Genius```
-- Search Media (Max. 10 Results)<br>
-  ```:: Youtube, Youtube Shorts, Youtube Music, Soundcloud, Spotify, Apple Music, Amazon Music, Bandcamp, ITunes, Deezer, Tidal, Qobuz, Tiktok Video, Tiktok Music, Tiktok Sound, NCS```
-- Download Media<br>
-  ```:: Youtube, Soundcloud, Spotify*, Tiktok, Instagram, Facebook, Bandcamp, Twitter```<br>
-`*from Youtube`<br><br>
+- Lyrics
+- Search Media
+- Download Media
 - Auto-generate auth keys needed
 - Dynamic info message
 - Autocomplete song name
@@ -36,7 +32,8 @@ ForgeLinked: Made with [lavalink-client](https://www.npmjs.com/package/lavalink-
 - DJ
 
 ## Source Supports
-![Youtube](https://img.shields.io/badge/YouTube-%23FF2D20.svg?style=for-the-badge&logo=youtube&logoColor=white) ![Soundcloud](https://img.shields.io/badge/Soundcloud-000000.svg?style=for-the-badge&logo=soundcloud&logoColor=white) ![Spotify](https://img.shields.io/badge/Spotify-1ed760.svg?style=for-the-badge&logo=spotify&logoColor=white) ![Apple Music](https://img.shields.io/badge/Apple%20Music-ff0436.svg?style=for-the-badge&logo=applemusic&logoColor=white) ![HTTP](https://img.shields.io/badge/http-358eaf.svg?style=for-the-badge&logo=itunes&logoColor=white)
+![Youtube](https://img.shields.io/badge/YouTube-%23FF2D20.svg?style=for-the-badge&logo=youtube&logoColor=white) ![Soundcloud](https://img.shields.io/badge/Soundcloud-000000.svg?style=for-the-badge&logo=soundcloud&logoColor=white) ![Spotify](https://img.shields.io/badge/Spotify-1ed760.svg?style=for-the-badge&logo=spotify&logoColor=white) ![Apple Music](https://img.shields.io/badge/Apple%20Music-ff0436.svg?style=for-the-badge&logo=applemusic&logoColor=white) ![HTTP](https://img.shields.io/badge/http-358eaf.svg?style=for-the-badge&logo=itunes&logoColor=white)<br>
+*May not accurate for Forgelinked version
 
 ## Commands
 |Name|Description|
@@ -58,7 +55,7 @@ ForgeLinked: Made with [lavalink-client](https://www.npmjs.com/package/lavalink-
 |`?eval`|(Owner only) Evaluates Forgescript code|
 |`?update`|(Owner only) Update/Refresh all commands|
 
-[Back to top](https://github.com/GreenVGJR/amc-discord-bot?tab=readme-ov-file#choose-version)
+[Back to top](https://github.com/GreenVGJR/amc-discord-bot?tab=readme-ov-file#-amc)
 
 ## Credits
 - [Emoji.gg](https://emoji.gg/) - Emojis source<br>
