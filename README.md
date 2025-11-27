@@ -81,6 +81,7 @@ ___
   Providers:
   = > Youtube Music
     > Deezer
+    > Shazam
     > Lrclib
     > Genius
 
@@ -102,6 +103,9 @@ ___
     > Tiktok Music
     > Tiktok Sound
     > NCS
+    > Capcut - Templates
+    > Kinemaster - Templates
+    > Roblox Music
 
 - Download media
   Providers:

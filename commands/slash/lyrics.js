@@ -44,11 +44,7 @@ module.exports = {
     $if[$env[result;results]==;$let[fsearch;null];$let[fsearch;true]]
     $let[latencyrs;$round[$executionTime]]
     ]
-    $interactionReply[
-    $addContainer[
-    $addTextDisplay[### -# Loading]
-    ;$callFunction[useIcon;color_embed]]
-    ]
+    $defer
 
     $loop[-1;
     $if[$get[fsearch]!=false;$break]

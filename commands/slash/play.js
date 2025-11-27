@@ -156,8 +156,6 @@ module.exports = {
   ]
   ]
   ;typesload]
-
-  $if[$isValidLink[$option[query]];$callLocalFunction[loadinteraction;1-2]]
   
   $let[default_provider;$callFunction[configMusic;default_provider]]
   $let[fallback_provider;$callFunction[configMusic;fallback_provider]]
@@ -188,21 +186,21 @@ module.exports = {
   ]
   $if[$get[fsearch]==null;
   $callLocalFunction[loadinteraction;error-1]
+  $if[$get[iscreatedfirst]==false;$setTimeout[$async[$!interactionDelete];3s]]
   $stop
   ]
   $let[music_title;$inflate[$env[result;title];base64]]
   $let[music_id;$env[result;id]]
   $let[music_duration;$multi[$env[result;duration];1000]]
-  $let[music_thumbnail;$if[$env[result;dynamic_thumbnail]==;$env[result;thumbnail];$env[result;dynamic_thumbnail]]]
+  $let[music_thumbnail;$default[$env[result;dynamic_thumbnail];$env[result;thumbnail]]]
   $let[music_thumbnail;$if[$isValidLink[$get[music_thumbnail]];$get[music_thumbnail];$userAvatar[$authorID;1024]]]
   $let[music_provider;$get[use_provider]]
 
   $let[isforcedirect;$option[direct_cdn]]
-  $if[$get[iscreatedfirst];$callLocalFunction[loadinteraction;2]]
 
   $if[$get[isforcedirect]==true;
   $let[music_playurl;$callFunction[fallbackPlaybackTrack;$get[tempstoreurl];va]]
-  $if[$or[$get[music_playurl]==live;$get[music_playurl]==null;$advancedTextSplit[$get[music_playurl];|;0]==bot]==true;$let[music_playurl;$get[tempstoreurl]] $let[isforcedirect;false]]
+  $if[$or[$get[music_playurl]==live;$get[music_playurl]==null;$advancedTextSplit[$get[music_playurl];|;0]==bot;$get[music_playurl]==]==true;$let[music_playurl;$get[tempstoreurl]] $let[isforcedirect;false]]
   ;
   $let[music_playurl;$get[tempstoreurl]]
   ]
@@ -213,6 +211,10 @@ module.exports = {
   $let[music_playurl;$if[$env[whatmusictype;type]==youtubeplaylist;https://youtube.com/playlist?list=$env[whatmusictype;id];$if[$env[whatmusictype;type]==youtube;https://youtube.com/watch?v=$env[whatmusictype;id];$if[$env[whatmusictype;type]==soundcloud;https://soundcloud.com/$env[whatmusictype;id];$if[$env[whatmusictype;type]==spotify;https://open.spotify.com/$env[whatmusictype;id];$option[query]]]]]]
   ]
 
+  $let[found;false]
+  $let[attemptry;0]
+  $let[donetry;5]
+  $async[
   $let[queue_lengthtemp;$if[$hasMusicNode;$try[$queueLength;0];0]]
 
   $if[$get[basic_type];
@@ -222,14 +224,10 @@ module.exports = {
   $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[music_playurl]]]
   ]]
 
-  $let[attemptry;0]
-  $let[donetry;5]
-  $let[found;false]
-
   $while[$and[$get[attemptry]<=$get[donetry];$get[found]==false];
     $try[
     $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==applemusic;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
-    $playTrack[$voiceID;$trimLines[$get[music_playurl]];$env[whatmusictype;type]]
+    $playTrack[$voiceID;$trimLines[$get[music_playurl]];$env[whatmusictype;type];AUTO_SEARCH]
     ;
     $playTrack[$voiceID;$trimLines[$get[music_playurl]];auto]
     ]
@@ -237,6 +235,21 @@ module.exports = {
     ;
     $letSum[attemptry;1]
     ;causeplayerror]
+  ]
+  ]
+
+  $if[$get[basic_type];
+  $if[$get[iscreatedfirst];
+  $callLocalFunction[loadinteraction;2]
+  $stop
+  ]
+  ;
+  $callLocalFunction[loadinteraction;1-2]
+  ]
+
+  $loop[-1;
+  $if[$or[$get[attemptry]>=$get[donetry];$get[found]==true];$break]
+  $wait[5]
   ]
 
   $let[currentqueuern;$if[$hasMusicNode;$try[$queueLength;0];0]]
@@ -247,9 +260,7 @@ module.exports = {
   $!deleteCache[musicplayer_message_$guildID_channelid]
   ]
   $callLocalFunction[loadinteraction;error-2]
-  $setTimeout[
-  $if[$get[iscreatedfirst]==false;$!interactionDelete]
-  ;5s]
+  $if[$get[iscreatedfirst]==false;$setTimeout[$async[$!interactionDelete];3s]]
   $stop
   ]
 

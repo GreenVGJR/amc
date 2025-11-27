@@ -51,8 +51,8 @@ module.exports = {
     ]
     $if[$env[filtype;type]==instagram;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $let[author;$env[a;results;owner;username]]
-    $let[title;$default[$env[a;results;caption;text];$env[a;results;pk]]]
+    $let[author;$default[$env[a;results;owner;username];$env[a;results;user;username]]]
+    $let[title;$default[$env[a;results;edge_media_to_caption;edges;0;node;text];$env[a;results;id]]]
     ]
     $if[$env[filtype;type]==bandcamp;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
@@ -64,7 +64,7 @@ module.exports = {
     $let[author;$env[a;results;core;user_results;result;core;screen_name]]
     $let[title;$default[$advancedTextSplit[$env[a;results;legacy;full_text];https://t.co;0];$env[a;results;post_video_description]]]
     ]
-    $let[finaltitle;$default[$get[author];null] - $default[$get[title];null]]
+    $let[finaltitle;$trim[$get[author]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]]
     $return[$get[finaltitle]]
     `
 }

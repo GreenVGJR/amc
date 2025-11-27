@@ -27,7 +27,10 @@ module.exports = {
         { "name": "Tiktok", "value": "tiktok" },
         { "name": "Tiktok Music", "value": "tiktokmusic" },
         { "name": "Tiktok Sound", "value": "tiktoksound" },
-        { "name": "NCS", "value": "ncs" }
+        { "name": "NCS", "value": "ncs" },
+        { "name": "Capcut - Templates", "value": "capcut" },
+        { "name": "Kinemaster - Templates", "value": "kinemaster" },
+        { "name": "Roblox Music", "value": "robloxmusic" }
       ]
     },
     {
@@ -62,7 +65,7 @@ module.exports = {
   $let[check;$getRecord[global;cachesearch_global-query_$deflate[$option[provider]$toLowercase[$option[query]];hex]]]
   $localFunction[loadinteraction;
   $if[$env[typela]==1;
-  $defer
+  $if[$get[fsearch]!=true;$defer]
   ]
   $if[$env[typela]==2;
   $interactionReply[
@@ -75,7 +78,7 @@ module.exports = {
   > $env[result;url]
   > -# $if[$and[$advancedTextSplit[$env[result;duration];:;1]==;$advancedTextSplit[$env[result;duration];:;2]==];$advancedTextSplit[$env[result;duration];:;0];$if[$advancedTextSplit[$env[result;duration];:;0]==00;$advancedTextSplit[$env[result;duration];:;1]:$advancedTextSplit[$env[result;duration];:;2];$env[result;duration]]]
   ]
-  $addThumbnail[$if[$or[$env[result;thumbnail]==null;$env[result;thumbnail]==];$userDefaultAvatar[$authorID];$env[result;thumbnail]]]
+  $addThumbnail[$if[$isValidLink[$env[result;thumbnail]]==false;$userDefaultAvatar[$authorID];$env[result;thumbnail]]]
   ]
   ]
   $if[$get[check]!={};

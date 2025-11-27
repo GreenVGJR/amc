@@ -100,8 +100,9 @@ module.exports = {
     ;
     $if[$env[whattype;type]==spotify;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$env[test;results;preview;0;file_id]!=;$callLocalFunction[oncecode;true]]
-    $let[finalurl;https://p.scdn.co/mp3-preview/$env[test;results;preview;0;file_id]]
+    $let[retpreview;$default[$if[$env[test;results;preview_url]==null;$env[test;results;props;pageProps;state;data;entity;audioPreview;url]];$env[test;results;preview_url]]]
+    $onlyIf[$get[retpreview]!=;$let[finalurl;null]]
+    $let[finalurl;$get[retpreview]]
     ]
     $if[$env[whattype;type]==tiktokmob;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
@@ -169,7 +170,7 @@ module.exports = {
     $if[$env[whattype;type]==instagram;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
-    $let[finalurl;$env[a;results;video_versions;0;url]]
+    $let[finalurl;$env[a;results;video_url]]
     ]
     $if[$env[whattype;type]==bandcamp;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]

@@ -17,11 +17,11 @@ const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { AttachmentExtractor } = require("@discord-player/extractor");
 
-console.clear();
-
 const quorielDb = new QuorielDB({
     events: [
-        "dbConnect"
+        "dbConnect",
+        "recordUpdate",
+        "recordRemove"
     ]
 });
 
@@ -48,6 +48,8 @@ const music = new ForgeMusic({
     },
     skipFFmpeg: true
 });
+
+console.clear();
 
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,

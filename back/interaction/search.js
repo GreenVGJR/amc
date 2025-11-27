@@ -13,7 +13,7 @@ module.exports = {
     $jsonLoad[loadser;$callFunction[searchSomeTrack;$get[query];$get[provider]]]
     $if[$env[loadser;0]==;$let[fsearch;null];$let[fsearch;true]]
     ]
-    $!deferUpdate
+    $interactionUpdate[$addTextDisplay[_ _]]
 
     $loop[-1;
     $if[$get[fsearch]!=false;$break]

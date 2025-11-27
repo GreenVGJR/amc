@@ -14,9 +14,10 @@ module.exports = {
 $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
 $try[
 $let[authorurl;https://www.last.fm/music/$env[query]]
-$httpAddHeader[Accept-Encoding;gzip, deflate, br]
-$httpAddHeader[Accept;text/html]
+$httpAddHeader[Accept;*]
+$httpAddHeader[Accept-Language;en-US]
 $httpAddHeader[User-Agent;$get[agent]]
+$httpAddHeader[Sec-Fetch-Dest;document]
 $httpAddHeader[Sec-Fetch-Site;none]
 $httpSetContentType[Text]
 $!httpRequest[$get[authorurl]?_pjax=%23content&top_tracks_date_preset=ALL;GET]

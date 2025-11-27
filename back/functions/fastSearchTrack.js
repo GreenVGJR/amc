@@ -14,10 +14,10 @@ module.exports = {
     $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+    $httpRemoveHeader[Accept-Encoding]
     $httpAddHeader[Accept-Language;en-US]
     $let[http;$httpRequest[https://clients1.google.com/complete/search?client=youtube&gs_ri=youtube&ds=yt&q=$encodeURI[$env[query]];GET;test]]
-    $onlyIf[$get[http]!=429]
+    $onlyIf[$or[$get[http]==429;$get[http]==403]!=true]
     $textSplit[$advancedTextSplit[$env[test];(\\[;1];\\["] 
     $let[splitcount;$sub[$getTextSplitLength;1]]
     $let[count;1]
