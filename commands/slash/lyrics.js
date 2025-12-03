@@ -73,7 +73,7 @@ module.exports = {
     $addActionRow
     $addButton[$env[result;results;thumbnail];Thumbnail;Link;🖼️]
     $addButton[$env[result;results;url];Source;Link;🎶]
-    $addTextDisplay[$bold[$codeBlock[$cropText[$get[loadlyrics];0;3000;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]]]
+    $addTextDisplay[$bold[$codeBlock[$cropText[$get[loadlyrics];0;3000;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]]
     ;$callFunction[useIcon;color_embed]]
     ]
     `
