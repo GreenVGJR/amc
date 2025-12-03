@@ -36,6 +36,6 @@ module.exports = {
     $if[$option[destroy];$async[$leaveVoiceChannel];$async[$!stopTrack]]
     $!deleteCache[cachesearchistory_user_autocomplete_$authorID]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalStopTrack]]
-    $setTimeout[$!interactionDelete;2s]
+    $setTimeout[$async[$!interactionDelete];2s]
     `
 }

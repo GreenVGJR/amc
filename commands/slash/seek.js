@@ -54,6 +54,6 @@ module.exports = {
     $async[$!seekTrack[$get[pest]]]
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[pest]]]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalSeekTrack] \`$parseDigital[$get[pest]]\`]
-    $setTimeout[$!interactionDelete;3s]
+    $setTimeout[$async[$!interactionDelete];3s]
   `
 }

@@ -273,7 +273,7 @@ module.exports = {
   $if[$get[statusloop]==TRACK;$setLoopMode[TRACK]]
   ]]
   $callLocalFunction[loadinteraction;3]
-  $setTimeout[$!interactionDelete;2s]
+  $setTimeout[$async[$!interactionDelete];2s]
   $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer]]
   ]`
 }

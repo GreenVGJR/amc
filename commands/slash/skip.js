@@ -53,6 +53,6 @@ module.exports = {
     $!skipTrack
     ]]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalSkipTrack]]
-    $setTimeout[$!interactionDelete;3s]
+    $setTimeout[$async[$!interactionDelete];1s]
     `
 }

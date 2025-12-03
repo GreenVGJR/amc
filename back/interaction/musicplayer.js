@@ -37,10 +37,18 @@ module.exports = {
     $setCache[musicplayer_message_$guildID_isshuffle;true]
     ]]
     $if[$advancedTextSplit[$customID;_;1]==lyrics;
+    $let[f-fetch;false]
+    $async[
+    $jsonLoad[result;$callFunction[getLyricsTrack;$if[$checkContains[$toLowercase[$trackInfo[title]];$toLowercase[$trackInfo[author]]]==false;$advancedTextSplit[$trackInfo[author];-;0] - $advancedTextSplit[$trackInfo[title];(;0];$advancedTextSplit[$trackInfo[title];(;0]];;false;false]]
+    $if[$env[result;results]==;$let[f-fetch;null];$let[f-fetch;true]]
+    ]
     $ephemeral
     $defer
-    $jsonLoad[result;$callFunction[getLyricsTrack;$if[$charCount[$trackInfo[title];-]==0;$advancedTextSplit[$trackInfo[author];-;0] - $advancedTextSplit[$trackInfo[title];(;0];$advancedTextSplit[$trackInfo[title];(;0]];;false;false]]
-    $onlyIf[$env[result;results]!=;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
+    $loop[-1;
+    $if[$get[f-fetch]!=false;$break]
+    $wait[5]
+    ]
+    $onlyIf[$get[f-fetch]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
     $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
     $interactionReply[
     $if[$charCount[$get[loadlyrics]]>3000;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]

@@ -6,7 +6,7 @@ module.exports = {
     $onlyIf[$advancedTextSplit[$customID;_;1]==$authorID]
 
     $let[nodes;$if[$hasMusicNode;$isPlaying;false]]
-    $onlyIf[$get[nodes];$!interactionDelete]
+    $onlyIf[$get[nodes];$!deferUpdate $!interactionDelete]
 
     $if[$advancedTextSplit[$customID;_;2]>15;
     $!deferUpdate

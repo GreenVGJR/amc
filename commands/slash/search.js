@@ -28,7 +28,8 @@ module.exports = {
         { "name": "Tiktok Music", "value": "tiktokmusic" },
         { "name": "Tiktok Sound", "value": "tiktoksound" },
         { "name": "NCS", "value": "ncs" },
-        { "name": "Capcut - Templates", "value": "capcut" },
+        { "name": "Capcut - Templates | Global", "value": "capcut" },
+        { "name": "Capcut - Templates | US", "value": "capcutus" },
         { "name": "Kinemaster - Templates", "value": "kinemaster" },
         { "name": "Roblox Music", "value": "robloxmusic" }
       ]
@@ -65,7 +66,7 @@ module.exports = {
   $let[check;$getRecord[global;cachesearch_global-query_$deflate[$option[provider]$toLowercase[$option[query]];hex]]]
   $localFunction[loadinteraction;
   $if[$env[typela]==1;
-  $if[$get[fsearch]!=true;$defer]
+  $defer
   ]
   $if[$env[typela]==2;
   $interactionReply[
@@ -111,9 +112,9 @@ module.exports = {
   ]
   $let[currentping;$round[$executionTime;0]]
   ;
+  $let[currentping;$round[$executionTime;0]]
   $jsonLoad[loadser;$get[check]]
   $jsonLoad[loadser;$env[loadser;playlist]]
-  $let[currentping;$round[$executionTime;0]]
   ]
   $arraySlice[loadser;loadser;0;10]
   $arrayReverse[loadser;loadser]

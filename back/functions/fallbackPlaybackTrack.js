@@ -100,18 +100,26 @@ module.exports = {
     ;
     $if[$env[whattype;type]==spotify;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $let[retpreview;$default[$if[$env[test;results;preview_url]==null;$env[test;results;props;pageProps;state;data;entity;audioPreview;url]];$env[test;results;preview_url]]]
+    $if[$env[test;results;props]!=;
+    $let[retpreview;$env[test;results;props;pageProps;state;data;entity;audioPreview;url]]
+    ;
+    $let[retpreview;$if[$env[test;results;preview_url]!=null;$env[test;results;preview_url]]]
+    ]
     $onlyIf[$get[retpreview]!=;$let[finalurl;null]]
     $let[finalurl;$get[retpreview]]
     ]
     $if[$env[whattype;type]==tiktokmob;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
-    $jsonLoad[whattype;$callFunction[filterMediaID;$if[$env[test;results;video;id]!=;https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
+    $jsonLoad[whattype;$callFunction[filterMediaID;$if[$or[$env[test;results;video;id]!=;$env[test;results;id_str]!=];https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
     ]
     $if[$env[whattype;type]==tiktok;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
+    $if[$env[test;results;video_info;url_list;0]!=;
+    $let[finalurl;$env[test;results;video_info;url_list;0]]
+    $return
+    ]
     $if[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList]==;
     $jsonLoad[b;$env[test;results;video;PlayAddrStruct;UrlList]]
     ;
@@ -172,6 +180,14 @@ module.exports = {
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
     $let[finalurl;$env[a;results;video_url]]
     ]
+    $if[$env[whattype;type]==instagramaudio;
+    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
+    $if[$env[a;results;metadata;original_sound_info;progressive_download_url]==null;
+    $let[finalurl;$env[a;results;metadata;music_info;music_asset_info;progressive_download_url]]
+    ;
+    $let[finalurl;$env[a;results;metadata;original_sound_info;progressive_download_url]]
+    ]]
     $if[$env[whattype;type]==bandcamp;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]

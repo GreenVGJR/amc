@@ -55,18 +55,21 @@ module.exports = {
 type: 0,
 code: `
 $onlyIf[$guildID!=;]
-$let[url;$sliceText[$option[url];0;1]]
+$let[url;$sliceText[$trim[$option[url]];0;1]]
+$let[uravt;$userAvatar[$authorID;1024]]
+$let[clavt;$userAvatar[$clientID;1024]]
 $onlyIf[$isValidLink[$get[url]];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidLinkDownload]]
 $jsonLoad[musictype;$callFunction[filterMediaID;$get[url]]]
 $onlyIf[$or[$env[musictype;id]==;$env[musictype;id]==null;$env[musictype;type]==null]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
 $onlyIf[$env[musictype;type]!=youtubeplaylist;$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
-$let[uravt;$memberAvatar[$guildID;$authorID;1024]]
-$let[clavt;$memberAvatar[$guildID;$clientID;1024]]
+$if[$channelExists[$channelID];
+$onlyIf[$channelHasPerms[$channelID;$clientID;AttachFiles];$ephemeral $callFunction[useCustomMusicMessage;config_errorPerm] **Attach Files** - <@$clientID>]
+]
 $localFunction[runcodessync;
 $let[mid2;$interactionReply[
 $author[$if[$env[msg1]!=;$env[msg1];None];$get[uravt]]
 $thumbnail[$get[clavt]]
-$addField[Type;\`$toTitleCase[$advancedReplace[$env[musictype;type];tiktokmusic;tiktok music;tiktokmob;tiktok mobile]]\`;true]
+$addField[Type;\`$toTitleCase[$advancedReplace[$env[musictype;type];tiktokmusic;tiktok music;tiktokmob;tiktok mobile;instagramaudio;instagram audio]]\`;true]
 $addField[Length Size;$if[$get[clh]==;\`null\`;\`$get[clh]\`\n-# $round[$divide[$get[clh];1024;1024];2] MB];true]
 $addField[Format;\`$if[$get[converttype]==;null;.$get[contenttype]$if[$get[contenttype]!=$get[converttype]; => .$get[converttype]]]\`;true]
 $addField[File Name;$if[$and[$option[lyrics]==true;$get[checklyric]];$codeBlock[$get[lyricnames]]]$codeBlock[$get[names]]$if[$and[$has[checklyric];$get[checklyric]==false];\n-# WARNING: Lyrics not available];false]
@@ -133,7 +136,7 @@ $httpAddHeader[User-Agent;$get[agent]]
 $httpSetContentType[Text]
 $onlyIf[$httpRequest[$get[getcdn];GET]==200;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $let[clh;$charCount[$httpResult]]
-$callLocalFunction[runcodessync;Fetching Segments;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$callLocalFunction[runcodessync;Fetching Segments » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
 $let[clh;0]
 $arrayLoad[b;#EXTINF;$httpResult]
 $!arrayShift[b]
@@ -146,8 +149,7 @@ $onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOv
 $let[contenttype;ts]
 $let[converttype;mp4]
 $let[names;$get[gettitle].$get[converttype]]
-$interactionReply[
-$callLocalFunction[runcodessync;;Uploading;true]
+$#interactionReply[
 $attachment[$get[ks];$get[names];true;base64]
 ]
 ;
@@ -170,26 +172,29 @@ $onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOv
 $let[mediatype;$advancedTextSplit[$get[cly];/;0]]
 $let[contenttype;$advancedTextSplit[$get[cly];/;1]]
 $if[$get[mediatype]==video;
+$if[$env[musictype;type]==instagramaudio;
+$let[converttype;m4a]
+;
 $let[converttype;mp4]
+]
 ;
 $let[converttype;$if[$get[contenttype]==webm;opus;$if[$get[contenttype]==mp4;m4a;$if[$or[$get[contenttype]==mp3;$get[contenttype]==mpeg];mp3;$get[contenttype]]]]]
 ]
 $let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];$get[gettitle].$get[converttype]]]
-$callLocalFunction[runcodessync;Downloading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$callLocalFunction[runcodessync;Downloading » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
 $loop[-1;
 $if[$get[f-fetch]!=false;$break]
 $wait[5]
 ]
 $onlyIf[$get[condownbytes]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-$interactionReply[
-$callLocalFunction[runcodessync;;Uploading;true]
+$#interactionReply[
 $if[$and[$option[lyrics]==true;$get[checklyric]];$attachment[$get[loadlyrics];$get[lyricnames];true]]
 $attachment[$get[condownbytes];$get[names];true;base64]
 ]]
 $if[$channelExists[$channelID];
 $fetchMessage[$channelID;$get[mid]]
 $if[$messageAttachmentCount[$channelID;$get[mid]]==0;
-$interactionReply[$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$#interactionReply[$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 ]]
 ]
 `

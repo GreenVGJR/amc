@@ -159,7 +159,7 @@ module.exports = {
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $!httpRequest[https://music.amazon.com/config.json;GET]
         $jsonLoad[tokens;$httpResult]
-        $if[$env[tokens;csrf;token]!=;$setCache[authmusic_amazonmusic;$deflate[$env[tokens];base64]]]
+        $if[$env[tokens;csrf;token]!=;$setCache[authmusic_amazonmusic;$env[tokens]]]
         $if[$env[successlog]==true;$logger[Info;$if[$env[tokens;csrf;token]!=;$cropText[$env[tokens;csrf;token];0;12;...];Failed to Retrieve] | Amazon Music]]
     ;$logger[Info;Failed to Retrieve - Amazon Music]]
     $if[$env[tokens;csrf;token]==;$logger[Warn;Re-trying - Amazon Music] $callFunction[generateAuthKeys;amazonmusic;;true]]

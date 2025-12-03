@@ -50,7 +50,7 @@ module.exports = {
     "url":"https://onlineradiobox.com$advancedTextSplit[$env[rest];href=";1;";0]",
     "thumbnail":"https:$advancedTextSplit[$env[rest];src=";1;";0]",
     "radioId":"$advancedTextSplit[$env[rest];radioId=";1;";0]",
-    "radioName":"$advancedTextSplit[$env[rest];radioName=";1;";0]",
+    "radioName":"$djsEval[require("entities").decodeHTML(\\\`$advancedTextSplit[$env[rest];radioName=";1;";0]\\\`)]",
     "streamFormat":"$advancedTextSplit[$env[rest];streamType=";1;";0]",
     "stream":"$advancedTextSplit[$env[rest];stream=";1;";0]"
     }]

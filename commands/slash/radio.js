@@ -46,8 +46,7 @@ module.exports = {
     ]
     $if[$env[typela]==2;
     $interactionReply[$callFunction[useCustomMusicMessage;config_errorNoResult]]
-    $wait[3s]
-    $!interactionDelete
+    $setTimeout[$async[$!interactionDelete];3s]
     ]
     $if[$env[typela]==3;
     $interactionReply[

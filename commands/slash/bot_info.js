@@ -15,10 +15,15 @@ module.exports = {
 },
   type: 0,
   code: `
+  $let[currentping;]
+  $async[
+  $let[time;$getTimestamp]
+  $let[currentping;$round[$sum[$divide[$advancedTextSplit[$interactionRawData;"id":;1;";1];4194304];1420070400000]]]
+  $let[currentping;$sub[$get[time];$get[currentping]]]
+  ]
   $onlyIf[$guildID!=;]
   $ephemeral
-  $let[currentping;$round[$sum[$divide[$advancedTextSplit[$interactionRawData;"id":;1;";1];4194304];1420070400000]]]
-  $let[currentping;$sub[$getTimestamp;$get[currentping]]]
+  $defer
   $localFunction[abcd;
   $interactionReply[
   $title[Owner;;0]
@@ -67,7 +72,6 @@ module.exports = {
   $let[av2;$userAvatar[$clientID;2048]]
   $arrayLoad[guild;,;$guildIDs[,]]
   $let[countnode;0]
-  $callLocalFunction[abcd;;]
   $arrayForEach[guild;guilds;
   $try[
   $if[$djsEval[(0, require("discord-player").useMainPlayer)().nodes.has(ctx.client.guilds.cache.get("$env[guilds]"))];$letSum[countnode;1]]

@@ -33,7 +33,7 @@ module.exports = {
     ]
     $if[$and[$env[pulltrack;type]==youtube;$get[ytmusic]!=];
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[pullyt;ping]","results":{"provider":"youtube","thumbnail":"https://i.ytimg.com/vi/$advancedTextSplit[$if[$env[isExclude]!=true;$trackInfo[url];$env[pullyt;results;0;url]];?v=;1;&;0]/maxres1.jpg","query":"$encodeURI[$env[query]]","url":"$if[$env[isExclude]!=true;$trackInfo[url];$env[pullyt;results;0;url]]","autocomplete":"$encodeURI[$if[$env[isExclude]!=true;$env[query];$env[pullyt;results;0;title]]]","lyric":"$deflate[$get[ytmusic];hex]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[pullyt;ping]","results":{"provider":"youtube","thumbnail":"$if[$env[isExclude]!=true;$trackInfo[thumbnail];$env[pullyt;results;0;thumbnail]]","query":"$encodeURI[$env[query]]","url":"$if[$env[isExclude]!=true;$trackInfo[url];$env[pullyt;results;0;url]]","autocomplete":"$encodeURI[$if[$env[isExclude]!=true;$env[query];$env[pullyt;results;0;title]]]","lyric":"$deflate[$get[ytmusic];hex]"}}]]
     ;
     $generateAuthKeys[deezer;;false]
     $httpSetBody[{"operationName":"SearchFull","variables":{"query":"$encodeURI[$env[query]]","firstList":1},"query":"$inflate[789c6d8c310e83300c45af122486546260e9920354aad4a9ac2c81b8c46a30c5715a5588bb57840e1d2a79b0bfff7b73027eab062cf7fe9442d0e5bc254635c2484351a9f2861ce582518c3a931407b5b48414c592ec9cfe223b9aff0c310589db2a6cfb7bd4d9627e6cb9076e80dca2c94116bb960425404b367469dcb27e7a0267954f63471683518943d40fec25315c614eb0c997173af1461debba521e70f0928ff5d0d2fa773edc105e8e;hex]"}]

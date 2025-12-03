@@ -16,7 +16,7 @@ module.exports = {
     $httpAddHeader[User-Agent;$get[agent]]
     $httpRemoveHeader[Accept-Encoding]
     $httpAddHeader[Accept-Language;en-US]
-    $let[http;$httpRequest[https://clients1.google.com/complete/search?client=youtube&gs_ri=youtube&ds=yt&q=$encodeURI[$env[query]];GET;test]]
+    $let[http;$httpRequest[https://suggestqueries-clients6.youtube.com/complete/search?ds=yt&hl=en&client=youtube&gs_ri=youtube&q=$env[query];GET;test]]
     $onlyIf[$or[$get[http]==429;$get[http]==403]!=true]
     $textSplit[$advancedTextSplit[$env[test];(\\[;1];\\["] 
     $let[splitcount;$sub[$getTextSplitLength;1]]

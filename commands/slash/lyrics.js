@@ -51,6 +51,7 @@ module.exports = {
     $wait[5]
     ]
 
+
     $onlyIf[$get[fsearch]!=null;$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]]]
     $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
     $interactionReply[
@@ -66,10 +67,13 @@ module.exports = {
     ]
     $addSection[
     $addTextDisplay[- $get[latencyrs]ms | $toTitleCase[$env[result;results;provider]]\n»   $bold[$hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]]
-    $addButton[$env[result;results;thumbnail];Thumbnail;Link;🖼️]
+    $addThumbnail[$env[result;results;thumbnail]]
     ]
     $addSeparator[Small;true]
-    $addTextDisplay[$codeBlock[$cropText[$get[loadlyrics];0;3000;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
+    $addActionRow
+    $addButton[$env[result;results;thumbnail];Thumbnail;Link;🖼️]
+    $addButton[$env[result;results;url];Source;Link;🎶]
+    $addTextDisplay[$bold[$codeBlock[$cropText[$get[loadlyrics];0;3000;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]]]
     ;$callFunction[useIcon;color_embed]]
     ]
     `

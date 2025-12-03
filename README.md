@@ -37,13 +37,11 @@ ___
 | Streaming     | Extractor     |
 | ------------- | ------------- |
 | Youtube       | Youtube       |
-| Soundcloud*   | Soundcloud    |
-| -             | Spotify**     |
-| -             | Apple Music** |
+| Soundcloud    | Soundcloud    |
+| -             | Spotify*      |
+| -             | Apple Music*  |
 | Local/HTTP    | Local/HTTP    |
-> *Unstable
-
-> **Stream via Youtube
+> *Stream via Youtube
 
 </details>
 
@@ -85,17 +83,19 @@ ___
     > Lrclib
     > Genius
 
-- Search a media (Max. 10 Result)
+- Search a media (Max. 10 Results)
   Providers:
   = > Youtube
     > Youtube Shorts
     > Youtube Music
+    > Youtube Audio Library
     > Soundcloud
     > Spotify
     > Apple Music
+    > Shazam
+    > ITunes
     > Amazon Music
     > Bandcamp
-    > ITunes
     > Deezer
     > Tidal
     > Qobuz
@@ -103,7 +103,8 @@ ___
     > Tiktok Music
     > Tiktok Sound
     > NCS
-    > Capcut - Templates
+    > Capcut - Templates | Global
+    > Capcut - Templates | US
     > Kinemaster - Templates
     > Roblox Music
 
