@@ -79,13 +79,13 @@ module.exports = {
     $jsonLoad[result;$getCache[system_file-listRadio]]
     $arrayMap[result;rest;$if[$checkContains[$toLowercase[$env[rest]];$toLowercase[$option[country]]];$return[$env[rest]]];result2]
     ]
-    $let[checkfirstdb;$getRecord[global;cachesearch_global-radio_$md5[$toLowercase[$option[query]]$advancedTextSplit[$env[result2;0;1];/;1]0]]]
+    $let[checkfirstdb;$getRecord[global;;cachesearch_global-radio_$md5[$toLowercase[$option[query]]$advancedTextSplit[$env[result2;0;1];/;1]0]]]
     $if[$get[checkfirstdb]=={};
     $callLocalFunction[loadinteraction;1;false]
     $jsonLoad[loadstate;$callFunction[scrapeOnlineRadio;$toLowercase[$option[query]];$if[$option[country]!=;$advancedTextSplit[$env[result2;0;1];/;1]];0;$guildID;false;false]]
     $onlyIf[$env[loadstate;0]!=;$callLocalFunction[loadinteraction;2;false]]
     ;
-    $jsonLoad[loadstate;$getRecord[global;cachesearch_global-radio_$md5[$toLowercase[$option[query]]$advancedTextSplit[$env[result2;0;1];/;1]0]]]
+    $jsonLoad[loadstate;$getRecord[global;;cachesearch_global-radio_$md5[$toLowercase[$option[query]]$advancedTextSplit[$env[result2;0;1];/;1]0]]]
     $jsonLoad[loadstate;$env[loadstate;list_radio]]
     ]
     $let[store;]

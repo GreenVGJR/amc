@@ -1,5 +1,5 @@
 module.exports = [{
-    type: "dbConnect",
+    type: "databaseConnect",
     code: `
     $logger[Info;Waiting to online]
     $!openDB[user;guild;global]

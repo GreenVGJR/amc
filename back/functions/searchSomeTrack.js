@@ -328,7 +328,7 @@ module.exports = {
     $httpAddHeader[User-Agent;$get[agent]]
     $!httpRequest[https://thumbnails.roblox.com/v1/assets?assetIds=$get[assetids]&size=512x512&format=png;GET]
     $jsonLoad[k;$httpResult[data]]
-    $arrayForEach[a;tp;$arrayPushJSON[results;{"title":"$advancedReplace[$env[tp;asset;audioDetails;title];\\\\;;";\\\\"]","duration":"$parseDigital[$multi[$env[tp;asset;duration];1000]]","thumbnail":"$default[$env[k;$arrayFindIndex[k;p;$checkCondition[$env[p;targetId]==$env[tp;asset;id]]];imageUrl];https://prod.docsiteassets.roblox.com/assets/feeds/robloxYoutubeAvatar.webp]","url":"https://create.roblox.com/store/asset/$env[tp;asset;id]"}]]
+    $arrayForEach[a;tp;$arrayPushJSON[results;{"title":"$advancedReplace[$env[tp;asset;audioDetails;title];\\\\;;";\\\\"]","duration":"$parseDigital[$multi[$env[tp;asset;duration];1000]]","thumbnail":"$if[$isValidLink[$env[k;$arrayFindIndex[k;p;$checkCondition[$env[p;targetId]==$env[tp;asset;id]]];imageUrl]];$env[k;$arrayFindIndex[k;p;$checkCondition[$env[p;targetId]==$env[tp;asset;id]]];imageUrl];https://prod.docsiteassets.roblox.com/assets/feeds/robloxYoutubeAvatar.webp]","url":"https://create.roblox.com/store/asset/$env[tp;asset;id]"}]]
     ]
     ]
     $if[$env[results;0]!=;

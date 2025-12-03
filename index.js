@@ -19,7 +19,7 @@ const { AttachmentExtractor } = require("@discord-player/extractor");
 
 const quorielDb = new QuorielDB({
     events: [
-        "dbConnect",
+        "databaseConnect",
         "recordUpdate",
         "recordRemove"
     ]

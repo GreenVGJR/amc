@@ -77,7 +77,7 @@ $jsonLoad[listracks;$env[ketdata;value;tracks]]
 $let[totaltrack;$arrayLength[listracks]]
 $let[curpage;$default[$advancedTextSplit[$customID;_;2];1]]
 $let[nextpage;$sum[$advancedTextSplit[$divide[$get[totaltrack];25];.;0];1]]
-$let[checkdbtempact;$checkCondition[$getRecord[user;storetempl-act_ls_user-$get[hash]]!={}]]
+$let[checkdbtempact;$checkCondition[$getRecord[user;;storetempl-act_ls_user-$get[hash]]!={}]]
 $arraySlice[listracks;listracks;$multi[25;$if[$get[curpage]==1;0;$sub[$get[curpage];1]]];$multi[25;$sum[1;$if[$get[curpage]==1;0;$sub[$get[curpage];1]]]]]
 $let[cotsr;]
 $loop[10;$if[$env[listracks;$sub[$env[cotrsls];1]]==;$break]$let[cotsr;$get[cotsr]- $cropText[$default[$env[listracks;$sub[$env[cotrsls];1];title];$env[listracks;$sub[$env[cotrsls];1];url]];0;90;...]\n];cotrsls;true]
@@ -98,7 +98,7 @@ $arrayForEach[listracks;lotr;
 $addOption[$cropText[$default[$env[lotr;title];$env[lotr;url]];0;100];$cropText[$advancedTextSplit[$env[lotr;url];https://;1;/;0];0;100];$get[countpr]]
 $letSum[countpr;1]
 ]]
-$jsonLoad[confplaylistdb;$getRecord[user;configplaylistuser_vgjra9f_$authorID]]
+$jsonLoad[confplaylistdb;$getRecord[user;;configplaylistuser_vgjra9f_$authorID]]
 $addActionRow
 $addButton[listplaylistuserall;Back;Secondary;↩️]
 $addButton[editplaylistuser_$get[hash];Edit Playlist;Secondary;📂]
@@ -156,7 +156,7 @@ $addTextInput[doplaylistuser_desc;Description;Paragraph;false;;$env[a;value;desc
 $if[$advancedTextSplit[$customID;_;0]==editplaylistuserh;
 $let[checkdb;$callFunction[findPlaylistUser;$advancedTextSplit[$customID;_;1];$authorID]]
 $onlyIf[$get[checkdb]!=;$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistNotExistUser]]
-$jsonLoad[confplaylistdb;$getRecord[user;configplaylistuser_vgjra9f_$authorID]]
+$jsonLoad[confplaylistdb;$getRecord[user;;configplaylistuser_vgjra9f_$authorID]]
 $jsonLoad[ketdata;$get[checkdb]]
 $jsonLoad[listracks;$env[ketdata;value;tracks]]
 $let[totaltrack;$arrayLength[listracks]]
@@ -205,7 +205,7 @@ $addButton[editplaylistuserh_$advancedTextSplit[$customID;_;1]_$get[nextpage]_tr
 ]
 ]
 $if[$advancedTextSplit[$customID;_;0]==toggleplaylistuser;
-$jsonLoad[confplaylistdb;$getRecord[user;configplaylistuser_vgjra9f_$authorID]]
+$jsonLoad[confplaylistdb;$getRecord[user;;configplaylistuser_vgjra9f_$authorID]]
 $if[$advancedTextSplit[$customID;_;1]==fm;$!jsonSet[confplaylistdb;title;$if[$default[$env[confplaylistdb;title];false]==false;true;false]]]
 $if[$advancedTextSplit[$customID;_;1]==fp;$!jsonSet[confplaylistdb;slice;$if[$default[$env[confplaylistdb;slice];false]==false;true;false]]]
 $if[$advancedTextSplit[$customID;_;1]==sc;$!jsonSet[confplaylistdb;confirm;$if[$default[$env[confplaylistdb;confirm];true]==false;true;false]]]
@@ -247,7 +247,7 @@ $addButton[trliplaylistuser_rmva_$advancedTextSplit[$customID;_;2]_1;Remove All;
 $if[$advancedTextSplit[$customID;_;1]==mod;
 $jsonLoad[a;$get[checkdb]]
 $jsonLoad[a;$env[a;value;tracks]]
-$let[checktempdb;$getRecord[user;storetempl-act_ls_user-$advancedTextSplit[$customID;_;2]]]
+$let[checktempdb;$getRecord[user;;storetempl-act_ls_user-$advancedTextSplit[$customID;_;2]]]
 $jsonLoad[b;$get[checktempdb]]
 $jsonLoad[b;$env[b;list]]
 $let[storetext;]
@@ -258,7 +258,7 @@ $modal[crplaylistusertrsu_$advancedTextSplit[$customID;_;2];Modify Tracks]
 $addTextInput[crplaylistusertrdo;Tracks;Paragraph;false;https://youtu.be/...\nhttps://youtube.com/playlist?list=...\nnever gonna give you;$get[storetext];1;4000]
 ]
 $if[$advancedTextSplit[$customID;_;1]==rmv;
-$let[lookmatch;$getRecord[user;storetempl-act_ls_user-$advancedTextSplit[$customID;_;2]]]
+$let[lookmatch;$getRecord[user;;toretempl-act_ls_user-$advancedTextSplit[$customID;_;2]]]
 $onlyIf[$get[lookmatch]!={};$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistTempNotExistUser]]
 $interactionUpdate[
 $footer[Updating Tracks;$callFunction[useIcon;loading]]
@@ -328,7 +328,7 @@ $addButton[listplaylistuser_$advancedTextSplit[$customID;_;1];Back to Playlist;S
 $callLocalFunction[loadinteraction;1]
 $arrayLoad[listlink;
 ;$trim[$trimLines[$input[crplaylistusertrdo]]]]
-$jsonLoad[confplaylistdb;$getRecord[user;configplaylistuser_vgjra9f_$authorID]]
+$jsonLoad[confplaylistdb;$getRecord[user;;configplaylistuser_vgjra9f_$authorID]]
 $let[isfetch;$default[$env[confplaylistdb;title];false]]
 $let[isslice;$default[$env[confplaylistdb;slice];false]]
 $arrayUnique[listlink;listlink]
@@ -385,7 +385,7 @@ code: `
 $onlyIf[$advancedTextSplit[$customID;_;0]==crplaylistusertrsu]
 $let[checkdb;$callFunction[findPlaylistUser;$advancedTextSplit[$customID;_;1];$authorID]]
 $onlyIf[$get[checkdb]!=;$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistNotExistUser]]
-$let[lookmatch;$getRecord[user;storetempl-act_ls_user-$advancedTextSplit[$customID;_;1]]]
+$let[lookmatch;$getRecord[user;;storetempl-act_ls_user-$advancedTextSplit[$customID;_;1]]]
 $onlyIf[$get[lookmatch]!={};$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistTempNotExistUser]]
 $interactionUpdate[
 $footer[Updating Tracks;$callFunction[useIcon;loading]]

@@ -63,7 +63,7 @@ module.exports = {
   $onlyIf[$guildID!=;]
   $if[$or[$option[ephemeral]==;$option[ephemeral]==true];$ephemeral]
   $let[colors;aa$randomBytes[2]]
-  $let[check;$getRecord[global;cachesearch_global-query_$deflate[$option[provider]$toLowercase[$option[query]];hex]]]
+  $let[check;$getRecord[global;;cachesearch_global-query_$deflate[$option[provider]$toLowercase[$option[query]];hex]]]
   $localFunction[loadinteraction;
   $if[$env[typela]==1;
   $defer

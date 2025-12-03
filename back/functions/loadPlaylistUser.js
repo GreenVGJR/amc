@@ -19,7 +19,7 @@ params: [{
 }],
 code: `
 $if[$env[useToggle]==true;
-$jsonLoad[confplaylistdb;$getRecord[user;configplaylistuser_vgjra9f_$authorID]]
+$jsonLoad[confplaylistdb;$getRecord[user;;configplaylistuser_vgjra9f_$authorID]]
 $let[0;$default[$env[confplaylistdb;title];false]]
 $let[1;$default[$env[confplaylistdb;slice];false]]
 $let[2;$default[$env[confplaylistdb;confirm];true]]
