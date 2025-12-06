@@ -16,12 +16,12 @@ module.exports = [{
     $let[interval_time;1000]
     $let[nextmessage_time;16000]
 
-    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$if[$env[reason]!=filters;0]]]
 
     $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[track];false;intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
 
     $if[$callFunction[configMusic;interval_message];
+    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $setInterval[
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
@@ -63,9 +63,11 @@ module.exports = [{
     $let[interval_time;1000]
     $let[nextmessage_time;16000]
 
+    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $setInterval[
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
+    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
 
     $let[calculatetime;$sum[$callFunction[musicVirtualDuration;$guildID;$get[cid]];$get[interval_time]]]
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[calculatetime]];0]]

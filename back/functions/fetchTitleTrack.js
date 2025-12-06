@@ -75,7 +75,7 @@ module.exports = {
     $let[author;$env[a;results;core;user_results;result;core;screen_name]]
     $let[title;$default[$advancedTextSplit[$env[a;results;legacy;full_text];https://t.co;0];$env[a;results;post_video_description]]]
     ]
-    $let[finaltitle;$trim[$get[author]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]]
+    $let[finaltitle;$trim[$if[$checkContains[$toLowercase[$toCamelCase[$get[title]]];$toLowercase[$toCamelCase[$get[author]]]]==false;$get[author]]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]]
     $return[$get[finaltitle]]
     `
 }

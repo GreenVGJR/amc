@@ -3,6 +3,7 @@ module.exports = [{
     code: `
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
+    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
 
     $try[
     $sendMessage[$channelID;
@@ -32,6 +33,7 @@ module.exports = [{
     code: `
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
+    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
 
     $try[
     $sendMessage[$channelID;

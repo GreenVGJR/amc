@@ -97,6 +97,7 @@ module.exports = {
   $let[fsearch;false]
   $if[$get[check]=={};
   $async[
+  $wait[1]
   $let[a;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
   $jsonLoad[loadser;$get[a]]
   $if[$env[loadser;0]==;$let[fsearch;null];$let[fsearch;true]]

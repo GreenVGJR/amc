@@ -1,6 +1,9 @@
 > [!CAUTION]
 > Stream Youtube violates Discord ToS. Use it with caution.
 
+> [!WARNING]
+> This branch is only for testing and development. Expect errors.
+
 > [!NOTE]
 > These 2 intents are required to use all features.
 > ![image](https://github.com/user-attachments/assets/4beb3e93-40f9-4253-99f4-c6ec8d5a7e67)
@@ -9,7 +12,7 @@ ___
 
 ## Installation
 1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v21.7.3 for node.js
-2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-main-local.zip) this branch (.zip)
+2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-dev-local.zip) this branch (.zip)
 3. Extract it, and rename `.env.example` file to `.env` inside folder you did extract
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
 5. Run this command with IDE/Terminal (still same folder)
@@ -120,13 +123,10 @@ ___
 - Dynamic info message
 - Show suggestion song name
 - Controller
+- Playlist
 - Radio
 - Queue
 - DJ
-- Skip song
-- Seek to specific duration
-- Change Volume
-- Stop song
 - Show bot information
 ```
 
@@ -140,10 +140,12 @@ ___
 
 </summary>
 
-![Preview 1](https://github.com/user-attachments/assets/6d80a389-f400-4436-a1aa-cae521a70cf3)
-![Preview 2](https://github.com/user-attachments/assets/863b8268-05b5-42df-a429-c85bf2277b00)
-![Preview 3](https://github.com/user-attachments/assets/b2070b40-5c88-456c-a441-0cb303c73a15)
-![Preview 4](https://github.com/user-attachments/assets/3a14db8c-2a69-4d4a-8084-0aa02ebcf3df)
-![Preview 5](https://github.com/user-attachments/assets/1b3ca4e3-06a6-4434-9548-ef3c870b1e55)
+<div align="center">
+<img src="https://github.com/user-attachments/assets/1474fc30-9f04-4eea-b79b-8ccd7f7ee04d" />
+<img src="https://github.com/user-attachments/assets/49c2d8fb-26d2-4313-8dab-5a1dfca09569" />
+<img src="https://github.com/user-attachments/assets/eb737e58-dd48-424c-b11d-cedf02c9267d" />
+<img src="https://github.com/user-attachments/assets/e8fbab0d-7a5c-4ed6-ba37-06aac6df5d97" />
+<img src="https://github.com/user-attachments/assets/f29f19a3-0dd3-466c-9737-b9166be6f465" />
+</div>
 
 </details>

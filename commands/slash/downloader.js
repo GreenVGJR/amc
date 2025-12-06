@@ -79,7 +79,7 @@ $footer[$env[msg2];$if[$env[togload]==true;$callFunction[useIcon;loading]]]
 $if[$has[mid]==false;$let[mid;$get[mid2]]]
 $return
 ;msg1;msg2;togload]
-$let[agent;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36]
+$let[agent;$callFunction[configMusic;default_userAgent]]
 $let[isactivelyric;$and[$option[yt_option]!=2;$option[yt_option]!=3;$option[lyrics]==true;$or[$env[musictype;type]==youtube;$env[musictype;type]==soundcloud;$env[musictype;type]==spotify;$env[musictype;type]==bandcamp]]]
 $try[
 $if[$env[musictype;type]==spotify;
@@ -96,6 +96,7 @@ $let[storeobjecthttp;]
 $let[getcdn;]
 $let[s-fetch;false]
 $async[
+$wait[1]
 $let[storeobjecthttp;$callFunction[extractTrack;$get[url]]]
 $let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;$if[$and[$env[musictype;type]==youtube;$option[yt_option]==3];va;v]];$get[storeobjecthttp]]]
 $let[s-fetch;true]
@@ -159,6 +160,7 @@ $let[httpstatus;]
 $let[clh;]
 $let[cly;]
 $async[
+$wait[1]
 $let[condownbytes;$djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).then(r=>{ctx.setKeyword("clh",r.headers?.get('content-length')??"")\\;ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= 10000000)) ? r.arrayBuffer() : null\\;}).then(b => Buffer.from(b).toString("base64")).then(e => e).catch()]]
 $let[f-fetch;true]
 ]

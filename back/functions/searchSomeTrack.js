@@ -18,7 +18,7 @@ module.exports = {
     code: `
     $arrayLoad[results]
     $try[
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $if[$env[provider]==youtube;
     $jsonLoad[loadser;$try[$getYoutubeVideo[$env[query]];{}]]
     $jsonLoad[loadser2;$env[loadser;results]]
@@ -115,10 +115,21 @@ module.exports = {
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_applemusic]]
     $httpAddHeader[Origin;https://music.apple.com]
     $httpAddHeader[Cookie;geo=US]
-    $!httpRequest[https://amp-api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]
+    $let[httpal;$httpRequest[https://amp-api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]]
+    $if[$or[$get[httpal]==429;$get[httpal]==401];
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Cookie;geo=US]
+    $!httpRequest[https://music.apple.com/us/search?term=$env[query];GET]
+    $jsonLoad[res;$advancedTextSplit[$httpResult;type="application/json";1;data">;1;</script>;0]]
+    $jsonLoad[res2;$env[res;0;data;sections]]
+    $jsonLoad[res3;$env[res2;$arrayFindIndex[res2;result;$checkContains[$env[result;id];song]]]]
+    $jsonLoad[res4;$env[res3;items]]
+    $arrayForEach[res4;res5;$arrayPushJSON[results;{"title":"$advancedReplace[$env[res5;title];\\\\;;";\\\\"]","duration":"Unknown","thumbnail":"$replace[$env[res5;artwork;dictionary;url];{w}x{h}bb.{f};1x1ss.png]","url":"https://music.apple.com/us/song/$advancedTextSplit[$env[res5;contentDescriptor;url];/;$sub[$charCount[$env[res5;contentDescriptor;url];/];1]]/$advancedTextSplit[$env[res5;contentDescriptor;url];?i=;1]"}]]
+    ;
     $jsonLoad[res2;$env[res;results;songs;data]]
     $arrayForEach[res2;res5;$arrayPushJSON[results;{"title":"$advancedReplace[$env[res5;attributes;name];\\\\;;";\\\\"]","duration":"$parseDigital[$env[res5;attributes;durationInMillis]]","thumbnail":"$replace[$env[res5;attributes;artwork;url];{w}x{h}bb;1x1ss]","url":"https://music.apple.com/us/song/$advancedTextSplit[$env[res5;attributes;url];/;$sub[$charCount[$env[res5;attributes;url];/];1]]/$env[res5;id]"}]]
-    ]
+    ]]
     $if[$env[provider]==tidal;
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept;application/json]
@@ -332,6 +343,7 @@ module.exports = {
     ]
     ]
     $if[$env[results;0]!=;
+    $arrayMap[results;rls;$if[$isJSON[$env[rls]];$return[$env[rls]]];results]
     $jsonLoad[lf;{}]
     $!jsonSet[lf;playlist;$env[results]]
     $!putRecord[global;$env[lf];cachesearch_global-query_$deflate[$env[provider]$toLowercase[$env[query]];hex]]]

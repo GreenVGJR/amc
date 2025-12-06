@@ -9,6 +9,7 @@ module.exports = {
     $jsonLoad[listregex;$get[list]]
     $let[url;$env[url]]
 
+    $if[$isValidLink[$get[url]]==false;$return[{"id":null,"type":null}]]
     $if[$checkContains[$get[url];youtube.com/playlist];$let[type;youtubeplaylist];$if[$checkContains[$get[url];youtube.com;youtu.be];$let[type;youtube]]]
     $if[$checkContains[$get[url];soundcloud.com];$let[type;soundcloud]]
     $if[$checkContains[$get[url];open.spotify.com];$let[type;spotify]]

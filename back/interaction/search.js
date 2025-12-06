@@ -10,6 +10,7 @@ module.exports = {
     $onlyIf[$or[$get[query]==;$get[provider]==]!=true;$!deferUpdate $!interactionDelete]
     $let[fsearch;false]
     $async[
+    $wait[1]
     $jsonLoad[loadser;$callFunction[searchSomeTrack;$get[query];$get[provider]]]
     $if[$env[loadser;0]==;$let[fsearch;null];$let[fsearch;true]]
     ]

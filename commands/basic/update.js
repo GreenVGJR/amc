@@ -3,13 +3,10 @@ module.exports = {
     type: "messageCreate",
     code: `
     $onlyIf[$botOwnerID==$authorID]
-    $let[mid;$sendMessage[$channelID;$reply[$channelID;$messageID;true] Updating Commands.;true]]
-    $setTimeout[$updateCommands;0]
-    $!editMessage[$channelID;$get[mid];$nomention Updating Slash.]
-    $setTimeout[
-    $updateApplicationCommands
+    $async[$updateCommands]
+    $async[$updateApplicationCommands
     $setCache[listcommands-help;$applicationCommands]
-    ;0]
-    $!editMessage[$channelID;$get[mid];$nomention OK]
+    ]
+    $sendMessage[$channelID;$reply[$channelID;$messageID;true] OK]
     `
 }
