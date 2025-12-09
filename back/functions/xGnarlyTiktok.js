@@ -206,7 +206,7 @@ module.exports = {
         val = ((str.charCodeAt(i - 2) & 255) << 8) | val
         val = (str.charCodeAt(i - 1) & 255) | val
         
-        let pos;
+        let pos\\;
         pos = val & 16515072
         pos = pos >> 18
         res += charSet.charAt(pos)

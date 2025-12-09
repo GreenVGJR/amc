@@ -2,7 +2,7 @@
   "dependencies": {
     "@evan/opus": "^1.0.3",
     "@quoriel/db": "^2.0.0",
-    "@tryforge/forge.music": "^1.0.0",
+    "@tryforge/forge.music": "github:tryforge/ForgeMusic#main",
     "@tryforge/forgescript": "^2.5.0",
     "discord-player-applemusic": "^1.0.3",
     "discord-player-soundcloud": "^1.0.7",
