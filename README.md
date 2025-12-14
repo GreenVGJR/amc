@@ -41,8 +41,8 @@ ___
 | ------------- | ------------- |
 | Youtube       | Youtube       |
 | Soundcloud    | Soundcloud    |
-| -             | Spotify*      |
-| -             | Apple Music*  |
+| Spotify*      | Spotify*      |
+| Apple Music*  | Apple Music*  |
 | Local/HTTP    | Local/HTTP    |
 > *If Available
 
