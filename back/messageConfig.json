@@ -3,7 +3,6 @@
         "-- DO NOT CHANGE THE NAMES EACH OF THESE.",
         "-- ONLY VALUE ARE ALLOWED."
     ],
-
     "config_errorJoin": "You must be in a voice channel.",
     "config_errorClientPlayer": "Nothing is playing.",
     "config_errorChannelPerm": "Can't join to voice channel.\nReason:",
@@ -11,52 +10,39 @@
     "config_errorIsSameVC": "You must same with {client} in",
     "config_errorIsLimitVC": "Can't join this voice channel.",
     "config_errorIsSameDJVC": "You must have {role} role to access this command.",
-
     "config_errorAttemptSearch": "[WARNING] Execute this Application in Server.",
     "config_errorAttemptSearchJoinVC": "[WARNING] You must be on voice channel to use this.",
     "config_errorAttemptRadioPlayer": "[WARNING] Stop the current active player before switching player.",
     "config_errorAttemptSearchFetchTitle": "[INFO] Can't find the title.",
-    
     "config_infoSearchFirst": "[INFO] What music you want to play?",
-
     "config_errorNoResult": "No results found.",
     "config_errorNoResultSearch": "No result.",
     "config_errorNoResultLyrics": "No lyrics were available.",
     "config_errorOverResultLyrics": "Unfortunately, i can't show rest of them.",
-    
     "config_errorPlayTrack": "Can't process this.\nError:",
     "config_errorPlayTrackEvents": "Can't process this.",
     "config_errorNoQueue": "There's no active player.",
     "config_errorNoQueueList": "There's no track on this queue.",
-
     "config_errorLiveBeforeSeek": "This track is LIVE.",
     "config_errorPauseBeforeSeek": "You can't seek while it's paused.",
     "config_errorProcessSeek": "It's still processing.",
-
     "config_errorNoTrackBeforeSeek": "Nothing to skip track.",
     "config_errorPlayerBeforeSeek": "Disable loop mode to skip.",
     "config_errorPositionBeforeSeek": "Nothing to skip on position:",
-
     "config_errorStopTrack": "Already disconnect.",
-
     "config_errorIntervalMessage": "Seems like the current message wasn't exist. This will be use to continue interval.",
-
     "config_errorRadioPlayer": "Stop the current active player before switching player.",
-
     "config_generalForceSkipTrack": "Attempting to Skip.",
     "config_generalSeekTrack": "Seek to",
     "config_generalStopTrack": "OK",
     "config_generalSkipTrack": "Skipped.",
     "config_generalVolumeTrack": "Volume changed to:",
-
     "config_generalInvalidLinkDownload": "Must be link.",
     "config_generalInvalidProviderDownload": "Invalid provider. Only accepts:\n`Youtube, Soundcloud, Spotify, Tiktok, Twitter, Instagram, Facebook, Bandcamp`",
     "config_generalEmptyDownload": "Can't download this.",
     "config_generalOverDownload": "Can't download this media if it's above 10MB.\n\nStill want to download? You can try access this url to direct downloads.",
-
     "config_generalPlaylistExistsUser": "You already have this playlist.",
     "config_generalPlaylistNotExistUser": "Can't find the playlist.",
     "config_generalPlaylistErrorUser": "Can't access this playlist.",
-
     "config_generalPlaylistTempNotExistUser": "Something just happened. Can't continue this process."
 }

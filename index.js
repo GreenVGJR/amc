@@ -8,6 +8,7 @@ const toggles = require('./back/config.json');
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
 const { ForgeMusic, GuildQueueEvent } = require('@tryforge/forge.music');
 const { QuorielDB } = require("@quoriel/db");
+const { QuorielEdge } = require("@quoriel/edge");
 // const { ForgeDB } = require("@tryforge/forge.db");
 
 // Extractor
@@ -70,8 +71,9 @@ const client = new ForgeClient({
         "?"
     ],
     extensions: [
-     // new ForgeDB(),
+        // new ForgeDB(),
         quorielDb,
+        new QuorielEdge(),
         music
     ]
 });

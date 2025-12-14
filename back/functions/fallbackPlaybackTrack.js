@@ -115,6 +115,7 @@ module.exports = {
     ]
     $if[$env[whattype;type]==tiktok;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $onlyIf[$env[test;results;error]==;$let[finalurl;bot|$env[test;results;error]]]
     $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
     $if[$env[test;results;video_info;url_list;0]!=;
     $let[finalurl;$env[test;results;video_info;url_list;0]]
@@ -172,12 +173,12 @@ module.exports = {
     ]]
     $if[$env[whattype;type]==facebook;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$or[$env[a;results]==;$env[a;results;is_live_stream]==true;$env[a;results;is_hls]==true]!=true;$let[finalurl;null]]
+    $onlyIf[$or[$env[a;results]==;$env[a;results;is_live_stream]==true;$env[a;results;is_hls]==true]!=true;$let[finalurl;bot|This video may no longer exist, or you don't have permission to view it]]
     $let[finalurl;$default[$env[a;results;hd_src];$env[a;results;sd_src]]]
     ]
     $if[$env[whattype;type]==instagram;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
+    $onlyIf[$env[a;results]!=null;$let[finalurl;bot|This video may no longer exist, or you don't have permission to view it]]
     $let[finalurl;$env[a;results;video_url]]
     ]
     $if[$env[whattype;type]==instagramaudio;

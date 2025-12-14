@@ -163,7 +163,7 @@ module.exports = {
   $let[basic_type;true]
   $let[fsearch;false]
   $async[
-  $wait[1]
+  $wait[3]
   $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$if[$option[provider]!=;$option[provider];$get[default_provider]];null]]
   $let[tempstoreurl;$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtube;https://youtube.com/watch?v=$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtubemusic;https://youtube.com/watch?v=$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==soundcloud;https://soundcloud.com/$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==spotify;https://open.spotify.com/track/$env[result;id];$env[result;id]]]]]]
   $let[use_provider;$if[$option[provider]!=;$option[provider];$get[default_provider]]]
@@ -216,7 +216,7 @@ module.exports = {
   $let[attemptry;0]
   $let[donetry;5]
   $async[
-  $wait[1]
+  $wait[3]
   $let[queue_lengthtemp;$if[$hasMusicNode;$try[$queueLength;0];0]]
 
   $if[$get[basic_type];
@@ -275,7 +275,7 @@ module.exports = {
   $if[$get[statusloop]==TRACK;$setLoopMode[TRACK]]
   ]]
   $callLocalFunction[loadinteraction;3]
-  $setTimeout[$async[$!interactionDelete];2s]
+  $setTimeout[$async[$!interactionDelete];1s]
   $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer]]
   ]`
 }

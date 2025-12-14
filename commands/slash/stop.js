@@ -1,24 +1,24 @@
 module.exports = {
   data: {
-  "name": "stop",
-  "description": "Stop a track",
-  "options": [
-    {
-      "type": 5,
-      "name": "destroy",
-      "description": "Destroy the music player?"
+    "name": "stop",
+    "description": "Stop a track",
+    "options": [
+      {
+        "type": 5,
+        "name": "destroy",
+        "description": "Destroy the music player?"
+      }
+    ],
+    "integration_types": [
+      0
+    ],
+    "contexts": [
+      0
+    ],
+    "description_localizations": {
+      "id": "Berhenti lagu yang dimainkan"
     }
-  ],
-  "integration_types": [
-    0
-  ],
-  "contexts": [
-    0
-  ],
-  "description_localizations": {
-    "id": "Berhenti lagu yang dimainkan"
-  }
-},
+  },
   type: 0,
   code: `
     $onlyIf[$guildID!=;]
@@ -36,6 +36,6 @@ module.exports = {
     $if[$option[destroy];$async[$leaveVoiceChannel];$async[$!stopTrack]]
     $!deleteCache[cachesearchistory_user_autocomplete_$authorID]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalStopTrack]]
-    $setTimeout[$async[$!interactionDelete];2s]
+    $setTimeout[$async[$!interactionDelete];1s]
     `
 }

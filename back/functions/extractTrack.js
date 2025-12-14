@@ -82,6 +82,7 @@ module.exports = {
     ]]
     $if[$env[filterid;type]==tiktokmob;
     $jsonLoad[filterid;$callFunction[filterMediaID;$djsEval[require("undici").request("$replace[$get[url];vm.tiktok.com;vt.tiktok.com]", { method: 'GET' }).then(a => a.headers.location).catch()]]]
+    $onlyIf[$or[$env[filterid;id]==;$env[filterid;id]==null]!=true;$return]
     ]
     $if[$env[filterid;type]==tiktok;
     $httpRemoveHeader[Accept-Encoding]
@@ -92,6 +93,8 @@ module.exports = {
     $let[http;$httpRequest[https://www.tiktok.com/@/video/$env[filterid;id];GET]]
     $onlyIf[$get[http]==200;$return]
     $jsonLoad[a;$advancedTextSplit[$httpResult;"webapp.video-detail":;1;,"webapp;0]]
+    $if[$and[$isJSON[$env[a]]==false;$checkContains[$httpResult;Please wait]];$return[{"status":null,"results":{"error":"IP blocked, solve the captcha to gain access again"}}]]
+    $if[$env[a;statusCode]!=0;$return[{"status":null,"results":{"error":"$env[a;statusMsg]"}}]]
     $jsonLoad[b;$env[a;itemInfo;itemStruct]]
     $if[$env[b;author]==;
     $httpRemoveHeader[Accept-Encoding]

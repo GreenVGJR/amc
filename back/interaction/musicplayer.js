@@ -39,7 +39,7 @@ module.exports = {
     $if[$advancedTextSplit[$customID;_;1]==lyrics;
     $let[f-fetch;false]
     $async[
-    $jsonLoad[result;$callFunction[getLyricsTrack;$if[$checkContains[$toLowercase[$trackInfo[title]];$toLowercase[$trackInfo[author]]]==false;$advancedTextSplit[$trackInfo[author];-;0] - $advancedTextSplit[$trackInfo[title];(;0];$advancedTextSplit[$trackInfo[title];(;0]];;false;false]]
+    $jsonLoad[result;$callFunction[getLyricsTrack;$if[$checkContains[$toLowercase[$toCamelCase[$trackInfo[title]]];$toLowercase[$toCamelCase[$trim[$advancedTextSplit[$trackInfo[author];-;0]]]]]==false;$trim[$advancedTextSplit[$trackInfo[author];-;0]] - $advancedTextSplit[$trackInfo[title];(;0];$advancedTextSplit[$trackInfo[title];(;0]];;false;false]]
     $if[$env[result;results]==;$let[f-fetch;null];$let[f-fetch;true]]
     ]
     $ephemeral
@@ -68,7 +68,7 @@ module.exports = {
     $footer[Fetching;$callFunction[useIcon;loading];1]
     $color[$callFunction[useIcon;color_embed];1]
     ]
-    $let[a;$callFunction[discoverArtistLastFm;$advancedTextSplit[$trackInfo[author];- Topic;0]]]
+    $let[a;$callFunction[discoverArtistLastFm;$trim[$advancedTextSplit[$trackInfo[author];- Topic;0]]]]
     $onlyIf[$get[a]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
     $interactionReply[$get[a]]
     ]

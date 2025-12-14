@@ -1,27 +1,27 @@
 module.exports = {
   data: {
-  "name": "volume",
-  "description": "Set the volume of the music player",
-  "options": [
-    {
-      "name": "value",
-      "description": "Set the volume of the music player",
-      "type": 4,
-      "min_value": 0,
-      "max_value": 150,
-      "required": true
+    "name": "volume",
+    "description": "Set the volume of the music player",
+    "options": [
+      {
+        "name": "value",
+        "description": "Set the volume of the music player",
+        "type": 4,
+        "min_value": 0,
+        "max_value": 150,
+        "required": true
+      }
+    ],
+    "integration_types": [
+      0
+    ],
+    "contexts": [
+      0
+    ],
+    "description_localizations": {
+      "id": "Ganti volume lagu"
     }
-  ],
-  "integration_types": [
-    0
-  ],
-  "contexts": [
-    0
-  ],
-  "description_localizations": {
-    "id": "Ganti volume lagu"
-  }
-},
+  },
   type: 0,
   code: `
     $onlyIf[$guildID!=;]
@@ -37,7 +37,7 @@ module.exports = {
     ]
     $async[$setVolume[$option[value]]]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalVolumeTrack] \`$getVolume%\`]
-    $setTimeout[$async[$!interactionDelete];2s]
+    $setTimeout[$async[$!interactionDelete];1s]
     $callFunction[updateCurrentMusicPlayer]
     `
 }

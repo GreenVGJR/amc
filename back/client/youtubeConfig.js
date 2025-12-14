@@ -1,8 +1,9 @@
 // Test replace yt stream
 const { request } = require("undici");
+const { default_userAgent } = require('../config.json');
 
 let vt;
-const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36";
+const userAgent = default_userAgent;
 const ytcookies = process.env.YOUTUBE_COOKIES;
 const lk = { context: { client: { clientName: "VISIONOS", clientVersion: "0.1" } } };
 var templist = [];
@@ -42,7 +43,7 @@ async function fallbackYTStream(lstracks) {
         }
         else {
             const fr = a.streamingData.adaptiveFormats.find(c => [251, 140].includes(c.itag));
-            finalurl = fr.url + "&range=0-" + fr.contentLength;
+            finalurl = fr.url + "&ratebypass=true&range=0-" + fr.contentLength;
         }
         templist.push({
             id: lstracks,

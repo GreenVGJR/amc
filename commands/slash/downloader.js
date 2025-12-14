@@ -1,63 +1,62 @@
 module.exports = {
   data: {
-  "name": "download",
-  "description": "Download a media",
-  "options": [
-    {
-      "type": 3,
-      "name": "url",
-      "description": "URL media | Youtube, Soundcloud, Spotify, Tiktok, Twitter, Instagram, Facebook, Bandcamp",
-      "required": true,
-      "min_length": 8
-    },
-    {
-      "type": 3,
-      "name": "yt_option",
-      "description": "Override download options for Youtube",
-      "required": false,
-      "choices": [{
-        "name": "Audio",
-        "value": "1"
+    "name": "download",
+    "description": "Download a media",
+    "options": [
+      {
+        "type": 3,
+        "name": "url",
+        "description": "URL media | Youtube, Soundcloud, Spotify, Tiktok, Twitter, Instagram, Facebook, Bandcamp",
+        "required": true,
+        "min_length": 8
       },
       {
-        "name": "Audio + Video",
-        "value": "2"
+        "type": 3,
+        "name": "yt_option",
+        "description": "Override download options for Youtube",
+        "required": false,
+        "choices": [{
+          "name": "Audio",
+          "value": "1"
+        },
+        {
+          "name": "Audio + Video",
+          "value": "2"
+        },
+        {
+          "name": "Audio + Video (Legacy)",
+          "value": "3"
+        }],
       },
       {
-        "name": "Audio + Video (Legacy)",
-        "value": "3"
-      }],
+        "type": 5,
+        "name": "lyrics",
+        "description": "Include lyrics?",
+        "required": false
+      },
+      {
+        "type": 3,
+        "name": "file_name",
+        "description": "File name for attachment",
+        "required": false
+      }
+    ],
+    "integration_types": [
+      0,
+      1
+    ],
+    "contexts": [
+      0
+    ],
+    "description_localizations": {
+      "id": "Unduh sebuah media"
     },
-    {
-      "type": 5,
-      "name": "lyrics",
-      "description": "Include lyrics?",
-      "required": false
-    },
-    {
-      "type": 3,
-      "name": "file_name",
-      "description": "File name for attachment",
-      "required": false
-    }
-  ],
-  "integration_types": [
-    0,
-    1
-  ],
-  "contexts": [
-    0
-  ],
-  "description_localizations": {
-    "id": "Unduh sebuah media"
   },
-},
-type: 0,
-code: `
+  type: 0,
+  code: `
 $onlyIf[$guildID!=;]
 $let[url;$sliceText[$trim[$option[url]];0;1]]
 $let[uravt;$userAvatar[$authorID;1024]]
-$let[clavt;$userAvatar[$clientID;1024]]
 $onlyIf[$isValidLink[$get[url]];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidLinkDownload]]
 $jsonLoad[musictype;$callFunction[filterMediaID;$get[url]]]
 $onlyIf[$or[$env[musictype;id]==;$env[musictype;id]==null;$env[musictype;type]==null]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
@@ -65,18 +64,17 @@ $onlyIf[$env[musictype;type]!=youtubeplaylist;$ephemeral $callFunction[useCustom
 $if[$channelExists[$channelID];
 $onlyIf[$channelHasPerms[$channelID;$clientID;AttachFiles];$ephemeral $callFunction[useCustomMusicMessage;config_errorPerm] **Attach Files** - <@$clientID>]
 ]
+$let[mid;]
 $localFunction[runcodessync;
-$let[mid2;$interactionReply[
+$let[mid;$interactionReply[
 $author[$if[$env[msg1]!=;$env[msg1];None];$get[uravt]]
-$thumbnail[$get[clavt]]
 $addField[Type;\`$toTitleCase[$advancedReplace[$env[musictype;type];tiktokmusic;tiktok music;tiktokmob;tiktok mobile;instagramaudio;instagram audio]]\`;true]
 $addField[Length Size;$if[$get[clh]==;\`null\`;\`$get[clh]\`\n-# $round[$divide[$get[clh];1024;1024];2] MB];true]
 $addField[Format;\`$if[$get[converttype]==;null;.$get[contenttype]$if[$get[contenttype]!=$get[converttype]; => .$get[converttype]]]\`;true]
 $addField[File Name;$if[$and[$option[lyrics]==true;$get[checklyric]];$codeBlock[$get[lyricnames]]]$codeBlock[$get[names]]$if[$and[$has[checklyric];$get[checklyric]==false];\n-# WARNING: Lyrics not available];false]
 $color[$callFunction[useIcon;color_embed];0]
 $footer[$env[msg2];$if[$env[togload]==true;$callFunction[useIcon;loading]]]
-;$checkCondition[$has[mid]==false]]]
-$if[$has[mid]==false;$let[mid;$get[mid2]]]
+;true]]
 $return
 ;msg1;msg2;togload]
 $let[agent;$callFunction[configMusic;default_userAgent]]
@@ -96,7 +94,7 @@ $let[storeobjecthttp;]
 $let[getcdn;]
 $let[s-fetch;false]
 $async[
-$wait[1]
+$wait[3]
 $let[storeobjecthttp;$callFunction[extractTrack;$get[url]]]
 $let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;$if[$and[$env[musictype;type]==youtube;$option[yt_option]==3];va;v]];$get[storeobjecthttp]]]
 $let[s-fetch;true]
@@ -123,7 +121,6 @@ $let[lyricnames;$if[$option[file_name]!=;$option[file_name];$get[gettitle]].lrc]
 ]]
 $let[checkcdn_headers;{
 "Accept": "*/*",
-"Accept-Encoding": "identify",
 "Sec-Fetch-Site": "none",
 "User-Agent": "$get[agent]"
 }]
@@ -132,7 +129,6 @@ $let[contenttype;m3u8]
 $let[converttype;ts]
 $let[names;$get[gettitle]]
 $let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];$get[gettitle].$get[converttype]]]
-$httpRemoveHeader[Accept-Encoding]
 $httpAddHeader[User-Agent;$get[agent]]
 $httpSetContentType[Text]
 $onlyIf[$httpRequest[$get[getcdn];GET]==200;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
@@ -160,7 +156,7 @@ $let[httpstatus;]
 $let[clh;]
 $let[cly;]
 $async[
-$wait[1]
+$wait[3]
 $let[condownbytes;$djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).then(r=>{ctx.setKeyword("clh",r.headers?.get('content-length')??"")\\;ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= 10000000)) ? r.arrayBuffer() : null\\;}).then(b => Buffer.from(b).toString("base64")).then(e => e).catch()]]
 $let[f-fetch;true]
 ]

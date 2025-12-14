@@ -23,7 +23,8 @@ module.exports = {
     code: `
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $let[time;$getTimestamp]
-    $if[$env[isExclude]!=true;
+    $let[usePlayerLyrics;$and[$callFunction[configMusic;usePlayerForFetchLyrics]==true;$env[isExclude]!=true]]
+    $if[$get[usePlayerLyrics];
     $jsonLoad[pulltrack;$callFunction[filterMediaID;$trackInfo[url]]]
     $let[ytmusic;$try[$getYTLyricsMusic[$env[pulltrack;id];;$env[line]]]]
     ;
@@ -33,7 +34,7 @@ module.exports = {
     ]
     $if[$and[$env[pulltrack;type]==youtube;$get[ytmusic]!=];
     $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$env[pullyt;ping]","results":{"provider":"youtube","thumbnail":"$if[$env[isExclude]!=true;$trackInfo[thumbnail];$env[pullyt;results;0;thumbnail]]","query":"$encodeURI[$env[query]]","url":"$if[$env[isExclude]!=true;$trackInfo[url];$env[pullyt;results;0;url]]","autocomplete":"$encodeURI[$if[$env[isExclude]!=true;$env[query];$env[pullyt;results;0;title]]]","lyric":"$deflate[$get[ytmusic];hex]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"youtube","thumbnail":"$if[$get[usePlayerLyrics];$trackInfo[thumbnail];$env[pullyt;results;0;thumbnail]]","query":"$encodeURI[$env[query]]","url":"$if[$get[usePlayerLyrics];$trackInfo[url];$env[pullyt;results;0;url]]","autocomplete":"$encodeURI[$if[$get[usePlayerLyrics];$trackInfo[title];$env[pullyt;results;0;title]]]","lyric":"$deflate[$get[ytmusic];hex]"}}]]
     ;
     $generateAuthKeys[deezer;;false]
     $httpSetBody[{"operationName":"SearchFull","variables":{"query":"$encodeURI[$env[query]]","firstList":1},"query":"$inflate[789c6d8c310e83300c45af122486546260e9920354aad4a9ac2c81b8c46a30c5715a5588bb57840e1d2a79b0bfff7b73027eab062cf7fe9442d0e5bc254635c2484351a9f2861ce582518c3a931407b5b48414c592ec9cfe223b9aff0c310589db2a6cfb7bd4d9627e6cb9076e80dca2c94116bb960425404b367469dcb27e7a0267954f63471683518943d40fec25315c614eb0c997173af1461debba521e70f0928ff5d0d2fa773edc105e8e;hex]"}]
@@ -83,9 +84,12 @@ module.exports = {
     ]
     $arrayLoad[results;]
     $jsonLoad[rts;$default[$advancedTextSplit[$env[prgn];script type="application/ld+json">;1;</script>;0];{}]]
+    $arrayLoad[hts;LyricsContent_;$env[prgn]]
     $let[crthumb-shazam;$env[rts;thumbnailUrl]]
     $if[$env[line]==true;
-    $jsonLoad[a;$djsEval[require("entities").decodeHTML(\\\`$advancedTextSplit[$env[prgn];<script>;$charCount[$advancedTextSplit[$env[prgn];songLyrics;1];<script>];</script>;0;"f0:;1;\\\\n;0]\\\`)]]
+    $let[pkc;$advancedTextSplit[$env[prgn];<script>;$charCount[$advancedTextSplit[$env[prgn];songLyrics;1];<script>];</script>;0;\\\\n;0]]
+    $let[pkc-find;$advancedTextSplit[$get[pkc];"$advancedTextSplit[$get[pkc];";1;:;0]:;1]]
+    $jsonLoad[a;$djsEval[require("entities").decodeHTML(\\\`$get[pkc-find]\\\`)]]
     $jsonLoad[a;$jsonEntries[a]]
     $jsonLoad[a;$env[a;$arrayFindIndex[a;b;$checkCondition[$env[b;1;dataTestId]==songLyrics]];1;children;3;children;3;children;1;0;3;children]]
     $arrayMap[a;c;$if[$env[c;3;lyrics]!=;$return[$env[c;3;lyrics;lyricLines]]];a]
@@ -94,13 +98,17 @@ module.exports = {
     $arrayForEach[b;d;$arrayForEach[d;f;
     $let[abr_t;$try[$unparseDigital[$if[$charCount[$advancedTextSplit[$env[f;startTimeInSeconds];.;0];:]<2;00:]$advancedTextSplit[$env[f;startTimeInSeconds];.;0]];$advancedTextSplit[$env[f;startTimeInSeconds];.;0]]]
     $let[abr_mt;$advancedTextSplit[$env[f;startTimeInSeconds];.;1]]
-    $let[finalres;\\[$cropText[$parseDate[$get[abr_t];ISO];14;19].$get[abr_mt]\\] $env[f;content]]
+    $let[finalres;\\[$cropText[$parseDate[$get[abr_t];ISO];14;19].$default[$get[abr_mt];00]\\] $env[f;content]]
     $arrayPushJSON[c;$get[finalres]]
     ]]
     $let[finallyric;$arrayJoin[c;
 ]]
     ;
-    $let[finallyric;$env[rts;recordingOf;lyrics;text]]
+    $arrayMap[hts;b;$if[$or[$startsWith[$env[b];sectionTitle];$startsWith[$env[b];lyricLine]];$return[$advancedTextSplit[$env[b];">;1;</div>;0]]];hts]
+    $let[shazamlyrictext;$arrayJoin[hts;
+]]
+    $let[shazamlyrictext;$djsEval[require("entities").decodeHTML(ctx.getKeyword("shazamlyrictext"))]]
+    $let[finallyric;$default[$get[shazamlyrictext];$env[rts;recordingOf;lyrics;text]]]
     ]
     $if[$get[finallyric]==;$let[cusshazamaborterls;true]]
     $if[$get[cusshazamaborterls]==false;

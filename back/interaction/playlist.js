@@ -26,7 +26,7 @@ $let[checkaction;$advancedTextSplit[$customID;_;1]]
 $let[checkpl;$callFunction[findPlaylistUser;$md5[$authorID_$toLowercase[$trim[$input[doplaylistuser_title]]]];$authorID]]
 $onlyIf[$and[$get[checkpl]!=;$get[checkaction]==create]!=true;$ephemeral
 $callFunction[useCustomMusicMessage;config_generalPlaylistExistsUser]
-$setTimeout[$!interactionDelete;3s]
+$setTimeout[$async[$!interactionDelete];3s]
 ]
 $if[$get[checkaction]==create;
 $let[hash;$md5[$authorID_$toLowercase[$trim[$input[doplaylistuser_title]]]]]

@@ -31,11 +31,11 @@ module.exports = [{
     $httpRemoveHeader[Accept-Encoding]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en-US]
-    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title(runs/text),longBylineText(runs/text),ownerBadges(metadataBadgeRenderer/icon/iconType),lengthText(simpleText));POST;res]
+    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,detailedMetadataSnippets,title(runs/text),lengthText(simpleText));POST;res]
     $jsonLoad[res;$env[res]]
     $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $arrayForEach[dofetch;getfetch;
-    $if[$and[$env[getfetch;videoRenderer]!=;$or[$endsWith[$env[getfetch;videoRenderer;longBylineText;runs;0;text];- Topic];$startsWith[$env[getfetch;videoRenderer;ownerBadges;0;metadataBadgeRenderer;icon;iconType];AUDIO]]];
+    $if[$and[$env[getfetch;videoRenderer;videoId]!=;$startsWith[$env[getfetch;videoRenderer;detailedMetadataSnippets;0;snippetText;runs;0;text];Provided to YouTube by]];
     $arrayPushJSON[results;{
         "title": "$replace[$replace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;];";\\\\"]",
         "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",
@@ -130,11 +130,11 @@ module.exports = [{
     $httpRemoveHeader[Accept-Encoding]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en-US]
-    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title(runs/text),richThumbnail(movingThumbnailRenderer/movingThumbnailDetails/thumbnails/url),lengthText(simpleText));POST;res]
+    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,detailedMetadataSnippets,title(runs/text),richThumbnail(movingThumbnailRenderer/movingThumbnailDetails/thumbnails/url),lengthText(simpleText));POST;res]
     $jsonLoad[res;$env[res]]
     $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $arrayForEach[dofetch;getfetch;
-    $if[$env[getfetch;videoRenderer]!=;
+    $if[$and[$env[getfetch;videoRenderer;videoId]!=;$startsWith[$env[getfetch;videoRenderer;detailedMetadataSnippets;0;snippetText;runs;0;text];Provided to YouTube by]==false];
     $arrayPushJSON[results;{
         "title": "$replace[$replace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;];";\\\\"]",
         "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",
@@ -263,11 +263,11 @@ module.exports = [{
     $httpAddHeader[User-Agent;$get[agent]]
     $httpRemoveHeader[Accept-Encoding]
     $httpAddHeader[Accept-Language;en-US]
-    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title(runs/text),longBylineText(runs/text),lengthText(simpleText));POST;res]
+    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,detailedMetadataSnippets,title(runs/text),lengthText(simpleText));POST;res]
     $jsonLoad[res;$env[res]]
     $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $arrayForEach[dofetch;getfetch;
-    $if[$and[$env[getfetch;videoRenderer]!=;$endsWith[$env[getfetch;videoRenderer;longBylineText;runs;0;text];- Topic]];
+    $if[$and[$env[getfetch;videoRenderer;videoId]!=;$startsWith[$env[getfetch;videoRenderer;detailedMetadataSnippets;0;snippetText;runs;0;text];Provided to YouTube by]];
     $arrayPushJSON[results;{
         "title": "$replace[$replace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;];";\\\\"]",
         "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",

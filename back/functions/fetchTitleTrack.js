@@ -20,7 +20,7 @@ module.exports = {
     $if[$env[filtype;type]==soundcloud;
     $jsonLoad[b;$env[a;results]]
     $arrayMap[b;bb;$if[$env[bb;hydratable]==sound;$return[$env[bb]]];c]
-    $let[author;$env[c;0;data;user;username]]
+    $let[author;$default[$env[c;0;data;publisher_metadata;artist];$env[c;0;data;user;username]]]
     $let[title;$env[c;0;data;title]]
     ]
     $if[$env[filtype;type]==spotify;
@@ -75,7 +75,8 @@ module.exports = {
     $let[author;$env[a;results;core;user_results;result;core;screen_name]]
     $let[title;$default[$advancedTextSplit[$env[a;results;legacy;full_text];https://t.co;0];$env[a;results;post_video_description]]]
     ]
-    $let[finaltitle;$trim[$if[$checkContains[$toLowercase[$toCamelCase[$get[title]]];$toLowercase[$toCamelCase[$get[author]]]]==false;$get[author]]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]]
+    $let[author;$trim[$if[$checkContains[$toLowercase[$toCamelCase[$get[title]]];$toLowercase[$toCamelCase[$get[author]]]]==false;$get[author]]]]
+    $let[finaltitle;$get[author]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]
     $return[$get[finaltitle]]
     `
 }

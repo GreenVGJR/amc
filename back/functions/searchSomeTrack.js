@@ -100,7 +100,7 @@ module.exports = {
     $httpAddHeader[User-Agent;$get[agent]]
     $httpRemoveHeader[Accept-Encoding]
     $httpSetContentType[Text]
-    $!httpRequest[https://itunes.apple.com/search?media=music&limit=10&country=US&term=$env[query];GET;res]
+    $!httpRequest[https://itunes.apple.com/search?media=music&entity=musicTrack&limit=10&country=US&lang=en-US&version=2&term=$env[query];GET;res]
     ]
     $onlyIf[$env[res]!=;$callLocalFunction[runitunes;true]]
     ;refresh]
