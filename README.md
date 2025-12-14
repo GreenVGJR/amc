@@ -86,7 +86,7 @@ ___
     > Lrclib
     > Genius
 
-- Search a media (Max. 10 Result)
+- Search a media (Max. 10 Results)
   Providers:
   = > Youtube
     > Youtube Shorts
@@ -102,11 +102,14 @@ ___
     > Deezer
     > Tidal
     > Qobuz
-    > JioSaavn
     > Tiktok Video
     > Tiktok Music
     > Tiktok Sound
     > NCS
+    > Capcut - Templates | Global
+    > Capcut - Templates | US
+    > Kinemaster - Templates
+    > Roblox Music
 
 - Download media
   Providers:
@@ -127,10 +130,6 @@ ___
 - Radio
 - Queue
 - DJ
-- Skip song
-- Seek to specific duration
-- Change Volume
-- Stop song
 - Show bot information
 ```
 

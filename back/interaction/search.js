@@ -7,17 +7,18 @@ module.exports = {
     $let[query;$getCache[storecachesearchusersfetch-q_$djsEval[ctx.interaction.message.interaction.id]]]
     $let[provider;$getCache[storecachesearchusersfetch-p_$djsEval[ctx.interaction.message.interaction.id]]]
 
-    $onlyIf[$or[$get[query]==null;$get[provider]==null]!=true;$!deferUpdate $!interactionDelete]
+    $onlyIf[$or[$get[query]==;$get[provider]==]!=true;$!deferUpdate $!interactionDelete]
     $let[fsearch;false]
     $async[
+    $wait[3]
     $jsonLoad[loadser;$callFunction[searchSomeTrack;$get[query];$get[provider]]]
     $if[$env[loadser;0]==;$let[fsearch;null];$let[fsearch;true]]
     ]
-    $!deferUpdate
+    $interactionUpdate[$addTextDisplay[_ _]]
 
     $loop[-1;
     $if[$get[fsearch]!=false;$break]
-    $wait[4]
+    $wait[5]
     ]
 
     $if[$get[fsearch]==null;

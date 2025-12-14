@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "@quoriel/db": "^1.7.3",
+    "@quoriel/db": "github:quoriel/db",
+    "@quoriel/edge": "github:quoriel/edge",
     "@tryforge/forgescript": "^2.5.0",
     "dotenv": "^17.2.3",
     "entities": "^7.0.0",

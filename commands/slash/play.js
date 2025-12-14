@@ -1,66 +1,66 @@
 module.exports = {
   data: {
-  "name": "play",
-  "description": "Play a track",
-  "options": [
-    {
-      "type": 3,
-      "name": "query",
-      "description": "Search a track to play",
-      "required": true,
-      "autocomplete": true
-    },
-    {
-    "type": 3,
-    "name": "provider",
-    "description": "Provider to use for searching track",
-    "required": false,
-    "choices": [
+    "name": "play",
+    "description": "Play a track",
+    "options": [
       {
-        "name": "YouTube",
-        "value": "youtube"
+        "type": 3,
+        "name": "query",
+        "description": "Search a track to play",
+        "required": true,
+        "autocomplete": true
       },
       {
-        "name": "YouTube Music",
-        "value": "youtubemusic"
+        "type": 3,
+        "name": "provider",
+        "description": "Provider to use for searching track",
+        "required": false,
+        "choices": [
+          {
+            "name": "YouTube",
+            "value": "youtube"
+          },
+          {
+            "name": "YouTube Music",
+            "value": "youtubemusic"
+          },
+          {
+            "name": "Soundcloud",
+            "value": "soundcloud"
+          },
+          {
+            "name": "Spotify",
+            "value": "spotify"
+          },
+          {
+            "name": "Apple Music",
+            "value": "applemusic"
+          }
+        ]
       },
       {
-        "name": "Soundcloud",
-        "value": "soundcloud"
+        "type": 5,
+        "name": "force_skip",
+        "description": "Skip current track playing after adding track",
+        "required": false,
       },
       {
-        "name": "Spotify",
-        "value": "spotify"
-      },
-      {
-        "name": "Apple Music",
-        "value": "applemusic"
+        "type": 5,
+        "name": "direct_cdn",
+        "description": "Use Direct CDN after search track to play",
+        "required": false,
       }
-    ]
+    ],
+    "integration_types": [
+      0
+    ],
+    "contexts": [
+      0
+    ],
+    "description_localizations": {
+      "id": "Mencari lagu untuk dimainkan"
     },
-    {
-      "type": 5,
-      "name": "force_skip",
-      "description": "Skip current track playing after adding track",
-      "required": false,
-    },
-    {
-      "type": 5,
-      "name": "direct_cdn",
-      "description": "Use Direct CDN after search track to play",
-      "required": false,
-    }
-  ],
-  "integration_types": [
-    0
-  ],
-  "contexts": [
-    0
-  ],
-  "description_localizations": {
-    "id": "Mencari lagu untuk dimainkan"
   },
-},
   type: 0,
   code: `
   $onlyIf[$guildID!=;]
@@ -243,6 +243,6 @@ module.exports = {
   ]]
   $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer]]
   $callLocalFunction[loadinteraction;3]
-  $setTimeout[$!interactionDelete;2s]
+  $setTimeout[$async[$!interactionDelete];1s]
   ]`
 }

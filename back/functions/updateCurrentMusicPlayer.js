@@ -6,8 +6,7 @@ module.exports = {
 
     $jsonLoad[currenttrack;$playerCurrentTrack[$guildID]]
     $let[testmessage;{
-    "title": "$replace[$env[currenttrack;title];";\\\\"]",
-    "description": "",
+    "title": "$advancedReplace[$env[currenttrack;title];\\\\;;";\\\\"]",
     "author": "$env[currenttrack;author]",
     "url": "$env[currenttrack;uri]",
     "thumbnail": "$env[currenttrack;artworkUrl]",

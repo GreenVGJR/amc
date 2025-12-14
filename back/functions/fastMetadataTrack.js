@@ -16,7 +16,7 @@ module.exports = {
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $let[tryattempt;0]
     $localFunction[refreshing;
     $if[$env[refresh]==true;
@@ -25,10 +25,12 @@ module.exports = {
     ]
     $if[$env[provider]==youtube;
     $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","context":{"client":{"clientName":"WEB","clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","hl":"en","gl":"US"}}}]
-    $httpSetContentType[Json]
+    $httpSetContentType[Text]
+    $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
-    $!httpRequest[https://www.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title,richThumbnail,lengthText);POST;res]
+    $httpRemoveHeader[Accept-Encoding]
+    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title,richThumbnail,lengthText);POST;res]
+    $jsonLoad[res;$env[res]]
     $jsonLoad[toindex;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $let[findindex;$arrayFindIndex[toindex;checkindex;$checkCondition[$env[checkindex;videoRenderer]!=]]]
     $let[rest2;{"id": "$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;videoId]","dynamic_thumbnail":"$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url]","thumbnail":"https://i.ytimg.com/vi/$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;videoId]/hq720.jpg","duration":"$round[$divide[$unparseDigital[$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;lengthText;simpleText]];1000];0]","title":"$deflate[$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[findindex];videoRenderer;title;runs;0;text];base64]"}]
@@ -40,22 +42,25 @@ module.exports = {
     ]
     $if[$env[provider]==soundcloud;
     $try[
+    $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+    $httpRemoveHeader[Accept-Encoding]
     $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[authmusic_soundcloud]&limit=1;GET;res]]
     $onlyIf[$get[http]!=401;
     $callFunction[generateAuthKeys;soundcloud;;false]
     $callLocalFunction[refreshing;true]]
     $onlyIf[$get[http]!=429;$return]
     ]
+    $jsonLoad[res;$env[res]]
     $let[rest2;{"id":"$advancedTextSplit[$env[res;collection;0;permalink_url];soundcloud.com/;1]","dynamic_thumbnail":"","thumbnail":"$env[res;collection;0;artwork_url]","duration":$round[$divide[$env[res;collection;0;duration];1000];0],"title":"$deflate[$env[res;collection;0;title];base64]"}]
     ]
     $if[$env[provider]==spotify;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_spotify]]
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+    $httpRemoveHeader[Accept-Encoding]
     $httpAddHeader[App-platform;WebPlayer]
+    $httpSetContentType[Text]
     $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1;GET;jsonres]]
     $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;
     $callFunction[generateAuthKeys;spotify;;false]
@@ -63,23 +68,28 @@ module.exports = {
     ]
     $onlyIf[$or[$get[httpspo]==429;$get[httpspo]==403]!=true;$return]
     ]
+    $jsonLoad[jsonres;$env[jsonres]]
     $jsonLoad[res1;$env[jsonres;tracks;items]]
     $let[rest2;{"id":"$advancedTextSplit[$env[res1;0;external_urls;spotify];/;4]","dynamic_thumbnail":"","thumbnail":"$env[res1;0;album;images;0;url]","duration":$round[$divide[$env[res1;0;duration_ms];1000];0],"title":"$deflate[$env[res1;0;name];base64]"}]
     ]
     $if[$env[provider]==applemusic;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+    $httpRemoveHeader[Accept-Encoding]
     $httpSetContentType[Text]
-    $!httpRequest[https://itunes.apple.com/search?media=music&limit=1&country=US&term=$env[query];GET;res]
+    $!httpRequest[https://itunes.apple.com/search?media=music&entity=musicTrack&limit=1&country=US&lang=en-US&version=2&term=$env[query];GET;res]
     ]
     $onlyIf[$env[res]!=;$callLocalFunction[refreshing;true]]
     $jsonLoad[res;$env[res]]
     $let[rest2;{"id":"$advancedTextSplit[$env[res;results;0;trackViewUrl];&;0]","dynamic_thumbnail":"","thumbnail":"$replace[$env[res;results;0;artworkUrl100];100x100bb;1x1ss]","duration":$round[$divide[$env[res;results;0;trackTimeMillis];1000];0],"title":"$deflate[$env[res;results;0;trackName];base64]"}]
     ]
     $if[$env[provider]==deezer;
+    $httpSetContentType[Text]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpRemoveHeader[Accept-Encoding]
     $let[status;$httpRequest[https://api.deezer.com/search?limit=1&q=$env[query];GET;res]]
     $onlyIf[$env[res]!=;$callLocalFunction[refreshing;true]]
+    $jsonLoad[res;$env[res]]
     $onlyIf[$and[$get[status]==200;$env[res;data;0]!=];$return]
     $let[rest2;{"id":"$env[res;data;0;id]","dynamic_thumbnail":"","thumbnail":"$env[res;data;0;album;cover]","duration":$env[res;data;0;duration],"title":"$deflate[$env[res;data;0;title];base64]"}]
     ]

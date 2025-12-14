@@ -49,6 +49,7 @@ module.exports = {
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
+    $setCache[musicplayer_message_$guildID_attemptseek;true]
     $async[
     $!playerSeek[$guildID;$get[pest]]
     $if[$callFunction[configMusic;interval_message]==false;$callFunction[updateCurrentMusicPlayer]]

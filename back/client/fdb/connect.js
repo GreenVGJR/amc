@@ -1,5 +1,5 @@
-module.exports = {
-    type: "dbConnect",
+module.exports = [{
+    type: "databaseConnect",
     code: `
     $logger[Info;Waiting to online]
     $!openDB[user;guild;global]
@@ -13,4 +13,20 @@ module.exports = {
     $!prefetchDB[guild;]
     $!prefetchDB[global;]
     `
-}
+},
+{
+    type: "recordUpdate",
+    code: `
+    $!prefetchDB[user;]
+    $!prefetchDB[guild;]
+    $!prefetchDB[global;]
+    `
+},
+{
+    type: "recordRemove",
+    code: `
+    $!prefetchDB[user;]
+    $!prefetchDB[guild;]
+    $!prefetchDB[global;]
+    `
+}]

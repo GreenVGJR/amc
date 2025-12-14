@@ -1,65 +1,69 @@
 module.exports = {
   data: {
-  "name": "search",
-  "description": "Search a media",
-  "options": [
-    {
-      "name": "provider",
-      "type": 3,
-      "description": "Provider to use for search",
-      "required": true,
-      "choices": [
-        { "name": "YouTube", "value": "youtube" },
-        { "name": "YouTube Shorts", "value": "youtubeshorts" },
-        { "name": "YouTube Music", "value": "youtubemusic" },
-        { "name": "YouTube Audio Library", "value": "youtubeaudiolibrary" },
-        { "name": "Soundcloud", "value": "soundcloud" },
-        { "name": "Spotify", "value": "spotify" },
-        { "name": "Apple Music", "value": "applemusic" },
-        { "name": "Shazam", "value": "shazam" },
-        { "name": "ITunes", "value": "itunes" },
-        { "name": "Amazon Music", "value": "amazonmusic" },
-        { "name": "Bandcamp", "value": "bandcamp" },
-        { "name": "Deezer", "value": "deezer" },
-        { "name": "Tidal", "value": "tidal" },
-        { "name": "Qobuz", "value": "qobuz" },
-        { "name": "JioSaavn", "value": "jiosaavn" },
-        { "name": "Tiktok", "value": "tiktok" },
-        { "name": "Tiktok Music", "value": "tiktokmusic" },
-        { "name": "Tiktok Sound", "value": "tiktoksound" },
-        { "name": "NCS", "value": "ncs" }
-      ]
-    },
-    {
-      "type": 3,
-      "name": "query",
-      "description": "Search a media",
-      "required": true
-    },
-    {
-      "type": 5,
-      "name": "ephemeral",
-      "description": "Respond on ephemeral?",
-      "required": false
+    "name": "search",
+    "description": "Search a media",
+    "options": [
+      {
+        "name": "provider",
+        "type": 3,
+        "description": "Provider to use for search",
+        "required": true,
+        "choices": [
+          { "name": "YouTube", "value": "youtube" },
+          { "name": "YouTube Shorts", "value": "youtubeshorts" },
+          { "name": "YouTube Music", "value": "youtubemusic" },
+          { "name": "YouTube Audio Library", "value": "youtubeaudiolibrary" },
+          { "name": "Soundcloud", "value": "soundcloud" },
+          { "name": "Spotify", "value": "spotify" },
+          { "name": "Apple Music", "value": "applemusic" },
+          { "name": "Shazam", "value": "shazam" },
+          { "name": "ITunes", "value": "itunes" },
+          { "name": "Amazon Music", "value": "amazonmusic" },
+          { "name": "Bandcamp", "value": "bandcamp" },
+          { "name": "Deezer", "value": "deezer" },
+          { "name": "Tidal", "value": "tidal" },
+          { "name": "Qobuz", "value": "qobuz" },
+          { "name": "JioSaavn", "value": "jiosaavn" },
+          { "name": "Tiktok", "value": "tiktok" },
+          { "name": "Tiktok Music", "value": "tiktokmusic" },
+          { "name": "Tiktok Sound", "value": "tiktoksound" },
+          { "name": "NCS", "value": "ncs" },
+          { "name": "Capcut - Templates | Global", "value": "capcut" },
+          { "name": "Capcut - Templates | US", "value": "capcutus" },
+          { "name": "Kinemaster - Templates", "value": "kinemaster" },
+          { "name": "Roblox Music", "value": "robloxmusic" }
+        ]
+      },
+      {
+        "type": 3,
+        "name": "query",
+        "description": "Search a media",
+        "required": true
+      },
+      {
+        "type": 5,
+        "name": "ephemeral",
+        "description": "Respond on ephemeral?",
+        "required": false
+      }
+    ],
+    "integration_types": [
+      0,
+      1
+    ],
+    "contexts": [
+      0
+    ],
+    "description_localizations": {
+      "id": "Cari media"
     }
-  ],
-  "integration_types": [
-    0,
-    1
-  ],
-  "contexts": [
-    0
-  ],
-  "description_localizations": {
-    "id": "Cari media"
-  }
-},
+  },
   type: 0,
   code: `
   $onlyIf[$guildID!=;]
   $if[$or[$option[ephemeral]==;$option[ephemeral]==true];$ephemeral]
   $let[colors;aa$randomBytes[2]]
-  $let[check;$getRecord[global;cachesearch_global-query_$deflate[$option[provider]$toLowercase[$option[query]];hex]]]
+  $let[check;$getRecord[global;;cachesearch_global-query_$deflate[$option[provider]$toLowercase[$option[query]];hex]]]
   $localFunction[loadinteraction;
   $if[$env[typela]==1;
   $defer
@@ -75,7 +79,7 @@ module.exports = {
   > $env[result;url]
   > -# $if[$and[$advancedTextSplit[$env[result;duration];:;1]==;$advancedTextSplit[$env[result;duration];:;2]==];$advancedTextSplit[$env[result;duration];:;0];$if[$advancedTextSplit[$env[result;duration];:;0]==00;$advancedTextSplit[$env[result;duration];:;1]:$advancedTextSplit[$env[result;duration];:;2];$env[result;duration]]]
   ]
-  $addThumbnail[$if[$or[$env[result;thumbnail]==null;$env[result;thumbnail]==];$userDefaultAvatar[$authorID];$env[result;thumbnail]]]
+  $addThumbnail[$if[$isValidLink[$env[result;thumbnail]]==false;$userDefaultAvatar[$authorID];$env[result;thumbnail]]]
   ]
   ]
   $if[$get[check]!={};
@@ -93,6 +97,7 @@ module.exports = {
   $let[fsearch;false]
   $if[$get[check]=={};
   $async[
+  $wait[3]
   $let[a;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
   $jsonLoad[loadser;$get[a]]
   $if[$env[loadser;0]==;$let[fsearch;null];$let[fsearch;true]]
@@ -108,9 +113,9 @@ module.exports = {
   ]
   $let[currentping;$round[$executionTime;0]]
   ;
+  $let[currentping;$round[$executionTime;0]]
   $jsonLoad[loadser;$get[check]]
   $jsonLoad[loadser;$env[loadser;playlist]]
-  $let[currentping;$round[$executionTime;0]]
   ]
   $arraySlice[loadser;loadser;0;10]
   $arrayReverse[loadser;loadser]

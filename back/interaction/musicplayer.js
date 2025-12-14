@@ -30,16 +30,25 @@ module.exports = {
     $!playerShuffle[$guildID]
     ]
     $if[$advancedTextSplit[$customID;_;1]==lyrics;
+    $let[f-fetch;false]
+    $async[
+    $wait[3]
+    $jsonLoad[trk;$playerCurrentTrack[$guildID]]
+    $jsonLoad[result;$callFunction[getLyricsTrack;$if[$checkContains[$toLowercase[$toCamelCase[$env[trk;title]]];$toLowercase[$toCamelCase[$trim[$advancedTextSplit[$env[trk;author];-;0]]]]]==false;$trim[$advancedTextSplit[$env[trk;author];-;0]] - $advancedTextSplit[$env[trk;title];(;0];$advancedTextSplit[$env[trk;title];(;0]];;false;false]]
+    $if[$env[result;results]==;$let[f-fetch;null];$let[f-fetch;true]]
+    ]
     $ephemeral
     $defer
-    $jsonLoad[trk;$playerCurrentTrack[$guildID]]
-    $jsonLoad[result;$callFunction[getLyricsTrack;$if[$charCount[$env[trk;title];-]==0;$advancedTextSplit[$env[trk;author];-;0] - $advancedTextSplit[$env[trk;title];(;0];$advancedTextSplit[$env[trk;title];(;0]];;false;false]]
-    $onlyIf[$env[result;results]!=;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
+    $loop[-1;
+    $if[$get[f-fetch]!=false;$break]
+    $wait[5]
+    ]
+    $onlyIf[$get[f-fetch]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
     $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
     $interactionReply[
     $if[$charCount[$get[loadlyrics]]>3000;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
     $title[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]
-    $description[$codeBlock[$cropText[$get[loadlyrics];0;3900;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
+    $description[$codeBlock[$cropText[$get[loadlyrics];0;3000;\n\n($callFunction[useCustomMusicMessage;config_errorOverResultLyrics])]]]
     $footer[$toTitleCase[$env[result;results;provider]];$callFunction[useIcon;$env[result;results;provider]]]
     $thumbnail[$env[result;results;thumbnail]]
     $color[$callFunction[useIcon;color_embed]]
@@ -56,7 +65,7 @@ module.exports = {
     ]
     $jsonLoad[trk;$playerCurrentTrack[$guildID]]
     
-    $let[a;$callFunction[discoverArtistLastFm;$advancedTextSplit[$env[trk;author];- Topic;0]]]
+    $let[a;$callFunction[discoverArtistLastFm;$trim[$advancedTextSplit[$env[trk;author];- Topic;0]]]]
     $onlyIf[$get[a]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
     $interactionReply[$get[a]]
     ]

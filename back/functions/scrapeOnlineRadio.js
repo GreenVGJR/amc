@@ -37,7 +37,7 @@ module.exports = {
     }],
     code: `
     $arrayLoad[tempstore]
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $if[$env[checkCache]==false;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
@@ -50,7 +50,7 @@ module.exports = {
     "url":"https://onlineradiobox.com$advancedTextSplit[$env[rest];href=";1;";0]",
     "thumbnail":"https:$advancedTextSplit[$env[rest];src=";1;";0]",
     "radioId":"$advancedTextSplit[$env[rest];radioId=";1;";0]",
-    "radioName":"$advancedTextSplit[$env[rest];radioName=";1;";0]",
+    "radioName":"$djsEval[require("entities").decodeHTML(\\\`$advancedTextSplit[$env[rest];radioName=";1;";0]\\\`)]",
     "streamFormat":"$advancedTextSplit[$env[rest];streamType=";1;";0]",
     "stream":"$advancedTextSplit[$env[rest];stream=";1;";0]"
     }]
@@ -61,7 +61,7 @@ module.exports = {
     $!jsonSet[lf;list_radio;$get[results]]
     $if[$env[tempstore;0]!=;$!putRecord[global;$env[lf];cachesearch_global-radio_$md5[$env[query]$env[countrycode]$env[page]]]]
     ;
-    $let[results;$getRecord[global;cachesearch_global-radio_$md5[$env[query]$env[countrycode]$env[page]]]]
+    $let[results;$getRecord[global;;cachesearch_global-radio_$md5[$env[query]$env[countrycode]$env[page]]]]
     $jsonLoad[listradio;$get[results]]
     $let[results;$env[listradio;list_radio]]
     ]

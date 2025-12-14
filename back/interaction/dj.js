@@ -4,7 +4,7 @@ module.exports = {
     code: `
     $onlyIf[$or[$customID==toggledjrolepick_clear;$customID==toggledjrolepick;$customID==toggledjrolemode]]
     $onlyIf[$hasPerms[$guildID;$authorID;ManageChannels;ManageRoles]]
-    $jsonLoad[test;$getRecord[guild;musicplayer_data_djft;$guildID]]
+    $jsonLoad[test;$getRecord[guild;;musicplayer_data_djft_$guildID]]
     $if[$customID==toggledjrolepick_clear;
     $!jsonSet[test;role;]
     $!jsonSet[test;mode;0]
@@ -16,7 +16,7 @@ module.exports = {
     $if[$customID==toggledjrolemode;
     $!jsonSet[test;mode;$selectMenuValues[0]]
     ]
-    $!putRecord[guild;$env[test];musicplayer_data_djft;$guildID]
+    $!putRecord[guild;$env[test];musicplayer_data_djft_$guildID]
     $interactionUpdate[$callFunction[loadDJUser]]
     `
 }

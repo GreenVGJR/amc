@@ -36,19 +36,19 @@ module.exports = {
     ]
     $if[$env[types]==hls;
     $httpAddHeader[User-Agent;Mozilla/5.0 (Macintosh\\; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15,gzip(gfe)]
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+    $httpRemoveHeader[Accept-Encoding]
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"WEB","clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $!httpRequest[https://www.youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,videoDetails.lengthSeconds,streamingData.hlsManifestUrl;POST;reshttp]
     ;
     $if[$or[$env[types]==;$env[types]==v];
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
-    $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36]
+    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"VISIONOS","clientVersion":"0.1","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $!httpRequest[https://www.youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
     ]
     $if[$env[types]==va;
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
-    $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36]
+    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID_VR","clientVersion":"1.00.0","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
     $!httpRequest[https://www.youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
     ]]]
@@ -100,17 +100,26 @@ module.exports = {
     ;
     $if[$env[whattype;type]==spotify;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $onlyIf[$env[test;results;preview;0;file_id]!=;$callLocalFunction[oncecode;true]]
-    $let[finalurl;https://p.scdn.co/mp3-preview/$env[test;results;preview;0;file_id]]
+    $if[$env[test;results;props]!=;
+    $let[retpreview;$env[test;results;props;pageProps;state;data;entity;audioPreview;url]]
+    ;
+    $let[retpreview;$if[$env[test;results;preview_url]!=null;$env[test;results;preview_url]]]
+    ]
+    $onlyIf[$get[retpreview]!=;$let[finalurl;null]]
+    $let[finalurl;$get[retpreview]]
     ]
     $if[$env[whattype;type]==tiktokmob;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
-    $jsonLoad[whattype;$callFunction[filterMediaID;$if[$env[test;results;video;id]!=;https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
+    $jsonLoad[whattype;$callFunction[filterMediaID;$if[$or[$env[test;results;video;id]!=;$env[test;results;id_str]!=];https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
     ]
     $if[$env[whattype;type]==tiktok;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[test;results]!=null;$callLocalFunction[oncecode;true]]
+    $if[$env[test;results;video_info;url_list;0]!=;
+    $let[finalurl;$env[test;results;video_info;url_list;0]]
+    $return
+    ]
     $if[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList]==;
     $jsonLoad[b;$env[test;results;video;PlayAddrStruct;UrlList]]
     ;
@@ -153,8 +162,8 @@ module.exports = {
     ]
     $if[$env[whattype;type]==applemusic;
     $try[
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
-    $httpAddHeader[User-Agent;Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36]
+    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
     $httpSetContentType[Text]
     $!httpRequest[$env[url];GET;a]
     ]
@@ -169,8 +178,16 @@ module.exports = {
     $if[$env[whattype;type]==instagram;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
-    $let[finalurl;$env[a;results;video_versions;0;url]]
+    $let[finalurl;$env[a;results;video_url]]
     ]
+    $if[$env[whattype;type]==instagramaudio;
+    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
+    $if[$env[a;results;metadata;original_sound_info;progressive_download_url]==null;
+    $let[finalurl;$env[a;results;metadata;music_info;music_asset_info;progressive_download_url]]
+    ;
+    $let[finalurl;$env[a;results;metadata;original_sound_info;progressive_download_url]]
+    ]]
     $if[$env[whattype;type]==bandcamp;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]

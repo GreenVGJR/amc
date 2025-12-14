@@ -4,5 +4,7 @@
 forge.db
 package-lock.json
 .vscode
+.cache
 Archive.zip
 /quoriel
+forgeconfig.json

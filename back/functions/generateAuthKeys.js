@@ -16,7 +16,7 @@ module.exports = {
         required: true
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];Mozilla/5.0 (Windows NT 10.0\\; Win64\\; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36;$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $let[typedebug;$callFunction[configMusic;debug_auth]]
 
     $if[$or[$env[type]==all;$env[type]==youtube];
@@ -41,10 +41,46 @@ module.exports = {
         ]
         $if[$and[$get[abortproscookies]!=true;$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false];
         $localFunction[cookiessid;
-        $let[tempytinitcs;$if[$has[ytinitcookies_replacement];$get[ytinitcookies_replacement];$get[ytinitcookies]]]
-        $let[ytinitcookies_replacement;$advancedReplace[$get[tempytinitcs];__Secure-3PSIDCC=$advancedTextSplit[$get[tempytinitcs];__Secure-3PSIDCC=;1;\\;;0];__Secure-3PSIDCC=$advancedTextSplit[$env[ab84830609467438272d];__Secure-3PSIDCC=;1;\\;;0];__Secure-1PSIDCC=$advancedTextSplit[$get[tempytinitcs];__Secure-1PSIDCC=;1;\\;;0];__Secure-1PSIDCC=$advancedTextSplit[$env[ab84830609467438272d];__Secure-1PSIDCC=;1;\\;;0];SIDCC=$advancedTextSplit[$get[tempytinitcs];SIDCC=;1;\\;;0];SIDCC=$advancedTextSplit[$env[ab84830609467438272d];SIDCC=;1;\\;;0];LOGIN_INFO=$advancedTextSplit[$get[tempytinitcs];LOGIN_INFO=;1;\\;;0];LOGIN_INFO=$advancedTextSplit[$env[g3];"LOGIN_INFO":";1;";0]]]
+        $let[tempgrinitcs;$default[$get[ytinitcookies_replacement];$get[ytinitcookies]]]
+        $arrayLoad[lkcinitcookies_1;\\;;$get[tempgrinitcs]]
+        $arrayMap[lkcinitcookies_1;b;$if[$charCount[$env[b];=]>=1;$return[$trim[$env[b]]]];lkcinitcookies_1]
+        $let[tempgt-gr-c-0_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__Secure-1PSIDCC]]]
+        $let[tempgt-gr-c-1_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__Secure-3PSIDCC]]]
+        $let[tempgt-gr-c-2_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__SIDCC]]]
+        $let[tempgt-gr-c-3_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];NID]]]
+        $let[tempgt-gr-c-4_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__Secure-ENID]]]
+        $let[tempgt-gr-c-5_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__Secure-1PSIDTS]]]
+        $let[tempgt-gr-c-6_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__Secure-3PSIDTS]]]
+        $arrayLoad[lkcinitcookies_2;\\;;$env[ab84830609467438272d]]
+        $arrayMap[lkcinitcookies_2;b;$return[$default[$advancedTextSplit[$env[b];, ;1];$advancedTextSplit[$env[b]; ;0]]];lkcinitcookies_2]
+        $arrayMap[lkcinitcookies_2;b;$if[$and[$charCount[$env[b]; ]==0;$charCount[$env[b]]!=0];$return[$env[b]]];lkcinitcookies_2]
+        $let[tempgt-gr-c-0_1;$arrayFindIndex[lkcinitcookies_2;a;$startsWith[$env[a];__Secure-1PSIDCC]]]
+        $let[tempgt-gr-c-1_1;$arrayFindIndex[lkcinitcookies_2;a;$startsWith[$env[a];__Secure-3PSIDCC]]]
+        $let[tempgt-gr-c-2_1;$arrayFindIndex[lkcinitcookies_2;a;$startsWith[$env[a];__SIDCC]]]
+        $let[tempgt-gr-c-3_1;$arrayFindIndex[lkcinitcookies_2;a;$startsWith[$env[a];NID]]]
+        $let[tempgt-gr-c-4_1;$arrayFindIndex[lkcinitcookies_2;a;$startsWith[$env[a];__Secure-ENID]]]
+        $let[tempgt-gr-c-5_1;$arrayFindIndex[lkcinitcookies_2;a;$startsWith[$env[a];__Secure-1PSIDTS]]]
+        $let[tempgt-gr-c-6_1;$arrayFindIndex[lkcinitcookies_2;a;$startsWith[$env[a];__Secure-3PSIDTS]]]
+        $if[$and[$get[tempgt-gr-c-0_0]!=-1;$get[tempgt-gr-c-0_1]!=-1];
+        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-0_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-0_1]]]
+        ]
+        $if[$and[$get[tempgt-gr-c-1_0]!=-1;$get[tempgt-gr-c-1_1]!=-1];
+        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-1_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-1_1]]]
+        ]
+        $if[$and[$get[tempgt-gr-c-2_0]!=-1;$get[tempgt-gr-c-2_1]!=-1];
+        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-2_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-2_1]]]
+        ]
+        $if[$and[$get[tempgt-gr-c-3_0]!=-1;$get[tempgt-gr-c-3_1]!=-1];
+        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-3_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-3_1]]]
+        ]
+        $if[$and[$get[tempgt-gr-c-4_0]!=-1;$get[tempgt-gr-c-4_1]!=-1];
+        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-4_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-4_1]]]
+        ]
+        $let[ytinitcookies_replacement;$arrayJoin[lkcinitcookies_1;\\; ]]
         $if[$env[findtsidexist]==true;
-        $let[ytinitcookies_replacement;$advancedReplace[$get[ytinitcookies_replacement];__Secure-1PSIDTS=$advancedTextSplit[$get[ytinitcookies_replacement];__Secure-1PSIDTS=;1;\\;;0];__Secure-1PSIDTS=$advancedTextSplit[$env[ab84830609467438272d];__Secure-1PSIDTS=;1;\\;;0];__Secure-3PSIDTS=$advancedTextSplit[$get[ytinitcookies_replacement];__Secure-3PSIDTS=;1;\\;;0];__Secure-3PSIDTS=$advancedTextSplit[$env[ab84830609467438272d];__Secure-3PSIDTS=;1;\\;;0]]]
+        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-5_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-5_1]]]
+        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-6_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-6_1]]]
+        $let[ytinitcookies_replacement;$arrayJoin[lkcinitcookies_1;\\; ]]
         ]
         $return
         ;ab84830609467438272d;findtsidexist]
@@ -55,7 +91,7 @@ module.exports = {
         $httpAddHeader[Accept;*/*]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpAddHeader[Referer;https://www.youtube.com]
-        $httpAddHeader[Cookie;$get[ytinitcookies_replacement]]
+        $httpAddHeader[Cookie;$default[$get[ytinitcookies_replacement];$get[ytinitcookies]]]
         $httpAddHeader[User-Agent;$get[agent]]
         $let[httpytrotate;$httpRequest[https://accounts.youtube.com/RotateCookiesPage?origin=https://www.youtube.com&yt_pid=1;GET;g3_1]]
         ]
@@ -74,7 +110,7 @@ module.exports = {
         $httpAddHeader[Origin;https://accounts.youtube.com]
         $httpAddHeader[Referer;https://www.youtube.com]
         $httpAddHeader[Sec-Fetch-Site;same-origin]
-        $httpAddHeader[Cookie;$get[ytinitcookies_replacement]]
+        $httpAddHeader[Cookie;$default[$get[ytinitcookies_replacement];$get[ytinitcookies]]]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpSetBody[\\[null,"$default[$get[ytinitrotateid+hp_init];$getCache[tempres-ytinitrotateid_0]]",$default[$get[ytinitrotatetd+up_init];$getCache[tempres-ytinitrotateid_1]]\\]]
         $let[httpytrotate_2;$httpRequest[https://accounts.youtube.com/RotateCookies;POST;g3_2]]
@@ -159,7 +195,7 @@ module.exports = {
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $!httpRequest[https://music.amazon.com/config.json;GET]
         $jsonLoad[tokens;$httpResult]
-        $if[$env[tokens;csrf;token]!=;$setCache[authmusic_amazonmusic;$deflate[$env[tokens];base64]]]
+        $if[$env[tokens;csrf;token]!=;$setCache[authmusic_amazonmusic;$env[tokens]]]
         $if[$env[successlog]==true;$logger[Info;$if[$env[tokens;csrf;token]!=;$cropText[$env[tokens;csrf;token];0;12;...];Failed to Retrieve] | Amazon Music]]
     ;$logger[Info;Failed to Retrieve - Amazon Music]]
     $if[$env[tokens;csrf;token]==;$logger[Warn;Re-trying - Amazon Music] $callFunction[generateAuthKeys;amazonmusic;;true]]

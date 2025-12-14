@@ -4,14 +4,17 @@ require('dotenv').config(); // Load Environment
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
 const { ForgeLinked } = require('ForgeLinked');
 const { QuorielDB } = require("@quoriel/db");
+const { QuorielEdge } = require("@quoriel/edge");
 // const { ForgeDB } = require("@tryforge/forge.db");
 
 console.clear();
 
 const quorielDb = new QuorielDB({
-    events: [
-        "dbConnect"
-    ]
+  events: [
+    "databaseConnect",
+    "recordUpdate",
+    "recordRemove"
+  ]
 });
 
 const lavalink = new ForgeLinked({
@@ -26,7 +29,6 @@ const lavalink = new ForgeLinked({
   ],
   nodes: [
     {
-      id: "maow",
       host: "localhost",
       port: 3000,
       authorization: "hai",
@@ -46,29 +48,30 @@ const lavalink = new ForgeLinked({
 });
 
 const client = new ForgeClient({
-    token: process.env.DISCORD_TOKEN,
-    logLevel: LogPriority.Medium,
-    intents: [
-        "Guilds",
-        "GuildMembers",
-        "GuildMessages",
-        "GuildVoiceStates",
-        "MessageContent"
-    ],
-    events: [
-        "clientReady",
-        "voiceStateUpdate",
-        "interactionCreate",
-        "messageCreate"
-    ],
-    prefixes: [
-        "?"
-    ],
-    extensions: [
-        lavalink,
-     // new ForgeDB(),
-        quorielDb
-    ]
+  token: process.env.DISCORD_TOKEN,
+  logLevel: LogPriority.Medium,
+  intents: [
+    "Guilds",
+    "GuildMembers",
+    "GuildMessages",
+    "GuildVoiceStates",
+    "MessageContent"
+  ],
+  events: [
+    "clientReady",
+    "voiceStateUpdate",
+    "interactionCreate",
+    "messageCreate"
+  ],
+  prefixes: [
+    "?"
+  ],
+  extensions: [
+    lavalink,
+    // new ForgeDB(),
+    quorielDb,
+    new QuorielEdge()
+  ]
 });
 
 client.login();
