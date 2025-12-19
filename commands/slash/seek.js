@@ -49,8 +49,10 @@ module.exports = {
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
+    $if[$callFunction[configMusic;interval_message]==true;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $setCache[musicplayer_message_$guildID_attemptseek;true]
+    ]
     $async[$!seekTrack[$get[pest]]]
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[pest]]]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalSeekTrack] \`$parseDigital[$get[pest]]\`]

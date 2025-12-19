@@ -94,7 +94,10 @@ module.exports = {
     $if[$getCache[musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
     $ephemeral
     $defer
+    $if[$callFunction[configMusic;interval_message]==true;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    $setCache[musicplayer_message_$guildID_attemptseek;true]
+    ]
     $async[
     $let[curduration;$if[$callFunction[configMusic;interval_message];$callFunction[musicVirtualDuration;$guildID;$get[cid]];$playerElapsedTime]]
     $let[seeks;10000]
@@ -109,7 +112,10 @@ module.exports = {
     $if[$getCache[musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
     $ephemeral
     $defer
+    $if[$callFunction[configMusic;interval_message]==true;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    $setCache[musicplayer_message_$guildID_attemptseek;true]
+    ]
     $async[
     $let[curduration;$if[$callFunction[configMusic;interval_message];$callFunction[musicVirtualDuration;$guildID;$get[cid]];$playerElapsedTime]]
     $let[seeks;10000]

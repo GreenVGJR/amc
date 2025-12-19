@@ -33,8 +33,13 @@ module.exports = {
     ]]
     $if[$env[filtype;type]==tiktokmob;
     $if[$env[a;results;id_str]!=;
+    $if[$env[a;results;mid]!=;
+    $let[author;$default[$env[a;results;matched_song;author];$env[a;results;author]]]
+    $let[title;$default[$env[a;results;matched_song;title];$env[a;results;title]]]
+    ;
     $let[author;$env[a;results;author_info;unique_id]]
     $let[title;$default[$env[a;results;desc];$env[a;results;id_str]]]
+    ]
     ;
     $let[author;$default[$env[a;results;author;uniqueId];$env[a;results;author]]]
     $let[title;$default[$env[a;results;desc];$env[a;results;id]]]
@@ -48,8 +53,8 @@ module.exports = {
     $let[title;$default[$env[a;results;desc];$env[a;results;id]]]
     ]]
     $if[$env[filtype;type]==tiktokmusic;
-    $let[author;$env[a;results;author]]
-    $let[title;$env[a;results;title]]
+    $let[author;$default[$env[a;results;matched_song;author];$env[a;results;author]]]
+    $let[title;$default[$env[a;results;matched_song;title];$env[a;results;title]]]
     ]
     $if[$env[filtype;type]==facebook;
     $let[author;$env[a;results;owner]]

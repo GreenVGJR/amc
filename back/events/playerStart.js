@@ -37,7 +37,9 @@ module.exports = [{
     code: `
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
+    $if[$callFunction[configMusic;interval_message]==true;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    ]
     `
 },
 {
@@ -80,7 +82,9 @@ module.exports = [{
     code: `
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
+    $if[$callFunction[configMusic;interval_message]==true;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    ]
     $try[$!disableComponentsOf[$get[cid];$get[mid]]]
     `
 }]

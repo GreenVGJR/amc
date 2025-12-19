@@ -37,7 +37,7 @@ module.exports = {
     $try[
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[authmusic_soundcloud]&limit=1;GET;res]]
     $onlyIf[$get[http]!=401;
     $callFunction[generateAuthKeys;soundcloud;;false]
@@ -49,26 +49,28 @@ module.exports = {
     ]
     $if[$env[provider]==spotify;
     $try[
-    $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Authorization;Bearer $getCache[authmusic_spotify]]
-    $httpRemoveHeader[Accept-Encoding]
-    $httpAddHeader[App-platform;WebPlayer]
-    $httpSetContentType[Text]
-    $let[httpspo;$httpRequest[https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1;GET;jsonres]]
+    $let[mdhedroute_spotify;{
+    "App-Platform": "WebPlayer",
+    "Authorization": "Bearer $getCache[authmusic_spotify]",
+    "Sec-Fetch-Site": "none",
+    "User-Agent": "$get[agent]"
+    }]
+    $let[mdquery;https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1]
+    $let[jsonres;$djsEval[const { request, Agent } = require("undici")\\; request(ctx.getKeyword("mdquery"), { dispatcher: new Agent({ connect: { family: 4 } }), headers: JSON.parse(ctx.getKeyword("mdhedroute_spotify")), method: "GET" }).then(a => { ctx.setKeyword('httpspo', a.statusCode)\\; return a.body.text() }).catch()]]
     $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;
     $callFunction[generateAuthKeys;spotify;;false]
     $callLocalFunction[refreshing;true]
     ]
     $onlyIf[$or[$get[httpspo]==429;$get[httpspo]==403]!=true;$return]
     ]
-    $jsonLoad[jsonres;$env[jsonres]]
+    $jsonLoad[jsonres;$get[jsonres]]
     $jsonLoad[res1;$env[jsonres;tracks;items]]
     $let[rest2;{"id":"$advancedTextSplit[$env[res1;0;external_urls;spotify];/;4]","dynamic_thumbnail":"","thumbnail":"$env[res1;0;album;images;0;url]","duration":$round[$divide[$env[res1;0;duration_ms];1000];0],"title":"$deflate[$env[res1;0;name];base64]"}]
     ]
     $if[$env[provider]==applemusic;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $httpSetContentType[Text]
     $!httpRequest[https://itunes.apple.com/search?media=music&entity=musicTrack&limit=1&country=US&lang=en-US&version=2&term=$env[query];GET;res]
     ]
@@ -79,7 +81,7 @@ module.exports = {
     $if[$env[provider]==deezer;
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $let[status;$httpRequest[https://api.deezer.com/search?limit=1&q=$env[query];GET;res]]
     $onlyIf[$env[res]!=;$callLocalFunction[refreshing;true]]
     $jsonLoad[res;$env[res]]

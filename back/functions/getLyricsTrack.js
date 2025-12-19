@@ -39,7 +39,7 @@ module.exports = {
     $generateAuthKeys[deezer;;false]
     $httpSetBody[{"operationName":"SearchFull","variables":{"query":"$encodeURI[$env[query]]","firstList":1},"query":"$inflate[789c6d8c310e83300c45af122486546260e9920354aad4a9ac2c81b8c46a30c5715a5588bb57840e1d2a79b0bfff7b73027eab062cf7fe9442d0e5bc254635c2484351a9f2861ce582518c3a931407b5b48414c592ec9cfe223b9aff0c310589db2a6cfb7bd4d9627e6cb9076e80dca2c94116bb960425404b367469dcb27e7a0267954f63471683518943d40fec25315c614eb0c997173af1461debba521e70f0928ff5d0d2fa773edc105e8e;hex]"}]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_deezer]]
     $httpAddHeader[Accept;application/json]
     $httpAddHeader[Content-Type;application/json]
@@ -49,7 +49,7 @@ module.exports = {
     $try[
     $httpSetBody[{"operationName":"GetLyrics","variables":{"trackId":"$env[drtcp;data;instantSearch;results;tracks;edges;0;node;id]"},"query":"$inflate[789c2b2c4d2daa54704f2df1a92cca4c2ed65029294a4ccef64cb152082e29cacc4b57d454a88ec953008b6ac0e560aa20923960ad1075a9152531790ac59579c91945f9799955a9293e9979a910c99ca2e490ccdcd4e292c4dc021037332f35264fa116816b01498b33f5;hex]"}]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_deezer]]
     $httpAddHeader[Accept;application/json]
     $httpAddHeader[Content-Type;application/json]
@@ -75,7 +75,7 @@ module.exports = {
     $try[
     $jsonLoad[r;$callFunction[fastMetadataTrack;$env[query];applemusic]]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $httpSetContentType[Text]
     $let[cer_appleurlms;$env[r;id]]
     $let[rs_http;$httpRequest[https://www.shazam.com/song/$advancedTextSplit[$env[r;id];?i=;1]/$advancedTextSplit[$env[r;id];/;$sub[$charCount[$env[r;id];/];1]];GET;prgn]]
@@ -115,7 +115,7 @@ module.exports = {
     $arrayPushJSON[results;$trimLines[{"status_1":$get[rs_http],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"shazam","thumbnail":"$get[crthumb-shazam]","query":"$encodeURI[$env[query]]","url":"$get[cer_appleurlms]","autocomplete":"$encodeURI[$inflate[$env[r;title];base64]]","lyric":"$deflate[$get[finallyric];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $httpSetContentType[Text]
     $let[http_2;$httpRequest[https://lrclib.net/api/search?q=$env[query];GET;ges1]]
     $jsonLoad[ges1;$env[ges1]]
@@ -125,13 +125,13 @@ module.exports = {
     $arrayPushJSON[results;$trimLines[{"status_1":$get[http_2],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"lrclib","thumbnail":"$callFunction[useIcon;lrclib]","query":"$encodeURI[$env[query]]","url":"https://lrclib.net/api/get/$env[ges1;0;id]","autocomplete":"$encodeURI[$env[ges1;0;name]]","lyric":"$deflate[$if[$and[$env[line]==true;$env[ges1;0;syncedLyrics]!=];$env[ges1;0;syncedLyrics];$if[$env[ges1;0;instrumental];\\[Instrumental\\];$env[ges1;0;plainLyrics]]];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $httpSetContentType[Text]
     $let[http_1;$httpRequest[https://genius.com/api/search/song?&per_page=1&q=$env[query];GET;ges]]
     $jsonLoad[ges;$env[ges]]
     $if[$env[ges;response;sections;0;hits;0]!=;
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $let[http2_1;$httpRequest[https://genius.com$env[ges;response;sections;0;hits;0;result;api_path]/embed.js;GET;ges2]]
     $let[a2;$advancedTextSplit[$advancedReplace[$env[ges2];\\\\n;
 ;\\\\;;<br>;];<p>;1;</p>;0]]

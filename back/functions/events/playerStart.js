@@ -47,7 +47,7 @@ module.exports = {
     $!clearInterval[$env[intervalName]]
     $return
     ]
-    $if[$or[$env[messageId]==;$env[channelId]==];
+    $if[$or[$env[messageId]==;$channelExists[$env[channelId]]==false];
     $leaveVoiceChannel
     $return
     ]
