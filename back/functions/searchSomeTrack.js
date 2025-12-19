@@ -191,7 +191,7 @@ module.exports = {
     $if[$env[provider]==tiktok;
     $httpSetContentType[Text]
     $httpRemoveHeader[Accept-Encoding]
-    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[Accept-Language;en]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
     $let[xgnarly;$callFunction[xGnarlyTiktok;aid=1180&app_language=en&app_name=tiktok_web&browser_language=en-US&from_page=search&cookie_enabled=true&search_source=normal_search&region=US&language=en&user_is_login=true&device_id=$getCache[authmusic_tiktok_did]&offset=0&keyword=$encodeURI[$env[query]];$get[agent]]]
@@ -205,12 +205,12 @@ module.exports = {
     $if[$env[provider]==tiktokmusic;
     $httpSetContentType[Text]
     $httpRemoveHeader[Accept-Encoding]
-    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[Accept-Language;en]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
-    $let[xgnarly;$callFunction[xGnarlyTiktok;count=10&cursor=0&aid=1180&device_id=$getCache[authmusic_tiktok_did]&user_is_login=true&cookie_enabled=true&keyword=$encodeURI[$env[query]];$get[agent]]]
-    $!httpRequest[https://api-boot.tiktokv.com/aweme/v1/music/search/?count=10&cursor=0&aid=1180&device_id=$getCache[authmusic_tiktok_did]&user_is_login=true&cookie_enabled=true&keyword=$encodeURI[$env[query]]&X-Gnarly=$get[xgnarly];GET;a]
+    $let[xgnarly;$callFunction[xGnarlyTiktok;count=10&cursor=0&aid=1180&device_id=$getCache[authmusic_tiktok_did]&user_is_login=true&cookie_enabled=true&region=&referer=&keyword=$encodeURI[$env[query]];$get[agent]]]
+    $!httpRequest[https://api-boot.tiktokv.com/aweme/v1/music/search/?count=10&cursor=0&aid=1180&device_id=$getCache[authmusic_tiktok_did]&user_is_login=true&cookie_enabled=true&region=&referer=&keyword=$encodeURI[$env[query]]&X-Gnarly=$get[xgnarly];GET;a]
     $if[$env[a]==;$return]
     $jsonLoad[a;$env[a]]
     $jsonLoad[a;$env[a;music_info_list]]
@@ -219,7 +219,7 @@ module.exports = {
     $if[$env[provider]==tiktoksound;
     $httpSetContentType[Text]
     $httpRemoveHeader[Accept-Encoding]
-    $httpAddHeader[Accept-Language;en-US]
+    $httpAddHeader[Accept-Language;en]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
     $let[xgnarly;$callFunction[xGnarlyTiktok;aid=1180&app_language=en&app_name=tiktok_web&browser_language=en-US&from_page=search&cookie_enabled=true&search_source=normal_search&region=US&language=en&user_is_login=true&device_id=$getCache[authmusic_tiktok_did]&offset=0&keyword=$encodeURI[$env[query]];$get[agent]]]

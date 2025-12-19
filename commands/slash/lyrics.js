@@ -43,7 +43,7 @@ module.exports = {
     $wait[3]
     $jsonLoad[result;$callFunction[getLyricsTrack;$option[song_name];;true;$option[line_synced]]]
     $if[$env[result;results]==;$let[fsearch;null];$let[fsearch;true]]
-    $let[latencyrs;$round[$executionTime]]
+    $let[latencyrs;$env[result;response_time]]
     ]
     $defer
 

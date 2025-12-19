@@ -179,7 +179,9 @@ $let[converttype;mp4]
 $let[converttype;$if[$get[contenttype]==webm;opus;$if[$get[contenttype]==mp4;m4a;$if[$or[$get[contenttype]==mp3;$get[contenttype]==mpeg];mp3;$get[contenttype]]]]]
 ]
 $let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];$get[gettitle].$get[converttype]]]
+$if[$get[f-fetch]==false;
 $callLocalFunction[runcodessync;Downloading » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+]
 $loop[-1;
 $if[$get[f-fetch]!=false;$break]
 $wait[5]

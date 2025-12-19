@@ -46,7 +46,7 @@ module.exports = {
     $if[$try[$checkCondition[$playerQueueLength[$env[guildId]]>=0];false]==false;
     $return
     ]
-    $if[$or[$env[messageId]==;$env[channelId]==];
+    $if[$or[$env[messageId]==;$channelExists[$env[channelId]]==false];
     $!playerDestroy[$env[guildId]]
     $return
     ]
@@ -127,7 +127,7 @@ module.exports = {
     $addActionRow
     $addButton[musicplayer_volumedown_$env[messageId];-10%;Secondary;🔉;$checkCondition[$playerGetVolume[$env[guildId]]==0]]
     $addButton[null0;$playerGetVolume[$env[guildId]]%;Secondary;🔈;true]
-    $addButton[musicplayer_volumeup_$env[messageId];+10%;Secondary;🔉;$checkCondition[$playerGetVolume[$env[guildId]]==150]]
+    $addButton[musicplayer_volumeup_$env[messageId];+10%;Secondary;🔉;$checkCondition[$playerGetVolume[$env[guildId]]>=150]]
     $addButton[musicplayer_volumemute_$env[messageId];$if[$playerGetVolume[$env[guildId]]==0;Unmute;Mute];Secondary;🔈;false]
     $addActionRow
     $addButton[musicplayer_seekdown_$env[messageId];-10s;Secondary;⏪;$or[$get[checkstream];$playerIsPaused[$env[guildId]]]]
@@ -139,8 +139,7 @@ module.exports = {
     ;
     $jsonLoad[aradio;$default[$getCache[radioplayer_data_$guildID_metadata];{}]]
     
-    $try[
-    $!#editMessage[$env[channelId];$env[messageId];
+    $try[$!editMessage[$env[channelId];$env[messageId];
     $author[Streaming Radio;https://cdn.onlineradiobox.com/img/android-chrome-192x192.png;;0]
     $title[$cropText[$env[aradio;title];0;253;...];$env[aradio;url];0]
     $if[$callFunction[configMusic;interval_message];$addField[Session Duration;$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]]]]
@@ -153,7 +152,7 @@ module.exports = {
     $addActionRow
     $addButton[musicplayer_volumedown_$env[messageId];-10%;Secondary;🔉;$checkCondition[$playerGetVolume[$env[guildId]]==0]]
     $addButton[musicplayer_stopplayer_$env[messageId];Stop;Danger;⏹️;false]
-    $addButton[musicplayer_volumeup_$env[messageId];+10%;Secondary;🔉;$checkCondition[$playerGetVolume[$env[guildId]]==150]]
+    $addButton[musicplayer_volumeup_$env[messageId];+10%;Secondary;🔉;$checkCondition[$playerGetVolume[$env[guildId]]>=150]]
     ]
     ]
     ]

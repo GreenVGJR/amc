@@ -15,7 +15,7 @@ $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[config
 $try[
 $let[authorurl;https://www.last.fm/music/$encodeURI[$env[query]]]
 $httpAddHeader[Accept;*]
-$httpAddHeader[Accept-Language;en-US]
+$httpAddHeader[Accept-Language;en]
 $httpAddHeader[User-Agent;$get[agent]]
 $httpAddHeader[Sec-Fetch-Dest;document]
 $httpAddHeader[Sec-Fetch-Site;none]

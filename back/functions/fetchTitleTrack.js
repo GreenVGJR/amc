@@ -20,7 +20,7 @@ module.exports = {
     $if[$env[filtype;type]==soundcloud;
     $jsonLoad[b;$env[a;results]]
     $arrayMap[b;bb;$if[$env[bb;hydratable]==sound;$return[$env[bb]]];c]
-    $let[author;$env[c;0;data;user;username]]
+    $let[author;$default[$env[c;0;data;publisher_metadata;artist];$env[c;0;data;user;username]]]
     $let[title;$env[c;0;data;title]]
     ]
     $if[$env[filtype;type]==spotify;
@@ -33,8 +33,13 @@ module.exports = {
     ]]
     $if[$env[filtype;type]==tiktokmob;
     $if[$env[a;results;id_str]!=;
+    $if[$env[a;results;mid]!=;
+    $let[author;$default[$env[a;results;matched_song;author];$env[a;results;author]]]
+    $let[title;$default[$env[a;results;matched_song;title];$env[a;results;title]]]
+    ;
     $let[author;$env[a;results;author_info;unique_id]]
     $let[title;$default[$env[a;results;desc];$env[a;results;id_str]]]
+    ]
     ;
     $let[author;$default[$env[a;results;author;uniqueId];$env[a;results;author]]]
     $let[title;$default[$env[a;results;desc];$env[a;results;id]]]
@@ -48,8 +53,8 @@ module.exports = {
     $let[title;$default[$env[a;results;desc];$env[a;results;id]]]
     ]]
     $if[$env[filtype;type]==tiktokmusic;
-    $let[author;$env[a;results;author]]
-    $let[title;$env[a;results;title]]
+    $let[author;$default[$env[a;results;matched_song;author];$env[a;results;author]]]
+    $let[title;$default[$env[a;results;matched_song;title];$env[a;results;title]]]
     ]
     $if[$env[filtype;type]==facebook;
     $let[author;$env[a;results;owner]]
@@ -75,7 +80,8 @@ module.exports = {
     $let[author;$env[a;results;core;user_results;result;core;screen_name]]
     $let[title;$default[$advancedTextSplit[$env[a;results;legacy;full_text];https://t.co;0];$env[a;results;post_video_description]]]
     ]
-    $let[finaltitle;$trim[$if[$checkContains[$toLowercase[$toCamelCase[$get[title]]];$toLowercase[$toCamelCase[$get[author]]]]==false;$get[author]]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]]
+    $let[author;$trim[$if[$checkContains[$toLowercase[$toCamelCase[$get[title]]];$toLowercase[$toCamelCase[$get[author]]]]==false;$get[author]]]]
+    $let[finaltitle;$get[author]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]
     $return[$get[finaltitle]]
     `
 }

@@ -89,6 +89,9 @@ module.exports = {
     $if[$advancedTextSplit[$customID;_;1]==seekdown;
     $ephemeral
     $defer
+    $if[$callFunction[configMusic;interval_message]==true;
+    $setCache[musicplayer_message_$guildID_attemptseek;true]
+    ]
     $async[
     $let[curduration;$playerElapsedTime[$guildID]]
     $let[seeks;10000]
@@ -101,6 +104,9 @@ module.exports = {
     $if[$advancedTextSplit[$customID;_;1]==seekup;
     $ephemeral
     $defer
+    $if[$callFunction[configMusic;interval_message]==true;
+    $setCache[musicplayer_message_$guildID_attemptseek;true]
+    ]
     $async[
     $let[curduration;$playerElapsedTime[$guildID]]
     $let[seeks;10000]
