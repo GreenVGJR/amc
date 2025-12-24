@@ -14,7 +14,7 @@ module.exports = {
     ;
     $localFunction[checkcookies;
     $let[checkcookie;$callFunction[generateAuthKeys;youtube;;$env[lfk];$env[toggle]]]
-    $if[$getCache[retrycookiesyt]==true;$deleteCache[retrycookiesyt] $wait[5s] $callLocalFunction[checkcookies;true;true]]
+    $if[$getCache[retrycookiesyt]==true;$deleteCache[retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;true]]
     ;lfk;toggle]
     $callLocalFunction[checkcookies;true;false]
     $setInterval[
