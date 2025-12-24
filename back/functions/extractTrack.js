@@ -31,7 +31,7 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpSetBody[{"videoId":"$env[filterid;id]","context":{"client":{"clientName":"WEB","clientVersion":"2.20261231"}}}]
+    $httpSetBody[{"videoId":"$env[filterid;id]","context":{"client":{"clientName":2,"clientVersion":"2.20261231"}}}]
     $httpAddHeader[Accept-Encoding;]
     $httpSetContentType[Text]
     $let[http;$httpRequest[https://m.youtube.com/youtubei/v1/player?prettyPrint=false&fields=videoDetails(videoId,title,lengthSeconds,channelId,isCrawlable,viewCount,author,isPrivate,isLiveContent);POST;reshttp]]
@@ -70,7 +70,7 @@ module.exports = {
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpSetContentType[Text]
-    $let[http;$httpRequest[https://open.spotify.com/embed/$env[filterid;id];GET;a]]
+    $let[http;$httpRequest[https://open.spotify.com/embed/$env[filterid;id]?utm_source=oembed;GET;a]]
     $if[$get[http]==403;
     $let[a;null]
     ;
@@ -90,7 +90,7 @@ module.exports = {
     $if[$env[filterid;type]==tiktok;
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Accept-Language;en]
-    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[User-Agent;Bot]
     $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
     $httpSetContentType[Text]
     $let[http;$httpRequest[https://www.tiktok.com/@/video/$env[filterid;id];GET]]
@@ -102,7 +102,7 @@ module.exports = {
     $if[$env[b;author]==;
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Accept-Language;en]
-    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[User-Agent;Bot]
     $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
     $httpSetContentType[Text]
     $let[http;$httpRequest[https://www.tiktok.com/player/api/v1/items?item_ids=$env[filterid;id];GET]]
@@ -137,7 +137,7 @@ module.exports = {
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Accept-Language;en]
     $httpAddHeader[Accept;*/*]
-    $httpAddHeader[User-Agent;Mozilla/5.0 (compatible\\; Discordbot/1.1\\; +https://discordapp.com)]
+    $httpAddHeader[User-Agent;Bot]
     $httpSetContentType[Text]
     $onlyIf[$httpRequest[https://www.tiktok.com/music/-$env[filterid;id];GET]==200;$callLocalFunction[refreshvm;true]]
     $if[$checkContains[$advancedTextSplit[$httpResult;property="al:android:url";1;content=";1;";0];//music/detail/];

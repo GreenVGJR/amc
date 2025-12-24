@@ -5,7 +5,8 @@ const { default_userAgent } = require('../config.json');
 let vt;
 const userAgent = default_userAgent;
 const ytcookies = process.env.YOUTUBE_COOKIES;
-const lk = { context: { client: { clientName: "VISIONOS", clientVersion: "0.1" } } };
+const hostdomain = ytcookies ? "www.youtube.com" : "m.youtube.com";
+const lk = { context: { client: { clientName: 101, clientVersion: "0.1" } } };
 var templist = [];
 (async () => {
     vt = await request("https://www.youtube.com/youtubei/v1/player?prettyPrint=false&fields=responseContext.visitorData", { method: "POST", body: JSON.stringify(lk), headers: { "Origin": "https://www.youtube.com", "Content-Type": "application/json", "User-Agent": userAgent, ...(ytcookies && { Cookie: ytcookies }) } }).then(a => a.body.json()).then(b => b.responseContext.visitorData);
@@ -21,12 +22,13 @@ async function fallbackYTStream(lstracks) {
     }
     try {
         const GTH = (sapisid = ytcookies?.match(/(?:^|;\s*)SAPISID=([^;]*)/)?.[1], secure1psid = ytcookies?.match(/(?:^|;\s*)__Secure-1PAPISID=([^;]*)/)?.[1], secure3psid = ytcookies?.match(/(?:^|;\s*)__Secure-3PAPISID=([^;]*)/)?.[1], origin_url = "https://www.youtube.com") => { const t = Math.floor(Date.now() / 1000).toString(); return "SAPISIDHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + sapisid + " " + origin_url).digest('hex') + "_u" + " SAPISID1PHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + secure1psid + " " + origin_url).digest('hex') + "_u" + " SAPISID3PHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + secure3psid + " " + origin_url).digest('hex') + "_u"; };
-        const pl = { videoId: lstracks.split('watch?v=')[1], context: { client: { clientName: "VISIONOS", clientVersion: "0.1", visitorData: vt, clientScreen: "WATCH", clientFormFactor: "UNKNOWN_FORM_FACTOR" }, request: { useSsl: true, internalExperimentFlags: [], consistencyTokenJars: [] } }, playbackContext: { contentPlaybackContext: { vis: 0, splay: true, html5Preference: "HTML5_PREF_WANTS", lactMilliseconds: "-1", signatureTimestamp: "0" } }, attestationRequest: { omitBotguardData: true }, racyCheckOk: true, contentCheckOk: true };
-        let a = await request('https://www.youtube.com/youtubei/v1/player?prettyPrint=false&fields=streamingData(hlsManifestUrl,adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent)', {
+        const pl = { videoId: lstracks.split('watch?v=')[1], context: { client: { clientName: 101, clientVersion: "0.1", visitorData: vt, clientScreen: "WATCH", clientFormFactor: "UNKNOWN_FORM_FACTOR" }, request: { useSsl: true, internalExperimentFlags: [], consistencyTokenJars: [] } }, playbackContext: { contentPlaybackContext: { vis: 0, splay: true, html5Preference: "HTML5_PREF_WANTS", lactMilliseconds: "-1" } }, attestationRequest: { omitBotguardData: true }, racyCheckOk: true, contentCheckOk: true };
+        let a = await request(`https://${hostdomain}/youtubei/v1/player?prettyPrint=false&fields=streamingData(hlsManifestUrl,adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent)`, {
             method: "POST", body: JSON.stringify(pl), headers: {
                 "Content-Type": "application/json",
                 "Accept-Language": "en",
-                "Origin": "https://www.youtube.com",
+                "Origin": `https://${hostdomain}`,
+                "X-Origin": `https://${hostdomain}`,
                 "User-Agent": userAgent,
                 ...(ytcookies && {
                     "Authorization": GTH(),

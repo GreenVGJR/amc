@@ -20,7 +20,11 @@ module.exports = {
     $if[$env[filtype;type]==soundcloud;
     $jsonLoad[b;$env[a;results]]
     $arrayMap[b;bb;$if[$env[bb;hydratable]==sound;$return[$env[bb]]];c]
-    $let[author;$default[$env[c;0;data;publisher_metadata;artist];$env[c;0;data;user;username]]]
+    $if[$or[$env[c;0;data;publisher_metadata;artist]==;$env[c;0;data;publisher_metadata;artist]==null];
+    $let[author;$env[c;0;data;user;username]]
+    ;
+    $let[author;$env[c;0;data;publisher_metadata;artist]]
+    ]
     $let[title;$env[c;0;data;title]]
     ]
     $if[$env[filtype;type]==spotify;

@@ -97,8 +97,8 @@ module.exports = {
   $let[fsearch;false]
   $if[$get[check]=={};
   $async[
-  $wait[3]
   $let[a;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
+  $let[currentping;$round[$executionTime;0]]
   $jsonLoad[loadser;$get[a]]
   $if[$env[loadser;0]==;$let[fsearch;null];$let[fsearch;true]]
   ]
@@ -111,7 +111,6 @@ module.exports = {
   $callLocalFunction[loadinteraction;3]
   $stop
   ]
-  $let[currentping;$round[$executionTime;0]]
   ;
   $let[currentping;$round[$executionTime;0]]
   $jsonLoad[loadser;$get[check]]

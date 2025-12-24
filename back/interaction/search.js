@@ -10,8 +10,9 @@ module.exports = {
     $onlyIf[$or[$get[query]==;$get[provider]==]!=true;$!deferUpdate $!interactionDelete]
     $let[fsearch;false]
     $async[
-    $wait[3]
-    $jsonLoad[loadser;$callFunction[searchSomeTrack;$get[query];$get[provider]]]
+    $let[a;$callFunction[searchSomeTrack;$get[query];$get[provider]]]
+    $let[currentping;$round[$executionTime;0]]
+    $jsonLoad[loadser;$get[a]]
     $if[$env[loadser;0]==;$let[fsearch;null];$let[fsearch;true]]
     ]
     $interactionUpdate[$addTextDisplay[_ _]]

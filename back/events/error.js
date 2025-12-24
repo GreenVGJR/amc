@@ -24,6 +24,7 @@ module.exports = [{
     $!deleteCache[musicplayer_message_$guildID_channelid]
     $!deleteCache[musicplayer_message_$guildID_isshuffle]
     $!deleteCache[musicplayer_message_$guildID_attemptseek]
+    $!deleteCache[musicplayer_message_$guildID_waitinterval]
     $!deleteCache[radioplayer_data_$guildID_playerstatus]
     $!deleteCache[radioplayer_data_$guildID_metadata]
     `
@@ -53,6 +54,7 @@ module.exports = [{
     $!deleteCache[musicplayer_message_$guildID_channelid]
     $!deleteCache[musicplayer_message_$guildID_isshuffle]
     $!deleteCache[musicplayer_message_$guildID_attemptseek]
+    $!deleteCache[musicplayer_message_$guildID_waitinterval]
     $!deleteCache[radioplayer_data_$guildID_playerstatus]
     $!deleteCache[radioplayer_data_$guildID_metadata]
     `

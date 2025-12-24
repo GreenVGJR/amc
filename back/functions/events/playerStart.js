@@ -55,6 +55,7 @@ module.exports = {
     $let[changeevery_time;5000]
 
     $if[$or[$getCache[musicplayer_message_$env[guildId]_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[elapsedtime];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$return]
+    $if[$getCache[musicplayer_message_$env[guildId]_waitinterval]==true;$return]
     $async[$if[$getCache[musicplayer_message_$env[guildId]_attemptseek]!=;$!deleteCache[musicplayer_message_$env[guildId]_attemptseek]]]
     $async[$if[$getCache[radioplayer_data_$env[guildId]_checkplayer]!=;$!deleteCache[radioplayer_data_$env[guildId]_checkplayer]]]
     $if[$try[$messageExists[$env[channelId];$env[messageId]];false]==false;
@@ -65,6 +66,7 @@ module.exports = {
     $stop
     ]
 
+    $if[$env[toggleInterval];$setCache[musicplayer_message_$env[guildId]_waitinterval;true]]
     $if[$getCache[radioplayer_data_$env[guildId]_playerstatus]!=true;
 
     $jsonLoad[jsonmusicdata;$env[musicInfo]]
@@ -142,7 +144,7 @@ module.exports = {
     $try[$!editMessage[$env[channelId];$env[messageId];
     $author[Streaming Radio;https://cdn.onlineradiobox.com/img/android-chrome-192x192.png;;0]
     $title[$cropText[$env[aradio;title];0;253;...];$env[aradio;url];0]
-    $if[$callFunction[configMusic;interval_message];$addField[Session Duration;$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]]]]
+    $if[$env[toggleInterval];$addField[Session Duration;$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]]]]
     $thumbnail[$if[$isValidLink[$env[aradio;thumbnail]]==false;$userAvatar[$env[aradio;requestedBy;id];1024];$env[aradio;thumbnail]];0]
     $footer[$userDisplayName[$env[aradio;requestedBy;id]];$userAvatar[$env[aradio;requestedBy;id];1024];0]
     $color[$default[$memberDisplayColor[$guildID;$env[aradio;requestedBy;id]];$callFunction[useIcon;color_embed]];0]
@@ -156,6 +158,7 @@ module.exports = {
     ]
     ]
     ]
+    $if[$env[toggleInterval];$setCache[musicplayer_message_$env[guildId]_waitinterval;false]]
     $return
     `,
 };

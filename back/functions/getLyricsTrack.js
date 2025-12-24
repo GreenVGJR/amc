@@ -89,7 +89,7 @@ module.exports = {
     $if[$env[line]==true;
     $let[pkc;$advancedTextSplit[$env[prgn];<script>;$charCount[$advancedTextSplit[$env[prgn];songLyrics;1];<script>];</script>;0;\\\\n;0]]
     $let[pkc-find;$advancedTextSplit[$get[pkc];"$advancedTextSplit[$get[pkc];";1;:;0]:;1]]
-    $jsonLoad[a;$djsEval[require("entities").decodeHTML(\\\`$get[pkc-find]\\\`)]]
+    $jsonLoad[a;$djsEval[require("entities").decodeHTML(ctx.getKeyword("pkc-find"))]]
     $jsonLoad[a;$jsonEntries[a]]
     $jsonLoad[a;$env[a;$arrayFindIndex[a;b;$checkCondition[$env[b;1;dataTestId]==songLyrics]];1;children;3;children;3;children;1;0;3;children]]
     $arrayMap[a;c;$if[$env[c;3;lyrics]!=;$return[$env[c;3;lyrics;lyricLines]]];a]
@@ -112,7 +112,7 @@ module.exports = {
     ]
     $if[$get[finallyric]==;$let[cusshazamaborterls;true]]
     $if[$get[cusshazamaborterls]==false;
-    $arrayPushJSON[results;$trimLines[{"status_1":$get[rs_http],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"shazam","thumbnail":"$get[crthumb-shazam]","query":"$encodeURI[$env[query]]","url":"$get[cer_appleurlms]","autocomplete":"$encodeURI[$inflate[$env[r;title];base64]]","lyric":"$deflate[$get[finallyric];hex]"}}]]
+    $arrayPushJSON[results;$trimLines[{"status_1":$get[rs_http],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"shazam","thumbnail":"$get[crthumb-shazam]","query":"$encodeURI[$env[query]]","url":"$get[cer_appleurlms]","autocomplete":"$encodeURI[$env[r;title]]","lyric":"$deflate[$get[finallyric];hex]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
