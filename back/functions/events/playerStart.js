@@ -1,48 +1,48 @@
 module.exports = {
-  name: "musicPlayerMessage",
-  params: [
-    {
-        name: "channelId", // int
-        description: "channelId",
-        required: true,
-    },
-    {
-        name: "messageId", // int
-        description: "messageId",
-        required: true,
-    },
-    {
-        name: "musicInfo", // object/json
-        description: "Music Object data",
-        required: true
-    },
-    {
-        name: "showNext", // bool
-        description: "Show a next track message",
-        required: true
-    },
-    {
-        name: "intervalName", // string
-        description: "Interval name for clears later",
-        required: true
-    },
-    {
-        name: "guildId", // int
-        description: "guildId",
-        required: true
-    },
-    {
-        name: "bypassRestrict", // bool
-        description: "Bypass any restrict for known reason",
-        required: false
-    },
-    {
-        name: "toggleInterval", // bool
-        description: "For interval message",
-        required: false
-    }
-  ],
-  code: `
+    name: "musicPlayerMessage",
+    params: [
+        {
+            name: "channelId", // int
+            description: "channelId",
+            required: true,
+        },
+        {
+            name: "messageId", // int
+            description: "messageId",
+            required: true,
+        },
+        {
+            name: "musicInfo", // object/json
+            description: "Music Object data",
+            required: true
+        },
+        {
+            name: "showNext", // bool
+            description: "Show a next track message",
+            required: true
+        },
+        {
+            name: "intervalName", // string
+            description: "Interval name for clears later",
+            required: true
+        },
+        {
+            name: "guildId", // int
+            description: "guildId",
+            required: true
+        },
+        {
+            name: "bypassRestrict", // bool
+            description: "Bypass any restrict for known reason",
+            required: false
+        },
+        {
+            name: "toggleInterval", // bool
+            description: "For interval message",
+            required: false
+        }
+    ],
+    code: `
     $if[$or[$hasMusicNode==false;$if[$hasMusicNode==true;$isPlaying;false]==false];
     $!clearInterval[$env[intervalName]]
     $return
@@ -55,9 +55,12 @@ module.exports = {
     $let[changeevery_time;5000]
 
     $if[$or[$getCache[musicplayer_message_$env[guildId]_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[elapsedtime];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$return]
-    $if[$getCache[musicplayer_message_$env[guildId]_waitinterval]==true;$return]
-    $async[$if[$getCache[musicplayer_message_$env[guildId]_attemptseek]!=;$!deleteCache[musicplayer_message_$env[guildId]_attemptseek]]]
-    $async[$if[$getCache[radioplayer_data_$env[guildId]_checkplayer]!=;$!deleteCache[radioplayer_data_$env[guildId]_checkplayer]]]
+    $if[$getCache[musicplayer_message_$env[guildId]_waitinterval]==true;
+    $if[$env[toggleInterval];$setCache[musicplayer_message_$env[guildId]_waitinterval;false]]
+    $return
+    ]
+    $async[$if[$getCache[musicplayer_message_$env[guildId]_attemptseek]!=;$deleteCache[musicplayer_message_$env[guildId]_attemptseek]]]
+    $async[$if[$getCache[radioplayer_data_$env[guildId]_checkplayer]!=;$deleteCache[radioplayer_data_$env[guildId]_checkplayer]]]
     $if[$try[$messageExists[$env[channelId];$env[messageId]];false]==false;
     $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
     $setCache[musicplayer_message_$env[guildId]_channelid;$env[channelId]]

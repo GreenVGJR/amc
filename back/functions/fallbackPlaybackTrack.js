@@ -203,11 +203,14 @@ module.exports = {
     $if[$env[whattype;type]==instagramaudio;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
+    $if[$and[$env[a;results;metadata;original_sound_info]==null;$env[a;results;metadata;music_info]==null];
+    $let[finalurl;$djsEval[require("entities").decodeHTML("$advancedTextSplit[$env[a;results;items;0;media;video_dash_manifest];mimeType="audio/mp4";1;<BaseURL>;1;</BaseURL>;0]")]]
+    ;
     $if[$env[a;results;metadata;original_sound_info;progressive_download_url]==null;
     $let[finalurl;$env[a;results;metadata;music_info;music_asset_info;progressive_download_url]]
     ;
     $let[finalurl;$env[a;results;metadata;original_sound_info;progressive_download_url]]
-    ]]
+    ]]]
     $if[$env[whattype;type]==bandcamp;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]

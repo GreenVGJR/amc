@@ -49,7 +49,7 @@ module.exports = {
     $wait[5]
     ]
     $onlyIf[$get[f-fetch]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
-    $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
+    $let[loadlyrics;$inflate[$env[result;results;lyric];base64]]
     $interactionReply[
     $if[$charCount[$get[loadlyrics]]>3000;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
     $title[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]
@@ -83,7 +83,7 @@ module.exports = {
     ]
     $if[$advancedTextSplit[$customID;_;1]==stopplayer;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $!deleteCache[cachesearchistory_user_autocomplete_$authorID]
+    $deleteCache[cachesearchistory_user_autocomplete_$authorID]
     $async[$leaveVoiceChannel]
     $!deferUpdate
     ]

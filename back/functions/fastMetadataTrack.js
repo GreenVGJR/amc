@@ -54,7 +54,7 @@ module.exports = {
     $onlyIf[$get[http]!=429;$return]
     ]
     $jsonLoad[res;$env[res]]
-    $!jsonSet[reslac;id;$env[res;collection;0;permalink]]
+    $!jsonSet[reslac;id;$advancedTextSplit[$env[res;collection;0;permalink_url];soundcloud.com/;1]]
     $!jsonSet[reslac;dynamic_thumbnail;]
     $!jsonSet[reslac;thumbnail;$replace[$env[res;collection;0;artwork_url];-large;-original]]
     $!jsonSet[reslac;duration;$round[$divide[$env[res;collection;0;duration];1000];0]]

@@ -46,7 +46,7 @@ module.exports = {
     ]
     ;aa$randomBytes[2]]
     ]
-    $!deleteCache[storecachesearchusersfetch-q_$djsEval[ctx.interaction.message.interaction.id]]
-    $!deleteCache[storecachesearchusersfetch-p_$djsEval[ctx.interaction.message.interaction.id]]
+    $deleteCache[storecachesearchusersfetch-q_$djsEval[ctx.interaction.message.interaction.id]]
+    $deleteCache[storecachesearchusersfetch-p_$djsEval[ctx.interaction.message.interaction.id]]
     `
 }

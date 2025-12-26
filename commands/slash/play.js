@@ -237,8 +237,8 @@ module.exports = {
 
   $if[$get[attemptry]>=$get[donetry];
   $if[$get[iscreatedfirst];
-  $!deleteCache[musicplayer_message_$guildID_messageid]
-  $!deleteCache[musicplayer_message_$guildID_channelid]
+  $deleteCache[musicplayer_message_$guildID_messageid]
+  $deleteCache[musicplayer_message_$guildID_channelid]
   ]
   $callLocalFunction[loadinteraction;error-2]
   $if[$get[iscreatedfirst]==false;$setTimeout[$async[$!interactionDelete];3s]]

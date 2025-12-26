@@ -52,7 +52,7 @@ module.exports = {
     ]
 
     $onlyIf[$get[fsearch]!=null;$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]]]
-    $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
+    $let[loadlyrics;$inflate[$env[result;results;lyric];base64]]
     $interactionReply[
     $if[$option[lyric_file]==true;
     $let[filename;$replaceRegex[$env[result;results;autocomplete];\\[^A-Za-z0-9_-\\];g;_]_-_Lyrics.$if[$option[line_synced]==true;lrc;txt]]
