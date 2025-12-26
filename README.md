@@ -2,7 +2,7 @@
   
 # 🌠 AMC
 Simple yet powerful Discord music bot. Built with [Forgescript](https://github.com/tryForge/ForgeScript)<br>
-[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/quoriel/db/main?label=@quoriel/db&color=2596be)](https://github.com/quoriel/db) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![ForgeLinked](https://img.shields.io/github/package-json/v/tryforge/ForgeLinked/dev?label=ForgeLinked&color=caa500)](https://github.com/tryforge/ForgeLinked/tree/dev) [![License](https://img.shields.io/github/license/GreenVGJR/amc-discord-bot)](LICENSE)
+[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/quoriel/db/main?label=@quoriel/db&color=2596be)](https://github.com/quoriel/db) [![QuorielEdge](https://img.shields.io/github/package-json/v/quoriel/edge/main?label=@quoriel/edge&color=2596be)](https://github.com/quoriel/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![ForgeLinked](https://img.shields.io/github/package-json/v/tryforge/ForgeLinked/dev?label=ForgeLinked&color=caa500)](https://github.com/tryforge/ForgeLinked/tree/dev) [![License](https://img.shields.io/github/license/GreenVGJR/amc-discord-bot)](LICENSE)
 
 <br>
 
@@ -42,7 +42,7 @@ ForgeLinked: Made with [lavalink-client](https://www.npmjs.com/package/lavalink-
 |`/dj`|Tweak DJ features|
 |`/download`|Download a media|
 |`/help`|List commands|
-|`/lyrics`|Search for lyrics \| Providers: Youtube Music, Deezer, Lrclib, Genius|
+|`/lyrics`|Search for lyrics \| Providers: Youtube Music, Deezer, Shazam, Lrclib, Genius|
 |`/play`|Play a track|
 |`/playlist`|Show playlist you made|
 |`/queue`|Show all tracks info|
