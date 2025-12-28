@@ -3,11 +3,10 @@ module.exports = {
     code: `
     $arrayLoad[anGuild;,;$guildIDs[,]]
     $arrayForEach[anGuild;a;
-    $async[
     $fetchMembers[$env[a]]
     $fetchChannels[$env[a]]
     $fetchRoles[$env[a]]
-    ]]
+    ]
     $return
     `
 }

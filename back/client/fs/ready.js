@@ -5,7 +5,7 @@ module.exports = {
     $async[$setCache[listcommands-help;$applicationCommands]]
     $if[$callFunction[configMusic;cacheAllContextNeed];
     $logger[Info;Caching Discord Context]
-    $callFunction[fetchDiscordContext]
+    $async[$callFunction[fetchDiscordContext]]
     ]
     $logger[Info;Attempting to Generate]
     $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]

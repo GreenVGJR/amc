@@ -4,8 +4,7 @@ module.exports = {
         "name": "ping",
         "description": "Check bot latency",
         "integration_types": [
-            0,
-            1
+            0
         ],
         "contexts": [
             0

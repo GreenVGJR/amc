@@ -2,15 +2,12 @@
     "_comment": "Currently only youtube / youtubemusic / soundcloud / spotify / applemusic for searching",
     "default_provider": "youtube",
     "fallback_provider": "soundcloud",
-
     "cacheAllContextNeed": true,
     "usePlayerForFetchLyrics": false,
-
     "debug_auth": false,
     "autodelete_nextmessage": false,
     "interval_message": true,
     "fetchMusicTitle_autocomplete": true,
-
     "disable_YT": false,
     "default_userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
 }
