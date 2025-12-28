@@ -5,15 +5,25 @@ module.exports = {
     $async[$setCache[listcommands-help;$applicationCommands]]
     $if[$callFunction[configMusic;cacheAllContextNeed];
     $logger[Info;Caching Discord Context]
-    $callFunction[fetchDiscordContext]
+    $async[$callFunction[fetchDiscordContext]]
     ]
     $logger[Info;Attempting to Generate]
     $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
-    $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
-    $callFunction[generateAuthKeys;youtube;;true]
-    $setInterval[$callFunction[generateAuthKeys;youtube;;false];9m]
-    ;
+    $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined];
     $async[$callFunction[generateAuthKeys;youtube;;true]]
+    ;
+    $localFunction[checkcookies;
+    $let[checkcookie;$callFunction[generateAuthKeys;youtube;;$env[lfk];$env[toggle]]]
+    $if[$getCache[retrycookiesyt]==true;$deleteCache[retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;true]]
+    ;lfk;toggle]
+    $callLocalFunction[checkcookies;true;false]
+    $setInterval[
+    $localFunction[checkcookies;
+    $let[checkcookie;$callFunction[generateAuthKeys;youtube;;$env[lfk];$env[toggle]]]
+    $if[$getCache[retrycookiesyt]==true;$deleteCache[retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;true]]
+    ;lfk;toggle]
+    $callLocalFunction[checkcookies;true;false]
+    ;9m]
     ]
     $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]

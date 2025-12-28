@@ -1,32 +1,32 @@
 module.exports = [
-{
-name: "configplaylistuserbutton",
-type: "interactionCreate",
-allowedInteractionTypes: ["button"],
-code: `
+    {
+        name: "configplaylistuserbutton",
+        type: "interactionCreate",
+        allowedInteractionTypes: ["button"],
+        code: `
 $interactionUpdate[$callFunction[loadPlaylistUser;;;true]]
 `
-},
-{
-name: "createplaylistuserbutton",
-type: "interactionCreate",
-allowedInteractionTypes: ["button"],
-code: `
+    },
+    {
+        name: "createplaylistuserbutton",
+        type: "interactionCreate",
+        allowedInteractionTypes: ["button"],
+        code: `
 $modal[createplaylistuser_create;Create Playlist]
 $addTextInput[doplaylistuser_title;Name;Short;true;;;1;350]
 $addTextInput[doplaylistuser_desc;Description;Paragraph;false;;;1;1000]
 `
-},
-{
-type: "interactionCreate",
-allowedInteractionTypes: ["modal"],
-code: `
+    },
+    {
+        type: "interactionCreate",
+        allowedInteractionTypes: ["modal"],
+        code: `
 $onlyIf[$advancedTextSplit[$customID;_;0]==createplaylistuser]
 $let[checkaction;$advancedTextSplit[$customID;_;1]]
 $let[checkpl;$callFunction[findPlaylistUser;$md5[$authorID_$toLowercase[$trim[$input[doplaylistuser_title]]]];$authorID]]
 $onlyIf[$and[$get[checkpl]!=;$get[checkaction]==create]!=true;$ephemeral
 $callFunction[useCustomMusicMessage;config_generalPlaylistExistsUser]
-$setTimeout[$!interactionDelete;3s]
+$setTimeout[$async[$!interactionDelete];3s]
 ]
 $if[$get[checkaction]==create;
 $let[hash;$md5[$authorID_$toLowercase[$trim[$input[doplaylistuser_title]]]]]
@@ -34,7 +34,7 @@ $jsonLoad[storejson;{}]
 $!jsonSet[storejson;title;$input[doplaylistuser_title]]
 $!jsonSet[storejson;description;$input[doplaylistuser_desc]]
 $!jsonSet[storejson;tracks;\\[\\]]
-$!putRecord[user;$env[storejson];storeplaylist_user-$get[hash]_$authorID]
+$!putRecord[user;$jsonStringify[storejson];storeplaylist_user-$get[hash]_$authorID]
 ;
 $let[hash;$md5[$authorID_$toLowercase[$trim[$input[doplaylistuser_title]]]]]
 $let[dbuser;$callFunction[findPlaylistUser;$advancedTextSplit[$customID;_;2];$authorID]]
@@ -62,11 +62,11 @@ $addActionRow
 $addButton[listplaylistuser_$get[hash];Back to Playlist;Secondary;↩️]
 ]
 `
-},
-{
-type: "interactionCreate",
-allowedInteractionTypes: ["selectMenu", "button"],
-code: `
+    },
+    {
+        type: "interactionCreate",
+        allowedInteractionTypes: ["selectMenu", "button"],
+        code: `
 $onlyIf[$advancedTextSplit[$customID;_;0]==listplaylistuser]
 $ephemeral
 $let[hash;$if[$selectMenuValues[0]==;$advancedTextSplit[$customID;_;1];$selectMenuValues[0]]]
@@ -112,11 +112,11 @@ $addButton[listplaylistuser_$get[hash]_$sum[$get[curpage];1];;Secondary;▶️;$
 $addButton[listplaylistuser_$get[hash]_$get[nextpage]_tr_pv;;Secondary;⏩;$checkCondition[$get[curpage]>=$get[nextpage]]]
 ]
 `
-},
-{
-type: "interactionCreate",
-allowedInteractionTypes: ["button", "selectMenu"],
-code: `
+    },
+    {
+        type: "interactionCreate",
+        allowedInteractionTypes: ["button", "selectMenu"],
+        code: `
 $if[$advancedTextSplit[$customID;_;0]==pageplaylistusertell;
 $interactionUpdate[$callFunction[loadPlaylistUser;$advancedTextSplit[$customID;_;1]]]
 $stop
@@ -209,7 +209,7 @@ $jsonLoad[confplaylistdb;$getRecord[user;;configplaylistuser_vgjra9f_$authorID]]
 $if[$advancedTextSplit[$customID;_;1]==fm;$!jsonSet[confplaylistdb;title;$if[$default[$env[confplaylistdb;title];false]==false;true;false]]]
 $if[$advancedTextSplit[$customID;_;1]==fp;$!jsonSet[confplaylistdb;slice;$if[$default[$env[confplaylistdb;slice];false]==false;true;false]]]
 $if[$advancedTextSplit[$customID;_;1]==sc;$!jsonSet[confplaylistdb;confirm;$if[$default[$env[confplaylistdb;confirm];true]==false;true;false]]]
-$!putRecord[user;$env[confplaylistdb];configplaylistuser_vgjra9f_$authorID]
+$!putRecord[user;$jsonStringify[confplaylistdb];configplaylistuser_vgjra9f_$authorID]
 $interactionUpdate[$callFunction[loadPlaylistUser;;;true]]
 ]
 $if[$advancedTextSplit[$customID;_;0]==trliplaylistuser;
@@ -258,7 +258,7 @@ $modal[crplaylistusertrsu_$advancedTextSplit[$customID;_;2];Modify Tracks]
 $addTextInput[crplaylistusertrdo;Tracks;Paragraph;false;https://youtu.be/...\nhttps://youtube.com/playlist?list=...\nnever gonna give you;$get[storetext];1;4000]
 ]
 $if[$advancedTextSplit[$customID;_;1]==rmv;
-$let[lookmatch;$getRecord[user;;toretempl-act_ls_user-$advancedTextSplit[$customID;_;2]]]
+$let[lookmatch;$getRecord[user;;storetempl-act_ls_user-$advancedTextSplit[$customID;_;2]]]
 $onlyIf[$get[lookmatch]!={};$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistTempNotExistUser]]
 $interactionUpdate[
 $footer[Updating Tracks;$callFunction[useIcon;loading]]
@@ -283,11 +283,11 @@ $addButton[editplaylistuserh_$advancedTextSplit[$customID;_;2];Back to List;Seco
 ]
 ]
 `
-},
-{
-type: "interactionCreate",
-allowedInteractionTypes: ["modal"],
-code: `
+    },
+    {
+        type: "interactionCreate",
+        allowedInteractionTypes: ["modal"],
+        code: `
 $onlyIf[$advancedTextSplit[$customID;_;0]==crplaylistusertrsl]
 $let[checkdb;$callFunction[findPlaylistUser;$advancedTextSplit[$customID;_;1];$authorID]]
 $onlyIf[$get[checkdb]!=;$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistNotExistUser]]
@@ -360,7 +360,7 @@ $arrayPushJSON[finaltest;$env[test]]
 $callLocalFunction[loadinteraction;1]
 $if[$get[isfetch];
 $jsonLoad[fetchmetamusic;$callFunction[fastMetadataTrack;$env[l];youtubemusic]]
-$let[mc_title;$inflate[$env[fetchmetamusic;title];base64]]
+$let[mc_title;$env[fetchmetamusic;title]]
 $let[mc_url;https://youtube.com/watch?v=$env[fetchmetamusic;id]]
 ;
 $let[mc_title;$env[l]]
@@ -377,11 +377,11 @@ $!jsonSet[ub;value;tracks;$env[finaltrack]]
 $!putRecord[user;$env[ub;value];storeplaylist_user-$advancedTextSplit[$customID;_;1]_$authorID]
 $callLocalFunction[loadinteraction;3]
 `
-},
-{
-type: "interactionCreate",
-allowedInteractionTypes: ["modal"],
-code: `
+    },
+    {
+        type: "interactionCreate",
+        allowedInteractionTypes: ["modal"],
+        code: `
 $onlyIf[$advancedTextSplit[$customID;_;0]==crplaylistusertrsu]
 $let[checkdb;$callFunction[findPlaylistUser;$advancedTextSplit[$customID;_;1];$authorID]]
 $onlyIf[$get[checkdb]!=;$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistNotExistUser]]
@@ -418,11 +418,11 @@ $addActionRow
 $addButton[editplaylistuserh_$advancedTextSplit[$customID;_;1];Back to List;Secondary;↩️]
 ]
 `
-},
-{
-type: "interactionCreate",
-allowedInteractionTypes: ["selectMenu"],
-code: `
+    },
+    {
+        type: "interactionCreate",
+        allowedInteractionTypes: ["selectMenu"],
+        code: `
 $onlyIf[$advancedTextSplit[$customID;_;0]==awaitplaytrackplts]
 $onlyIf[$hasPerms[$guildID;$clientID;SendMessages];$ephemeral $callFunction[useCustomMusicMessage;config_errorPerm] **Send Messages** - <@$clientID>]
 $onlyIf[$hasPerms[$guildID;$clientID;Connect];$ephemeral $callFunction[useCustomMusicMessage;config_errorPerm] **Connect** - <@$clientID>]
@@ -488,4 +488,4 @@ $footer[Done]
 $color[$callFunction[useIcon;color_embed]]
 ]
 `
-}]
+    }]

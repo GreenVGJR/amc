@@ -1,21 +1,17 @@
 {
     "color_embed": "a09fff",
     "error_color_embed": "ff0000",
-
     "loading": "https://cdn3.emoji.gg/emojis/43294-youtube-loading-circle.gif",
     "checked": "https://cdn3.emoji.gg/emojis/40197-checkmark-ids.png",
-
     "youtube": "https://cdn3.emoji.gg/emojis/6463-youtube.png",
     "youtubemusic": "https://cdn3.emoji.gg/emojis/8066-youtubemusic.png",
     "soundcloud": "https://cdn3.emoji.gg/emojis/3827-soundcloud.png",
     "spotify": "https://open.spotifycdn.com/cdn/images/icons/Spotify_1024.31b25879.png",
     "applemusic": "https://cdn3.emoji.gg/emojis/3265-apple-music.png",
     "null": "https://cdn3.emoji.gg/emojis/2107-music.png",
-
     "genius": "https://images.genius.com/086f5809e96b133dd536982629e5844b.1000x1000x1.png",
     "lrclib": "https://lrclib.net/assets/lrclib-370c57eb.png",
     "deezer": "https://cdn3.emoji.gg/emojis/43884-deezer.png",
     "shazam": "https://assets.shazam.com/website/images/favicons/apple-touch-icon",
-
     "radioplayerload": "https://cdn.discordapp.com/emojis/1265661020257648665.gif?size=1024"
 }

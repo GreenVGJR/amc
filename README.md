@@ -1,6 +1,9 @@
 > [!CAUTION]
 > Stream Youtube violates Discord ToS. Use it with caution.
 
+> [!WARNING]
+> This branch is only for testing and development. Expect errors.
+
 > [!NOTE]
 > These 2 intents are required to use all features.
 > ![image](https://github.com/user-attachments/assets/4beb3e93-40f9-4253-99f4-c6ec8d5a7e67)
@@ -12,7 +15,7 @@ ___
 
 ## Installation
 1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v21.7.3 for node.js
-2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-main-lavalink.zip) this branch (.zip)
+2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-dev-lavalink.zip) this branch (.zip)
 3. Extract it, and rename `.env.example` file to `.env` inside folder you did extract
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
 5. Run this command with IDE/Terminal (still same folder)
@@ -65,6 +68,8 @@ ___
 > [!WARNING]
 > By doing this you're risking your account getting temporary / permanent banned if you use for massive requests / users.<br>
 > Consider to use throwaway account. Only use this for certain cases.
+
+> (Only works for downloader command)
 
 <details close>
 
@@ -140,8 +145,10 @@ ___
 
 </summary>
 
-![Preview 1](https://github.com/user-attachments/assets/5cf219b9-f6a2-4a08-bdb2-4df5f8743e21)
-![Preview 2](https://github.com/user-attachments/assets/d75568aa-948d-48bc-a93e-827749a48613)
-![Preview 3](https://github.com/user-attachments/assets/4f99016b-5987-4662-bda0-dc282bca7343)
+![Preview 1](https://github.com/user-attachments/assets/09116ae0-20ef-44f0-aaf1-171bc5ecd106)
+![Preview 2](https://github.com/user-attachments/assets/7a3ace53-eb6b-4766-bcf4-ae00f0687db8)
+![Preview 3](https://github.com/user-attachments/assets/06a811ef-dcf3-4d44-b35f-35888e17d82d)
+![Preview 4](https://github.com/user-attachments/assets/aeceb76b-f8e7-458b-9f0f-3056b354dd0f)
+![Preview 5](https://github.com/user-attachments/assets/15d3277f-7fac-43d1-ad8b-70cc18c30f9b)
 
 </details>

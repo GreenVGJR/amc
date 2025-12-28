@@ -43,12 +43,6 @@ module.exports = {
         "name": "force_skip",
         "description": "Skip current track playing after adding track",
         "required": false,
-      },
-      {
-        "type": 5,
-        "name": "direct_cdn",
-        "description": "Use Direct CDN after search track to play",
-        "required": false,
       }
     ],
     "integration_types": [
@@ -86,8 +80,8 @@ module.exports = {
   $localFunction[loadinteraction;
   $if[$env[typesload]==1-1;
   $let[mid;$interactionReply[
-  $author[$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
-  $footer[Searching;$callFunction[useIcon;loading]]
+  $author[» Searching\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
+  $footer[none;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
   $if[$or[$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
@@ -97,9 +91,9 @@ module.exports = {
   ]
   $if[$env[typesload]==1-2;
   $let[mid;$interactionReply[
-  $author[$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
+  $author[» Fetching\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
   $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
-  $footer[Fetching;$callFunction[useIcon;loading]]
+  $footer[none;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
   $if[$or[$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
@@ -109,22 +103,21 @@ module.exports = {
   ]
   $if[$env[typesload]==2;
   $interactionReply[
-  $author[$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
+  $author[» Fetching\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
   $addField[$get[music_title];-# $if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]];true]
   $thumbnail[$get[music_thumbnail]]
   $color[$callFunction[useIcon;color_embed]]
-  $footer[Fetching | $if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]];$callFunction[useIcon;loading]]
+  $footer[Fetching | $toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]];$callFunction[useIcon;loading]]
   ]
   ]
   $if[$env[typesload]==3;
-  $let[checkinter-4;true]
   $interactionReply[
   $if[$get[basic_type];
   $author[$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
   $addField[$get[music_title];-# $if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]];true]
   $thumbnail[$get[music_thumbnail];0]
   $color[$callFunction[useIcon;color_embed];0]
-  $footer[$if[$get[isforcedirect]==true;DIRECT CDN - ]$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]];$callFunction[useIcon;$get[use_provider];0]]
+  $footer[$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]];$callFunction[useIcon;$get[use_provider];0]]
   $author[Queue;;;1]
   $addField[Added Song;$sub[$get[currentqueuern];$get[queue_lengthtemp]];true;1]
   $addField[Total Song;$get[currentqueuern];true;1]
@@ -142,7 +135,6 @@ module.exports = {
   ]]
   ]
   $if[$env[typesload]==error-1;
-  $let[checkinter-5;true]
   $interactionReply[
   $description[$callFunction[useCustomMusicMessage;config_errorNoResult]]
   $color[$callFunction[useIcon;error_color_embed]]
@@ -151,7 +143,6 @@ module.exports = {
   ]
   ]
   $if[$env[typesload]==error-2;
-  $let[checkinter-6;true]
   $interactionReply[
   $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack] $codeBlock[$env[causeplayerror]]]
   $color[$callFunction[useIcon;error_color_embed]]
@@ -179,24 +170,19 @@ module.exports = {
   $let[cac2;$env[result;id]]
   $if[$and[$get[cac1]==;$get[cac2]==];
   $callLocalFunction[loadinteraction;error-1]
+  $if[$get[iscreatedfirst]==false;$setTimeout[$async[$!interactionDelete];3s]]
   $stop
   ]]
-  $let[music_title;$inflate[$env[result;title];base64]]
+  $let[music_title;$env[result;title]]
   $let[music_id;$env[result;id]]
   $let[music_duration;$multi[$env[result;duration];1000]]
   $let[music_thumbnail;$if[$env[result;dynamic_thumbnail]==;$env[result;thumbnail];$env[result;dynamic_thumbnail]]]
   $let[music_thumbnail;$if[$isValidLink[$get[music_thumbnail]];$get[music_thumbnail];$userAvatar[$authorID;1024]]]
   $let[music_provider;$get[use_provider]]
 
-  $let[isforcedirect;$option[direct_cdn]]
-  $if[$get[iscreatedfirst];$callLocalFunction[loadinteraction;2]]
+  $callLocalFunction[loadinteraction;2]
 
-  $if[$get[isforcedirect]==true;
-  $let[music_playurl;$callFunction[fallbackPlaybackTrack;$get[tempstoreurl];v]]
-  $if[$or[$get[music_playurl]==live;$get[music_playurl]==null;$advancedTextSplit[$get[music_playurl];|;0]==bot]==true;$let[music_playurl;$get[tempstoreurl]] $let[isforcedirect;false]]
-  ;
   $let[music_playurl;$get[tempstoreurl]]
-  ]
   ;
   $let[basic_type;false]
   
@@ -222,14 +208,12 @@ module.exports = {
 
   $if[$get[attemptry]>=$get[donetry];
   $if[$get[iscreatedfirst];
-  $!deleteCache[musicplayer_message_$guildID_messageid]
-  $!deleteCache[musicplayer_message_$guildID_channelid]
+  $deleteCache[musicplayer_message_$guildID_messageid]
+  $deleteCache[musicplayer_message_$guildID_channelid]
   $!playerDestroy[$guildID]
   ]
   $callLocalFunction[loadinteraction;error-2]
-  $setTimeout[
-  $if[$get[iscreatedfirst]==false;$!interactionDelete]
-  ;5s]
+  $if[$get[iscreatedfirst]==false;$setTimeout[$async[$!interactionDelete];3s]]
   $stop
   ]
 

@@ -14,6 +14,12 @@ module.exports = {
         name: "tempobject", // object
         description: "Replacement of objects http response",
         required: false
+    },
+    {
+        name: "size_limit", // number
+        description: "Limit size before downgrade quality",
+        type: "Number",
+        required: false
     }],
     code: `
     $onlyIf[$isValidLink[$env[url]];$return]
@@ -32,25 +38,27 @@ module.exports = {
     $let[ytinitauth;$djsEval[const GTH = (sapisid = "$advancedTextSplit[$get[ytinitcookies];SAPISID=;1;\\;;0]", secure1psid = "$advancedTextSplit[$get[ytinitcookies];__Secure-1PAPISID=;1;\\;;0]", secure3psid = "$advancedTextSplit[$get[ytinitcookies];__Secure-3PAPISID=;1;\\;;0]", origin_url = "https://www.youtube.com") => { const t = Math.floor(Date.now() / 1000).toString()\\; return "SAPISIDHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + sapisid + " " + origin_url).digest('hex') + "_u" + " SAPISID1PHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + secure1psid + " " + origin_url).digest('hex') + "_u" + " SAPISID3PHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + secure3psid + " " + origin_url).digest('hex') + "_u"\\; }\\; GTH()]]
     $httpAddHeader[Authorization;$get[ytinitauth]]
     $httpAddHeader[Cookie;$get[ytinitcookies]]
+    $httpAddHeader[Origin;https://www.youtube.com]
+    $httpAddHeader[X-Origin;https://www.youtube.com]
     $httpAddHeader[X-Goog-Visitor-Id;$getCache[authmusic_youtube_visitor]]
     ]
     $if[$env[types]==hls;
     $httpAddHeader[User-Agent;Mozilla/5.0 (Macintosh\\; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15,gzip(gfe)]
-    $httpRemoveHeader[Accept-Encoding]
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"WEB","clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://www.youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,videoDetails.lengthSeconds,streamingData.hlsManifestUrl;POST;reshttp]
+    $httpAddHeader[Accept-Encoding;]
+    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":1,"clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
+    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;www;m].youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,videoDetails.lengthSeconds,streamingData.hlsManifestUrl;POST;reshttp]
     ;
     $if[$or[$env[types]==;$env[types]==v];
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"VISIONOS","clientVersion":"0.1","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://www.youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
+    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":101,"clientVersion":"0.1","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
+    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;www;m].youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
     ]
     $if[$env[types]==va;
-    $httpRemoveHeader[Accept-Encoding]
+    $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":"ANDROID_VR","clientVersion":"1.00.0","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://www.youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
+    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":28,"clientVersion":"1.00.0","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"attestationRequest":{"omitBotguardData":true},"racyCheckOk":true,"contentCheckOk":true}]
+    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;www;m].youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
     ]]]
     $onlyIf[$env[reshttp;playabilityStatus;status]==OK;$let[finalurl;bot|$env[reshttp;playabilityStatus;reason]]]
     $onlyIf[$env[reshttp;videoDetails;isLiveContent]!=true;$let[finalurl;live]]
@@ -59,21 +67,32 @@ module.exports = {
     $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
     $onlyIf[$get[getindex251]!=-1;$let[finalurl;null]]
     $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
-    $if[$get[getcdnytlength]>=10000000;
+    $if[$get[getcdnytlength]>=$env[size_limit];
     $let[checkindex139;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
     $if[$get[checkindex139]!=-1;
     $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
     $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
     ]]
     $let[getcdnyt;$env[afs;$get[getindex251];url]]
+    $if[$get[getcdnytlength]>=10000000;
+    $arrayLoad[las]
+    $let[trackytlength;0]
+    $loop[-1;
+    $arrayPush[las;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=$get[trackytlength]-$if[$sum[$get[trackytlength];10000000]>=$get[getcdnytlength];$get[getcdnytlength];$sum[$get[trackytlength];10000000]];1]]
+    $letSum[trackytlength;10000000]
+    $if[$get[trackytlength]>=$get[getcdnytlength];
+    $break
+    ]]
+    $let[finalurl;{"length":"$get[getcdnytlength]","container":$jsonStringify[las],"original":"$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]"}]
+    ;
     $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]]
-    ]
+    ]]
     $if[$env[types]==hls;
     $let[jaghttp;$httpRequest[$env[reshttp;streamingData;hlsManifestUrl];GET;jsbd]]
     $onlyIf[$get[jaghttp]==200;$let[finalurl;null]]
     $arrayLoad[jskd;#EXT-X-STREAM-INF:BANDWIDTH=;$env[jsbd]]
     $!arrayShift[jskd]
-    $let[fskklsv;$arrayFindIndex[jskd;oasb;$checkCondition[$divide[$multi[$advancedTextSplit[$env[oasb];,;0];$env[reshttp;videoDetails;lengthSeconds]];8]>=10000000]]]
+    $let[fskklsv;$arrayFindIndex[jskd;oasb;$checkCondition[$divide[$multi[$advancedTextSplit[$env[oasb];,;0];$env[reshttp;videoDetails;lengthSeconds]];7]>=$env[size_limit]]]]
     $let[fsidlsv;$env[jskd;$if[$get[fskklsv]==-1;$sub[$arrayLength[jskd];1];$get[fskklsv]]]]
     $let[finalurl;$advancedTextSplit[$get[fsidlsv];
 ;1]]
@@ -184,11 +203,14 @@ module.exports = {
     $if[$env[whattype;type]==instagramaudio;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]
+    $if[$and[$env[a;results;metadata;original_sound_info]==null;$env[a;results;metadata;music_info]==null];
+    $let[finalurl;$djsEval[require("entities").decodeHTML("$advancedTextSplit[$env[a;results;items;0;media;video_dash_manifest];mimeType="audio/mp4";1;<BaseURL>;1;</BaseURL>;0]")]]
+    ;
     $if[$env[a;results;metadata;original_sound_info;progressive_download_url]==null;
     $let[finalurl;$env[a;results;metadata;music_info;music_asset_info;progressive_download_url]]
     ;
     $let[finalurl;$env[a;results;metadata;original_sound_info;progressive_download_url]]
-    ]]
+    ]]]
     $if[$env[whattype;type]==bandcamp;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $onlyIf[$env[a;results]!=null;$let[finalurl;null]]

@@ -1,26 +1,26 @@
 module.exports = {
   data: {
-  "name": "skip",
-  "description": "Skip a track",
-  "options": [
-    {
-      "type": 4,
-      "name": "position",
-      "description": "Skip to specific track",
-      "min_value": 1,
-      "required": false,
-    },
-  ],
-  "integration_types": [
-    0
-  ],
-  "contexts": [
-    0
-  ],
-  "description_localizations": {
-    "id": "Ganti lagu ke selanjutnya"
-  }
-},
+    "name": "skip",
+    "description": "Skip a track",
+    "options": [
+      {
+        "type": 4,
+        "name": "position",
+        "description": "Skip to specific track",
+        "min_value": 1,
+        "required": false,
+      },
+    ],
+    "integration_types": [
+      0
+    ],
+    "contexts": [
+      0
+    ],
+    "description_localizations": {
+      "id": "Ganti lagu ke selanjutnya"
+    }
+  },
   type: 0,
   code: `
     $onlyIf[$guildID!=;]
@@ -52,6 +52,6 @@ module.exports = {
     $!playerSkip[$guildID]
     ]]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalSkipTrack]]
-    $setTimeout[$!interactionDelete;3s]
+    $setTimeout[$async[$!interactionDelete];1s]
     `
 }

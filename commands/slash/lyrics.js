@@ -40,7 +40,6 @@ module.exports = {
     $ephemeral
     $let[fsearch;false]
     $async[
-    $wait[3]
     $jsonLoad[result;$callFunction[getLyricsTrack;$option[song_name];;true;$option[line_synced]]]
     $if[$env[result;results]==;$let[fsearch;null];$let[fsearch;true]]
     $let[latencyrs;$env[result;response_time]]
@@ -53,7 +52,7 @@ module.exports = {
     ]
 
     $onlyIf[$get[fsearch]!=null;$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]]]
-    $let[loadlyrics;$inflate[$env[result;results;lyric];hex]]
+    $let[loadlyrics;$inflate[$env[result;results;lyric];base64]]
     $interactionReply[
     $if[$option[lyric_file]==true;
     $let[filename;$replaceRegex[$env[result;results;autocomplete];\\[^A-Za-z0-9_-\\];g;_]_-_Lyrics.$if[$option[line_synced]==true;lrc;txt]]

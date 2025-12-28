@@ -192,7 +192,7 @@ module.exports = [{
 
     $try[
     $let[testmessage;{
-    "title": "$replace[$replace[$get[title];\\\\;];";\\\\"]",
+    "title": "$advancedReplace[$get[title];\\\\;;";\\\\"]",
     "url": "$get[url]",
     "thumbnail": "$get[thumbnail]",
     "durationMS": 0,

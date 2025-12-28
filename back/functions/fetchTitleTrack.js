@@ -20,7 +20,11 @@ module.exports = {
     $if[$env[filtype;type]==soundcloud;
     $jsonLoad[b;$env[a;results]]
     $arrayMap[b;bb;$if[$env[bb;hydratable]==sound;$return[$env[bb]]];c]
-    $let[author;$default[$env[c;0;data;publisher_metadata;artist];$env[c;0;data;user;username]]]
+    $if[$or[$env[c;0;data;publisher_metadata;artist]==;$env[c;0;data;publisher_metadata;artist]==null];
+    $let[author;$env[c;0;data;user;username]]
+    ;
+    $let[author;$env[c;0;data;publisher_metadata;artist]]
+    ]
     $let[title;$env[c;0;data;title]]
     ]
     $if[$env[filtype;type]==spotify;
@@ -65,13 +69,17 @@ module.exports = {
     $let[title;$default[$env[a;results;edge_media_to_caption;edges;0;node;text];$env[a;results;id]]]
     ]
     $if[$env[filtype;type]==instagramaudio;
+    $if[$and[$env[a;results;metadata;original_sound_info]==null;$env[a;results;metadata;music_info]==null];
+    $let[author;$env[a;results;items;0;media;code]]
+    $let[title;$env[a;results;items;0;media;caption;text]]
+    ;
     $if[$env[a;results;metadata;original_sound_info]!=null;
     $let[author;$default[$env[a;results;metadata;original_sound_info;ig_artist;username];$env[a;results;metadata;original_sound_info;ig_artist;full_name]]]
     $let[title;$default[$env[a;results;metadata;original_sound_info;original_audio_title];$env[a;results;metadata;original_sound_info;original_media_id]]]
     ;
     $let[author;$default[$env[a;results;metadata;music_info;music_asset_info;display_artist];$env[a;results;metadata;music_info;music_asset_info;ig_username]]]
     $let[title;$default[$env[a;results;metadata;music_info;music_asset_info;title];$env[a;results;metadata;music_info;music_asset_info;audio_asset_id]]]
-    ]]
+    ]]]
     $if[$env[filtype;type]==bandcamp;
     $let[author;$env[a;results;artist]]
     $let[title;$env[a;results;title]]

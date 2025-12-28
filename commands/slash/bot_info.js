@@ -1,26 +1,23 @@
 module.exports = {
   data: {
-  "type": 1,
-  "name": "bot-info",
-  "description": "Show the bot info",
-  "description_localizations": {
-    "id": "Lihat informasi bot"
+    "type": 1,
+    "name": "bot-info",
+    "description": "Show the bot info",
+    "description_localizations": {
+      "id": "Lihat informasi bot"
+    },
+    "integration_types": [
+      0
+    ],
+    "contexts": [
+      0
+    ]
   },
-  "integration_types": [
-    0
-  ],
-  "contexts": [
-    0
-  ]
-},
   type: 0,
   code: `
-  $let[currentping;]
-  $async[
   $let[time;$getTimestamp]
   $let[currentping;$round[$sum[$divide[$advancedTextSplit[$interactionRawData;"id":;1;";1];4194304];1420070400000]]]
   $let[currentping;$sub[$get[time];$get[currentping]]]
-  ]
   $onlyIf[$guildID!=;]
   $ephemeral
   $defer

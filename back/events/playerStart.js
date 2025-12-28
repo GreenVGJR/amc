@@ -28,6 +28,7 @@ module.exports = [{
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
     $if[$callFunction[configMusic;interval_message]==true;
+    $deleteCache[musicplayer_message_$guildID_waitinterval]
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     ]
     $try[$!disableComponentsOf[$get[cid];$get[mid]]]

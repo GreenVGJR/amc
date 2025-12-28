@@ -55,6 +55,7 @@ module.exports = {
   type: 0,
   code: `
 $onlyIf[$guildID!=;]
+$let[limitsize;$djsEval[ctx.interaction.attachmentSizeLimit]]
 $let[url;$sliceText[$trim[$option[url]];0;1]]
 $let[uravt;$userAvatar[$authorID;1024]]
 $onlyIf[$isValidLink[$get[url]];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidLinkDownload]]
@@ -69,9 +70,9 @@ $localFunction[runcodessync;
 $let[mid;$interactionReply[
 $author[$if[$env[msg1]!=;$env[msg1];None];$get[uravt]]
 $addField[Type;\`$toTitleCase[$advancedReplace[$env[musictype;type];tiktokmusic;tiktok music;tiktokmob;tiktok mobile;instagramaudio;instagram audio]]\`;true]
-$addField[Length Size;$if[$get[clh]==;\`null\`;\`$get[clh]\`\n-# $round[$divide[$get[clh];1024;1024];2] MB];true]
+$addField[Length Size;$if[$get[clh]==;\`null\`;\`$get[clh]\`\n-# $round[$divide[$get[clh];1024;1024];2] MB - $round[$divide[$get[limitsize];1024;1024];2] MB];true]
 $addField[Format;\`$if[$get[converttype]==;null;.$get[contenttype]$if[$get[contenttype]!=$get[converttype]; => .$get[converttype]]]\`;true]
-$addField[File Name;$if[$and[$option[lyrics]==true;$get[checklyric]];$codeBlock[$get[lyricnames]]]$codeBlock[$get[names]]$if[$and[$has[checklyric];$get[checklyric]==false];\n-# WARNING: Lyrics not available];false]
+$addField[File Name;$if[$and[$option[lyrics]==true;$get[checklyric]];$codeBlock[$default[$get[lyricnames];null]]]$codeBlock[$default[$get[names];null]]$if[$and[$has[checklyric];$get[checklyric]==false];\n-# WARNING: Lyrics not available];false]
 $color[$callFunction[useIcon;color_embed];0]
 $footer[$env[msg2];$if[$env[togload]==true;$callFunction[useIcon;loading]]]
 ;true]]
@@ -87,19 +88,22 @@ $let[gettitle;$cropText[$callFunction[fetchTitleTrack;https://open.spotify.com/t
 $onlyIf[$get[gettitle]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $jsonLoad[b;$callFunction[getYoutubeMusic;$get[gettitle]]]
 $onlyIf[$env[b;results;0]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$if[$get[s-fetch]==false;
 $callLocalFunction[runcodessync;Getting CDN$if[$get[isactivelyric]; & Lyrics];Fetching - This may take longer;true]
-$let[getcdn;$callFunction[fallbackPlaybackTrack;$env[b;results;0;url];v;$get[storeobjecthttp]]]
+]
+$let[getcdn;$callFunction[fallbackPlaybackTrack;$env[b;results;0;url];v;$get[storeobjecthttp];$get[limitsize]]]
 ;
 $let[storeobjecthttp;]
 $let[getcdn;]
 $let[s-fetch;false]
 $async[
-$wait[3]
 $let[storeobjecthttp;$callFunction[extractTrack;$get[url]]]
-$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;$if[$and[$env[musictype;type]==youtube;$option[yt_option]==3];va;v]];$get[storeobjecthttp]]]
+$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;$if[$and[$env[musictype;type]==youtube;$option[yt_option]==3];va;v]];$get[storeobjecthttp];$get[limitsize]]]
 $let[s-fetch;true]
 ]
+$if[$get[s-fetch]==false;
 $callLocalFunction[runcodessync;Getting CDN & Title$if[$get[isactivelyric]; & Lyrics];Fetching - This may take longer;true]
+]
 $loop[-1;
 $if[$get[s-fetch]!=false;$break]
 $wait[5]
@@ -111,11 +115,19 @@ $if[$has[gettitle]==false;
 $let[gettitle;$cropText[$callFunction[fetchTitleTrack;$get[url];$get[storeobjecthttp]];0;479;]]
 $if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]]]
 ]
+$if[$isJSON[$get[getcdn]];
+$jsonLoad[yup;$get[getcdn]]
+$let[clh-temp;$env[yup;length]]
+$onlyIf[$get[clh]<=$get[limitsize];$replace[$callFunction[useCustomMusicMessage;config_generalOverDownload];{limit_size};$round[$divide[$get[limitsize];1024;1024];2]MB]\n$hyperlink[$get[gettitle];$trimLines[$env[yup;original]]]]
+$let[isjsoncdn;true]
+;
+$let[isjsoncdn;false]
+]
 $if[$get[isactivelyric];
 $let[checklyric;false]
 $jsonLoad[lyricresult;$callFunction[getLyricsTrack;$get[gettitle];;true;true]]
 $if[$env[lyricresult;results]!=;
-$let[loadlyrics;$inflate[$env[lyricresult;results;lyric];hex]] 
+$let[loadlyrics;$inflate[$env[lyricresult;results;lyric];base64]] 
 $let[checklyric;true]
 $let[lyricnames;$if[$option[file_name]!=;$option[file_name];$get[gettitle]].lrc]
 ]]
@@ -126,7 +138,7 @@ $let[checkcdn_headers;{
 }]
 $if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];
 $let[contenttype;m3u8]
-$let[converttype;ts]
+$let[converttype;mp4]
 $let[names;$get[gettitle]]
 $let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];$get[gettitle].$get[converttype]]]
 $httpAddHeader[User-Agent;$get[agent]]
@@ -139,12 +151,10 @@ $arrayLoad[b;#EXTINF;$httpResult]
 $!arrayShift[b]
 $arrayMap[b;c;$return[$advancedTextSplit[$env[c];
 ;1]];b]
-$arrayMap[b;c;$if[$get[clh]<=10000000;$return[$djsEval[fetch("$env[c]", { method: "GET", headers: JSON.parse(ctx.getKeyword("checkcdn_headers")) }).then(r => r.arrayBuffer()).then(d => { (ctx.setKeyword("clh", Number(ctx.getKeyword("clh") ?? 0) + d.byteLength))\\; return Buffer.from(d).toString("base64")}).then(e => e).catch()]]];b]
+$arrayMap[b;c;$if[$get[clh]<=$get[limitsize];$return[$djsEval[fetch("$env[c]", { method: "GET", headers: JSON.parse(ctx.getKeyword("checkcdn_headers")) }).then(r => r.arrayBuffer()).then(d => { (ctx.setKeyword("clh", Number(ctx.getKeyword("clh") ?? 0) + d.byteLength))\\; return Buffer.from(d).toString("base64")}).then(e => e).catch()]]];b]
 $let[ks;$djsEval[Buffer.concat(JSON.parse(\\\`$env[b]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64")]]
 $onlyIf[$get[clh]!=0;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-$onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOverDownload]\n$hyperlink[$get[gettitle];$trimLines[$get[getcdn]]]]
-$let[contenttype;ts]
-$let[converttype;mp4]
+$onlyIf[$get[clh]<=$get[limitsize];$replace[$callFunction[useCustomMusicMessage;config_generalOverDownload];{limit_size};$round[$divide[$get[limitsize];1024;1024];2]MB]\n$hyperlink[$get[gettitle];$trimLines[$get[getcdn]]]]
 $let[names;$get[gettitle].$get[converttype]]
 $#interactionReply[
 $attachment[$get[ks];$get[names];true;base64]
@@ -156,16 +166,23 @@ $let[httpstatus;]
 $let[clh;]
 $let[cly;]
 $async[
-$wait[3]
-$let[condownbytes;$djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).then(r=>{ctx.setKeyword("clh",r.headers?.get('content-length')??"")\\;ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= 10000000)) ? r.arrayBuffer() : null\\;}).then(b => Buffer.from(b).toString("base64")).then(e => e).catch()]]
+$if[$get[isjsoncdn]==false;
+$let[condownbytes;$djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).then(r=>{ctx.setKeyword("clh",r.headers?.get('content-length')??"")\\;ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= ctx.getKeyword("limitsize"))) ? r.arrayBuffer() : null\\;}).then(b => Buffer.from(b).toString("base64")).then(e => e).catch()]]
+;
+$let[clh;$get[clh-temp]]
+$jsonLoad[yup_container;$env[yup;container]]
+$let[getcdn;$env[yup;original]]
+$arrayMap[yup_container;c;$return[$djsEval[fetch("$env[c]", { method: "GET", headers: JSON.parse(ctx.getKeyword("checkcdn_headers")) }).then(r=>{ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= ctx.getKeyword("limitsize"))) ? r.arrayBuffer() : null\\;}).then(d => Buffer.from(d).toString("base64")).then(e => e).catch()]];yup_container]
+$let[condownbytes;$djsEval[Buffer.concat(JSON.parse(\\\`$env[yup_container]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64")]]
+]
 $let[f-fetch;true]
 ]
 $loop[-1;
-$if[$or[$isNumber[$get[clh]];$get[f-fetch]==true];$break]
+$if[$or[$isNumber[$get[httpstatus]];$get[f-fetch]==true];$break]
 $wait[5]
 ]
 $onlyIf[$or[$get[httpstatus]==200;$get[httpstatus]==206];$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-$onlyIf[$get[clh]<=10000000;$callFunction[useCustomMusicMessage;config_generalOverDownload]\n$hyperlink[$advancedTextSplit[$get[gettitle];
+$onlyIf[$get[clh]<=$get[limitsize];$replace[$callFunction[useCustomMusicMessage;config_generalOverDownload];{limit_size};$round[$divide[$get[limitsize];1024;1024];2]MB]\n$hyperlink[$advancedTextSplit[$get[gettitle];
 ;0];$trimLines[$get[getcdn]]]]
 $let[mediatype;$advancedTextSplit[$get[cly];/;0]]
 $let[contenttype;$advancedTextSplit[$get[cly];/;1]]

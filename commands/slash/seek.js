@@ -1,25 +1,25 @@
 module.exports = {
   data: {
-  "name": "seek",
-  "description": "Seek a track to specific duration",
-  "options": [
-    {
-      "type": 3,
-      "name": "duration",
-      "description": "Seek a track to specific duration",
-      "required": true
-    }
-  ],
-  "description_localizations": {
-    "id": "Pindah durasi lagu ke bagian tertentu"
+    "name": "seek",
+    "description": "Seek a track to specific duration",
+    "options": [
+      {
+        "type": 3,
+        "name": "duration",
+        "description": "Seek a track to specific duration",
+        "required": true
+      }
+    ],
+    "description_localizations": {
+      "id": "Pindah durasi lagu ke bagian tertentu"
+    },
+    "integration_types": [
+      0
+    ],
+    "contexts": [
+      0
+    ]
   },
-  "integration_types": [
-    0
-  ],
-  "contexts": [
-    0
-  ]
-},
   type: 0,
   code: `
     $onlyIf[$guildID!=;]
@@ -59,6 +59,6 @@ module.exports = {
     
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[pest]]]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalSeekTrack] \`$parseDigital[$get[pest]]\`]
-    $setTimeout[$!interactionDelete;3s]
+    $setTimeout[$async[$!interactionDelete];1s]
   `
 }
