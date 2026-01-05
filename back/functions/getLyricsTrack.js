@@ -89,6 +89,7 @@ module.exports = {
     $localFunction[lyrde;
     $if[$env[refresh]==true;$generateAuthKeys[deezer;;false]]
     $if[$env[sumCount]==true;$letSum[drtcp_count;1]]
+    $if[$env[drtcp;data;$get[drtcp_count];id]==;$return[$jsonLoad[res;{}]]]
     $try[
     $httpSetBody[{"operationName":"GetLyrics","variables":{"trackId":"$env[drtcp;data;$get[drtcp_count];id]"},"query":"$inflate[789c2b2c4d2daa54704f2df1a92cca4c2ed65029294a4ccef64cb152082e29cacc4b57d454a88ec953008b6ac0e560aa20923960ad1075a9152531790ac59579c91945f9799955a9293e9979a910c99ca2e490ccdcd4e292c4dc021037332f35264fa116816b01498b33f5;hex]"}]
     $httpAddHeader[User-Agent;$get[agent]]
@@ -105,7 +106,7 @@ module.exports = {
     ;refresh;sumCount]
     $callLocalFunction[lyrde;false;false]
     ]
-    $if[$and[$get[http_3]==200;$or[$env[res;data;track;lyrics;text]!=null;$env[res;data;track;lyrics;synchronizedLines]!=null]];
+    $if[$and[$get[http_3]==200;$env[drtcp;data;$get[drtcp_count];id]!=;$or[$env[res;data;track;lyrics;text]!=null;$env[res;data;track;lyrics;synchronizedLines]!=null]];
     $if[$and[$env[line]==true;$env[res;data;track;lyrics;synchronizedLines]!=null];
     $jsonLoad[syncLyDe;$if[$env[res;data;track;lyrics;synchronizedLines]==null;{};$env[res;data;track;lyrics;synchronizedLines]]]
     $arrayMap[syncLyDe;e;$return[$env[e;lrcTimestamp] $env[e;line]];syncLyDe]
