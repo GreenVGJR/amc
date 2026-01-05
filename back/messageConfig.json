@@ -18,7 +18,7 @@
     "config_errorNoResult": "No results found.",
     "config_errorNoResultSearch": "No result.",
     "config_errorNoResultLyrics": "No lyrics were available.",
-    "config_errorOverResultLyrics": "Unfortunately, i can't show rest of them.",
+    "config_errorOverResultLyrics": "Unfortunately, i can't show rest of these.",
     "config_errorPlayTrack": "Can't process this.\nError:",
     "config_errorPlayTrackEvents": "Can't process this.",
     "config_errorNoQueue": "There's no active player.",

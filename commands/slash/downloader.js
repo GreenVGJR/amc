@@ -39,7 +39,13 @@ module.exports = {
         "name": "file_name",
         "description": "File name for attachment",
         "required": false
-      }
+      },
+      {
+        "type": 5,
+        "name": "ephemeral",
+        "description": "Respond on ephemeral?",
+        "required": false
+      },
     ],
     "integration_types": [
       0,
@@ -56,7 +62,7 @@ module.exports = {
   code: `
 $onlyIf[$guildID!=;]
 $let[limitsize;$djsEval[ctx.interaction.attachmentSizeLimit]]
-$let[url;$sliceText[$trim[$option[url]];0;1]]
+$let[url;$sliceText[$trim[$decodeURIComponent[$option[url]]];0;1]]
 $let[uravt;$userAvatar[$authorID;1024]]
 $onlyIf[$isValidLink[$get[url]];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidLinkDownload]]
 $jsonLoad[musictype;$callFunction[filterMediaID;$get[url]]]
@@ -66,6 +72,7 @@ $if[$channelExists[$channelID];
 $onlyIf[$channelHasPerms[$channelID;$clientID;AttachFiles];$ephemeral $callFunction[useCustomMusicMessage;config_errorPerm] **Attach Files** - <@$clientID>]
 ]
 $let[mid;]
+$if[$or[$and[$channelExists[$channelID]==false;$option[ephemeral]!=false];$and[$channelExists[$channelID]==true;$option[ephemeral]==true]];$ephemeral]
 $localFunction[runcodessync;
 $let[mid;$interactionReply[
 $author[$if[$env[msg1]!=;$env[msg1];None];$get[uravt]]
@@ -85,6 +92,7 @@ $if[$env[musictype;type]==spotify;
 $callLocalFunction[runcodessync;Converting;Processing;true]
 $let[storeobjecthttp;$callFunction[extractTrack;https://open.spotify.com/track/$advancedTextSplit[$env[musictype;id];/;1]]]
 $let[gettitle;$cropText[$callFunction[fetchTitleTrack;https://open.spotify.com/track/$advancedTextSplit[$env[musictype;id];/;1];$get[storeobjecthttp]];0;479;]]
+$let[getpuretitle;$cropText[$callFunction[fetchTitleTrack;https://open.spotify.com/track/$advancedTextSplit[$env[musictype;id];/;1];$get[storeobjecthttp]];0;1024;]]
 $onlyIf[$get[gettitle]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $jsonLoad[b;$callFunction[getYoutubeMusic;$get[gettitle]]]
 $onlyIf[$env[b;results;0]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
@@ -113,7 +121,9 @@ $onlyIf[$advancedTextSplit[$trimLines[$get[getcdn]];|;0]!=bot;$callFunction[useC
 $onlyIf[$or[$trimLines[$get[getcdn]]==null;$trimLines[$get[getcdn]]==live;$trimLines[$get[getcdn]]==]!=true;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $if[$has[gettitle]==false;
 $let[gettitle;$cropText[$callFunction[fetchTitleTrack;$get[url];$get[storeobjecthttp]];0;479;]]
-$if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]]]
+$if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]];
+$let[getpuretitle;$cropText[$callFunction[fetchTitleTrack;$get[url];$get[storeobjecthttp]];0;1024;]]
+]
 ]
 $if[$isJSON[$get[getcdn]];
 $jsonLoad[yup;$get[getcdn]]
@@ -133,31 +143,35 @@ $let[lyricnames;$if[$option[file_name]!=;$option[file_name];$get[gettitle]].lrc]
 ]]
 $let[checkcdn_headers;{
 "Accept": "*/*",
+"Accept-Encoding": "",
 "Sec-Fetch-Site": "none",
 "User-Agent": "$get[agent]"
 }]
 $if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];
 $let[contenttype;m3u8]
 $let[converttype;mp4]
-$let[names;$get[gettitle]]
 $let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];$get[gettitle].$get[converttype]]]
 $httpAddHeader[User-Agent;$get[agent]]
+$httpAddHeader[Accept-Encoding;]
 $httpSetContentType[Text]
 $onlyIf[$httpRequest[$get[getcdn];GET]==200;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $let[clh;$charCount[$httpResult]]
-$callLocalFunction[runcodessync;Fetching Segments » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
-$let[clh;0]
+$callLocalFunction[runcodessync;Cooldown in 2s;;false]
+$wait[2s]
 $arrayLoad[b;#EXTINF;$httpResult]
 $!arrayShift[b]
 $arrayMap[b;c;$return[$advancedTextSplit[$env[c];
 ;1]];b]
-$arrayMap[b;c;$if[$get[clh]<=$get[limitsize];$return[$djsEval[fetch("$env[c]", { method: "GET", headers: JSON.parse(ctx.getKeyword("checkcdn_headers")) }).then(r => r.arrayBuffer()).then(d => { (ctx.setKeyword("clh", Number(ctx.getKeyword("clh") ?? 0) + d.byteLength))\\; return Buffer.from(d).toString("base64")}).then(e => e).catch()]]];b]
-$let[ks;$djsEval[Buffer.concat(JSON.parse(\\\`$env[b]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64")]]
+$callLocalFunction[runcodessync;Fetching Segments;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$let[clh;0]
+$arrayMap[b;c;$if[$get[clh]<=$get[limitsize];$return[$djsEval[(function r(n){return fetch("$env[c]",{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).catch(e=>n>0?r(n-1):Promise.reject(e))})(5).then(r=>r.arrayBuffer()).then(d=>{ctx.setKeyword("clh",Number(ctx.getKeyword("clh")??0)+d.byteLength);return Buffer.from(d).toString("base64")}).then(e=>e).catch()]]];b]
 $onlyIf[$get[clh]!=0;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $onlyIf[$get[clh]<=$get[limitsize];$replace[$callFunction[useCustomMusicMessage;config_generalOverDownload];{limit_size};$round[$divide[$get[limitsize];1024;1024];2]MB]\n$hyperlink[$get[gettitle];$trimLines[$get[getcdn]]]]
 $let[names;$get[gettitle].$get[converttype]]
+$callLocalFunction[runcodessync;Fetching Segments » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$let[ks;$djsEval[Buffer.concat(JSON.parse(\\\`$env[b]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64")]]
 $#interactionReply[
-$attachment[$get[ks];$get[names];true;base64]
+$#attachment[$get[ks];$get[names];true;base64;$get[getpuretitle]]
 ]
 ;
 $let[f-fetch;false]
@@ -205,10 +219,10 @@ $wait[5]
 ]
 $onlyIf[$get[condownbytes]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $#interactionReply[
-$if[$and[$option[lyrics]==true;$get[checklyric]];$attachment[$get[loadlyrics];$get[lyricnames];true]]
-$attachment[$get[condownbytes];$get[names];true;base64]
+$if[$and[$option[lyrics]==true;$get[checklyric]];$#attachment[$get[loadlyrics];$get[lyricnames];true]]
+$#attachment[$get[condownbytes];$get[names];true;base64;$get[getpuretitle]]
 ]]
-$if[$channelExists[$channelID];
+$if[$and[$channelExists[$channelID];$option[ephemeral]!=true];
 $fetchMessage[$channelID;$get[mid]]
 $if[$messageAttachmentCount[$channelID;$get[mid]]==0;
 $#interactionReply[$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]

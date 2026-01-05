@@ -10,7 +10,7 @@ module.exports = {
     $logger[Info;Attempting to Generate]
     $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
     $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined];
-    $async[$callFunction[generateAuthKeys;youtube;;true]]
+    $callFunction[generateAuthKeys;youtube;;true]
     ;
     $localFunction[checkcookies;
     $let[checkcookie;$callFunction[generateAuthKeys;youtube;;$env[lfk];$env[toggle]]]

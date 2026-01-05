@@ -1,7 +1,7 @@
 module.exports = {
   data: {
     "name": "lyrics",
-    "description": "Search for lyrics | Providers: Youtube Music, Deezer, Shazam, Lrclib, Genius",
+    "description": "Search for lyrics | Providers: Youtube Music, Shazam, Deezer, Lrclib, Genius",
     "options": [
       {
         "type": 3,
@@ -21,9 +21,15 @@ module.exports = {
         "description": "Include a lryics file?",
         "required": false
       },
+      {
+        "type": 5,
+        "name": "ephemeral",
+        "description": "Respond on ephemeral?",
+        "required": false
+      },
     ],
     "description_localizations": {
-      "id": "Cari lirik lagu | Sumber: Youtube Music, Deezer, Shazam, Lrclib, Genius"
+      "id": "Cari lirik lagu | Sumber: Youtube Music, Shazam, Deezer, Lrclib, Genius"
     },
     "integration_types": [
       0,
@@ -37,7 +43,7 @@ module.exports = {
   code: `
     $onlyIf[$guildID!=;]
 
-    $ephemeral
+    $if[$or[$option[ephemeral]==;$option[ephemeral]==true];$ephemeral]
     $let[fsearch;false]
     $async[
     $jsonLoad[result;$callFunction[getLyricsTrack;$option[song_name];;true;$option[line_synced]]]

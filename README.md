@@ -45,6 +45,15 @@ ___
 
 </details>
 
+___
+
+> [!WARNING]
+> By doing this you're risking your account getting temporary / permanent banned if you use for massive requests / users.<br>
+> Consider to use throwaway account. Only use this for certain cases.
+
+> [!NOTE]
+> You might also need to set for `YOUTUBE_UA=` User Agent same as previous.
+
 <details close>
 
 <summary>
@@ -62,9 +71,7 @@ ___
 
 </details>
 
-> [!WARNING]
-> By doing this you're risking your account getting temporary / permanent banned if you use for massive requests / users.<br>
-> Consider to use throwaway account. Only use this for certain cases.
+___
 
 <details close>
 
@@ -78,8 +85,8 @@ ___
 - Find Lyrics from current/specific song
   Providers:
   = > Youtube Music
-    > Deezer
     > Shazam
+    > Deezer
     > Lrclib
     > Genius
 
@@ -88,7 +95,6 @@ ___
   = > Youtube
     > Youtube Shorts
     > Youtube Music
-    > Youtube Audio Library
     > Soundcloud
     > Spotify
     > Apple Music
@@ -96,15 +102,19 @@ ___
     > ITunes
     > Amazon Music
     > Bandcamp
+    > Beatport
     > Deezer
     > Tidal
     > Qobuz
+    > JioSaavn
     > Tiktok Video
     > Tiktok Music
     > Tiktok Sound
+    > BiliBili.tv
+    > Twitch
+    > Facebook Reels
     > NCS
-    > Capcut - Templates | Global
-    > Capcut - Templates | US
+    > Capcut - Templates
     > Kinemaster - Templates
     > Roblox Music
 
@@ -117,7 +127,7 @@ ___
     > Instagram
     > Facebook
     > Bandcamp
-    > Twitter
+    > Twitter / X
 
 - Auto-generate auth keys needed
 - Dynamic info message
@@ -131,6 +141,8 @@ ___
 ```
 
 </details>
+
+___
 
 <details close>
 

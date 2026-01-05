@@ -36,41 +36,6 @@ module.exports = {
     $arrayLoad[results;]
     $arrayPushJSON[results;$trimLines[{"status_1":null,"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"youtube","thumbnail":"$if[$get[usePlayerLyrics];$trackInfo[thumbnail];$env[pullyt;results;0;thumbnail]]","query":"$encodeURI[$env[query]]","url":"$if[$get[usePlayerLyrics];$trackInfo[url];$env[pullyt;results;0;url]]","autocomplete":"$encodeURI[$if[$get[usePlayerLyrics];$trackInfo[title];$env[pullyt;results;0;title]]]","lyric":"$deflate[$get[ytmusic];base64]"}}]]
     ;
-    $generateAuthKeys[deezer;;false]
-    $httpSetBody[{"operationName":"SearchFull","variables":{"query":"$encodeURI[$env[query]]","firstList":1},"query":"$inflate[789c6d8c310e83300c45af122486546260e9920354aad4a9ac2c81b8c46a30c5715a5588bb57840e1d2a79b0bfff7b73027eab062cf7fe9442d0e5bc254635c2484351a9f2861ce582518c3a931407b5b48414c592ec9cfe223b9aff0c310589db2a6cfb7bd4d9627e6cb9076e80dca2c94116bb960425404b367469dcb27e7a0267954f63471683518943d40fec25315c614eb0c997173af1461debba521e70f0928ff5d0d2fa773edc105e8e;hex]"}]
-    $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[Authorization;Bearer $getCache[authmusic_deezer]]
-    $httpAddHeader[Accept;application/json]
-    $httpAddHeader[Content-Type;application/json]
-    $!httpRequest[https://pipe.deezer.com/api;POST;drtcp]
-    $if[$env[drtcp;data;instantSearch;results;tracks;edges;0;node;id]!=;
-    $localFunction[lyrde;
-    $try[
-    $httpSetBody[{"operationName":"GetLyrics","variables":{"trackId":"$env[drtcp;data;instantSearch;results;tracks;edges;0;node;id]"},"query":"$inflate[789c2b2c4d2daa54704f2df1a92cca4c2ed65029294a4ccef64cb152082e29cacc4b57d454a88ec953008b6ac0e560aa20923960ad1075a9152531790ac59579c91945f9799955a9293e9979a910c99ca2e490ccdcd4e292c4dc021037332f35264fa116816b01498b33f5;hex]"}]
-    $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[Authorization;Bearer $getCache[authmusic_deezer]]
-    $httpAddHeader[Accept;application/json]
-    $httpAddHeader[Content-Type;application/json]
-    $httpSetContentType[Text]
-    $let[http_3;$httpRequest[https://pipe.deezer.com/api;POST;ges9]]
-    ]
-    $if[$env[ges9]==;$callLocalFunction[lyrde;true]]
-    ;refresh]
-    $callLocalFunction[lyrde;false]
-    $jsonLoad[res;$env[ges9]]
-    ]
-    $if[$and[$get[http_3]==200;$or[$env[res;data;track;lyrics;text]!=null;$env[res;data;track;lyrics;synchronizedLines]!=null]];
-    $if[$and[$env[line]==true;$env[res;data;track;lyrics;synchronizedLines]!=null];
-    $jsonLoad[syncLyDe;$if[$env[res;data;track;lyrics;synchronizedLines]==null;{};$env[res;data;track;lyrics;synchronizedLines]]]
-    $arrayMap[syncLyDe;e;$return[$env[e;lrcTimestamp] $env[e;line]];syncLyDe]
-    $let[finallyde;$arrayJoin[syncLyDe;
-]]
-    ]
-    $arrayLoad[results;]
-    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_3],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"deezer","thumbnail":"$env[drtcp;data;instantSearch;results;tracks;edges;0;node;album;cover;thumbnail;0]","query":"$encodeURI[$env[query]]","url":"https://www.deezer.com/track/$env[drtcp;id]","autocomplete":"$encodeURI[$env[drtcp;data;instantSearch;results;tracks;edges;0;node;title]]","lyric":"$deflate[$if[$and[$env[line]==true;$env[res;data;track;lyrics;synchronizedLines]!=null];$get[finallyde];$env[res;data;track;lyrics;text]];base64]"}}]]
-    ;
     $let[cusshazamaborterls;false]
     $try[
     $jsonLoad[r;$callFunction[fastMetadataTrack;$env[query];applemusic]]
@@ -113,6 +78,42 @@ module.exports = {
     $if[$get[finallyric]==;$let[cusshazamaborterls;true]]
     $if[$get[cusshazamaborterls]==false;
     $arrayPushJSON[results;$trimLines[{"status_1":$get[rs_http],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"shazam","thumbnail":"$get[crthumb-shazam]","query":"$encodeURI[$env[query]]","url":"$get[cer_appleurlms]","autocomplete":"$encodeURI[$env[r;title]]","lyric":"$deflate[$get[finallyric];base64]"}}]]
+    ;
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept;application/json]
+    $!httpRequest[https://api.deezer.com/search?limit=5&q=$env[query];GET;drtcp]
+    $if[$env[drtcp;data;0;id]!=;
+    $let[drtcp_count;0]
+    $generateAuthKeys[deezer;;false]
+    $localFunction[lyrde;
+    $if[$env[refresh]==true;$generateAuthKeys[deezer;;false]]
+    $if[$env[sumCount]==true;$letSum[drtcp_count;1]]
+    $try[
+    $httpSetBody[{"operationName":"GetLyrics","variables":{"trackId":"$env[drtcp;data;$get[drtcp_count];id]"},"query":"$inflate[789c2b2c4d2daa54704f2df1a92cca4c2ed65029294a4ccef64cb152082e29cacc4b57d454a88ec953008b6ac0e560aa20923960ad1075a9152531790ac59579c91945f9799955a9293e9979a910c99ca2e490ccdcd4e292c4dc021037332f35264fa116816b01498b33f5;hex]"}]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Authorization;Bearer $getCache[authmusic_deezer]]
+    $httpAddHeader[Accept;application/json]
+    $httpAddHeader[Content-Type;application/json]
+    $httpSetContentType[Text]
+    $let[http_3;$httpRequest[https://pipe.deezer.com/api;POST;ges9]]
+    ]
+    $if[$env[ges9]==;$callLocalFunction[lyrde;true;false]]
+    $jsonLoad[res;$env[ges9]]
+    $if[$env[res;data;track;lyrics;text]==null;$callLocalFunction[lyrde;false;true]]
+    ;refresh;sumCount]
+    $callLocalFunction[lyrde;false;false]
+    ]
+    $if[$and[$get[http_3]==200;$or[$env[res;data;track;lyrics;text]!=null;$env[res;data;track;lyrics;synchronizedLines]!=null]];
+    $if[$and[$env[line]==true;$env[res;data;track;lyrics;synchronizedLines]!=null];
+    $jsonLoad[syncLyDe;$if[$env[res;data;track;lyrics;synchronizedLines]==null;{};$env[res;data;track;lyrics;synchronizedLines]]]
+    $arrayMap[syncLyDe;e;$return[$env[e;lrcTimestamp] $env[e;line]];syncLyDe]
+    $let[finallyde;$arrayJoin[syncLyDe;
+]]
+    ]
+    $arrayLoad[results;]
+    $arrayPushJSON[results;$trimLines[{"status_1":$get[http_3],"status_2":null,"response_time":"$sub[$getTimestamp;$get[time]]","results":{"provider":"deezer","thumbnail":"$env[drtcp;data;$get[drtcp_count];album;cover_xl]","query":"$encodeURI[$env[query]]","url":"https://www.deezer.com/track/$env[drtcp;data;$get[drtcp_count];id]","autocomplete":"$encodeURI[$env[drtcp;data;$get[drtcp_count];title]]","lyric":"$deflate[$if[$and[$env[line]==true;$env[res;data;track;lyrics;synchronizedLines]!=null];$get[finallyde];$env[res;data;track;lyrics;text]];base64]"}}]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]

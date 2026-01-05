@@ -120,7 +120,7 @@ module.exports = [{
     $httpAddHeader[Accept-Encoding;gzip, deflate, br]
     $!httpRequest[https://onlineradiobox.com/$advancedTextSplit[$get[code];.;0]/$advancedTextSplit[$get[code];.;1]/;GET]
     ]
-    $let[current_track;$replace[$replace[$replace[$replace[$replace[$replace[$replace[$advancedTextSplit[$httpResult;class="station-onair";1;class="track_history_item";1;class="ajax">;1;</a>;0];<a>;];</a>;];<i>;];</i>;];<b>;];</b>;];";\\\\"]]
+    $let[current_track;$advancedReplace[$advancedTextSplit[$httpResult;class="station-onair";1;class="track_history_item";1;class="ajax">;1;</a>;0];<a>;;</a>;;<i>;;</i>;;<b>;;</b>;;";\\\\"]]
     
     $let[thumbnail;https:$advancedTextSplit[$httpResult;class="station";1;src=";1;";0]]
     $let[validthumbnail;$advancedTextSplit[$httpResult;class="station";1;src=";1;";0]]
@@ -192,7 +192,7 @@ module.exports = [{
 
     $try[
     $let[testmessage;{
-    "title": "$replace[$replace[$get[title];\\\\;];";\\\\"]",
+    "title": "$advancedReplace[$get[title];\\\\;;";\\\\"]",
     "url": "$get[url]",
     "thumbnail": "$get[thumbnail]",
     "durationMS": 0,

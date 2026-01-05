@@ -10,16 +10,26 @@ module.exports = {
     $let[url;$env[url]]
 
     $if[$isValidLink[$get[url]]==false;$return[{"id":null,"type":null}]]
-    $if[$checkContains[$get[url];youtube.com/playlist];$let[type;youtubeplaylist];$if[$checkContains[$get[url];youtube.com;youtu.be];$let[type;youtube]]]
-    $if[$checkContains[$get[url];soundcloud.com];$let[type;soundcloud]]
-    $if[$checkContains[$get[url];open.spotify.com];$let[type;spotify]]
-    $if[$checkContains[$get[url];tiktok.com/music/];$let[type;tiktokmusic];$if[$checkContains[$get[url];vt.tiktok.com;vm.tiktok.com];$let[type;tiktokmob];$if[$checkContains[$get[url];tiktok.com];$let[type;tiktok]]]]
-    $if[$checkContains[$get[url];music.apple.com];$let[type;applemusic]]
-    $if[$checkContains[$get[url];deezer.com];$let[type;deezer]]
-    $if[$checkContains[$get[url];instagram.com/reels/audio/];$let[type;instagramaudio];$if[$checkContains[$get[url];instagram.com];$let[type;instagram]]]
-    $if[$checkContains[$get[url];facebook.com];$let[type;facebook]]
-    $if[$checkContains[$get[url];bandcamp.com];$let[type;bandcamp]]
-    $if[$checkContains[$get[url];x.com;twitter.com];$let[type;twitter]]
+
+    $!djsEval[try { 
+        const e = new URL(ctx.getKeyword("url"))\\;
+
+        ctx.setKeyword("paths", e.pathname)\\;
+        ctx.setKeyword("host", e.host)\\;
+    }
+        catch { '' }
+    ]
+    
+    $if[$and[$endsWith[$get[host];youtube.com];$startsWith[$get[paths];/playlist]];$let[type;youtubeplaylist];$if[$or[$endsWith[$get[host];youtube.com];$endsWith[$get[host];youtu.be]];$let[type;youtube]]]
+    $if[$endsWith[$get[host];soundcloud.com];$let[type;soundcloud]]
+    $if[$endsWith[$get[host];open.spotify.com];$let[type;spotify]]
+    $if[$endsWith[$get[host];vt.tiktok.com;vm.tiktok.com];$let[type;tiktokmob];$if[$and[$endsWith[$get[host];tiktok.com];$startsWith[$get[paths];/music/]];$let[type;tiktokmusic];$if[$endsWith[$get[host];tiktok.com];$let[type;tiktok]]]]
+    $if[$endsWith[$get[host];music.apple.com];$let[type;applemusic]]
+    $if[$endsWith[$get[host];deezer.com];$let[type;deezer]]
+    $if[$and[$endsWith[$get[host];instagram.com];$startsWith[$get[paths];/reels/audio/]];$let[type;instagramaudio];$if[$endsWith[$get[host];instagram.com];$let[type;instagram]]]
+    $if[$endsWith[$get[host];facebook.com];$let[type;facebook]]
+    $if[$endsWith[$get[host];bandcamp.com];$let[type;bandcamp]]
+    $if[$or[$endsWith[$get[host];x.com];$endsWith[$get[host];twitter.com]];$let[type;twitter]]
 
     $if[$get[type]!=;
     $let[regex;$env[listregex;$get[type];0]]

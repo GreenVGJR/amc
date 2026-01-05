@@ -39,7 +39,7 @@ const music = new ForgeMusic({
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
         disableFallbackStream: toggles.disable_YT,
-        bufferingTimeout: 500,
+        bufferingTimeout: 1000,
         volume: 50,
         connectionTimeout: 10000,
         leaveOnEmpty: true,

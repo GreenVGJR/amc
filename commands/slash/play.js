@@ -59,6 +59,7 @@ module.exports = {
   code: `
   $onlyIf[$guildID!=;]
   $onlyIf[$option[query]!=__infointer-$authorID__;$ephemeral $defer $!interactionDelete]
+  $let[filquery;$decodeURIComponent[$option[query]]]
   $onlyIf[$hasPerms[$guildID;$clientID;SendMessages];$ephemeral $callFunction[useCustomMusicMessage;config_errorPerm] **Send Messages** - <@$clientID>]
   $onlyIf[$hasPerms[$guildID;$clientID;Connect];$ephemeral $callFunction[useCustomMusicMessage;config_errorPerm] **Connect** - <@$clientID>]
   $onlyIf[$voiceID!=;$ephemeral $callFunction[useCustomMusicMessage;config_errorJoin]]
@@ -91,7 +92,7 @@ module.exports = {
   $if[$env[typesload]==1-2;
   $let[mid;$interactionReply[
   $author[» Fetching\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
-  $addField[Query;$codeBlock[$cropText[$option[query];0;1000]]]
+  $addField[Query;$codeBlock[$cropText[$get[filquery];0;1000]]]
   $footer[none;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
@@ -153,17 +154,17 @@ module.exports = {
   
   $let[default_provider;$callFunction[configMusic;default_provider]]
   $let[fallback_provider;$callFunction[configMusic;fallback_provider]]
-  $if[$isValidLink[$option[query]]==false;
+  $if[$isValidLink[$get[filquery]]==false;
   $let[basic_type;true]
   $let[fsearch;false]
   $async[
-  $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$if[$option[provider]!=;$option[provider];$get[default_provider]];null]]
+  $jsonLoad[result;$callFunction[fastMetadataTrack;$get[filquery];$if[$option[provider]!=;$option[provider];$get[default_provider]];null]]
   $let[tempstoreurl;$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtube;https://youtube.com/watch?v=$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==youtubemusic;https://youtube.com/watch?v=$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==soundcloud;https://soundcloud.com/$env[result;id];$if[$if[$option[provider]!=;$option[provider];$get[default_provider]]==spotify;https://open.spotify.com/track/$env[result;id];$env[result;id]]]]]]
   $let[use_provider;$if[$option[provider]!=;$option[provider];$get[default_provider]]]
   $let[cac1;$env[result;id]]
   $if[$get[cac1]!=;$let[fsearch;true]]
   $if[$get[cac1]==;
-  $jsonLoad[result;$callFunction[fastMetadataTrack;$option[query];$get[fallback_provider];null]]
+  $jsonLoad[result;$callFunction[fastMetadataTrack;$get[filquery];$get[fallback_provider];null]]
   $let[tempstoreurl;$if[$or[$get[fallback_provider]==youtube;$get[fallback_provider]==youtubemusic];https://youtube.com/watch?v=$env[result;id];$if[$get[fallback_provider]==soundcloud;https://soundcloud.com/$env[result;id];$if[$get[fallback_provider]==spotify;https://open.spotify.com/track/$env[result;id];$env[result;id]]]]]
   $let[use_provider;$get[fallback_provider]]
   $let[cac2;$env[result;id]]
@@ -194,8 +195,8 @@ module.exports = {
   ;
   $let[basic_type;false]
   
-  $jsonLoad[whatmusictype;$callFunction[filterMediaID;$option[query]]]
-  $let[music_playurl;$if[$env[whatmusictype;type]==youtubeplaylist;https://youtube.com/playlist?list=$env[whatmusictype;id];$if[$env[whatmusictype;type]==youtube;https://youtube.com/watch?v=$env[whatmusictype;id];$if[$env[whatmusictype;type]==soundcloud;https://soundcloud.com/$env[whatmusictype;id];$if[$env[whatmusictype;type]==spotify;https://open.spotify.com/$env[whatmusictype;id];$option[query]]]]]]
+  $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[filquery]]]
+  $let[music_playurl;$if[$env[whatmusictype;type]==youtubeplaylist;https://youtube.com/playlist?list=$env[whatmusictype;id];$if[$env[whatmusictype;type]==youtube;https://youtube.com/watch?v=$env[whatmusictype;id];$if[$env[whatmusictype;type]==soundcloud;https://soundcloud.com/$env[whatmusictype;id];$if[$env[whatmusictype;type]==spotify;https://open.spotify.com/$env[whatmusictype;id];$get[filquery]]]]]]
   ]
 
   $let[found;false]

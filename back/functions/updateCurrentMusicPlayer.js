@@ -6,7 +6,7 @@ module.exports = {
 
     $let[testmessage;{
     "id": "$trackInfo[id]",
-    "title": "$replace[$replace[$trackInfo[title];\\\\;];";\\\\"]",
+    "title": "$advancedReplace[$trackInfo[title];\\\\;;";\\\\"]",
     "author": "$trackInfo[author]",
     "url": "$trackInfo[url]",
     "thumbnail": "$trackInfo[thumbnail]",

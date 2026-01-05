@@ -15,12 +15,8 @@ module.exports = {
 },
   type: 0,
   code: `
-  $let[time;$getTimestamp]
-  $let[currentping;$round[$sum[$divide[$advancedTextSplit[$interactionRawData;"id":;1;";1];4194304];1420070400000]]]
-  $let[currentping;$sub[$get[time];$get[currentping]]]
   $onlyIf[$guildID!=;]
   $ephemeral
-  $defer
   $localFunction[abcd;
   $interactionReply[
   $title[Owner;;0]
@@ -40,7 +36,7 @@ module.exports = {
   $addField[Versions;- ForgeScript.js: \`v$version\`\n- Discord.js: \`v$djsVersion\`\n- Node.js: \`$nodeVersion\`;false;1]
   $addField[Uptime;<t:$sub[$cropText[$getTimestamp;0;10];$round[$divide[$uptime;1000]]]:F>\n-# $parseMS[$uptime;4;, ];false;1]
   $addField[OS Uptime ($os);<t:$sub[$cropText[$getTimestamp;0;10];$round[$osUptime]]:F>\n-# $parseMS[$multi[$osUptime;1000];4;, ];false;1]
-  $addField[Ping;\`$pingms / $round[$get[currentping]]ms\`;true;1]
+  $addField[Ping;\`$pingms\`;true;1]
   $addField[DB Ping;\`$round[$pingDB[global]]ms\`;true;1]
   $addField[Player Ping;\`$round[$try[$djsEval[(0, require("discord-player").useQueue)(ctx.interaction.guild).ping];0]]ms\`;true;1]
   $addField[Total Connections;\`$if[$env[connections]==;Loading;$env[connections] / $guildCount]\`;true;1]

@@ -14,7 +14,7 @@ module.exports = [{
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $arrayLoad[results]
     $try[
-    $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","params":"EgWKAQIIAWoQEAMQCRAFEAQQChAVEBAQEQ%3D%3D", "context":{"client":{"clientName":67,"clientVersion":"1.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"query":"$advancedReplace[$env[query];\\\\;;";\\\\"]","params":"EgWKAQIIAWoQEAMQCRAFEAQQChAVEBAQEQ%3D%3D", "context":{"client":{"clientName":67,"clientVersion":"1.20261231","hl":"en","gl":"US"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
@@ -25,7 +25,7 @@ module.exports = [{
     $jsonLoad[testfetch;$env[res;contents;tabbedSearchResultsRenderer;tabs;0;tabRenderer;content;sectionListRenderer;contents]]
     $jsonLoad[dofetch;$env[res;contents;tabbedSearchResultsRenderer;tabs;0;tabRenderer;content;sectionListRenderer;contents;$arrayFindIndex[testfetch;resfetch;$checkCondition[$env[resfetch;musicShelfRenderer]!=]];musicShelfRenderer;contents]]
     $if[$env[dofetch]==;
-    $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","context":{"client":{"clientName":1,"clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"query":"$advancedReplace[$env[query];\\\\;;";\\\\"]","context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
@@ -37,7 +37,7 @@ module.exports = [{
     $arrayForEach[dofetch;getfetch;
     $if[$and[$env[getfetch;videoRenderer;videoId]!=;$startsWith[$env[getfetch;videoRenderer;detailedMetadataSnippets;0;snippetText;runs;0;text];Provided to YouTube by]];
     $arrayPushJSON[results;{
-        "title": "$replace[$replace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;];";\\\\"]",
+        "title": "$advancedReplace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;;";\\\\"]",
         "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",
         "thumbnail": "https://i.ytimg.com/vi/$env[getfetch;videoRenderer;videoId]/maxres1.jpg",
         "url": "https://music.youtube.com/watch?v=$env[getfetch;videoRenderer;videoId]"
@@ -48,7 +48,7 @@ module.exports = [{
     $jsonLoad[a;$env[getfetch;musicResponsiveListItemRenderer;flexColumns;1;musicResponsiveListItemFlexColumnRenderer;text;runs]]
     $let[finduration;$sub[$arrayLength[a];1]]
     $arrayPushJSON[results;{
-        "title": "$replace[$replace[$env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;text];\\\\;];";\\\\"]",
+        "title": "$advancedReplace[$env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;text];\\\\;;";\\\\"]",
         "duration": "$round[$divide[$unparseDigital[$env[getfetch;musicResponsiveListItemRenderer;flexColumns;1;musicResponsiveListItemFlexColumnRenderer;text;runs;$get[finduration];text]];1000];0]",
         "thumbnail": "$advancedTextSplit[$env[getfetch;musicResponsiveListItemRenderer;thumbnail;musicThumbnailRenderer;thumbnail;thumbnails;0;url];=;0]=w2160-h2160-l100",
         "url": "https://music.youtube.com/watch?v=$env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;navigationEndpoint;watchEndpoint;videoId]"
@@ -73,7 +73,7 @@ module.exports = [{
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $arrayLoad[results]
     $try[
-    $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","context":{"client":{"clientName":1,"clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"query":"$advancedReplace[$env[query];\\\\;;";\\\\"]","context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}}}]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Content-Type;application/json]
@@ -86,7 +86,7 @@ module.exports = [{
     $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $arrayMap[dofetch;docatch;$if[$env[docatch;videoRenderer;navigationEndpoint;commandMetadata;webCommandMetadata;webPageType]==WEB_PAGE_TYPE_SHORTS;$return[$env[docatch]]];dofetch]
     ;
-    $httpSetBody[{"continuation": "$get[tokens]","context":{"client":{"clientName":1,"clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"continuation": "$get[tokens]","context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}}}]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Content-Type;application/json]
@@ -99,7 +99,7 @@ module.exports = [{
     $arrayForEach[dofetch;getfetch;
     $if[$env[getfetch;videoRenderer]!=;
     $arrayPushJSON[results;{
-        "title": "$replace[$replace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;];";\\\\"]",
+        "title": "$advancedReplace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;;";\\\\"]",
         "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",
         "thumbnail": "$default[$env[getfetch;videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url];https://i.ytimg.com/vi_webp/$env[getfetch;videoRenderer;videoId]/oardefault.webp]",
         "url": "https://youtube.com/shorts/$env[getfetch;videoRenderer;videoId]"
@@ -124,7 +124,7 @@ module.exports = [{
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $arrayLoad[results]
     $try[
-    $httpSetBody[{"query":"$replace[$replace[$env[query];\\\\;];";\\\\"]","context":{"client":{"clientName":1,"clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"query":"$advancedReplace[$env[query];\\\\;;";\\\\"]","context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
@@ -136,7 +136,7 @@ module.exports = [{
     $arrayForEach[dofetch;getfetch;
     $if[$and[$env[getfetch;videoRenderer;videoId]!=;$startsWith[$env[getfetch;videoRenderer;detailedMetadataSnippets;0;snippetText;runs;0;text];Provided to YouTube by]==false];
     $arrayPushJSON[results;{
-        "title": "$replace[$replace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;];";\\\\"]",
+        "title": "$advancedReplace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;;";\\\\"]",
         "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",
         "thumbnail": "$default[$env[getfetch;videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url];https://i.ytimg.com/vi_webp/$env[getfetch;videoRenderer;videoId]/hq720.webp]",
         "url": "https://youtube.com/watch?v=$env[getfetch;videoRenderer;videoId]"
@@ -165,7 +165,7 @@ module.exports = [{
     code: `
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $try[
-    $httpSetBody[{"videoId":"$env[videoId]","context":{"client":{"clientName":67,"clientVersion":"1.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"videoId":"$env[videoId]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","hl":"en","gl":"US"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
@@ -187,7 +187,7 @@ module.exports = [{
     $let[finalyric;$arrayJoin[er;
 ]]
     ;
-    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":67,"clientVersion":"1.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","hl":"en","gl":"US"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
@@ -216,7 +216,7 @@ module.exports = [{
     $arrayLoad[results]
     $localFunction[runfuncytpl;
     $let[checktoken;$or[$env[lotoken]==;$env[lotoken]==null]]
-    $httpSetBody[{"context":{"client":{"hl":"en","gl":"US","clientName":1,"clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]"}},$if[$get[checktoken];"browseId":"VL$env[playlistId]";"continuation":"$env[lotoken]"]}]
+    $httpSetBody[{"context":{"client":{"hl":"en","gl":"US","clientName":1,"clientVersion":"2.20261231"}},$if[$get[checktoken];"browseId":"VL$env[playlistId]";"continuation":"$env[lotoken]"]}]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Content-Type;application/json]
@@ -239,42 +239,5 @@ module.exports = [{
     ;lotoken]
     $callLocalFunction[runfuncytpl;]
     $return[$env[results]]
-    `
-},
-{
-    name: "getYoutubeAudio",
-    params: [{
-        name: "query", // string
-        description: "Query",
-        required: true
-    },
-    {
-        name: "userAgent", // string
-        description: "Spoof client",
-        required: false
-    }],
-    code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
-    $arrayLoad[results]
-    $try[
-    $httpSetBody[{"query":"YouTube Audio Library - \\\\"$replace[$replace[$env[query];\\\\;];";\\\\"]\\\\"","context":{"client":{"clientName":1,"clientVersion":"2.$replace[$cropText[$parseDate[$getTimestamp;ISO];0;10];-;]","hl":"en","gl":"US"}}}]
-    $httpSetContentType[Text]
-    $httpAddHeader[Content-Type;application/json]
-    $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[Accept-Language;en]
-    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,detailedMetadataSnippets,title(runs/text),lengthText(simpleText));POST;res]
-    $jsonLoad[res;$env[res]]
-    $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
-    $arrayForEach[dofetch;getfetch;
-    $if[$and[$env[getfetch;videoRenderer;videoId]!=;$startsWith[$env[getfetch;videoRenderer;detailedMetadataSnippets;0;snippetText;runs;0;text];Provided to YouTube by]];
-    $arrayPushJSON[results;{
-        "title": "$replace[$replace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;];";\\\\"]",
-        "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",
-        "thumbnail": "https://i.ytimg.com/vi/$env[getfetch;videoRenderer;videoId]/hq720.jpg",
-        "url": "https://youtube.com/watch?v=$env[getfetch;videoRenderer;videoId]"
-    }]]]
-    ]
-    $return[{"ping":"$httpPing", "results":$env[results]}]
     `
 }]
