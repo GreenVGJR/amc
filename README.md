@@ -1,6 +1,9 @@
 > [!CAUTION]
 > Stream Youtube violates Discord ToS. Use it with caution.
 
+> [!WARNING]
+> This branch is only for testing and development. Expect errors.
+
 > [!NOTE]
 > These 2 intents are required to use all features.
 > ![image](https://github.com/user-attachments/assets/4beb3e93-40f9-4253-99f4-c6ec8d5a7e67)

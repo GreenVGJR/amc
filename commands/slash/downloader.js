@@ -137,7 +137,7 @@ $if[$get[isactivelyric];
 $let[checklyric;false]
 $jsonLoad[lyricresult;$callFunction[getLyricsTrack;$get[gettitle];;true;true]]
 $if[$env[lyricresult;results]!=;
-$let[loadlyrics;$inflate[$env[lyricresult;results;lyric];hex]] 
+$let[loadlyrics;$inflate[$env[lyricresult;results;lyric];base64]] 
 $let[checklyric;true]
 $let[lyricnames;$if[$option[file_name]!=;$option[file_name];$get[gettitle]].lrc]
 ]]
