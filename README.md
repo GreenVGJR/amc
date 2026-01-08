@@ -60,4 +60,5 @@ ForgeLinked: Made with [lavalink-client](https://www.npmjs.com/package/lavalink-
 ## Credits
 - [Emoji.gg](https://emoji.gg/) - Emojis source<br>
 - [Cyberghxst/Sora](https://github.com/Cyberghxst/Sora/) - FS & FM configs<br>
-- [skick1234/DisTube](https://github.com/skick1234/DisTube) - Style reference
+- [skick1234/DisTube](https://github.com/skick1234/DisTube) - Style reference<br>
+- [justscrapeme/tiktok-web-reverse-engineering](https://github.com/justscrapeme/tiktok-web-reverse-engineering) - Tiktok Hash Function
