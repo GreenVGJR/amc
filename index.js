@@ -38,7 +38,7 @@ const music = new ForgeMusic({
     ],
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
-        disableFallbackStream: toggles.disable_YT,
+        disableFallbackStream: true,
         bufferingTimeout: 1000,
         volume: 50,
         connectionTimeout: 10000,
@@ -48,8 +48,6 @@ const music = new ForgeMusic({
     },
     skipFFmpeg: true
 });
-
-console.clear();
 
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
@@ -92,3 +90,5 @@ music.player.extractors.register(AppleMusicExtractor);
 music.player.extractors.register(AttachmentExtractor);
 music.player.extractors.register(YoutubeiExtractor, youtube);
 music.commands.load("back/events");
+
+console.clear();

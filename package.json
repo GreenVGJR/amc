@@ -4,7 +4,7 @@
     "@quoriel/db": "github:quoriel/db",
     "@quoriel/edge": "github:quoriel/edge",
     "@tryforge/forge.music": "github:tryforge/ForgeMusic#main",
-    "@tryforge/forgescript": "^2.5.0",
+    "@tryforge/forgescript": "^2.6.0",
     "discord-player-applemusic": "^1.0.3",
     "discord-player-soundcloud": "^1.0.7",
     "discord-player-spotify": "^1.1.7",

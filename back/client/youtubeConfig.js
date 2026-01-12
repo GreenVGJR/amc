@@ -25,8 +25,8 @@ async function fallbackYTStream(lstracks) {
         if(ytcookies) {
         GTH = (sapisid = ytcookies?.match(/(?:^|;\s*)SAPISID=([^;]*)/)?.[1], secure1psid = ytcookies?.match(/(?:^|;\s*)__Secure-1PAPISID=([^;]*)/)?.[1], secure3psid = ytcookies?.match(/(?:^|;\s*)__Secure-3PAPISID=([^;]*)/)?.[1], origin_url = "https://www.youtube.com") => { const t = Math.floor(Date.now() / 1000).toString(); return "SAPISIDHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + sapisid + " " + origin_url).digest('hex') + "_u" + " SAPISID1PHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + secure1psid + " " + origin_url).digest('hex') + "_u" + " SAPISID3PHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + secure3psid + " " + origin_url).digest('hex') + "_u"; };
         }
-        const pl = { videoId: lstracks.split('watch?v=')[1], context: { client: { clientName: 101, clientVersion: "0.1", visitorData: vt, clientScreen: "WATCH", clientFormFactor: "UNKNOWN_FORM_FACTOR" }, request: { useSsl: true, internalExperimentFlags: [], consistencyTokenJars: [] } }, playbackContext: { contentPlaybackContext: { vis: 0, splay: true, html5Preference: "HTML5_PREF_WANTS", lactMilliseconds: "-1" } }, attestationRequest: { omitBotguardData: true }, racyCheckOk: true, contentCheckOk: true };
-        let a = await request(`https://${hostdomain}/youtubei/v1/player?prettyPrint=false&fields=streamingData(hlsManifestUrl,adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent)`, {
+        const pl = { videoId: lstracks.split('watch?v=')[1], context: { client: { clientName: 101, clientVersion: "0.1", visitorData: vt, clientScreen: "WATCH", clientFormFactor: "UNKNOWN_FORM_FACTOR" }, request: { useSsl: true, internalExperimentFlags: [], consistencyTokenJars: [] } }, playbackContext: { contentPlaybackContext: { vis: 0, splay: false, html5Preference: "HTML5_PREF_WANTS", lactMilliseconds: "-1" } }, racyCheckOk: true, contentCheckOk: true };
+        let a = await request(`https://${hostdomain}/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(hlsManifestUrl,adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent)`, {
             method: "POST", body: JSON.stringify(pl), headers: {
                 "Content-Type": "application/json",
                 "Accept-Language": "en",
@@ -40,20 +40,23 @@ async function fallbackYTStream(lstracks) {
                 })
             }
         })
-            .then(b => b.body.json());
+        .then(b => b.body.json());
+
         let finalurl;
+        if(a.playabilityStatus.status !== 'OK') throw new Error();
 
         if (a.videoDetails.isLiveContent || streamTypeYT === 2) {
             finalurl = await request(a.streamingData.hlsManifestUrl, { method: "GET" }).then(a => a.body.text()).then(b => b.split('GROUP-ID="234"')[0].split('URI="')[2].split('"')[0]);
         }
         else {
             const fr = a.streamingData.adaptiveFormats.find(c => [251, 140].includes(c.itag));
-            finalurl = fr.url + "&ratebypass=true&alr=yes&fallback_count=1&range=0-" + fr.contentLength;
+            finalurl = fr.url + "&ratebypass=true&alr=no&range=0-" + fr.contentLength;
         }
+        // Due youtube changes, i've change this to 1 minute
         templist.push({
             id: lstracks,
             url: finalurl,
-            ref: Date.now() + 21600000
+            ref: Date.now() + 60000
         });
         return finalurl;
     }

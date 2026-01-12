@@ -224,7 +224,9 @@ module.exports = {
   ]
 
   $if[$get[basic_type];
+  $if[$get[found]==false;
   $callLocalFunction[loadinteraction;2]
+  ]
   ;
   $callLocalFunction[loadinteraction;1-2]
   ]

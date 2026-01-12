@@ -557,12 +557,15 @@ module.exports = {
     ]
     ]
     $arrayMap[results;rls;$if[$startsWith[$env[rls];{];$return[$env[rls]]];results]
+    $if[$env[results;0]!=;$let[results;$jsonStringify[results]]]
+    $async[
+    $wait[1]
     $if[$env[results;0]!=;
-    $let[results;$jsonStringify[results]]
     $jsonLoad[lf;{}]
     $!jsonSet[lf;playlist;$get[results]]
     $!putRecord[global;$jsonStringify[lf];cachesearch_global-query_$deflate[$env[provider]$toLowercase[$env[query]];hex]]]
     ]]
+    ]
     $return[$get[results]]
     `
 }
