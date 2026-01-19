@@ -6,8 +6,8 @@ module.exports = [{
     $wait[500]
     $onlyIf[$or[$hasMusicNode==false;$if[$hasMusicNode==true;$isPlaying;false]==false]!=true;]
     $async[$!deleteMessage[$getCache[musicplayer_message_$guildID_channelid];$getCache[musicplayer_message_$guildID_messageid]]]
-    $setCache[musicplayer_message_$guildID_channelid;$channelID]
-    $setCache[musicplayer_message_$guildID_messageid;$sendMessage[$channelID;_ _;true]]
+    $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
+    $setCache[musicplayer_message_$guildID_messageid;"$sendMessage[$channelID;_ _;true]"]
     ]]
 
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]

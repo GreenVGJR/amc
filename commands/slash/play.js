@@ -85,8 +85,8 @@ module.exports = {
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
   $if[$or[$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
-  $setCache[musicplayer_message_$guildID_channelid;$channelID]
-  $setCache[musicplayer_message_$guildID_messageid;$get[mid]]
+  $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
+  $setCache[musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
   ]
   $if[$env[typesload]==1-2;
@@ -97,8 +97,8 @@ module.exports = {
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
   $if[$or[$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
-  $setCache[musicplayer_message_$guildID_channelid;$channelID]
-  $setCache[musicplayer_message_$guildID_messageid;$get[mid]]
+  $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
+  $setCache[musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
   ]
   $if[$env[typesload]==2;
@@ -204,6 +204,7 @@ module.exports = {
   $let[donetry;5]
   $async[
   $let[queue_lengthtemp;$if[$hasMusicNode;$try[$queueLength;0];0]]
+  $let[lockprovyt;youtubeVideo]
 
   $if[$get[basic_type];
   $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[music_playurl]]]
@@ -211,13 +212,19 @@ module.exports = {
 
   $while[$and[$get[attemptry]<=$get[donetry];$get[found]==false];
     $try[
+    $if[$env[whatmusictype;type]==youtube;
+    $playTrack[$voiceID;$trimLines[$get[music_playurl]];$get[lockprovyt]]
+    ;
     $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==applemusic;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
-    $playTrack[$voiceID;$trimLines[$get[music_playurl]];$env[whatmusictype;type];AUTO_SEARCH]
+    $playTrack[$voiceID;$trimLines[$get[music_playurl]];$env[whatmusictype;type]]
     ;
     $playTrack[$voiceID;$trimLines[$get[music_playurl]];auto]
-    ]
+    ]]
     $let[found;true]
     ;
+    $if[$env[whatmusictype;type]==youtube;
+    $if[$get[attemptry]==2;$let[lockprovyt;youtube]]
+    ]
     $letSum[attemptry;1]
     ;causeplayerror]
   ]

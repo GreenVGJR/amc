@@ -20,12 +20,8 @@ module.exports = {
           "value": "1"
         },
         {
-          "name": "Audio + Video",
-          "value": "2"
-        },
-        {
           "name": "Audio + Video (Legacy)",
-          "value": "3"
+          "value": "2"
         }],
       },
       {
@@ -106,7 +102,7 @@ $let[getcdn;]
 $let[s-fetch;false]
 $async[
 $let[storeobjecthttp;$callFunction[extractTrack;$get[url]]]
-$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];hls;$if[$and[$env[musictype;type]==youtube;$option[yt_option]==3];va;v]];$get[storeobjecthttp];$get[limitsize]]]
+$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];va;v];$get[storeobjecthttp];$get[limitsize]]]
 $let[s-fetch;true]
 ]
 $if[$get[s-fetch]==false;
@@ -147,33 +143,7 @@ $let[checkcdn_headers;{
 "Sec-Fetch-Site": "none",
 "User-Agent": "$get[agent]"
 }]
-$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];
-$let[contenttype;m3u8]
-$let[converttype;mp4]
-$let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];$get[gettitle].$get[converttype]]]
-$httpAddHeader[User-Agent;$get[agent]]
-$httpAddHeader[Accept-Encoding;]
-$httpSetContentType[Text]
-$onlyIf[$httpRequest[$get[getcdn];GET]==200;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-$let[clh;$charCount[$httpResult]]
-$callLocalFunction[runcodessync;Cooldown in 2s;;false]
-$wait[2s]
-$arrayLoad[b;#EXTINF;$httpResult]
-$!arrayShift[b]
-$arrayMap[b;c;$return[$advancedTextSplit[$env[c];
-;1]];b]
-$callLocalFunction[runcodessync;Fetching Segments;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
-$let[clh;0]
-$arrayMap[b;c;$if[$get[clh]<=$get[limitsize];$return[$djsEval[(function r(n){return fetch("$env[c]",{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).catch(e=>n>0?r(n-1):Promise.reject(e))})(5).then(r=>r.arrayBuffer()).then(d=>{ctx.setKeyword("clh",Number(ctx.getKeyword("clh")??0)+d.byteLength);return Buffer.from(d).toString("base64")}).then(e=>e).catch()]]];b]
-$onlyIf[$get[clh]!=0;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-$onlyIf[$get[clh]<=$get[limitsize];$replace[$callFunction[useCustomMusicMessage;config_generalOverDownload];{limit_size};$round[$divide[$get[limitsize];1024;1024];2]MB]\n$hyperlink[$get[gettitle];$trimLines[$get[getcdn]]]]
-$let[names;$get[gettitle].$get[converttype]]
-$callLocalFunction[runcodessync;Fetching Segments » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
-$let[ks;$djsEval[Buffer.concat(JSON.parse(\\\`$env[b]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64")]]
-$#interactionReply[
-$#attachment[$get[ks];$get[names];true;base64;$get[getpuretitle]]
-]
-;
+
 $let[f-fetch;false]
 $let[condownbytes;]
 $let[httpstatus;]
@@ -181,13 +151,12 @@ $let[clh;]
 $let[cly;]
 $async[
 $if[$get[isjsoncdn]==false;
-$let[condownbytes;$djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).then(r=>{ctx.setKeyword("clh",r.headers?.get('content-length')??"")\\;ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= ctx.getKeyword("limitsize"))) ? r.arrayBuffer() : null\\;}).then(b => Buffer.from(b).toString("base64")).then(e => e).catch()]]
+$!djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).then(r=>{ctx.setKeyword("clh",r.headers?.get('content-length')??"")\\;ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= ctx.getKeyword("limitsize"))) ? r.arrayBuffer() : null\\;}).then(b => ctx.setKeyword("condownbytes", Buffer.from(b).toString("base64"))).catch()]
 ;
 $let[clh;$get[clh-temp]]
 $jsonLoad[yup_container;$env[yup;container]]
 $let[getcdn;$env[yup;original]]
 $arrayMap[yup_container;c;$return[$djsEval[fetch("$env[c]", { method: "GET", headers: JSON.parse(ctx.getKeyword("checkcdn_headers")) }).then(r=>{ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= ctx.getKeyword("limitsize"))) ? r.arrayBuffer() : null\\;}).then(d => Buffer.from(d).toString("base64")).then(e => e).catch()]];yup_container]
-$let[condownbytes;$djsEval[Buffer.concat(JSON.parse(\\\`$env[yup_container]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64")]]
 ]
 $let[f-fetch;true]
 ]
@@ -211,17 +180,24 @@ $let[converttype;$if[$get[contenttype]==webm;opus;$if[$get[contenttype]==mp4;m4a
 ]
 $let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];$get[gettitle].$get[converttype]]]
 $if[$get[f-fetch]==false;
+$if[$get[isjsoncdn]==false;
 $callLocalFunction[runcodessync;Downloading » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
-]
+;
+$callLocalFunction[runcodessync;Downloading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+]]
 $loop[-1;
 $if[$get[f-fetch]!=false;$break]
 $wait[5]
+]
+$if[$get[isjsoncdn]==true;
+$callLocalFunction[runcodessync;Processing » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$try[$!djsEval[ctx.setKeyword("condownbytes", Buffer.concat(JSON.parse(\\\`$jsonStringify[yup_container]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64"))]]
 ]
 $onlyIf[$get[condownbytes]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $#interactionReply[
 $if[$and[$option[lyrics]==true;$get[checklyric]];$#attachment[$get[loadlyrics];$get[lyricnames];true]]
 $#attachment[$get[condownbytes];$get[names];true;base64;$get[getpuretitle]]
-]]
+]
 $if[$and[$channelExists[$channelID];$option[ephemeral]!=true];
 $fetchMessage[$channelID;$get[mid]]
 $if[$messageAttachmentCount[$channelID;$get[mid]]==0;

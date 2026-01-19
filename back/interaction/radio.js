@@ -203,8 +203,8 @@ module.exports = [{
 
     $playTrack[$voiceID;$trimLines[$get[stream]];auto;FILE]
     $if[$get[iscreatedfirst];
-    $setCache[musicplayer_message_$guildID_channelid;$channelID]
-    $setCache[musicplayer_message_$guildID_messageid;$messageID]
+    $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
+    $setCache[musicplayer_message_$guildID_messageid;"$messageID"]
     ;
     $callLocalFunction[loadinteraction;2]
     $if[$getLoopMode!=OFF;$setLoopMode[OFF] $wait[1s]]

@@ -30,7 +30,7 @@ module.exports = {
     $!jsonSet[reslac;id;$advancedTextSplit[$env[a;results;0;url];watch?v=;1]]
     $!jsonSet[reslac;dynamic_thumbnail;]
     $!jsonSet[reslac;thumbnail;$env[a;results;0;thumbnail]]
-    $!jsonSet[reslac;duration;$env[a;results;0;duration]]
+    $!jsonSet[reslac;duration;"$env[a;results;0;duration]"]
     $!jsonSet[reslac;title;$env[a;results;0;title]]
     ]
     $if[$env[provider]==youtubemusic;
@@ -39,7 +39,7 @@ module.exports = {
     $!jsonSet[reslac;id;$advancedTextSplit[$env[a;results;0;url];watch?v=;1]]
     $!jsonSet[reslac;dynamic_thumbnail;]
     $!jsonSet[reslac;thumbnail;$env[a;results;0;thumbnail]]
-    $!jsonSet[reslac;duration;$env[a;results;0;duration]]
+    $!jsonSet[reslac;duration;"$env[a;results;0;duration]"]
     $!jsonSet[reslac;title;$env[a;results;0;title]]
     ]
     $if[$env[provider]==soundcloud;
@@ -57,7 +57,7 @@ module.exports = {
     $!jsonSet[reslac;id;$advancedTextSplit[$env[res;collection;0;permalink_url];soundcloud.com/;1]]
     $!jsonSet[reslac;dynamic_thumbnail;]
     $!jsonSet[reslac;thumbnail;$replace[$env[res;collection;0;artwork_url];-large;-original]]
-    $!jsonSet[reslac;duration;$round[$divide[$env[res;collection;0;duration];1000];0]]
+    $!jsonSet[reslac;duration;"$round[$divide[$env[res;collection;0;duration];1000];0]"]
     $!jsonSet[reslac;title;$env[res;collection;0;title]]
     ]
     $if[$env[provider]==spotify;
@@ -82,7 +82,7 @@ module.exports = {
     $!jsonSet[reslac;id;$advancedTextSplit[$env[res1;0;external_urls;spotify];/;4]]
     $!jsonSet[reslac;dynamic_thumbnail;]
     $!jsonSet[reslac;thumbnail;$env[res1;0;album;images;0;url]]
-    $!jsonSet[reslac;duration;$round[$divide[$env[res1;0;duration_ms];1000];0]]
+    $!jsonSet[reslac;duration;"$round[$divide[$env[res1;0;duration_ms];1000];0]"]
     $!jsonSet[reslac;title;$env[res1;0;name]]
     ]
     $if[$env[provider]==applemusic;
@@ -97,7 +97,7 @@ module.exports = {
     $!jsonSet[reslac;id;$advancedTextSplit[$env[res;results;0;trackViewUrl];&;0]]
     $!jsonSet[reslac;dynamic_thumbnail;]
     $!jsonSet[reslac;thumbnail;$replace[$env[res;results;0;artworkUrl100];100x100bb;1x1ss]]
-    $!jsonSet[reslac;duration;$round[$divide[$env[res;results;0;trackTimeMillis];1000];0]]
+    $!jsonSet[reslac;duration;"$round[$divide[$env[res;results;0;trackTimeMillis];1000];0]"]
     $!jsonSet[reslac;title;$env[res;results;0;trackName]]
     ]
     $if[$env[provider]==deezer;
@@ -108,10 +108,10 @@ module.exports = {
     $onlyIf[$env[res]!=;$callLocalFunction[refreshing;true]]
     $jsonLoad[res;$env[res]]
     $onlyIf[$and[$get[status]==200;$env[res;data;0]!=];$return]
-    $!jsonSet[reslac;id;$env[res;data;0;id]]
+    $!jsonSet[reslac;id;"$env[res;data;0;id]"]
     $!jsonSet[reslac;dynamic_thumbnail;]
     $!jsonSet[reslac;thumbnail;$env[res;data;0;album;cover]]
-    $!jsonSet[reslac;duration;$env[res;data;0;duration]]
+    $!jsonSet[reslac;duration;"$env[res;data;0;duration]"]
     $!jsonSet[reslac;title;$env[res;data;0;title]]
     ]
     ;refresh]

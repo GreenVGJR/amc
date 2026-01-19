@@ -42,12 +42,6 @@ module.exports = {
     $httpAddHeader[X-Origin;https://www.youtube.com]
     $httpAddHeader[X-Goog-Visitor-Id;$getCache[authmusic_youtube_visitor]]
     ]
-    $if[$env[types]==hls;
-    $httpAddHeader[User-Agent;Mozilla/5.0 (Macintosh\\; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15,gzip(gfe)]
-    $httpAddHeader[Accept-Encoding;]
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":1,"clientVersion":"2.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":false,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;www;m].youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,videoDetails(lengthSeconds,isLiveContent),streamingData.hlsManifestUrl;POST;reshttp]
-    ;
     $if[$or[$env[types]==;$env[types]==v];
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
@@ -59,7 +53,7 @@ module.exports = {
     $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":28,"clientVersion":"1.00.0","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":false,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"racyCheckOk":true,"contentCheckOk":true}]
     $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;www;m].youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
-    ]]]
+    ]]
     $if[$env[reshttp;playabilityStatus;status]!=OK;$return[$let[finalurl;bot|$env[reshttp;playabilityStatus;reason]]]]
     $if[$env[reshttp;videoDetails;isLiveContent];$return[$let[finalurl;live]]]
     $if[$or[$env[types]==;$env[types]==v];
@@ -87,19 +81,6 @@ module.exports = {
     ;
     $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no]
     ]]
-    $if[$env[types]==hls;
-    $if[$or[$env[reshttp;streamingData;hlsManifestUrl]==;$env[reshttp;streamingData;hlsManifestUrl]==null];$return[$let[finalurl;bot|Video unavailable for this client]]]
-    $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
-    $httpAddHeader[Accept-Encoding;]
-    $let[jaghttp;$httpRequest[$env[reshttp;streamingData;hlsManifestUrl];GET;jsbd]]
-    $if[$get[jaghttp]!=200;$return[$let[finalurl;null]]]
-    $arrayLoad[jskd;#EXT-X-STREAM-INF:BANDWIDTH=;$env[jsbd]]
-    $!arrayShift[jskd]
-    $let[fskklsv;$arrayFindIndex[jskd;oasb;$checkCondition[$divide[$multi[$advancedTextSplit[$env[oasb];,;0];$env[reshttp;videoDetails;lengthSeconds]];7]>=$env[size_limit]]]]
-    $let[fsidlsv;$env[jskd;$if[$get[fskklsv]==-1;$sub[$arrayLength[jskd];1];$get[fskklsv]]]]
-    $let[finalurl;$advancedTextSplit[$get[fsidlsv];
-;1]]
-    ]
     $if[$env[types]==va;
     $jsonLoad[fts;$env[reshttp;streamingData;formats]]
     $let[getindex18;$arrayFindIndex[fts;aaa;$env[aaa;itag]==18]]
@@ -224,7 +205,7 @@ module.exports = {
     $if[$env[whattype;type]==twitter;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $if[$env[a;results]==null;$return[$let[finalurl;null]]]
-    $if[$env[a;results;quoted_status_result;result]!=;
+    $if[$env[a;results;quoted_status_result;result;legacy;entities;media;0;video_info]!=;
     $jsonLoad[b;$env[a;results;quoted_status_result;result;legacy;entities;media;0;video_info;variants]]
     ;
     $jsonLoad[b;$env[a;results;legacy;entities;media;0;video_info;variants]]

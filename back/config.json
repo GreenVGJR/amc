@@ -10,7 +10,12 @@
     "interval_message": true,
     "fetchMusicTitle_autocomplete": true,
 
-    "_comment|stream": [
+    "_comment|stream": [{
+        "_comment": [
+        "Having trouble while streaming youtube? Try switching the stream type.",
+        "This setting would also apply to spotify and applemusic"
+        ]
+    },
         "1 = DASH",
         "2 = HLS"
     ],

@@ -69,7 +69,6 @@ module.exports = {
     generateWithPoToken: false,
     disablePlayer: true,
     slicePlaylist: true,
-    overrideBridgeMode: "yt",
     createStream: async (q, e) => {
         try { return await fallbackYTStream(q.url); }
         catch { return; }

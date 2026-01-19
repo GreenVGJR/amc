@@ -1,8 +1,11 @@
 {
-    "_WARNING": [
-        "-- DO NOT CHANGE THE NAMES EACH OF THESE.",
-        "-- ONLY VALUE ARE ALLOWED."
+    "_comment": [
+        "Here you can change the messages that happen.",
+        "Currently not all yet"
     ],
+
+    "_inline|clientcheck": "---",
+
     "config_errorJoin": "You must be in a voice channel.",
     "config_errorClientPlayer": "Nothing is playing.",
     "config_errorChannelPerm": "Can't join to voice channel.\nReason:",
@@ -10,17 +13,26 @@
     "config_errorIsSameVC": "You must same with {client} in",
     "config_errorIsLimitVC": "Can't join this voice channel.",
     "config_errorIsSameDJVC": "You must have {role} role to access this command.",
+
+    "_inline|autocomplete": "---",
+
     "config_errorAttemptSearch": "[WARNING] Execute this Application in Server.",
     "config_errorAttemptSearchJoinVC": "[WARNING] You must be on voice channel to use this.",
     "config_errorAttemptRadioPlayer": "[WARNING] Stop the current active player before switching player.",
     "config_errorAttemptSearchFetchTitle": "[INFO] Can't find the title.",
     "config_infoSearchFirst": "[INFO] What music you want to play?",
+
+    "_inline|clienterror": "---",
+
     "config_errorNoResult": "No results found.",
     "config_errorNoResultSearch": "No result.",
     "config_errorNoResultLyrics": "No lyrics were available.",
     "config_errorOverResultLyrics": "Unfortunately, i can't show rest of these.",
     "config_errorPlayTrack": "Can't process this.\nError:",
     "config_errorPlayTrackEvents": "Can't process this.",
+
+    "_inline|player": "---",
+
     "config_errorNoQueue": "There's no active player.",
     "config_errorNoQueueList": "There's no track on this queue.",
     "config_errorLiveBeforeSeek": "This track is LIVE.",
@@ -37,10 +49,16 @@
     "config_generalStopTrack": "OK",
     "config_generalSkipTrack": "Skipped.",
     "config_generalVolumeTrack": "Volume changed to:",
+
+    "_inline|downloader": "---",
+
     "config_generalInvalidLinkDownload": "Must be link.",
     "config_generalInvalidProviderDownload": "Invalid provider. Only accepts:\n`Youtube, Soundcloud, Spotify, Tiktok, Twitter, Instagram, Facebook, Bandcamp`",
     "config_generalEmptyDownload": "Can't download this.",
     "config_generalOverDownload": "Can't download this media if it's above {limit_size}.\n\nStill want to download? You can try access this url to direct downloads.",
+
+    "_inline|playlistuser": "---",
+
     "config_generalPlaylistExistsUser": "You already have this playlist.",
     "config_generalPlaylistNotExistUser": "Can't find the playlist.",
     "config_generalPlaylistErrorUser": "Can't access this playlist.",

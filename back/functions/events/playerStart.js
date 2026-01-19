@@ -63,8 +63,8 @@ module.exports = {
     $async[$if[$getCache[radioplayer_data_$env[guildId]_checkplayer]!=;$deleteCache[radioplayer_data_$env[guildId]_checkplayer]]]
     $if[$try[$messageExists[$env[channelId];$env[messageId]];false]==false;
     $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
-    $setCache[musicplayer_message_$env[guildId]_channelid;$env[channelId]]
-    $setCache[musicplayer_message_$env[guildId]_messageid;$get[secmid]]
+    $setCache[musicplayer_message_$env[guildId]_channelid;"$env[channelId]"]
+    $setCache[musicplayer_message_$env[guildId]_messageid;"$get[secmid]"]
     $callFunction[updateCurrentMusicPlayer]
     $stop
     ]
@@ -100,7 +100,7 @@ module.exports = {
     $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]LIVE;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]$if[$advancedTextSplit[$parseDigital[$env[jsonmusicdata;durationMS]];:;0]==00;$cropText[$parseDigital[$env[jsonmusicdata;durationMS]];3;];$parseDigital[$env[jsonmusicdata;durationMS]]]];true;0]
     $addField[Songs;$separateNumber[$sum[$queueLength;1];.];true;0]
     $color[$default[$memberDisplayColor[$guildID;$get[requestedBy]];$callFunction[useIcon;color_embed]];0]
-    $thumbnail[$if[$isValidLink[$get[thumbnail]]==false;$userAvatar[$get[requestedBy];1024];$if[$endsWith[$get[owner]; - Topic];$replace[$get[thumbnail];hq720.jpg;frame0.jpg];$get[thumbnail]]];0]
+    $thumbnail[$if[$isValidLink[$get[thumbnail]]==false;$userAvatar[$get[requestedBy];1024];$if[$endsWith[$get[owner]; - Topic];https://i.ytimg.com/vi/$advancedTextSplit[$get[thumbnail];/;4]/frame0.jpg;$if[$get[provider]==applemusic;$replace[$get[thumbnail];1200x630wp-60;1x1ss];$get[thumbnail]]]];0]
     $footer[$userDisplayName[$get[requestedBy]];$userAvatar[$get[requestedBy];1024];0]
     ;
     $author[» Now Playing\n$env[jsonmusicdata;author];$callFunction[useIcon;$get[provider]];;0]
@@ -108,17 +108,17 @@ module.exports = {
     $if[$and[$get[delayping];$env[toggleInterval]];$description[Bad connection.\nThe current music playing may be sound robotic.;0]]
     $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]LIVE;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]$if[$advancedTextSplit[$parseDigital[$env[jsonmusicdata;durationMS]];:;0]==00;$cropText[$parseDigital[$env[jsonmusicdata;durationMS]];3;];$parseDigital[$env[jsonmusicdata;durationMS]]]];true;0]
     $addField[Songs;$separateNumber[$sum[$queueLength;1];.];true;0]
-    $thumbnail[$if[$isValidLink[$env[jsonmusicdata;thumbnail]]==false;$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];$if[$endsWith[$env[jsonmusicdata;author]; - Topic];$replace[$env[jsonmusicdata;thumbnail];hq720.jpg;frame0.jpg];$env[jsonmusicdata;thumbnail]]];0]
+    $thumbnail[$if[$isValidLink[$env[jsonmusicdata;thumbnail]]==false;$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];$if[$endsWith[$env[jsonmusicdata;author]; - Topic];https://i.ytimg.com/vi/$advancedTextSplit[$env[jsonmusicdata;thumbnail];/;4]/frame0.jpg;$if[$get[provider]==applemusic;$replace[$env[jsonmusicdata;thumbnail];1200x630wp-60;1x1ss];$env[jsonmusicdata;thumbnail]]]];0]
     $color[$default[$memberDisplayColor[$guildID;$env[jsonmusicdata;requestedBy;id]];$callFunction[useIcon;color_embed]];0]
     $footer[$userDisplayName[$env[jsonmusicdata;requestedBy;id]];$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];0]
     ]
     $addActionRow
-    $addStringSelectMenu[musicplayer_nodequeue_$env[messageId];$cropText[Queue | $djsEval[require("entities").decodeHTML(\\\`$replace[$trackInfo[title];";\\\\"]\\\`)];0;61;...];$or[$queueLength==0;$getLoopMode==TRACK];1;1]
+    $addStringSelectMenu[musicplayer_nodequeue_$env[messageId];$cropText[Queue | $djsEval[require("entities").decodeHTML(\\\`$trackInfo[title]\\\`)];0;61;...];$or[$queueLength==0;$getLoopMode==TRACK];1;1]
 
     $let[countqueue;0]
     $if[$queueLength!=0;
     $arrayForEach[rest;yesnt;
-    $addOption[$djsEval[require("entities").decodeHTML(\\\`$replace[$cropText[$env[yesnt];0;97;...];";\\\\"]\\\`)];;$get[countqueue]]
+    $addOption[$djsEval[require("entities").decodeHTML(\\\`$cropText[$env[yesnt];0;97;...]\\\`)];;$get[countqueue]]
     $letSum[countqueue;1]
     ]
     ;

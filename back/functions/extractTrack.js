@@ -52,7 +52,7 @@ module.exports = {
     $!jsonSet[reshttptest;lengthSeconds;0] $c[i couldn't find which data return that]
     $!jsonSet[reshttptest;channelId;$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoSecondaryInfoRenderer]!=]];videoSecondaryInfoRenderer;owner;videoOwnerRenderer;navigationEndpoint;browseEndpoint;browseId]]
     $!jsonSet[reshttptest;isCrawlable;true] $c[i couldn't find which data return that]
-    $!jsonSet[reshttptest;viewCount;$advancedReplace[$advancedTextSplit[$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;viewCount;videoViewCountRenderer;viewCount;simpleText]; ;0];,;;.;]]
+    $!jsonSet[reshttptest;viewCount;"$advancedReplace[$advancedTextSplit[$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;viewCount;videoViewCountRenderer;viewCount;simpleText]; ;0];,;;.;]"]
     $!jsonSet[reshttptest;author;$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoSecondaryInfoRenderer]!=]];videoSecondaryInfoRenderer;owner;videoOwnerRenderer;title;runs;0;text]]
     $!jsonSet[reshttptest;isPrivate;$checkCondition[$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]]==-1]]
     $!jsonSet[reshttptest;isLiveContent;$if[$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;viewCount;videoViewCountRenderer;isLive]!=;$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;viewCount;videoViewCountRenderer;isLive];$startsWith[$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;dateText;simpleText];Started streaming]]]
@@ -266,7 +266,7 @@ module.exports = {
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_twitter]]
     $httpSetContentType[Text]
     $let[http;$httpRequest[https://api.x.com/graphql/$getCache[authmusic_twitter_qid]/TweetResultByRestId?variables=$encodeURI[$get[xr_variables]]&features=$encodeURI[$get[xr_features]];GET]]
-    $if[$or[$get[http]==401;$get[http]==400];
+    $if[$or[$get[http]==401;$get[http]==400;$get[http]==429];
     $callFunction[generateAuthKeys;twitter;;true]
     $callFunction[generateAuthKeys;twitter_cookies;;true]
     $callLocalFunction[refreshx;true]

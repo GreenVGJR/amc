@@ -10,11 +10,11 @@ module.exports = {
     $!jsonSet[test;mode;0]
     ]
     $if[$customID==toggledjrolepick;
-    $!jsonSet[test;role;$selectMenuValues[0]]
+    $!jsonSet[test;role;"$selectMenuValues[0]"]
     $!jsonSet[test;mode;0]
     ]
     $if[$customID==toggledjrolemode;
-    $!jsonSet[test;mode;$selectMenuValues[0]]
+    $!jsonSet[test;mode;"$selectMenuValues[0]"]
     ]
     $!putRecord[guild;$env[test];musicplayer_data_djft_$guildID]
     $interactionUpdate[$callFunction[loadDJUser]]
