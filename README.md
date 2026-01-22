@@ -42,7 +42,7 @@ ForgeLinked: Made with [lavalink-client](https://www.npmjs.com/package/lavalink-
 |`/dj`|Tweak DJ features|
 |`/download`|Download a media|
 |`/help`|List commands|
-|`/lyrics`|Search for lyrics \| Providers: Youtube Music, Deezer, Shazam, Lrclib, Genius|
+|`/lyrics`|Search for lyrics \| Providers: Youtube Music, Shazam, Deezer, Lrclib, Genius|
 |`/play`|Play a track|
 |`/playlist`|Show playlist you made|
 |`/queue`|Show all tracks info|
