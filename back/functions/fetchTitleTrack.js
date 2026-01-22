@@ -19,13 +19,12 @@ module.exports = {
     ]
     $if[$env[filtype;type]==soundcloud;
     $jsonLoad[b;$env[a;results]]
-    $arrayMap[b;bb;$if[$env[bb;hydratable]==sound;$return[$env[bb]]];c]
-    $if[$or[$env[c;0;data;publisher_metadata;artist]==;$env[c;0;data;publisher_metadata;artist]==null];
-    $let[author;$env[c;0;data;user;username]]
+    $if[$or[$env[b;publisher_metadata;artist]==;$env[b;publisher_metadata;artist]==null];
+    $let[author;$env[b;user;username]]
     ;
-    $let[author;$env[c;0;data;publisher_metadata;artist]]
+    $let[author;$env[b;publisher_metadata;artist]]
     ]
-    $let[title;$env[c;0;data;title]]
+    $let[title;$env[b;title]]
     ]
     $if[$env[filtype;type]==spotify;
     $if[$env[a;results;props]!=;
@@ -81,12 +80,12 @@ module.exports = {
     $let[title;$default[$env[a;results;metadata;music_info;music_asset_info;title];$env[a;results;metadata;music_info;music_asset_info;audio_asset_id]]]
     ]]]
     $if[$env[filtype;type]==bandcamp;
-    $let[author;$env[a;results;artist]]
+    $if[$env[a;results;artist]!=null;$let[author;$env[a;results;artist]]]
     $let[title;$env[a;results;title]]
     ]
     $if[$env[filtype;type]==twitter;
     $let[author;$env[a;results;core;user_results;result;core;screen_name]]
-    $let[title;$default[$advancedTextSplit[$env[a;results;legacy;full_text];https://t.co;0];$env[a;results;post_video_description]]]
+    $let[title;$default[$advancedTextSplit[$env[a;results;legacy;full_text];https://t.co;0];$default[$env[a;results;post_video_description];$env[a;results;rest_id]]]]
     ]
     $let[author;$trim[$if[$checkContains[$toLowercase[$toCamelCase[$get[title]]];$toLowercase[$toCamelCase[$get[author]]]]==false;$get[author]]]]
     $let[finaltitle;$get[author]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]

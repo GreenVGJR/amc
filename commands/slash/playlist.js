@@ -6,7 +6,7 @@ module.exports = {
     {
         "type": 3,
         "name": "name",
-        "description": "(TESTING) Search specific playlist?",
+        "description": "Search specific playlist",
         "required": false,
         "min_length": 1
     }

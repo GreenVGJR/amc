@@ -11,7 +11,7 @@
 ___
 
 > [!NOTE]
-> [List Public Lavalink available](https://lavalink-list.darrennathanael.com/).
+> [List Public Lavalink Available](https://lavalink-list.darrennathanael.com/)
 
 ## Installation
 1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v21.7.3 for node.js
@@ -21,6 +21,7 @@ ___
 5. Run this command with IDE/Terminal (still same folder)
 ```js
 npm install
+npm update
 node .
 ```
 > How about for Pterodactyl user?
@@ -41,12 +42,23 @@ ___
 | ------------- | ------------- |
 | Youtube       | Youtube       |
 | Soundcloud    | Soundcloud    |
-| Spotify*      | Spotify*      |
-| Apple Music*  | Apple Music*  |
+| Spotify       | Spotify       |
+| Apple Music   | Apple Music   |
 | Local/HTTP    | Local/HTTP    |
-> *If Available
+
+_At least with known lavalink server_
 
 </details>
+
+___
+
+> [!WARNING]
+> By doing this you're risking your account getting temporary / permanent banned if you use for massive requests / users.<br>
+> Consider to use throwaway account. Only use this for certain cases.
+
+
+> [!NOTE]
+> You might also need to set for `YOUTUBE_UA=` User Agent same as previous.
 
 <details close>
 
@@ -55,6 +67,8 @@ ___
 ## Find Youtube Cookies
 
 </summary>
+
+**This Cookies only used for Downloader command**
 
 1. Open a new private browsing/incognito window and login your youtube account
 2. If that done, navigate to `https://www.youtube.com/robots.txt` then open developers tools (`Ctrl + Shift + I`)
@@ -65,11 +79,7 @@ ___
 
 </details>
 
-> [!WARNING]
-> By doing this you're risking your account getting temporary / permanent banned if you use for massive requests / users.<br>
-> Consider to use throwaway account. Only use this for certain cases.
-
-> (Only works for downloader command)
+___
 
 <details close>
 
@@ -83,8 +93,8 @@ ___
 - Find Lyrics from current/specific song
   Providers:
   = > Youtube Music
-    > Deezer
     > Shazam
+    > Deezer
     > Lrclib
     > Genius
 
@@ -93,7 +103,6 @@ ___
   = > Youtube
     > Youtube Shorts
     > Youtube Music
-    > Youtube Audio Library
     > Soundcloud
     > Spotify
     > Apple Music
@@ -101,15 +110,19 @@ ___
     > ITunes
     > Amazon Music
     > Bandcamp
+    > Beatport
     > Deezer
     > Tidal
     > Qobuz
+    > JioSaavn
     > Tiktok Video
     > Tiktok Music
     > Tiktok Sound
+    > BiliBili.tv
+    > Twitch
+    > Facebook Reels
     > NCS
-    > Capcut - Templates | Global
-    > Capcut - Templates | US
+    > Capcut - Templates
     > Kinemaster - Templates
     > Roblox Music
 
@@ -122,7 +135,7 @@ ___
     > Instagram
     > Facebook
     > Bandcamp
-    > Twitter
+    > Twitter / X
 
 - Auto-generate auth keys needed
 - Dynamic info message
@@ -137,6 +150,8 @@ ___
 
 </details>
 
+___
+
 <details close>
 
 <summary>
@@ -145,10 +160,12 @@ ___
 
 </summary>
 
+<div align="center">
 ![Preview 1](https://github.com/user-attachments/assets/09116ae0-20ef-44f0-aaf1-171bc5ecd106)
 ![Preview 2](https://github.com/user-attachments/assets/7a3ace53-eb6b-4766-bcf4-ae00f0687db8)
 ![Preview 3](https://github.com/user-attachments/assets/06a811ef-dcf3-4d44-b35f-35888e17d82d)
 ![Preview 4](https://github.com/user-attachments/assets/aeceb76b-f8e7-458b-9f0f-3056b354dd0f)
 ![Preview 5](https://github.com/user-attachments/assets/15d3277f-7fac-43d1-ad8b-70cc18c30f9b)
+</div>
 
 </details>

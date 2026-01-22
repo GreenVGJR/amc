@@ -203,8 +203,8 @@ module.exports = [{
     $!playerCreate[$guildID;$voiceID;$channelID;50;true]
     $disableConsoleErrors
     $if[$get[iscreatedfirst];
-    $setCache[musicplayer_message_$guildID_channelid;$channelID]
-    $setCache[musicplayer_message_$guildID_messageid;$messageID]
+    $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
+    $setCache[musicplayer_message_$guildID_messageid;"$messageID"]
     $setCache[radioplayer_data_$guildID_checkplayer;true]
     $setCache[radioplayer_data_$guildID_playerstatus;true]
     $!playerAddTrack[$guildID;$trimLines[$get[stream]]]

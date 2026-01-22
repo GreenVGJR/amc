@@ -5,7 +5,11 @@ module.exports = {
     $onlyIf[$advancedTextSplit[$customID;_;0]==musicplayer;]
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
-    $onlyIf[$get[mid]==$messageID;$async[$!disableComponentsOf[$channelID;$messageID]] $!deferUpdate]
+    $onlyIf[$get[mid]==$messageID;
+    $interactionUpdate[
+    $fetchResponse
+    $disableComponents
+    ]]
     $onlyIf[$voiceID[$guildID;$clientID]!=;]
     $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
     $if[$get[crdjcs_0f]==false;

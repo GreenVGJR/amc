@@ -20,7 +20,7 @@ module.exports = {
   code: `
     $let[inital;virtualDuration_$env[guildId]_$env[channelId]]
     $if[$env[duration]!=;
-    $setCache[musicplayer_message_$get[inital];$if[$env[duration]<0;0;$env[duration]]]
+    $setCache[musicplayer_message_$get[inital];"$if[$env[duration]<0;0;$env[duration]]"]
     ]
     $return[$default[$getCache[musicplayer_message_$get[inital]];0]]
   `,

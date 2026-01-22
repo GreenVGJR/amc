@@ -85,8 +85,8 @@ module.exports = {
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
   $if[$or[$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
-  $setCache[musicplayer_message_$guildID_channelid;$channelID]
-  $setCache[musicplayer_message_$guildID_messageid;$get[mid]]
+  $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
+  $setCache[musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
   ]
   $if[$env[typesload]==1-2;
@@ -97,8 +97,8 @@ module.exports = {
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
   $if[$or[$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
-  $setCache[musicplayer_message_$guildID_channelid;$channelID]
-  $setCache[musicplayer_message_$guildID_messageid;$get[mid]]
+  $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
+  $setCache[musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
   ]
   $if[$env[typesload]==2;

@@ -9,7 +9,7 @@ module.exports = {
     $onlyIf[$or[$focusedOptionValue!=;$getCache[cachesearchistory_user_autocomplete_$authorID]!=];$addChoice[$callFunction[useCustomMusicMessage;config_infoSearchFirst];__infointer-$authorID__]]
     $if[$isValidLink[$focusedOptionValue]==false;
     $jsonLoad[testing;$callFunction[fastSearchTrack;$if[$focusedOptionValue!=;$focusedOptionValue;$getCache[cachesearchistory_user_autocomplete_$authorID]]]]
-    $async[$if[$focusedOptionValue!=;$setCache[cachesearchistory_user_autocomplete_$authorID;$focusedOptionValue]]]
+    $async[$if[$focusedOptionValue!=;$setCache[cachesearchistory_user_autocomplete_$authorID;"$focusedOptionValue"]]]
     $if[$env[testing;results;0]==;
     $addChoice[$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue]]
     ;
