@@ -10,7 +10,7 @@
     "discord-player-spotify": "^1.1.7",
     "discord-player-youtubei": "^1.5.0",
     "dotenv": "^17.2.3",
-    "entities": "^7.0.0",
+    "entities": "^7.0.1",
     "lmdb": "^3.4.4",
     "mediaplex": "^1.0.0"
   },

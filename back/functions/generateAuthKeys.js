@@ -176,8 +176,9 @@ module.exports = {
         $httpSetContentType[Text]
         $!httpRequest[https://w.soundcloud.com/player/;GET]
         $arrayLoad[storeclientid]
-        $arrayLoad[conres;widget.sndcdn.com;$httpResult]
-        $arrayMap[conres;conrest;$if[$checkContains[$env[conrest];.js];$return[https://widget.sndcdn.com$advancedTextSplit[$env[conrest];</script>;0;";0]]];conres2]
+        $arrayLoad[conres;script crossorigin src=";$httpResult]
+        $arrayMap[conres;conrest;$return[$advancedTextSplit[$env[conrest];";0]];conres2]
+        $!arrayShift[conres2]
         $arrayReverse[conres2;conres2]
         $arrayForEach[conres2;conres3;
         $try[
