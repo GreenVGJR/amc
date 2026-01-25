@@ -43,6 +43,7 @@ ForgeLinked: Made with [lavalink-client](https://www.npmjs.com/package/lavalink-
 |`/download`|Download a media|
 |`/help`|List commands|
 |`/lyrics`|Search for lyrics \| Providers: Youtube Music, Shazam, Deezer, Lrclib, Genius|
+|`/ping`|Check bot latency|
 |`/play`|Play a track|
 |`/playlist`|Show playlist you made|
 |`/queue`|Show all tracks info|
