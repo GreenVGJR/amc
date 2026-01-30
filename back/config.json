@@ -10,16 +10,16 @@
     "interval_message": true,
     "fetchMusicTitle_autocomplete": true,
 
-    "_comment|stream": [{
-        "_comment": [
-        "Having trouble while streaming youtube? Try switching the stream type.",
-        "This setting would also apply to spotify and applemusic"
-        ]
-    },
+    "_comment|stream": [
+        "Having trouble while streaming youtube? Try switching the stream type, or enable SABR.",
+        "This setting would also apply to spotify and applemusic",
+        "Note: Enabling SABR will override current youtube stream",
         "1 = DASH",
         "2 = HLS"
     ],
     "streamTypeYT": 1,
+    "useClientYT": "VISIONOS",
+    "useSABR": false,
 
     "disable_YT": false,
     "default_userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"

@@ -1,5 +1,3 @@
-require('dotenv').config(); // Load Environment
-
 // Config
 const youtube = require('./back/client/youtubeConfig');
 const toggles = require('./back/config.json');
@@ -11,12 +9,18 @@ const { QuorielDB } = require("@quoriel/db");
 const { QuorielEdge } = require("@quoriel/edge");
 // const { ForgeDB } = require("@tryforge/forge.db");
 
+require('dotenv').config(); // Load Environment
+
 // Extractor
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const { SoundcloudExtractor } = require("discord-player-soundcloud");
 const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { AttachmentExtractor } = require("@discord-player/extractor");
+let YoutubeSabrExtractor;
+if(toggles.useSABR) {
+    ({ YoutubeSabrExtractor } = require('discord-player-googlevideo'));
+}
 
 const quorielDb = new QuorielDB({
     events: [
@@ -38,9 +42,9 @@ const music = new ForgeMusic({
     ],
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
-        disableFallbackStream: true,
+        disableFallbackStream: !toggles.useSABR,
         preferBridgedMetadata: false,
-        bufferingTimeout: 1000,
+        bufferingTimeout: 500,
         volume: 50,
         connectionTimeout: 10000,
         leaveOnEmpty: true,
@@ -85,6 +89,7 @@ client.applicationCommands.load("commands/slash");
 client.commands.load("back/interaction");
 client.commands.load("back/client/fs");
 client.commands.load("commands/basic");
+if(toggles.useSABR) music.player.extractors.register(YoutubeSabrExtractor, {});
 music.player.extractors.register(SoundcloudExtractor);
 music.player.extractors.register(SpotifyExtractor);
 music.player.extractors.register(AppleMusicExtractor);

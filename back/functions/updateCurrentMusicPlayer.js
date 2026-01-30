@@ -1,6 +1,7 @@
 module.exports = {
     name: "updateCurrentMusicPlayer",
     code: `
+    $if[$try[$queueLength;-1]==-1;$return]
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 

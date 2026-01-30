@@ -34,17 +34,34 @@ module.exports = {
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
         $if[$and[$env[cookielog]!=true;$env[successlog]==true];$logger[Info;Using Youtube Cookies. Attempting to rotating]
-        $if[$or[$get[ytinitua]==;$get[ytinitua]==undefined];$logger[Warn;Using default User Agent. Rotation may fail if it's not same as previous]]
+        $if[$or[$get[ytinitua]==;$get[ytinitua]==undefined];$logger[Warn;Using default User Agent. Rotation may fails]]
         ]
         $httpAddHeader[Cookie;$get[ytinitcookies]]
         ;
-        $if[$env[successlog]==true;
+        $jsonLoad[listconfig;$getCache[system_file-config]]
+        $if[$and[$env[listconfig;useSABR]==false;$env[successlog]==true];
         $c[-- Test Fetch Youtube Video --]
         $httpAddHeader[Accept-Encoding;]
         $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
-        $httpSetBody[{"videoId":"dQw4w9WgXcQ","context":{"client":{"gl":"US","clientName":3,"clientVersion":"20.14.43"}}}]
-        $!httpRequest[https://m.youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus(status);POST]
-        $if[$httpResult[playabilityStatus;status]!=OK;$logger[Warn;Missing Youtube Cookies. Some features might not available]]
+        $c[ANDROID Client]
+        $let[testvideoid;fa5IWHDbftI]
+        $httpSetBody[{"videoId":"$get[testvideoid]","context":{"client":{"gl":"US","clientName":3,"clientVersion":"20.14.43"}}}]
+        $logger[Info;InnerTube: Test Fetching  | $get[testvideoid]]
+        $!httpRequest[https://m.youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus(status),streamingData(adaptiveFormats(itag,url));POST]
+        $if[$httpResult[playabilityStatus;status]==LOGIN_REQUIRED;
+        $logger[Warn;Missing Youtube Cookies. Some features might not available]
+        ]
+        $if[$httpResult[playabilityStatus;status]==OK;
+        $jsonLoad[osav;$httpResult[streamingData;adaptiveFormats]]
+        $let[testitag;$arrayFindIndex[osav;v;$or[$env[v;itag]==251;$env[v;itag]==140]]]
+        $logger[Info;InnerTube: Test Streaming | Itag $env[osav;$get[testitag];itag]]
+        $let[ckec;$httpRequest[$env[osav;$get[testitag];url];HEAD]]
+        $if[$or[$get[ckec]==403;$get[ckec]==400];
+        $logger[Warn;InnerTube: $get[ckec] | Youtube forcing to solve challenge for this client: ANDROID, IOS]
+        ;
+        $logger[Info;InnerTube: $get[ckec]]
+        ]
+        ]
         ]
         ]
         $httpSetContentType[Text]
@@ -228,14 +245,16 @@ module.exports = {
     $if[$or[$env[type]==all;$env[type]==tidal];
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Tidal               | Token;cyan]]
     $try[
+        $let[tidalurl;https://embed.tidal.com/tracks/230917825]
+        $httpAddHeader[Sec-Fetch-Dest;iframe]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
-        $!httpRequest[https://embed.tidal.com/tracks/$randomText[230917825;432597859;355309145;416356151;434875762];GET;tokens]
+        $!httpRequest[$get[tidalurl];GET;tokens]
         $let[embti;$advancedTextSplit[$env[tokens];type="module";0;script src=";1;";0]]
         $httpAddHeader[User-Agent;$get[agent]]
-        $httpAddHeader[Content-Type;application/javascript]
-        $httpAddHeader[Origin;https://embed.tidal.com]
+        $httpAddHeader[Sec-Fetch-Dest;script]
+        $httpAddHeader[Referer;$get[tidalurl]]
         $httpSetContentType[Text]
         $!httpRequest[https://embed.tidal.com$get[embti];GET;rettokens]
         $let[finaltoken;$advancedTextSplit[$env[rettokens];.append("X-Tidal-Token";1;";1]]

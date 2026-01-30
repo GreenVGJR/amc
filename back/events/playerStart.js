@@ -35,17 +35,19 @@ module.exports = [{
 {
     type: "playerPause",
     code: `
+    $wait[1]
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
     $if[$callFunction[configMusic;interval_message]==true;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     ]
+    $callFunction[updateCurrentMusicPlayer]
     `
 },
 {
     type: "playerResume",
     code: `
-    $onlyIf[$djsEval[(0, require("discord-player").useMainPlayer)().queues.get(ctx.client.guilds.cache.get("$guildID"))]!=null;]
+    $wait[1]
 
     $if[$callFunction[configMusic;interval_message];
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
@@ -66,10 +68,10 @@ module.exports = [{
     $let[nextmessage_time;16000]
 
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    $callFunction[updateCurrentMusicPlayer]
     $setInterval[
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
-    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
 
     $let[calculatetime;$sum[$callFunction[musicVirtualDuration;$guildID;$get[cid]];$get[interval_time]]]
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[calculatetime]];0]]
@@ -86,6 +88,9 @@ module.exports = [{
     $deleteCache[musicplayer_message_$guildID_waitinterval]
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     ]
-    $try[$!disableComponentsOf[$get[cid];$get[mid]]]
+    $async[
+    $let[al;$playerElapsedTime]
+    $!disableComponentsOf[$get[cid];$get[mid]]
+    ]
     `
 }]

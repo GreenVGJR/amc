@@ -43,7 +43,8 @@ module.exports = {
         }
     ],
     code: `
-    $if[$or[$hasMusicNode==false;$if[$hasMusicNode==true;$isPlaying;false]==false];
+    $wait[1]
+    $if[$or[$isPlaying==;$isPlaying==false];
     $!clearInterval[$env[intervalName]]
     $return
     ]

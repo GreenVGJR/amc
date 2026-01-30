@@ -1,5 +1,20 @@
+<div align="center">
+  
+# 🌠 AMC
+Simple yet powerful Discord music bot. Built with [Forgescript](https://github.com/tryForge/ForgeScript)<br>
+[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/quoriel/db/main?label=@quoriel/db&color=2596be)](https://github.com/quoriel/db) [![QuorielEdge](https://img.shields.io/github/package-json/v/quoriel/edge/main?label=@quoriel/edge&color=2596be)](https://github.com/quoriel/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![License](https://img.shields.io/github/license/GreenVGJR/amc-discord-bot)](LICENSE)
+
+</div>
+
+[Check another version](https://github.com/GreenVGJR/amc-discord-bot/blob/landing/README.md#choose-version)
+
+## Installation
+
 > [!CAUTION]
 > Stream Youtube violates Discord ToS. Use it with caution.
+
+> [!WARNING]
+> This branch is only for testing and development. Expect errors.
 
 > [!NOTE]
 > These 2 intents are required to use all features.
@@ -7,9 +22,8 @@
 
 ___
 
-## Installation
 1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v21.7.3 for node.js
-2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-main-local.zip) this branch (.zip)
+2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-dev-local.zip) this branch (.zip)
 3. Extract it, and rename `.env.example` file to `.env` inside folder you did extract
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
 5. Run this command with IDE/Terminal (still same folder)
@@ -130,7 +144,7 @@ ___
 - Auto-generate auth keys needed
 - Dynamic info message
 - Show suggestion song name
-- Controller
+- Music Controller
 - Playlist
 - Radio
 - Queue

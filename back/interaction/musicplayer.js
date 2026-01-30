@@ -92,7 +92,8 @@ module.exports = {
     $!deferUpdate
     ]
     $if[$advancedTextSplit[$customID;_;1]==actionplayer;
-    $if[$isPaused;$!resumeTrack;$!pauseTrack]
+    $async[$if[$isPaused;$!resumeTrack;$!pauseTrack]]
+    $!deferUpdate
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekdown;
     $if[$getCache[musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
@@ -130,7 +131,7 @@ module.exports = {
     ]
     $!interactionDelete
     ]
-    $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown;lastfm]!=true;]
+    $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown;lastfm;actionplayer]!=true;]
     $async[$!deferUpdate]
     $callFunction[updateCurrentMusicPlayer]
     `
