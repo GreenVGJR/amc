@@ -75,7 +75,7 @@ module.exports = [{
 
     $let[calculatetime;$sum[$callFunction[musicVirtualDuration;$guildID;$get[cid]];$get[interval_time]]]
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[calculatetime]];0]]
-    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$get[testmessage];$checkCondition[$sum[$get[elapsedtime];$get[nextmessage_time]]>=$env[track;durationMS]];intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]];$get[interval_time];intervalmusicmessage_$guildID_$get[cid]]
+    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$get[testmessage];$checkCondition[$sum[$get[elapsedtime];$get[nextmessage_time]]>=$trackInfo[durationMS]];intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]];$get[interval_time];intervalmusicmessage_$guildID_$get[cid]]
     ]
     `
 },
