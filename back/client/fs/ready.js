@@ -27,6 +27,7 @@ module.exports = {
     $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]
     $async[$callFunction[generateAuthKeys;spotify;;true]]
+    $async[$callFunction[generateAuthKeys;spotify_token;;true]]
     $async[$callFunction[generateAuthKeys;amazonmusic;;true]]
     $async[$callFunction[generateAuthKeys;applemusic;;true]]
     $async[$callFunction[generateAuthKeys;tidal;;true]]

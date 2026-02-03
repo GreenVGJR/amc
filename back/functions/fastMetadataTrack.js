@@ -73,10 +73,37 @@ module.exports = {
     $let[jsonres;$djsEval[const { request, Agent } = require("undici")\\; request(ctx.getKeyword("mdquery"), { dispatcher: new Agent({ connect: { family: 4 } }), headers: JSON.parse(ctx.getKeyword("mdhedroute_spotify")), method: "GET" }).then(a => { ctx.setKeyword('httpspo', a.statusCode)\\; return a.body.text() }).catch()]]
     $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;
     $callFunction[generateAuthKeys;spotify;;false]
+    $callFunction[generateAuthKeys;spotify_token;;false]
+    $callLocalFunction[refreshing;true]
+    ]
+    $if[$or[$get[httpspo]==429;$get[httpspo]==403];
+    $let[mdhedroute_spotify2;{
+    "Accept": "application/json",
+    "Accept-Language": "en",
+    "App-Platform": "WebPlayer",
+    "Authorization": "Bearer $getCache[authmusic_spotify]",
+    "Client-Token": "$getCache[authmusic_spotify_token]",
+    "Content-Type": "application/json",
+    "User-Agent": "$get[agent]"
+    }]
+    $jsonLoad[mdbody_spotify;{"variables":{"includePreReleases":false,"searchTerm":null,"offset":0,"limit":1,"includeAudiobooks":false,"includeAuthors":false},"operationName":"searchTracks","extensions":{"persistedQuery":{"version":1,"sha256Hash":"131fd38c13431be963a851082dca0108a4200998b886e7e9d20a21fc51a36aaf"}}}]
+    $!jsonSet[mdbody_spotify;variables;searchTerm;$env[query]]
+    $let[mdquery2;https://api-partner.spotify.com/pathfinder/v2/query]
+    $let[jsonres2;$djsEval[const { request, Agent } = require("undici")\\; request(ctx.getKeyword("mdquery2"), { dispatcher: new Agent({ connect: { family: 4 } }), body: JSON.stringify(ctx.getEnvironmentKey("mdbody_spotify")), headers: JSON.parse(ctx.getKeyword("mdhedroute_spotify2")), method: "POST" }).then(a => { ctx.setKeyword('httpspo', a.statusCode)\\; return a.body.text() }).catch()]]
+    $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;
+    $callFunction[generateAuthKeys;spotify;;false]
+    $callFunction[generateAuthKeys;spotify_token;;false]
     $callLocalFunction[refreshing;true]
     ]
     $onlyIf[$or[$get[httpspo]==429;$get[httpspo]==403]!=true;$return]
-    ]
+    $jsonLoad[jsonres;$get[jsonres2]]
+    $jsonLoad[res1;$env[jsonres;data;searchV2;tracksV2;items]]
+    $!jsonSet[reslac;id;$env[res1;0;item;data;id]]
+    $!jsonSet[reslac;dynamic_thumbnail;]
+    $!jsonSet[reslac;thumbnail;$env[res1;0;item;data;albumOfTrack;coverArt;sources;0;url]]
+    $!jsonSet[reslac;duration;"$round[$divide[$env[res1;0;item;data;duration;totalMilliseconds];1000];0]"]
+    $!jsonSet[reslac;title;$env[res1;0;item;data;name]]
+    ;
     $jsonLoad[jsonres;$get[jsonres]]
     $jsonLoad[res1;$env[jsonres;tracks;items]]
     $!jsonSet[reslac;id;$advancedTextSplit[$env[res1;0;external_urls;spotify];/;4]]
@@ -84,7 +111,7 @@ module.exports = {
     $!jsonSet[reslac;thumbnail;$env[res1;0;album;images;0;url]]
     $!jsonSet[reslac;duration;"$round[$divide[$env[res1;0;duration_ms];1000];0]"]
     $!jsonSet[reslac;title;$env[res1;0;name]]
-    ]
+    ]]]
     $if[$env[provider]==applemusic;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]

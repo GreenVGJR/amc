@@ -198,11 +198,12 @@ $#interactionReply[
 $if[$and[$option[lyrics]==true;$get[checklyric]];$#attachment[$get[loadlyrics];$get[lyricnames];true]]
 $#attachment[$get[condownbytes];$get[names];true;base64;$get[getpuretitle]]
 ]
-$if[$and[$channelExists[$channelID];$option[ephemeral]!=true];
+$if[$channelExists[$channelID];
+$if[$option[ephemeral]!=true;
 $fetchMessage[$channelID;$get[mid]]
 $if[$messageAttachmentCount[$channelID;$get[mid]]==0;
 $#interactionReply[$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-]]
+]]]
 ]
 `
 }

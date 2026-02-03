@@ -1,6 +1,6 @@
 {
     "_comment|provider": "Currently only youtube / youtubemusic / soundcloud / spotify / applemusic for searching",
-    "default_provider": "youtube",
+    "default_provider": "youtubemusic",
     "fallback_provider": "soundcloud",
 
     "cacheAllContextNeed": true,

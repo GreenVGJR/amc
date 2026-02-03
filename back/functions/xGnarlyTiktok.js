@@ -3,6 +3,7 @@
 
 module.exports = {
     name: "xGnarlyTiktok",
+    description: "Generate X-Gnarly Signature Tiktok",
     params: [{
         name: "parameter", // string
         required: true

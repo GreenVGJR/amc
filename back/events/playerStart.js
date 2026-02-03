@@ -36,6 +36,7 @@ module.exports = [{
     type: "playerPause",
     code: `
     $wait[1]
+    $onlyIf[$try[$queueLength;-1]!=-1]
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
     $if[$callFunction[configMusic;interval_message]==true;
@@ -48,6 +49,7 @@ module.exports = [{
     type: "playerResume",
     code: `
     $wait[1]
+    $onlyIf[$try[$queueLength;-1]!=-1]
 
     $if[$callFunction[configMusic;interval_message];
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
