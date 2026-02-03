@@ -112,6 +112,7 @@ module.exports = {
     ]
     $if[$env[whattype;type]==tiktokmob;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[test;results;error]!=;$return[$let[finalurl;bot|$env[test;results;error]]]]
     $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $stop]
     $jsonLoad[whattype;$callFunction[filterMediaID;$if[$or[$env[test;results;video;id]!=;$env[test;results;music_info]!=];https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
     ]
@@ -184,7 +185,7 @@ module.exports = {
     $if[$env[whattype;type]==instagram;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $if[$env[a;results]==null;$return[$let[finalurl;bot|This video may no longer exist, or you don't have permission to view it]]]
-    $let[finalurl;$env[a;results;video_url]]
+    $let[finalurl;$default[$env[a;results;video_versions;0;url];$env[a;results;video_url]]]
     ]
     $if[$env[whattype;type]==instagramaudio;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]

@@ -1,7 +1,6 @@
 module.exports = [{
     type: "databaseConnect",
     code: `
-    $logger[Info;Waiting to online]
     $!openDB[user;guild;global]
     $logger[Debug;Refreshing cache data]
     $setCache[system_file-config;$readFile[./back/config.json]]
@@ -12,6 +11,7 @@ module.exports = [{
     $!prefetchDB[user;]
     $!prefetchDB[guild;]
     $!prefetchDB[global;]
+    $logger[Info;Waiting to online]
     `
 },
 {

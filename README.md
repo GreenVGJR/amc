@@ -1,5 +1,20 @@
+<div align="center">
+  
+# 🌠 AMC
+Simple yet powerful Discord music bot. Built with [Forgescript](https://github.com/tryForge/ForgeScript)<br>
+[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/quoriel/db/main?label=@quoriel/db&color=2596be)](https://github.com/quoriel/db) [![QuorielEdge](https://img.shields.io/github/package-json/v/quoriel/edge/main?label=@quoriel/edge&color=2596be)](https://github.com/quoriel/edge) [![ForgeLinked](https://img.shields.io/github/package-json/v/tryforge/ForgeLinked/dev?label=ForgeLinked&color=caa500)](https://github.com/tryforge/ForgeLinked/tree/dev) [![License](https://img.shields.io/github/license/GreenVGJR/amc-discord-bot)](LICENSE)
+
+</div>
+
+[Check another version](https://github.com/GreenVGJR/amc-discord-bot/blob/landing/README.md#choose-version)
+
+## Installation
+
 > [!CAUTION]
 > Stream Youtube violates Discord ToS. Use it with caution.
+
+> [!WARNING]
+> This branch is only for testing and development. Expect errors.
 
 > [!NOTE]
 > These 2 intents are required to use all features.
@@ -10,9 +25,8 @@ ___
 > [!NOTE]
 > [List Public Lavalink Available](https://lavalink-list.darrennathanael.com/)
 
-## Installation
 1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v21.7.3 for node.js
-2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-main-lavalink.zip) this branch (.zip)
+2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-dev-lavalink.zip) this branch (.zip)
 3. Extract it, and rename `.env.example` file to `.env` inside folder you did extract
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
 5. Run this command with IDE/Terminal (still same folder)
@@ -137,7 +151,7 @@ ___
 - Auto-generate auth keys needed
 - Dynamic info message
 - Show suggestion song name
-- Controller
+- Music Controller
 - Playlist
 - Radio
 - Queue
@@ -158,11 +172,11 @@ ___
 </summary>
 
 <div align="center">
-![Preview 1](https://github.com/user-attachments/assets/09116ae0-20ef-44f0-aaf1-171bc5ecd106)
-![Preview 2](https://github.com/user-attachments/assets/7a3ace53-eb6b-4766-bcf4-ae00f0687db8)
-![Preview 3](https://github.com/user-attachments/assets/06a811ef-dcf3-4d44-b35f-35888e17d82d)
-![Preview 4](https://github.com/user-attachments/assets/aeceb76b-f8e7-458b-9f0f-3056b354dd0f)
-![Preview 5](https://github.com/user-attachments/assets/15d3277f-7fac-43d1-ad8b-70cc18c30f9b)
+<img src="https://github.com/user-attachments/assets/09116ae0-20ef-44f0-aaf1-171bc5ecd106" />
+<img src="https://github.com/user-attachments/assets/7a3ace53-eb6b-4766-bcf4-ae00f0687db8" />
+<img src="https://github.com/user-attachments/assets/06a811ef-dcf3-4d44-b35f-35888e17d82d" />
+<img src="https://github.com/user-attachments/assets/aeceb76b-f8e7-458b-9f0f-3056b354dd0f" />
+<img src="https://github.com/user-attachments/assets/15d3277f-7fac-43d1-ad8b-70cc18c30f9b" />
 </div>
 
 </details>

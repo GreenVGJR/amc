@@ -65,7 +65,7 @@ module.exports = {
     ]
     $if[$env[filtype;type]==instagram;
     $let[author;$default[$env[a;results;owner;username];$env[a;results;user;username]]]
-    $let[title;$default[$env[a;results;edge_media_to_caption;edges;0;node;text];$env[a;results;id]]]
+    $let[title;$default[$env[a;results;edge_media_to_caption;edges;0;node;text];$default[$env[a;results;caption;text];$env[a;results;id]]]]
     ]
     $if[$env[filtype;type]==instagramaudio;
     $if[$and[$env[a;results;metadata;original_sound_info]==null;$env[a;results;metadata;music_info]==null];

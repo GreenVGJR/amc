@@ -1,11 +1,11 @@
-require('dotenv').config(); // Load Environment
-
 // Main
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
 const { ForgeLinked } = require('ForgeLinked');
 const { QuorielDB } = require("@quoriel/db");
 const { QuorielEdge } = require("@quoriel/edge");
 // const { ForgeDB } = require("@tryforge/forge.db");
+
+require('dotenv').config(); // Load Environment
 
 const quorielDb = new QuorielDB({
   events: [

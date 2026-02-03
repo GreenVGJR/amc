@@ -3,6 +3,7 @@ const cf = require("../config.json");
 module.exports = [{
     type: cf.interval_message ? "linkedPlayerUpdate" : "linkedTrackStart",
     code: `
+    $onlyIf[$playerIsPaused[$guildID]!=true]
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 

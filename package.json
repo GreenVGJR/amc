@@ -6,6 +6,6 @@
     "dotenv": "^17.2.3",
     "entities": "^7.0.1",
     "ForgeLinked": "github:tryforge/ForgeLinked#dev",
-    "lmdb": "^3.4.4"
+    "lmdb": "^3.5.1"
   }
 }
