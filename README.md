@@ -1,11 +1,5 @@
 <div align="center">
   
-# 🌠 AMC
-Simple yet powerful Discord music bot. Built with [Forgescript](https://github.com/tryForge/ForgeScript)<br>
-[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/quoriel/db/main?label=@quoriel/db&color=2596be)](https://github.com/quoriel/db) [![QuorielEdge](https://img.shields.io/github/package-json/v/quoriel/edge/main?label=@quoriel/edge&color=2596be)](https://github.com/quoriel/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![ForgeLinked](https://img.shields.io/github/package-json/v/tryforge/ForgeLinked/dev?label=ForgeLinked&color=caa500)](https://github.com/tryforge/ForgeLinked/tree/dev) [![License](https://img.shields.io/github/license/GreenVGJR/amc-discord-bot)](LICENSE)
-
-<br>
-
 ## Choose Version
 |ForgeMusic|ForgeLinked|
 |:-:|:-:|
@@ -60,6 +54,7 @@ ForgeLinked: Made with [lavalink-client](https://www.npmjs.com/package/lavalink-
 
 ## Credits
 - [Emoji.gg](https://emoji.gg/) - Emojis source<br>
-- [Cyberghxst/Sora](https://github.com/Cyberghxst/Sora/) - FS & FM configs<br>
+- [Cyberghxst/Sora](https://github.com/Cyberghxst/Sora/) - ForgeScript & ForgeMusic configs<br>
 - [skick1234/DisTube](https://github.com/skick1234/DisTube) - Style reference<br>
-- [justscrapeme/tiktok-web-reverse-engineering](https://github.com/justscrapeme/tiktok-web-reverse-engineering) - Tiktok Hash Function
+- [justscrapeme/tiktok-web-reverse-engineering](https://github.com/justscrapeme/tiktok-web-reverse-engineering), [yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp) - Tiktok Hash Function
+- [xxczaki/discord-bot](https://github.com/xxczaki/discord-bot/tree/main/packages/discord-player-googlevideo) - Youtube SABR for ForgeMusic
