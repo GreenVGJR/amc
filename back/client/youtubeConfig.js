@@ -1,5 +1,5 @@
 // Test replace yt stream
-const { request, Agent } = require("undici");
+const { request } = require("undici");
 const { randomBytes } = require('crypto');
 const { default_userAgent, streamTypeYT, useClientYT, useSABR } = require('../config.json');
 const ytClients = require('./youtubeClients.js');
