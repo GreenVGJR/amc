@@ -262,7 +262,7 @@ module.exports = {
         $httpRequest[https://www.tiktok.com;GET]
         $let[los;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
         $if[$get[los]==;
-        $logger[Warn;WAF detected. Solving challenge - Tiktok]
+        $if[$env[successlog]==true;$logger[Warn;WAF detected. Solving challenge - Tiktok]]
         $let[lks;$callFunction[wafTiktok;$httpResult]]
         $if[$get[lks]==0;$let[finaljs;true]]
         $if[$get[finaljs]==false;
@@ -278,7 +278,7 @@ module.exports = {
         $let[a12;$advancedTextSplit[$httpResult;"wid":";1;";0]]
         ]]]
         $if[$get[finaljs]==true;
-        $logger[Warn;Failed to solve. Using fallback - Tiktok]
+        $if[$env[successlog]==true;$logger[Warn;Failed to solve. Using fallback - Tiktok]]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept;application/json]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
