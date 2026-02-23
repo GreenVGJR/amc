@@ -1,3 +1,5 @@
+const { tarClientYT } = require('./clientYoutube.js');
+
 module.exports = {
     name: "fallbackPlaybackTrack",
     params: [{
@@ -35,24 +37,33 @@ module.exports = {
 
     $try[
     $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
-    $let[ytinitauth;$djsEval[const GTH = (sapisid = "$advancedTextSplit[$get[ytinitcookies];SAPISID=;1;\\;;0]", secure1psid = "$advancedTextSplit[$get[ytinitcookies];__Secure-1PAPISID=;1;\\;;0]", secure3psid = "$advancedTextSplit[$get[ytinitcookies];__Secure-3PAPISID=;1;\\;;0]", origin_url = "https://www.youtube.com") => { const t = Math.floor(Date.now() / 1000).toString()\\; return "SAPISIDHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + sapisid + " " + origin_url).digest('hex') + "_u" + " SAPISID1PHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + secure1psid + " " + origin_url).digest('hex') + "_u" + " SAPISID3PHASH " + t + "_" + require('crypto').createHash('sha1').update(t + " " + secure3psid + " " + origin_url).digest('hex') + "_u"\\; }\\; GTH()]]
+    $let[ytinitauth;$callFunction[generateBearerYt;$get[ytinitcookies];]]
+    $jsonLoad[listclient;$replace[${tarClientYT()};%SEMI%;\\;]]
     $httpAddHeader[Authorization;$get[ytinitauth]]
     $httpAddHeader[Cookie;$get[ytinitcookies]]
-    $httpAddHeader[Origin;https://www.youtube.com]
-    $httpAddHeader[X-Origin;https://www.youtube.com]
+    $httpAddHeader[Origin;https://$env[listclient;targetDomain]]
+    $httpAddHeader[X-Origin;https://$env[listclient;targetDomain]]
+    $httpAddHeader[Alt-Used;$env[listclient;targetDomain]]
     $httpAddHeader[X-Goog-Visitor-Id;$getCache[authmusic_youtube_visitor]]
+    $httpAddHeader[X-Youtube-Bootstrap-Logged-In;true]
     ]
     $if[$or[$env[types]==;$env[types]==v];
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":101,"clientVersion":"0.1","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":false,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;www;m].youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
+    $httpAddHeader[Content-Type;application/json]
+    $httpAddHeader[X-Youtube-Client-Name;101]
+    $httpAddHeader[X-Youtube-Client-Version;0.1]
+    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":101,"clientVersion":"0.1","visitorData":"$getCache[authmusic_youtube_visitor]"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1","signatureTimestamp":"0"}},"racyCheckOk":true,"contentCheckOk":true}]
+    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;$advancedTextSplit[$env[listclient;targetDomain];.;0];m].youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
     ]
     $if[$env[types]==va;
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":28,"clientVersion":"1.00.0","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":false,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;www;m].youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
+    $httpAddHeader[Content-Type;application/json]
+    $httpAddHeader[X-Youtube-Client-Name;28]
+    $httpAddHeader[X-Youtube-Client-Version;1.00.0]
+    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":28,"clientVersion":"1.00.0","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1","signatureTimestamp":"0"}},"racyCheckOk":true,"contentCheckOk":true}]
+    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;$advancedTextSplit[$env[listclient;targetDomain];.;0];m].youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
     ]]
     $if[$env[reshttp;playabilityStatus;status]!=OK;$return[$let[finalurl;bot|$env[reshttp;playabilityStatus;reason]]]]
     $if[$env[reshttp;videoDetails;isLiveContent];$return[$let[finalurl;live]]]
