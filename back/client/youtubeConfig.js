@@ -68,7 +68,8 @@ async function fallbackYTStream(lstracks) {
                     "Authorization": GTH(),
                     "Cookie": ytcookies,
                     "X-Youtube-Bootstrap-Logged-In": true,
-                    "Alt-Used": hostdomain
+                    "Alt-Used": hostdomain,
+                    "X-Goog-AuthUser": 0
                 })
             }
         })

@@ -74,5 +74,5 @@ module.exports = {
         "userAgent": "com.google.ios.youtube/21.02.35 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)",
         "osName": "iPhone",
         "osVersion": "18.3.2.22D82"
-    },
+    }
 }
