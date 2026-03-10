@@ -47,10 +47,13 @@ module.exports = [{
     $if[$env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;navigationEndpoint;watchEndpoint;videoId]!=;
     $jsonLoad[a;$env[getfetch;musicResponsiveListItemRenderer;flexColumns;1;musicResponsiveListItemFlexColumnRenderer;text;runs]]
     $let[finduration;$sub[$arrayLength[a];1]]
+    $jsonLoad[cleanytmusictitle;$env[getfetch;musicResponsiveListItemRenderer;flexColumns;1;musicResponsiveListItemFlexColumnRenderer;text;runs]]
+    $arraySlice[cleanytmusictitle;cleanytmusictitle;0;-4]
+    $arrayMap[cleanytmusictitle;yt;$return[$env[yt;text]];cleanytmusictitle]
     $arrayPushJSON[results;{
-        "title": "$advancedReplace[$env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;text];\\\\;;";\\\\"]",
+        "title": "$advancedReplace[$arrayJoin[cleanytmusictitle;] - $env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;text];\\\\;;";\\\\";•;-]",
         "duration": "$round[$divide[$unparseDigital[$env[getfetch;musicResponsiveListItemRenderer;flexColumns;1;musicResponsiveListItemFlexColumnRenderer;text;runs;$get[finduration];text]];1000];0]",
-        "thumbnail": "$advancedTextSplit[$env[getfetch;musicResponsiveListItemRenderer;thumbnail;musicThumbnailRenderer;thumbnail;thumbnails;0;url];=;0]=w2160-h2160-l100",
+        "thumbnail": "$advancedTextSplit[$env[getfetch;musicResponsiveListItemRenderer;thumbnail;musicThumbnailRenderer;thumbnail;thumbnails;0;url];=;0]=s0",
         "url": "https://music.youtube.com/watch?v=$env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;navigationEndpoint;watchEndpoint;videoId]"
     }]
     ]]]]

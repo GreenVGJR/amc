@@ -90,6 +90,23 @@ ___
 
 </details>
 
+<details close>
+
+<summary>
+
+## Find Spotify Cookies
+
+</summary>
+
+1. Open a new private browsing/incognito window and login your spotify account
+2. If that done, navigate to `https://accounts.spotify.com/robots.txt` then open developers tools (`Ctrl + Shift + I`)
+3. Go to "Network" tab and find `robots.txt` request
+4. Copy the `Cookie` from Request Headers
+> Doesn't show? do `Ctrl + F5`
+5. Put inside `.env` at `SPOTIFY_COOKIES=put_cookies_here`
+
+</details>
+
 ___
 
 <details close>

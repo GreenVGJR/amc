@@ -3,7 +3,7 @@
     "@quoriel/db": "github:quoriel/db",
     "@quoriel/edge": "github:quoriel/edge",
     "@tryforge/forgescript": "^2.6.0",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.3.1",
     "entities": "^7.0.1",
     "ForgeLinked": "github:tryforge/ForgeLinked#dev",
     "lmdb": "^3.5.1"

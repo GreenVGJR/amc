@@ -113,7 +113,7 @@ module.exports = {
     $color[$default[$memberDisplayColor[$guildID;$playerTrackRequester[$guildID]];$callFunction[useIcon;color_embed]];0]
     ]
     $addActionRow
-    $addStringSelectMenu[musicplayer_nodequeue_$env[messageId];$cropText[Queue | $djsEval[require("entities").decodeHTML(\\\`$replace[$env[currenttrack;title];";\\\\"]\\\`)];0;61;...];$or[$playerQueueLength[$env[guildId]]==0;$playerLoopStatus[$env[guildId]]==track];1;1]
+    $addStringSelectMenu[musicplayer_nodequeue_$env[messageId];$cropText[Queue | $djsEval[require("entities").decodeHTML(\\\`$env[currenttrack;title]\\\`)];0;50;...];$or[$playerQueueLength[$env[guildId]]==0;$playerLoopStatus[$env[guildId]]==track];1;1]
 
     $let[countqueue;0]
     $if[$playerQueueLength[$env[guildId]]>=1;

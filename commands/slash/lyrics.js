@@ -16,6 +16,13 @@ module.exports = {
         "required": false
       },
       {
+        "type": 3,
+        "name": "translate",
+        "description": "Translate lyrics to another language",
+        "required": false,
+        "autocomplete": true
+      },
+      {
         "type": 5,
         "name": "lyric_file",
         "description": "Include a lryics file?",
@@ -58,7 +65,17 @@ module.exports = {
     ]
 
     $onlyIf[$get[fsearch]!=null;$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]]]
-    $let[loadlyrics;$inflate[$env[result;results;lyric];base64]]
+    $let[loadlyrics;$env[result;results;lyric]]
+    $if[$option[translate]!=;
+    $jsonLoad[checklang;$getCache[system_file-listLyricsLanguage]]
+    $jsonLoad[checklang;$jsonEntries[checklang]]
+    $arrayMap[checklang;rest;$if[$checkContains[$toLowercase[$env[rest;1]];$toLowercase[$option[translate]]];$return[$env[rest]]];checklang]
+    $jsonLoad[loadtranslatelyrics;$callFunction[translateText;$get[loadlyrics];;$env[checklang;0;0]]]
+    $let[loadlyrics;$arrayJoin[loadtranslatelyrics;
+]]
+    $let[translateTextLang-c;$env[checklang;0;0]]
+    $let[translateTextLang-n;$env[checklang;0;1]]
+    ]
     $interactionReply[
     $if[$option[lyric_file]==true;
     $let[filename;$replaceRegex[$env[result;results;autocomplete];\\[^A-Za-z0-9_-\\];g;_]_-_Lyrics.$if[$option[line_synced]==true;lrc;txt]]
@@ -71,7 +88,7 @@ module.exports = {
     $addSeparator[Small;true]
     ]
     $addSection[
-    $addTextDisplay[- $get[latencyrs]ms | $toTitleCase[$env[result;results;provider]]\n»   $bold[$hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]]
+    $addTextDisplay[- $get[latencyrs]ms | $toTitleCase[$env[result;results;provider]]\n»   $bold[$hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]$if[$and[$option[translate]!=;$get[translateTextLang-c]!=];\n»   $bold[Translated to:] $get[translateTextLang-n]]]
     $addThumbnail[$env[result;results;thumbnail]]
     ]
     $addSeparator[Small;true]

@@ -17,6 +17,7 @@ module.exports = {
   code: `
   $onlyIf[$guildID!=;]
   $ephemeral
+  $defer
   $localFunction[abcd;
   $interactionReply[
   $title[Owner;;0]

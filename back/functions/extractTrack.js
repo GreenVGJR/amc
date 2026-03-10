@@ -71,7 +71,7 @@ module.exports = {
     $httpSetContentType[Text]
     $let[http;$httpRequest[https://api-v2.soundcloud.com/resolve?url=$get[keturl]&client_id=$getCache[authmusic_soundcloud];GET;reshttp]]
     $let[a;$env[reshttp]]
-    $let[results;{"status":$get[http],"results":$if[$get[a]=={};null;$advancedReplace[$get[a];/preview/progressive;/preview/progressive?client_id=$getCache[authmusic_soundcloud_fall];/stream/progressive;/stream/progressive?client_id=$getCache[authmusic_soundcloud_fall]]]}]
+    $let[results;{"status":$get[http],"results":$if[$get[a]=={};null;$advancedReplace[$get[a];/preview/progressive;/preview/progressive?client_id=$getCache[authmusic_soundcloud_fall];/stream/progressive;/stream/progressive?client_id=$getCache[authmusic_soundcloud_fall];/preview/hls;/preview/hls?client_id=$getCache[authmusic_soundcloud_fall];/stream/hls;/stream/hls?client_id=$getCache[authmusic_soundcloud_fall]]]}]
     ]
     $if[$env[filterid;type]==spotify;
     $let[tryattempt;0]

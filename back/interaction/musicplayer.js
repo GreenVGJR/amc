@@ -48,7 +48,7 @@ module.exports = {
     $wait[5]
     ]
     $onlyIf[$get[f-fetch]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
-    $let[loadlyrics;$inflate[$env[result;results;lyric];base64]]
+    $let[loadlyrics;$env[result;results;lyric]]
     $interactionReply[
     $if[$charCount[$get[loadlyrics]]>3000;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
     $title[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]

@@ -151,12 +151,12 @@ $let[clh;]
 $let[cly;]
 $async[
 $if[$get[isjsoncdn]==false;
-$!djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).then(r=>{ctx.setKeyword("clh",r.headers?.get('content-length')??"")\\;ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= ctx.getKeyword("limitsize"))) ? r.arrayBuffer() : null\\;}).then(b => ctx.setKeyword("condownbytes", Buffer.from(b).toString("base64"))).catch()]
+$!djsEval[fetch(ctx.getKeyword("getcdn"),{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers"))}).then(r=>{ctx.setKeyword("clh",r.headers?.get('content-length')??"")\\;ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= ctx.getKeyword("limitsize"))) ? r.arrayBuffer() : null\\;}).then(b => { if(b) ctx.setKeyword("condownbytes", Buffer.from(b).toString("base64"))\\; b = null\\; }).catch(() => "")]
 ;
 $let[clh;$get[clh-temp]]
 $jsonLoad[yup_container;$env[yup;container]]
 $let[getcdn;$env[yup;original]]
-$arrayMap[yup_container;c;$return[$djsEval[fetch("$env[c]", { method: "GET", headers: JSON.parse(ctx.getKeyword("checkcdn_headers")) }).then(r=>{ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= ctx.getKeyword("limitsize"))) ? r.arrayBuffer() : null\\;}).then(d => Buffer.from(d).toString("base64")).then(e => e).catch()]];yup_container]
+$arrayMap[yup_container;c;$return[$djsEval[fetch("$env[c]", { method: "GET", headers: JSON.parse(ctx.getKeyword("checkcdn_headers")) }).then(r=>{ctx.setKeyword("cly",r.headers?.get('content-type')??"")\\;ctx.setKeyword("httpstatus",r.status)\\; return ((r.status === 200 || r.status === 206) && ((parseInt(r.headers?.get('content-length'), 10) ?? 0) <= ctx.getKeyword("limitsize"))) ? r.arrayBuffer() : null\\;}).then(d => { const b = d ? Buffer.from(d).toString("base64") : ""\\; d = null\\; return b\\; }).catch(() => "")]];yup_container]
 ]
 $let[f-fetch;true]
 ]
@@ -191,7 +191,13 @@ $wait[5]
 ]
 $if[$get[isjsoncdn]==true;
 $callLocalFunction[runcodessync;Processing » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
-$try[$!djsEval[ctx.setKeyword("condownbytes", Buffer.concat(JSON.parse(\\\`$jsonStringify[yup_container]\\\`).map(s => Buffer.from(s, "base64"))).toString("base64"))]]
+$try[$!djsEval[
+  let chunks = JSON.parse(\\\`$jsonStringify[yup_container]\\\`)\\;
+  let buffers = chunks.map(s => Buffer.from(s, "base64"))\\;
+  let final = Buffer.concat(buffers)\\;
+  ctx.setKeyword("condownbytes", final.toString("base64"))\\;
+  chunks = null\\; buffers = null\\; final = null\\;
+]]
 ]
 $onlyIf[$get[condownbytes]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $#interactionReply[

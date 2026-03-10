@@ -192,13 +192,49 @@ module.exports = {
     $if[$or[$env[type]==all;$env[type]==spotify];
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Key;cyan]]
     $try[
+    $let[spinitcookies;$trimLines[$trim[$djsEval[process.env.SPOTIFY_COOKIES]]]]
+    $if[$or[$get[spinitcookies]==;$get[spinitcookies]==undefined]==false;
+        $djsEval[const crypto = require('crypto')\\;
+
+        const verifier = crypto.randomBytes(64).toString('base64url').slice(0, 128)\\;
+        const challenge = crypto.createHash('sha256').update(verifier).digest('base64url')\\;
+
+        ctx.setKeyword("jasg", verifier)\\;
+        ctx.setKeyword("jasc", challenge)\\;
+        ]
+        $httpAddHeader[Cookie;$get[spinitcookies]]
+        $httpAddHeader[Referer;https://developer.spotify.com/]
+        $httpAddHeader[Sec-Fetch-Dest;iframe]
+        $httpAddHeader[Sec-Fetch-Site;same-site]
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+        $httpSetContentType[Text]
+        $!httpRequest[https://accounts.spotify.com/oauth2/v2/auth?response_type=code&client_id=cfe923b2d660439caf2b557b21f31221&scope=&redirect_uri=https%3A%2F%2Fdeveloper.spotify.com&code_challenge=$get[jasc]&code_challenge_method=S256&response_mode=web_message&prompt=none;GET]
+        $let[pkcode;$advancedTextSplit[$httpResult;"code": ";1;";0]]
+        $httpAddHeader[Origin;https://developer.spotify.com/]
+        $httpAddHeader[Referer;https://developer.spotify.com/]
+        $httpAddHeader[Sec-Fetch-Dest;empty]
+        $httpAddHeader[Sec-Fetch-Site;same-site]
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+        $httpAddHeader[Accept;application/json]
+        $httpAddHeader[Content-Type;application/x-www-form-urlencoded]
+        $httpSetBody[grant_type=authorization_code&client_id=cfe923b2d660439caf2b557b21f31221&code=$get[pkcode]&redirect_uri=https%3A%2F%2Fdeveloper.spotify.com&code_verifier=$get[jasg]]
+        $httpSetContentType[Json]
+        $!httpRequest[https://accounts.spotify.com/api/token;POST]
+        $let[cjdspo;true]
+        $let[token;$httpResult[access_token]]
+        ;
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
         $!httpRequest[https://open.spotify.com/embed/track/$randomText[4PTG3Z6ehGkBFwjybzWkR8;2yR2sziCF4WEs3klW1F38d;0IuVhCflrQPMGRrOyoY5RW;2yWlGEgEfPot0lv3OAjuG3;4Xfp9BcKrKYmxJPxn68Yb8;7uuJqaRjSXzja6VGgDpWem;3BP1klbHxsOf6IxscNIX0r;6BYzwbWg1Z2EB6VUXTYnhm];GET]
-        $let[token;$advancedTextSplit[$httpResult;"accessToken":";1;";0]]
+        $let[parsejsspo;$advancedTextSplit[$httpResult;id="__NEXT_DATA__" type="application/json">;1;</script>;0]]
+        $jsonLoad[parsejsspo;$default[$get[parsejsspo];{}]]
+        $let[token;$env[parsejsspo;props;pageProps;state;settings;session;accessToken]]
+        ]
         $if[$get[token]!=;$setCache[authmusic_spotify;$get[token]]]
-        $if[$env[successlog]==true;$logger[Info;$if[$get[token]!=;$cropText[$get[token];0;12;...];Failed to Retrieve] | Spotify / Key]]
+        $if[$env[successlog]==true;$logger[Info;$if[$get[token]!=;$cropText[$get[token];0;12;...];Failed to Retrieve] | Spotify / Key$if[$get[cjdspo]; (with Cookies)]]]
     ;$logger[Info;Failed to Retrieve - Spotify]]
     $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuthKeys;spotify;;true]]
     ]

@@ -8,8 +8,9 @@ module.exports = {
     code: `$let[list;$getCache[system_file-filterMedia]]
     $jsonLoad[listregex;$get[list]]
     $let[url;$env[url]]
+    $jsonLoad[inputregexjson;{"id":null,"type":null}]
 
-    $if[$isValidLink[$get[url]]==false;$return[{"id":null,"type":null}]]
+    $if[$isValidLink[$get[url]]==false;$return[$jsonStringify[inputregexjson]]]
 
     $!djsEval[try { 
         const e = new URL(ctx.getKeyword("url"))\\;
@@ -38,8 +39,8 @@ module.exports = {
     $let[res;$djsEval[ctx.getKeyword("url").match(ctx.getKeyword("regex"))?.\\[ctx.getKeyword("regex_target")\\]]]
     $if[$get[res]==undefined;$let[res;$djsEval[ctx.getKeyword("url").match(ctx.getKeyword("regex"))?.\\[ctx.getKeyword("regex_target_alt")\\]]]]
     ]
-    $arrayLoad[results;]
-    $arrayPushJSON[results;{"id":$if[$or[$get[res]==;$get[res]==undefined];null;"$get[res]"],"type":$if[$get[type]==;null;"$get[type]"]}]
-    $return[$env[results;0]]
+    $!jsonSet[inputregexjson;id;$if[$or[$get[res]==;$get[res]==undefined];null;"$get[res]"]]
+    $!jsonSet[inputregexjson;type;$if[$get[type]==;null;"$get[type]"]]
+    $return[$jsonStringify[inputregexjson]]
     `
 }
