@@ -32,7 +32,7 @@ module.exports = {
     $arraySlice[loadser;loadser;0;10]
     $arrayReverse[loadser;loadser]
     $addContainer[
-    $addTextDisplay[-# Query:\n\`$get[query]\`\n-# Provider:\n\`$get[provider]\`\n-# Ping:\n\`$get[currentping]ms\`]
+    $addTextDisplay[-# Provider:\n\`$get[provider]\`\n-# Ping:\n\`$get[currentping]ms\`]
     $addSeparator[Large;true]
     $arrayForEach[loadser;result;
     $addSection[

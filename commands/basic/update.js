@@ -13,6 +13,7 @@ module.exports = {
     $setCache[system_file-useCustom;$readFile[./back/messageConfig.json]]
     $setCache[system_file-useIcon;$readFile[./back/iconsURL.json]]
     $setCache[system_file-listRadio;$readFile[./back/listRadioCountry.json]]
+    $setCache[system_file-listLyricsLanguage;$readFile[./back/listLanguages.json]]
     ]
     $sendMessage[$channelID;$reply[$channelID;$messageID;true] OK]
     `

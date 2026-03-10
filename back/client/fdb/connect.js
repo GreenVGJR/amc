@@ -3,30 +3,31 @@ module.exports = [{
     code: `
     $!openDB[user;guild;global]
     $logger[Debug;Refreshing cache data]
-    $setCache[system_file-config;$readFile[./back/config.json]]
-    $setCache[system_file-filterMedia;$readFile[./back/listRegex.json]]
-    $setCache[system_file-useCustom;$readFile[./back/messageConfig.json]]
-    $setCache[system_file-useIcon;$readFile[./back/iconsURL.json]]
-    $setCache[system_file-listRadio;$readFile[./back/listRadioCountry.json]]
-    $!prefetchDB[user;]
-    $!prefetchDB[guild;]
-    $!prefetchDB[global;]
+    $async[$setCache[system_file-config;$readFile[./back/config.json]]]
+    $async[$setCache[system_file-filterMedia;$readFile[./back/listRegex.json]]]
+    $async[$setCache[system_file-useCustom;$readFile[./back/messageConfig.json]]]
+    $async[$setCache[system_file-useIcon;$readFile[./back/iconsURL.json]]]
+    $async[$setCache[system_file-listRadio;$readFile[./back/listRadioCountry.json]]]
+    $async[$setCache[system_file-listLyricsLanguage;$readFile[./back/listLanguages.json]]]
+    $async[$!prefetchDB[user;]]
+    $async[$!prefetchDB[guild;]]
+    $async[$!prefetchDB[global;]]
     $logger[Info;Waiting to online]
     `
 },
 {
     type: "recordUpdate",
     code: `
-    $!prefetchDB[user;]
-    $!prefetchDB[guild;]
-    $!prefetchDB[global;]
+    $async[$!prefetchDB[user;]]
+    $async[$!prefetchDB[guild;]]
+    $async[$!prefetchDB[global;]]
     `
 },
 {
     type: "recordRemove",
     code: `
-    $!prefetchDB[user;]
-    $!prefetchDB[guild;]
-    $!prefetchDB[global;]
+    $async[$!prefetchDB[user;]]
+    $async[$!prefetchDB[guild;]]
+    $async[$!prefetchDB[global;]]
     `
 }]

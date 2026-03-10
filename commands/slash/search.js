@@ -72,7 +72,7 @@ module.exports = {
   ]
   $if[$env[typela]==2;
   $interactionReply[
-  $addContainer[$addTextDisplay[-# Query:\n\`$option[query]\`\n-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms$if[$get[check]!={}; - Cached]\`]
+  $addContainer[$addTextDisplay[-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms$if[$get[check]!={}; - Cached]\`]
   $addSeparator[Large;true]
   $arrayForEach[loadser;result;
   $addSection[
