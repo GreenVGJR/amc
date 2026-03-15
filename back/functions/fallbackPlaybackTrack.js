@@ -46,6 +46,8 @@ module.exports = {
     $httpAddHeader[Alt-Used;$env[listclient;targetDomain]]
     $httpAddHeader[X-Goog-Visitor-Id;$getCache[authmusic_youtube_visitor]]
     $httpAddHeader[X-Youtube-Bootstrap-Logged-In;true]
+    ;
+    $httpAddHeader[Cookie;$getCache[authmusic_youtube_tempcookies]]
     ]
     $if[$or[$env[types]==;$env[types]==v];
     $httpAddHeader[Accept-Encoding;]

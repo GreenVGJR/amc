@@ -32,9 +32,13 @@ $httpAddHeader[X-Goog-Api-Key;AIzaSyATBXajvzQLTDHEQbcpq0Ihe0vWDHmO520]
 $httpSetBody[$jsonStringify[51]]
 $httpSetContentType[Text]
 $!httpRequest[https://translate-pa.googleapis.com/v1/translateHtml;POST]
-$let[rtcgow;$httpResult]
-$jsonLoad[lvm;$djsEval[require("entities").decodeHTML(ctx.getKeyword("rtcgow"))]]
+$jsonLoad[lvm;$httpResult]
+$jsonLoad[lvm;$env[lvm;0]]
+$arrayMap[lvm;v;
+$let[kklv;$env[v]]
+$return[$djsEval[require("entities").decodeHTML(ctx.getKeyword("kklv"))]]
+;lvm]
 ]
-$return[$default[$env[lvm;0];null]]
+$return[$default[$jsonStringify[lvm];{}]]
 `
 }

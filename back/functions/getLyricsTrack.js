@@ -122,7 +122,7 @@ module.exports = {
     $localFunction[lyrde;
     $if[$env[refresh]==true;$generateAuthKeys[deezer;;false]]
     $if[$env[sumCount]==true;$letSum[drtcp_count;1]]
-    $if[$env[drtcp;data;$get[drtcp_count];id]==;$return[$jsonLoad[res;{}]]]
+    $if[$env[drtcp;data;$get[drtcp_count];id]==;$jsonLoad[res;{}] $return]
     $let[checkcachelyric;$getCache[cachelyricsdata-$env[line]-$md5[deezer_$env[drtcp;data;$get[drtcp_count];id]]]]
     $if[$get[checkcachelyric]!=;
     $jsonLoad[res;{}]
@@ -151,7 +151,7 @@ module.exports = {
     $let[finallyde;$arrayJoin[syncLyDe;
 ]]
     ]]]
-    $if[$get[cusdezaborterls]==false;
+    $if[$and[$env[drtcp;data;$get[drtcp_count];id]!=;$get[cusdezaborterls]==false];
     $!jsonSet[results;status_1;$get[http_3]]
     $!jsonSet[results;status_2;null]
     $!jsonSet[results;response_time;$sub[$getTimestamp;$get[time]]]

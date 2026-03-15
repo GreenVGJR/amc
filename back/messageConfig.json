@@ -28,6 +28,7 @@
     "config_errorNoResultSearch": "No result.",
     "config_errorNoResultLyrics": "No lyrics were available.",
     "config_errorOverResultLyrics": "Unfortunately, i can't show rest of these.",
+    "config_errorNoResultLyricsTranslation": "Translation is not available.",
     "config_errorPlayTrack": "Cannot process this.\nError:",
     "config_errorPlayTrackEvents": "Cannot process this.",
 

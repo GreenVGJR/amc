@@ -16,10 +16,10 @@ module.exports = {
     // might not support cookies
     // can't stream after 1 minute
     "ANDROID": {
-        "targetDomain": "m.youtube.com",
+        "targetDomain": "youtubei.googleapis.com",
         "clientName": 3,
-        "clientVersion": "20.40.45",
-        "userAgent": "com.google.android.youtube/21.02.35 (Linux; U; Android 11) gzip",
+        "clientVersion": "21.11.480",
+        "userAgent": "com.google.android.youtube/21.11.480 (Linux; U; Android 11) gzip",
         "osName": "Android",
         "osVersion": "11"
     },
@@ -29,12 +29,13 @@ module.exports = {
     "ANDROID_REEL": {
         "targetDomain": "youtubei.googleapis.com",
         "clientName": 3,
-        "clientVersion": "20.40.45",
+        "clientVersion": "21.11.480",
         "androidSdkVersion": 30,
-        "userAgent": "com.google.android.youtube/21.02.35 (Linux; U; Android 11) gzip",
+        "userAgent": "com.google.android.youtube/21.11.480 (Linux; U; Android 11) gzip",
         "osName": "Android",
         "osVersion": "11"
     },
+    // least stable
     // doesn't support stream kids contents
     "ANDROID_VR": {
         "targetDomain": "m.youtube.com",
@@ -51,12 +52,12 @@ module.exports = {
     // can't stream live content normally
     // can't stream after 1 minute
     "IOS": {
-        "targetDomain": "m.youtube.com",
+        "targetDomain": "youtubei.googleapis.com",
         "clientName": 5,
-        "clientVersion": "20.40.45",
+        "clientVersion": "21.11.480",
         "deviceMake": "Apple",
         "deviceModel": "iPhone16,2",
-        "userAgent": "com.google.ios.youtube/21.02.35 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)",
+        "userAgent": "com.google.ios.youtube/21.11.480 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)",
         "osName": "iPhone",
         "osVersion": "18.3.2.22D82"
     },
@@ -68,10 +69,10 @@ module.exports = {
     "IOS_REEL": {
         "targetDomain": "youtubei.googleapis.com",
         "clientName": 5,
-        "clientVersion": "20.40.45",
+        "clientVersion": "21.11.480",
         "deviceMake": "Apple",
         "deviceModel": "iPhone16,2",
-        "userAgent": "com.google.ios.youtube/21.02.35 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)",
+        "userAgent": "com.google.ios.youtube/21.11.480 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)",
         "osName": "iPhone",
         "osVersion": "18.3.2.22D82"
     }

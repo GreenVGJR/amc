@@ -93,9 +93,9 @@ $title[$advancedTextSplit[$env[reslast];resource-name=";1;data-page;0;";0];$get[
 $color[$get[checkcolor];0]
 $if[$get[desc]!=;$description[-# $get[desc]]]
 $addField[> \`🏷️\` | Tags;$if[$arrayLength[loadtag]==0;-# Not Available;$arrayJoin[loadtag;, ]];false;0]
-$addField[> \`🍀\` | Latest Release;$if[$get[latestre-t]==;-# Not Available;$get[latestre]];true;0]
-$addField[> \`📈\` | Popular This Week;$if[$get[popweek-t]==;-# Not Available;$get[popweek]];true;0]
-$addField[> \`👥\` | Similar Artists;$if[$get[simartist]==;-# Not Available;$get[simartist]];false;0]
+$addField[> \`🍀\` | Latest Release;$if[$trim[$get[latestre-t]]==;-# Not Available;$get[latestre]];true;0]
+$addField[> \`📈\` | Popular This Week;$if[$trim[$get[popweek-t]]==;-# Not Available;$get[popweek]];true;0]
+$addField[> \`👥\` | Similar Artists;$if[$trim[$get[simartist]]==;-# Not Available;$get[simartist]];false;0]
 $thumbnail[$get[valthumbnail_author];0]
 $if[$get[bannerchannelurl]!=;
 $image[$get[bannerchannelurl];0]

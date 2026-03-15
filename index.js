@@ -1,6 +1,8 @@
 // Config
-const youtube = require('./back/client/youtubeConfig');
 const toggles = require('./back/config.json');
+const youtube = require('./back/client/youtubeConfig');
+
+require('dotenv').config(); // Load Environment
 
 // Main
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
@@ -8,8 +10,6 @@ const { ForgeMusic, GuildQueueEvent } = require('@tryforge/forge.music');
 const { QuorielDB } = require("@quoriel/db");
 const { QuorielEdge } = require("@quoriel/edge");
 // const { ForgeDB } = require("@tryforge/forge.db");
-
-require('dotenv').config(); // Load Environment
 
 // Extractor
 const { YoutubeiExtractor } = require("discord-player-youtubei");
@@ -43,6 +43,7 @@ const music = new ForgeMusic({
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
         defaultFFmpegFilters: ["compressor"],
+        disableResampler: true,
         disableFallbackStream: !toggles.useSABR,
         bufferingTimeout: 350,
         volume: 50,
@@ -51,7 +52,8 @@ const music = new ForgeMusic({
         leaveOnEmptyCooldown: 15000,
         pauseOnEmpty: true
     },
-    skipFFmpeg: true
+    skipFFmpeg: true,
+    probeTimeout: 1
 });
 
 const client = new ForgeClient({
@@ -98,3 +100,5 @@ music.player.extractors.register(YoutubeiExtractor, youtube);
 music.commands.load("back/events");
 
 console.clear();
+
+import('youtubei.js').then(({ Log }) => Log.setLevel()).catch(() => {});

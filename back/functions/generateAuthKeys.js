@@ -34,6 +34,8 @@ module.exports = {
         $httpAddHeader[Accept;*/*]
         $httpAddHeader[User-Agent;$if[$or[$get[ytinitua]==;$get[ytinitua]==undefined]==false;$get[ytinitua];$get[agent]]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+        $httpAddHeader[Sec-Fetch-Dest;document]
+        $httpAddHeader[Sec-Fetch-Site;none]
         $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
         $if[$and[$env[cookielog]!=true;$env[successlog]==true];$logger[Info;Using Youtube Cookies. Attempting to rotating]
         $if[$or[$get[ytinitua]==;$get[ytinitua]==undefined];$logger[Warn;Using default User Agent. Rotation may fails]]
@@ -41,18 +43,25 @@ module.exports = {
         $httpAddHeader[Cookie;$get[ytinitcookies]]
         ]
         $httpSetContentType[Text]
-        $!httpRequest[https://www.youtube.com/embed?html5=1;GET;g3]
+        $!httpRequest[https://www.youtube.com;GET;g3]
         $if[$and[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;$advancedTextSplit[$env[g3];"LOGIN_INFO":";1;";0]==];
         $let[abortproscookies;true]
         $logger[Error;Cookies no longer active. Please put a new one - Youtube]
         $logger[Info;Continuing process]
         ]
         $let[a32;$advancedTextSplit[$env[g3];"visitorData":";1;";0]]
+        $let[tempCookiesYT;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
         $if[$get[a32]!=;$setCache[authmusic_youtube_visitor;$get[a32]]]
         $let[a33;$advancedTextSplit[$advancedTextSplit[$env[g3];"DATASYNC_ID":";1;";0];||;0]]
         $if[$get[a33]!=;$setCache[authmusic_youtube_datasync_id;$get[a33]]]
         $jsonLoad[listconfig;$getCache[system_file-config]]
         $if[$and[$env[listconfig;useSABR]==false;$env[successlog]==true;$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]];
+        $setCache[authmusic_youtube_tempcookies;$get[tempCookiesYT]]
+        $writeFile[.env;$replace[$readFile[.env];YOUTUBE_ANONCOOKIES=$djsEval[process.env.YOUTUBE_ANONCOOKIES];YOUTUBE_ANONCOOKIES=$get[tempCookiesYT]]]
+        $!djsEval[require('dotenv').config({ override: true, quiet: true })]
+        $if[$checkContains[$get[tempCookiesYT];Secure-YNID=]==false;
+        $logger[Warn;InnerTube: No 'Secure-YNID' Cookie appears]
+        ]
         $let[getpickclient;${tarClient()}]
         $jsonLoad[listclient;$replace[${tarClientYT()};%SEMI%;\\;]]
         $let[defytdomain;$env[listclient;targetDomain]]
@@ -64,12 +73,13 @@ module.exports = {
         $httpAddHeader[Accept-Encoding;]
         $httpAddHeader[User-Agent;$default[$env[listclient;userAgent];$callFunction[configMusic;default_userAgent]]]
         $httpAddHeader[Content-Type;application/json]
+        $httpAddHeader[Cookie;$get[tempCookiesYT]]
         $let[testvideoid;fa5IWHDbftI]
         $httpSetBody[{"videoId":"$get[testvideoid]","context":{"client":$jsonStringify[listclient]}}]
         $logger[Info;InnerTube: Test Fetching  | $get[testvideoid] ($get[getpickclient])]
         $!httpRequest[https://$get[defytdomain]/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus(status),streamingData(adaptiveFormats(itag,url));POST]
-        $if[$and[$httpResult[playabilityStatus;status]!=UNPLAYABLE;$httpResult[playabilityStatus;status]!=OK];
-        $logger[Warn;Missing Youtube Cookies. Some features might not available]
+        $if[$httpResult[playabilityStatus;status]!=OK;
+        $logger[Warn;InnerTube: $default[$httpResult[playabilityStatus;status];Unknown] - Some features might not available]
         ]
         $if[$httpResult[playabilityStatus;status]==OK;
         $jsonLoad[osav;$httpResult[streamingData;adaptiveFormats]]
