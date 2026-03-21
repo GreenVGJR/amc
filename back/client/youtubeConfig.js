@@ -14,7 +14,7 @@ if (!useClient) {
     throw new Error(`YouTube client "${targetClient}" does not exist. Available clients: ${available}`);
 }
 
-const buildQuery = (['ANDROID_REEL','IOS_REEL'].includes(targetClient) ? 'reel/reel_item_watch' : 'get_watch') + '?prettyPrint=false&alt=json&fields=playerResponse(playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url)),videoDetails(isLiveContent))';
+const buildQuery = (['ANDROID_REEL','IOS_REEL'].includes(targetClient) ? 'reel/reel_item_watch' : 'get_watch') + '?prettyPrint=false&alt=json&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url)),videoDetails(isLiveContent))';
 
 const APIuserAgent = useClient?.userAgent || default_userAgent;
 const ytcookies = process.env.YOUTUBE_COOKIES;
@@ -112,7 +112,7 @@ function http2Request(url, opts = {}) {
     }
     
     if (!vt) {
-        const res = await http2Request(`https://${hostdomain}/youtubei/v1/player?prettyPrint=false&fields=responseContext.visitorData`, { method: "POST", body: JSON.stringify(lk), headers: { "Origin": `https://${hostdomain}`, "Content-Type": "application/json", "User-Agent": APIuserAgent } });
+        const res = await http2Request(`https://${hostdomain}/youtubei/v1/player?prettyPrint=false&alt=json&fields=responseContext(visitorData)`, { method: "POST", body: JSON.stringify(lk), headers: { "Origin": `https://${hostdomain}`, "Content-Type": "application/json", "User-Agent": APIuserAgent } });
         const data = await res.body.json();
         vt = data.responseContext.visitorData || "";
         actuallk.visitorData = vt;
@@ -157,6 +157,10 @@ async function fallbackYTStream(lstracks) {
         let finalurl;
         a = Array.isArray(a) ? a[0] : a;
         a = a?.playerResponse || a;
+
+        const new_vt = a?.responseContext?.visitorData;
+        if (new_vt) actuallk.visitorData = new_vt;
+
         if(!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') throw new Error();
         const cpn = randomBytes(12).toString('base64url');
 

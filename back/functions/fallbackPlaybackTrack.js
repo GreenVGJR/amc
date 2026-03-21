@@ -56,7 +56,7 @@ module.exports = {
     $httpAddHeader[X-Youtube-Client-Name;101]
     $httpAddHeader[X-Youtube-Client-Version;0.1]
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":101,"clientVersion":"0.1","visitorData":"$getCache[authmusic_youtube_visitor]"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1","signatureTimestamp":"0"}},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;$env[listclient;targetDomain];m.youtube.com]/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
+    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;$env[listclient;targetDomain];m.youtube.com]/youtubei/v1/player?prettyPrint=false&fields=responseContext(visitorData),playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
     ]
     $if[$env[types]==va;
     $httpAddHeader[Accept-Encoding;]
@@ -65,10 +65,11 @@ module.exports = {
     $httpAddHeader[X-Youtube-Client-Name;28]
     $httpAddHeader[X-Youtube-Client-Version;1.00.0]
     $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":28,"clientVersion":"1.00.0","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1","signatureTimestamp":"0"}},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;$env[listclient;targetDomain];m.youtube.com]/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
+    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;$env[listclient;targetDomain];m.youtube.com]/youtubei/v1/player?prettyPrint=false&fields=responseContext(visitorData),playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
     ]]
     $if[$env[reshttp;playabilityStatus;status]!=OK;$return[$let[finalurl;bot|$default[$env[reshttp;playabilityStatus;reason];Precondition check failed]]]]
-    $if[$env[reshttp;videoDetails;isLiveContent];$return[$let[finalurl;live]]]
+    $if[$default[$env[reshttp;videoDetails;isLiveContent];false];$return[$let[finalurl;live]]]
+    $if[$env[reshttp;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[reshttp;responseContext;visitorData]]]
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
@@ -222,10 +223,17 @@ module.exports = {
     $if[$env[a;results;quoted_status_result;result;legacy;entities;media;0;video_info]!=;
     $jsonLoad[b;$env[a;results;quoted_status_result;result;legacy;entities;media;0;video_info;variants]]
     ;
+    $if[$env[a;results;card;legacy;binding_values;0;value;string_value]!=;
+    $jsonLoad[b1;$env[a;results;card;legacy;binding_values;0;value;string_value]]
+    $jsonLoad[b1;$env[b1;media_entities]]
+    $jsonLoad[b1;$jsonEntries[b1]]
+    $jsonLoad[b;$env[b1;0;1;video_info;variants]]
+    ;
     $jsonLoad[b;$env[a;results;legacy;entities;media;0;video_info;variants]]
-    ]
+    ]]
     $arrayMap[b;c;$if[$env[c;bitrate]!=;$return[$env[c]]];b]
     $let[finalurl;$env[b;$sub[$arrayLength[b];1];url]]
+    $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Video not available]]]
     ]
     ;retry]
     $callLocalFunction[oncecode;false]

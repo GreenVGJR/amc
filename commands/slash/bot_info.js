@@ -1,18 +1,18 @@
 module.exports = {
   data: {
-  "type": 1,
-  "name": "bot-info",
-  "description": "Show the bot info",
-  "description_localizations": {
-    "id": "Lihat informasi bot"
+    "type": 1,
+    "name": "info",
+    "description": "Show the bot info",
+    "description_localizations": {
+      "id": "Lihat informasi bot"
+    },
+    "integration_types": [
+      0
+    ],
+    "contexts": [
+      0
+    ]
   },
-  "integration_types": [
-    0
-  ],
-  "contexts": [
-    0
-  ]
-},
   type: 0,
   code: `
   $onlyIf[$guildID!=;]

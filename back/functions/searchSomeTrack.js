@@ -177,9 +177,9 @@ module.exports = {
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_applemusic]]
     $httpAddHeader[Origin;https://music.apple.com]
     $httpAddHeader[Cookie;geo=US]
-    $let[httpal;$httpRequest[https://amp-api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]]
+    $let[httpal;$httpRequest[https://amp-edge-api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]]
     $if[$or[$get[httpal]==401;$get[httpal]==400];
-    $callFunction[generateAuthKeys;applemusic;;false]
+    $async[$callFunction[generateAuthKeys;applemusic;;false]]
     $let[httpal;429]
     ]
     $if[$get[httpal]==429;
@@ -188,7 +188,7 @@ module.exports = {
     $httpAddHeader[Cookie;geo=US]
     $!httpRequest[https://music.apple.com/us/search?term=$env[query];GET]
     $jsonLoad[res;$advancedTextSplit[$httpResult;type="application/json";1;data">;1;</script>;0]]
-    $jsonLoad[res2;$env[res;0;data;sections]]
+    $jsonLoad[res2;$default[$env[res;data;0;data;sections];$env[res;data;sections]]]
     $jsonLoad[res3;$env[res2;$arrayFindIndex[res2;result;$checkContains[$env[result;id];song]]]]
     $jsonLoad[res4;$env[res3;items]]
     $arrayForEach[res4;res5;
@@ -458,20 +458,6 @@ module.exports = {
     $!jsonSet[kls;duration;$parseDigital[$env[tp;duration]]]
     $!jsonSet[kls;thumbnail;$env[tp;optimized_cover_url;cover_url_large]]
     $!jsonSet[kls;url;https://www.capcut.com/template-detail/$env[tp;web_id]]
-    $arrayPush[results;$jsonStringify[kls]]
-    ]
-    ]
-    $if[$env[provider]==kinemaster;
-    $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[User-Agent;$get[agent]]
-    $!httpRequest[https://www.kinemaster.com/api/template/searchTemplate?display=10&env=3&edition=IOS&application=com.nexstreaming.app.kinemasterfree&tag=$env[query];GET;l]
-    $if[$env[l;0]==;$return]
-    $arrayForEach[l;tp;
-    $jsonLoad[kls;{}]
-    $!jsonSet[kls;title;$default[$trim[$advancedTextSplit[$env[tp;translation;description];#;0]];$env[tp;translation;description]]]
-    $!jsonSet[kls;duration;$env[tp;duration]]
-    $!jsonSet[kls;thumbnail;$env[tp;imagePath]]
-    $!jsonSet[kls;url;https://www.kinemaster.com/kinespace/detail/$env[tp;projectId]]
     $arrayPush[results;$jsonStringify[kls]]
     ]
     ]

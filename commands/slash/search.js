@@ -32,7 +32,6 @@ module.exports = {
           { "name": "Tiktok Sound", "value": "tiktoksound" },
           { "name": "NCS", "value": "ncs" },
           { "name": "Capcut - Templates", "value": "capcut" },
-          { "name": "Kinemaster - Templates", "value": "kinemaster" },
           { "name": "Roblox Music", "value": "robloxmusic" }
         ]
       },

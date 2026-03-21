@@ -168,7 +168,7 @@ module.exports = [{
     code: `
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $try[
-    $httpSetBody[{"videoId":"$env[videoId]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"videoId":"$env[videoId]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
@@ -183,21 +183,23 @@ module.exports = [{
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
-    $!httpRequest[https://music.youtube.com/youtubei/v1/browse?prettyPrint=false&fields=contents.elementRenderer.newElement.type.componentType.model.timedLyricsModel.lyricsData(timedLyricsData(lyricLine,cueRange(startTimeMilliseconds)));POST;pers]
+    $!httpRequest[https://music.youtube.com/youtubei/v1/browse?prettyPrint=false&fields=responseContext(visitorData),contents.elementRenderer.newElement.type.componentType.model.timedLyricsModel.lyricsData(timedLyricsData(lyricLine,cueRange(startTimeMilliseconds)));POST;pers]
     $jsonLoad[pers;$env[pers]]
+    $if[$env[pers;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[pers;responseContext;visitorData]]]
     $jsonLoad[er;$env[pers;contents;elementRenderer;newElement;type;componentType;model;timedLyricsModel;lyricsData;timedLyricsData]]
     $arrayMap[er;ers;$return[\\[$cropText[$parseDate[$default[$env[ers;cueRange;startTimeMilliseconds];0];ISO];14;19].$cropText[$parseDate[$default[$env[ers;cueRange;startTimeMilliseconds];0];ISO];20;22]\\] $env[ers;lyricLine]];er]
     $let[finalyric;$arrayJoin[er;
 ]]
     ;
-    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
-    $!httpRequest[https://music.youtube.com/youtubei/v1/browse?prettyPrint=false&fields=contents.sectionListRenderer.contents.musicDescriptionShelfRenderer.description(runs/text);POST;res2]
+    $!httpRequest[https://music.youtube.com/youtubei/v1/browse?prettyPrint=false&fields=responseContext(visitorData),contents.sectionListRenderer.contents.musicDescriptionShelfRenderer.description(runs/text);POST;res2]
     $jsonLoad[res2;$env[res2]]
+    $if[$env[res2;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[res2;responseContext;visitorData]]]
     ]]
     $return[$if[$env[line]==true;$get[finalyric];$env[res2;contents;sectionListRenderer;contents;0;musicDescriptionShelfRenderer;description;runs;0;text]]]
     `
