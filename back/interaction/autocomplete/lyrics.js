@@ -4,7 +4,6 @@ module.exports = {
     code: `
     $onlyIf[$and[$applicationCommandName==lyrics;$focusedOptionName==translate]]
     $onlyIf[$guildID!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearch];__null__]]
-    $onlyIf[$charCount[$focusedOptionValue]<=100;$autocomplete]
     $jsonLoad[result;$getCache[system_file-listLyricsLanguage]]
     $jsonLoad[result;$jsonEntries[result]]
     $arrayMap[result;rest;$if[$checkContains[$toLowercase[$env[rest;1]];$toLowercase[$focusedOptionValue]];$return[$env[rest]]];result2]

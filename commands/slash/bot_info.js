@@ -1,7 +1,7 @@
 module.exports = {
   data: {
     "type": 1,
-    "name": "bot-info",
+    "name": "info",
     "description": "Show the bot info",
     "description_localizations": {
       "id": "Lihat informasi bot"

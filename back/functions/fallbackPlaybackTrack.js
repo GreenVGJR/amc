@@ -43,6 +43,8 @@ module.exports = {
     $httpAddHeader[Alt-Used;www.youtube.com]
     $httpAddHeader[X-Goog-Visitor-Id;$getCache[authmusic_youtube_visitor]]
     $httpAddHeader[X-Youtube-Bootstrap-Logged-In;true]
+    ;
+    $httpAddHeader[Cookie;$getCache[authmusic_youtube_tempcookies]]
     ]
     $if[$or[$env[types]==;$env[types]==v];
     $httpAddHeader[Accept-Encoding;]
@@ -115,13 +117,13 @@ module.exports = {
     $if[$env[whattype;type]==tiktokmob;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $if[$env[test;results;error]!=;$return[$let[finalurl;bot|$env[test;results;error]]]]
-    $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $stop]
+    $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $return]
     $jsonLoad[whattype;$callFunction[filterMediaID;$if[$or[$env[test;results;video;id]!=;$env[test;results;music_info]!=];https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
     ]
     $if[$env[whattype;type]==tiktok;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $if[$env[test;results;error]!=;$return[$let[finalurl;bot|$env[test;results;error]]]]
-    $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $stop]
+    $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $return]
     $if[$env[test;results;video_info;url_list;0]!=;
     $let[finalurl;$env[test;results;video_info;url_list;0]]
     $return
@@ -157,7 +159,7 @@ module.exports = {
     ]
     $if[$env[whattype;type]==tiktokmusic;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $if[$env[a;results]==null;$callLocalFunction[oncecode;true] $stop]
+    $if[$env[a;results]==null;$callLocalFunction[oncecode;true] $return]
     $if[$env[a;results;play_url;uri]==;
     $jsonLoad[b;$env[a;results;extra]]
     $let[finalurl;$env[b;original_song_url]]
@@ -173,7 +175,7 @@ module.exports = {
     $httpSetContentType[Text]
     $!httpRequest[$env[url];GET;a]
     ]
-    $if[$env[a]==;$callLocalFunction[oncecode;true] $stop]
+    $if[$env[a]==;$callLocalFunction[oncecode;true] $return]
     $let[finalurl;$advancedTextSplit[$env[a];"contentUrl":";1;";0]]
     ]]
     $if[$env[whattype;type]==facebook;
@@ -211,10 +213,17 @@ module.exports = {
     $if[$env[a;results;quoted_status_result;result;legacy;entities;media;0;video_info]!=;
     $jsonLoad[b;$env[a;results;quoted_status_result;result;legacy;entities;media;0;video_info;variants]]
     ;
+    $if[$env[a;results;card;legacy;binding_values;0;value;string_value]!=;
+    $jsonLoad[b1;$env[a;results;card;legacy;binding_values;0;value;string_value]]
+    $jsonLoad[b1;$env[b1;media_entities]]
+    $jsonLoad[b1;$jsonEntries[b1]]
+    $jsonLoad[b;$env[b1;0;1;video_info;variants]]
+    ;
     $jsonLoad[b;$env[a;results;legacy;entities;media;0;video_info;variants]]
-    ]
+    ]]
     $arrayMap[b;c;$if[$env[c;bitrate]!=;$return[$env[c]]];b]
     $let[finalurl;$env[b;$sub[$arrayLength[b];1];url]]
+    $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Video not available]]]
     ]
     ;retry]
     $callLocalFunction[oncecode;false]

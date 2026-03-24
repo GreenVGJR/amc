@@ -2,6 +2,7 @@ module.exports = {
     type: "clientReady",
     code: `
     $logger[Info;Ready on client $username[$clientID]]
+    $logger[Info;Waiting Lavalink connections]
     $if[$callFunction[configMusic;cacheAllContextNeed];
     $logger[Warn;Caching Discord context for better performance]
     $async[$callFunction[fetchDiscordContext]]

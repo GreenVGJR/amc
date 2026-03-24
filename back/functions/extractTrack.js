@@ -31,10 +31,10 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpSetBody[{"videoId":"$env[filterid;id]","context":{"client":{"clientName":2,"clientVersion":"2.20261231"}}}]
+    $httpSetBody[{"videoId":"$env[filterid;id]","context":{"client":{"clientName":2,"clientVersion":"2.20261231","visitorData":"$getCache[authmusic_youtube_visitor]"}}}]
     $httpAddHeader[Accept-Encoding;]
     $httpSetContentType[Text]
-    $let[http;$httpRequest[https://m.youtube.com/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,videoDetails(videoId,title,lengthSeconds,channelId,isCrawlable,viewCount,author,isPrivate,isLiveContent);POST;reshttp]]
+    $let[http;$httpRequest[https://m.youtube.com/youtubei/v1/player?prettyPrint=false&fields=responseContext(visitorData),playabilityStatus,videoDetails(videoId,title,lengthSeconds,channelId,isCrawlable,viewCount,author,isPrivate,isLiveContent);POST;reshttp]]
     $jsonLoad[reshttp;$env[reshttp]]
     $c[Fallback]
     $if[$and[$env[reshttp;playabilityStatus;status]!=OK;$env[reshttp;videoDetails;videoId]==];
@@ -43,7 +43,7 @@ module.exports = {
     $httpSetContentType[Text]
     $let[http2;$httpRequest[https://www.youtube.com/watch?v=$env[filterid;id];GET]]
     $let[outputhtyt;$advancedTextSplit[$httpResult;var ytInitialData =;1;\\;;0]]
-    $onlyIf[$isJSON[$get[outputhtyt]];$callLocalFunction[refreshyt;true] $stop]
+    $onlyIf[$isJSON[$get[outputhtyt]];$callLocalFunction[refreshyt;true] $return]
     $jsonLoad[reshttptest;{}]
     $jsonLoad[reshttp2;$get[outputhtyt]]
     $jsonLoad[resfindindex;$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents]]
@@ -58,6 +58,7 @@ module.exports = {
     $!jsonSet[reshttptest;isLiveContent;$if[$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;viewCount;videoViewCountRenderer;isLive]!=;$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;viewCount;videoViewCountRenderer;isLive];$startsWith[$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;dateText;simpleText];Started streaming]]]
     $let[results;{"status":$get[http2],"results":$if[$env[reshttptest;videoId]==;null;$env[reshttptest]]}]
     ;
+    $if[$env[reshttp;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[reshttp;responseContext;visitorData]]]
     $let[results;{"status":$get[http],"results":$if[$env[reshttp;videoDetails]==;null;$env[reshttp;videoDetails]]}]
     ]
     ;retry]
@@ -195,6 +196,8 @@ module.exports = {
     $httpAddHeader[Accept;text/html]
     $httpAddHeader[Accept-Language;en]
     $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Sec-Fetch-Dest;iframe]
+    $httpAddHeader[Sec-Fetch-Site;none]
     $httpSetContentType[Text]
     $!httpRequest[https://web.facebook.com/plugins/video.php?href=$get[url]&show_text=true;GET]
     $let[cs;$default[$advancedTextSplit[$httpResult;"videoData":\\[;1;,"player_version;0];{]]
@@ -219,6 +222,7 @@ module.exports = {
     $if[$env[lkck;require_login]==true;
     $httpAddHeader[Accept;text/html, */*]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Sec-Fetch-Dest;iframe]
     $httpAddHeader[Sec-Fetch-Site;none]
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[User-Agent;$get[agent]]
@@ -266,10 +270,11 @@ module.exports = {
     $if[$env[filterid;type]==twitter;
     $let[xr_variables;{"tweetId":"$env[filterid;id]","includePromotedContent":false,"withBirdwatchNotes":false,"withVoice":false,"withCommunity":false}]
     $let[xr_features;$getCache[authmusic_twitter_features]]
+    $let[xr_toggles;$getCache[authmusic_twitter_toggles]]
     $let[tryattempt;0]
     $localFunction[refreshx;
     $if[$env[retry]==true;
-    $if[$get[tryattempt]>=3;$return]
+    $if[$get[tryattempt]>=2;$return]
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
@@ -279,13 +284,16 @@ module.exports = {
     $httpAddHeader[Origin;https://x.com]
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_twitter]]
+    $httpAddHeader[x-guest-token;$getCache[authmusic_twitter_token]]
+    $httpAddHeader[x-twitter-client-language;en]
+    $httpAddHeader[x-twitter-active-user;yes]
     $httpSetContentType[Text]
-    $let[http;$httpRequest[https://api.x.com/graphql/$getCache[authmusic_twitter_qid]/TweetResultByRestId?variables=$encodeURI[$get[xr_variables]]&features=$encodeURI[$get[xr_features]];GET]]
-    $if[$or[$get[http]==401;$get[http]==400;$get[http]==429];
-    $callFunction[generateAuthKeys;twitter;;true]
-    $callFunction[generateAuthKeys;twitter_cookies;;true]
+    $let[http;$httpRequest[https://api.x.com/graphql/$getCache[authmusic_twitter_qid]/TweetResultByRestId?variables=$encodeURI[$get[xr_variables]]&features=$get[xr_features]&fieldToggles=$get[xr_toggles];GET]]
+    $if[$get[http]!=200;
+    $callFunction[generateAuthKeys;twitter;;false]
+    $callFunction[generateAuthKeys;twitter_cookies;;false]
     $callLocalFunction[refreshx;true]
-    $stop
+    $return
     ]
     $jsonLoad[thers;$httpResult]
     ;retry]

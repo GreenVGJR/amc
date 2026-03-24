@@ -66,13 +66,16 @@ module.exports = {
 
     $onlyIf[$get[fsearch]!=null;$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]]]
     $let[loadlyrics;$env[result;results;lyric]]
-    $if[$option[translate]!=;
+    $if[$and[$get[loadlyrics]!=;$option[translate]!=];
     $jsonLoad[checklang;$getCache[system_file-listLyricsLanguage]]
     $jsonLoad[checklang;$jsonEntries[checklang]]
     $arrayMap[checklang;rest;$if[$checkContains[$toLowercase[$env[rest;1]];$toLowercase[$option[translate]]];$return[$env[rest]]];checklang]
-    $jsonLoad[loadtranslatelyrics;$callFunction[translateText;$get[loadlyrics];;$env[checklang;0;0]]]
-    $let[loadlyrics;$arrayJoin[loadtranslatelyrics;
-]]
+    $let[temptrjson;$callFunction[translateText;$get[loadlyrics];;$env[checklang;0;0]]]
+    $jsonLoad[loadtranslatelyrics;$get[temptrjson]]
+    $let[prsl;$env[loadtranslatelyrics;acc]]
+    $jsonLoad[loadtranslatelyrics;$env[loadtranslatelyrics;text]]
+    $let[loadlyrics;$default[$arrayJoin[loadtranslatelyrics;
+];$callFunction[useCustomMusicMessage;config_errorNoResultLyricsTranslation]]]
     $let[translateTextLang-c;$env[checklang;0;0]]
     $let[translateTextLang-n;$env[checklang;0;1]]
     ]
@@ -88,7 +91,7 @@ module.exports = {
     $addSeparator[Small;true]
     ]
     $addSection[
-    $addTextDisplay[- $get[latencyrs]ms | $toTitleCase[$env[result;results;provider]]\n»   $bold[$hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]$if[$and[$option[translate]!=;$get[translateTextLang-c]!=];\n»   $bold[Translated to:] $get[translateTextLang-n]]]
+    $addTextDisplay[- $get[latencyrs]ms | $toTitleCase[$env[result;results;provider]]\n»   $bold[$hyperlink[$decodeURI[$env[result;results;autocomplete]];$env[result;results;url]]]$if[$and[$option[translate]!=;$get[translateTextLang-c]!=];\n»   $bold[Translated to:] $get[translateTextLang-n] ($get[prsl]%)]]
     $addThumbnail[$env[result;results;thumbnail]]
     ]
     $addSeparator[Small;true]

@@ -11,7 +11,7 @@ module.exports = {
     $jsonLoad[testing;$callFunction[fastSearchTrack;$if[$focusedOptionValue!=;$focusedOptionValue;$getCache[cachesearchistory_user_autocomplete_$authorID]]]]
     $async[$if[$focusedOptionValue!=;$setCache[cachesearchistory_user_autocomplete_$authorID;"$focusedOptionValue"]]]
     $if[$env[testing;results;0]==;
-    $addChoice[$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue]]
+    $addChoice[$cropText[$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];0;100;];$cropText[$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];0;100;]]
     ;
     $if[$env[testing;results;0]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;0];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;0];";\\\\"]\\\`)]]]
     $if[$env[testing;results;1]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;1];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;1];";\\\\"]\\\`)]]]

@@ -24,8 +24,11 @@ module.exports = {
     ;
     $let[author;$env[b;publisher_metadata;artist]]
     ]
+    $if[$or[$env[b;publisher_metadata;release_title]==;$env[b;publisher_metadata;release_title]==null];
     $let[title;$env[b;title]]
-    ]
+    ;
+    $let[title;$default[$env[b;publisher_metadata;release_title];$env[b;publisher_metadata;album_title]]]
+    ]]
     $if[$env[filtype;type]==spotify;
     $if[$env[a;results;props]!=;
     $let[author;$env[a;results;props;pageProps;state;data;entity;artists;0;name]]

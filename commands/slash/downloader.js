@@ -59,7 +59,6 @@ module.exports = {
 $onlyIf[$guildID!=;]
 $let[limitsize;$djsEval[ctx.interaction.attachmentSizeLimit]]
 $let[url;$sliceText[$trim[$decodeURIComponent[$option[url]]];0;1]]
-$let[uravt;$userAvatar[$authorID;1024]]
 $onlyIf[$isValidLink[$get[url]];$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidLinkDownload]]
 $jsonLoad[musictype;$callFunction[filterMediaID;$get[url]]]
 $onlyIf[$or[$env[musictype;id]==;$env[musictype;id]==null;$env[musictype;type]==null]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_generalInvalidProviderDownload]]
@@ -71,13 +70,13 @@ $let[mid;]
 $if[$or[$and[$channelExists[$channelID]==false;$option[ephemeral]!=false];$and[$channelExists[$channelID]==true;$option[ephemeral]==true]];$ephemeral]
 $localFunction[runcodessync;
 $let[mid;$interactionReply[
-$author[$if[$env[msg1]!=;$env[msg1];None];$get[uravt]]
 $addField[Type;\`$toTitleCase[$advancedReplace[$env[musictype;type];tiktokmusic;tiktok music;tiktokmob;tiktok mobile;instagramaudio;instagram audio]]\`;true]
 $addField[Length Size;$if[$get[clh]==;\`null\`;\`$get[clh]\`\n-# $round[$divide[$get[clh];1024;1024];2] MB - $round[$divide[$get[limitsize];1024;1024];2] MB];true]
 $addField[Format;\`$if[$get[converttype]==;null;.$get[contenttype]$if[$get[contenttype]!=$get[converttype]; => .$get[converttype]]]\`;true]
 $addField[File Name;$if[$and[$option[lyrics]==true;$get[checklyric]];$codeBlock[$default[$get[lyricnames];null]]]$codeBlock[$default[$get[names];null]]$if[$and[$has[checklyric];$get[checklyric]==false];\n-# WARNING: Lyrics not available];false]
 $color[$callFunction[useIcon;color_embed];0]
-$footer[$env[msg2];$if[$env[togload]==true;$callFunction[useIcon;loading]]]
+$author[$if[$env[msg1]!=;$env[msg1];None]\n$env[msg2];$if[$env[togload]==true;$callFunction[useIcon;loading]]]
+$timestamp
 ;true]]
 $return
 ;msg1;msg2;togload]
@@ -85,16 +84,28 @@ $let[agent;$callFunction[configMusic;default_userAgent]]
 $let[isactivelyric;$and[$option[yt_option]!=2;$option[yt_option]!=3;$option[lyrics]==true;$or[$env[musictype;type]==youtube;$env[musictype;type]==soundcloud;$env[musictype;type]==spotify;$env[musictype;type]==bandcamp]]]
 $try[
 $if[$env[musictype;type]==spotify;
-$callLocalFunction[runcodessync;Converting;Processing;true]
+$let[m-fetch;false]
+$let[storeobjecthttp;]
+$let[gettitle;]
+$let[getpuretitle;]
+$let[getcdn;]
+$async[
 $let[storeobjecthttp;$callFunction[extractTrack;https://open.spotify.com/track/$advancedTextSplit[$env[musictype;id];/;1]]]
 $let[gettitle;$cropText[$callFunction[fetchTitleTrack;https://open.spotify.com/track/$advancedTextSplit[$env[musictype;id];/;1];$get[storeobjecthttp]];0;479;]]
+$onlyIf[$get[gettitle]!=;$let[m-fetch;null]]
 $let[getpuretitle;$cropText[$callFunction[fetchTitleTrack;https://open.spotify.com/track/$advancedTextSplit[$env[musictype;id];/;1];$get[storeobjecthttp]];0;1024;]]
-$onlyIf[$get[gettitle]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-$jsonLoad[b;$callFunction[getYoutubeMusic;$get[gettitle]]]
-$onlyIf[$env[b;results;0]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
-$if[$get[s-fetch]==false;
-$callLocalFunction[runcodessync;Getting CDN$if[$get[isactivelyric]; & Lyrics];Fetching - This may take longer;true]
+$jsonLoad[b;$callFunction[getYoutubeMusic;$get[getpuretitle]]]
+$onlyIf[$env[b;results;0]!=;$let[m-fetch;null]]
+$let[m-fetch;true]
 ]
+$if[$get[m-fetch]==false;
+$defer
+]
+$loop[-1;
+$if[$get[m-fetch]!=false;$break]
+$wait[5]
+]
+$onlyIf[$get[m-fetch]!=null;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
 $let[getcdn;$callFunction[fallbackPlaybackTrack;$env[b;results;0;url];v;$get[storeobjecthttp];$get[limitsize]]]
 ;
 $let[storeobjecthttp;]
@@ -106,7 +117,7 @@ $let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictyp
 $let[s-fetch;true]
 ]
 $if[$get[s-fetch]==false;
-$callLocalFunction[runcodessync;Getting CDN & Title$if[$get[isactivelyric]; & Lyrics];Fetching - This may take longer;true]
+$defer
 ]
 $loop[-1;
 $if[$get[s-fetch]!=false;$break]
@@ -181,16 +192,16 @@ $let[converttype;$if[$get[contenttype]==webm;opus;$if[$get[contenttype]==mp4;m4a
 $let[names;$if[$option[file_name]!=;$option[file_name].$get[converttype];$get[gettitle].$get[converttype]]]
 $if[$get[f-fetch]==false;
 $if[$get[isjsoncdn]==false;
-$callLocalFunction[runcodessync;Downloading » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$callLocalFunction[runcodessync;Downloading » Uploading;$advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
 ;
-$callLocalFunction[runcodessync;Downloading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$callLocalFunction[runcodessync;Downloading;$advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
 ]]
 $loop[-1;
 $if[$get[f-fetch]!=false;$break]
 $wait[5]
 ]
 $if[$get[isjsoncdn]==true;
-$callLocalFunction[runcodessync;Processing » Uploading;Connected to: $advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
+$callLocalFunction[runcodessync;Processing » Uploading;$advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
 $try[$!djsEval[
   let chunks = JSON.parse(\\\`$jsonStringify[yup_container]\\\`)\\;
   let buffers = chunks.map(s => Buffer.from(s, "base64"))\\;

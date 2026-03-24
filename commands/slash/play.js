@@ -107,7 +107,7 @@ module.exports = {
   $addField[$get[music_title];-# $if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]];true]
   $thumbnail[$get[music_thumbnail]]
   $color[$callFunction[useIcon;color_embed]]
-  $footer[Fetching | $toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]];$callFunction[useIcon;loading]]
+  $footer[$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]];$callFunction[useIcon;loading]]
   ]
   ]
   $if[$env[typesload]==3;

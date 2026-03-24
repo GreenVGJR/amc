@@ -138,7 +138,6 @@ ___
     > ITunes
     > Amazon Music
     > Bandcamp
-    > Beatport
     > Deezer
     > Tidal
     > Qobuz
@@ -151,7 +150,6 @@ ___
     > Facebook Reels
     > NCS
     > Capcut - Templates
-    > Kinemaster - Templates
     > Roblox Music
 
 - Download media
@@ -169,6 +167,7 @@ ___
 - Dynamic info message
 - Show suggestion song name
 - Music Controller
+- Lyrics Translation
 - Playlist
 - Radio
 - Queue

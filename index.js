@@ -23,18 +23,27 @@ const lavalink = new ForgeLinked({
     "linkedPlayerDisconnect",
     "linkedPlayerUpdate",
     "linkedTrackStart",
-    "linkedTrackEnd"
+    "linkedTrackEnd",
+    "linkedNodeConnect"
   ],
   nodes: [
+    {
+      host: "lavalinkv4.serenetia.com",
+      port: 443,
+      authorization: "https://seretia.link/discord",
+      secure: true,
+      closeOnError: false
+    },
     {
       host: "localhost",
       port: 3000,
       authorization: "hai",
-      secure: false
+      secure: false,
+      closeOnError: false
     }
   ],
   playerOptions: {
-    defaultSearchPlatform: "youtube",
+    defaultSearchPlatform: "ytm",
     onDisconnect: {
       autoReconnect: true,
       destroyPlayer: true
@@ -81,5 +90,6 @@ client.commands.load("back/interaction");
 client.commands.load("back/client/fs");
 client.commands.load("commands/basic");
 lavalink.commands.load("back/events");
+lavalink.commands.load("back/client/fl");
 
 console.clear();
