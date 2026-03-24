@@ -43,7 +43,7 @@ module.exports = {
     $httpSetContentType[Text]
     $let[http2;$httpRequest[https://www.youtube.com/watch?v=$env[filterid;id];GET]]
     $let[outputhtyt;$advancedTextSplit[$httpResult;var ytInitialData =;1;\\;;0]]
-    $onlyIf[$isJSON[$get[outputhtyt]];$callLocalFunction[refreshyt;true] $stop]
+    $onlyIf[$isJSON[$get[outputhtyt]];$callLocalFunction[refreshyt;true] $return]
     $jsonLoad[reshttptest;{}]
     $jsonLoad[reshttp2;$get[outputhtyt]]
     $jsonLoad[resfindindex;$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents]]
@@ -274,7 +274,7 @@ module.exports = {
     $let[tryattempt;0]
     $localFunction[refreshx;
     $if[$env[retry]==true;
-    $if[$get[tryattempt]>=3;$return]
+    $if[$get[tryattempt]>=2;$return]
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
@@ -289,11 +289,11 @@ module.exports = {
     $httpAddHeader[x-twitter-active-user;yes]
     $httpSetContentType[Text]
     $let[http;$httpRequest[https://api.x.com/graphql/$getCache[authmusic_twitter_qid]/TweetResultByRestId?variables=$encodeURI[$get[xr_variables]]&features=$get[xr_features]&fieldToggles=$get[xr_toggles];GET]]
-    $if[$or[$get[http]==401;$get[http]==400;$get[http]==429];
-    $callFunction[generateAuthKeys;twitter;;true]
-    $callFunction[generateAuthKeys;twitter_cookies;;true]
+    $if[$get[http]!=200;
+    $callFunction[generateAuthKeys;twitter;;false]
+    $callFunction[generateAuthKeys;twitter_cookies;;false]
     $callLocalFunction[refreshx;true]
-    $stop
+    $return
     ]
     $jsonLoad[thers;$httpResult]
     ;retry]

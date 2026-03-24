@@ -131,7 +131,6 @@ ___
     > ITunes
     > Amazon Music
     > Bandcamp
-    > Beatport
     > Deezer
     > Tidal
     > Qobuz
@@ -161,6 +160,7 @@ ___
 - Dynamic info message
 - Show suggestion song name
 - Music Controller
+- Lyrics Translation
 - Playlist
 - Radio
 - Queue

@@ -21,9 +21,12 @@ module.exports = {
     $jsonLoad[b;$env[a;results]]
     $if[$or[$env[b;publisher_metadata;artist]==;$env[b;publisher_metadata;artist]==null];
     $let[author;$env[b;user;username]]
-    $let[title;$env[b;title]]
     ;
     $let[author;$env[b;publisher_metadata;artist]]
+    ]
+    $if[$or[$env[b;publisher_metadata;release_title]==;$env[b;publisher_metadata;release_title]==null];
+    $let[title;$env[b;title]]
+    ;
     $let[title;$default[$env[b;publisher_metadata;release_title];$env[b;publisher_metadata;album_title]]]
     ]]
     $if[$env[filtype;type]==spotify;

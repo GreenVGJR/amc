@@ -1,3 +1,13 @@
+['log', 'warn', 'error', 'info', 'debug'].forEach(method => {
+    const original = console[method];
+    console[method] = (...args) => {
+        if (args[0] && typeof args[0] === 'string' && args[0].includes('[YOUTUBEJS]')) return;
+        original(...args);
+    };
+});
+try { require('youtubei.js').Log.setLevel(0); } catch (e) {}
+try { require('discord-player-youtubei/node_modules/youtubei.js').Log.setLevel(0); } catch (e) {}
+
 // Config
 const toggles = require('./back/config.json');
 const youtube = require('./back/client/youtubeConfig');
@@ -100,5 +110,3 @@ music.player.extractors.register(YoutubeiExtractor, youtube);
 music.commands.load("back/events");
 
 console.clear();
-
-import('youtubei.js').then(({ Log }) => Log.setLevel()).catch(() => {});
