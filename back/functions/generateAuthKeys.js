@@ -31,6 +31,7 @@ module.exports = {
     $let[ytinitcookies;$trimLines[$trim[$djsEval[process.env.YOUTUBE_COOKIES]]]]
     $let[ytinitua;$trimLines[$trim[$djsEval[process.env.YOUTUBE_UA]]]]
     $try[
+        $localFunction[testfetchvtyt;
         $httpAddHeader[Accept;*/*]
         $httpAddHeader[User-Agent;$if[$or[$get[ytinitua]==;$get[ytinitua]==undefined]==false;$get[ytinitua];$get[agent]]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
@@ -38,20 +39,49 @@ module.exports = {
         $httpAddHeader[Sec-Fetch-Site;none]
         $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
         $if[$and[$env[cookielog]!=true;$env[successlog]==true];$logger[Info;Using Youtube Cookies. Attempting to rotating]
-        $if[$or[$get[ytinitua]==;$get[ytinitua]==undefined];$logger[Warn;Using default User Agent. Rotation may fails]]
+        $if[$and[$env[dlk]==false;$or[$get[ytinitua]==;$get[ytinitua]==undefined]];$logger[Warn;Using default User Agent. Rotation may fails]]
         ]
         $httpAddHeader[Cookie;$get[ytinitcookies]]
         ]
         $httpSetContentType[Text]
-        $!httpRequest[https://www.youtube.com;GET;g3]
+        $if[$env[dlk]==false;
+        $let[checkythttp;$httpRequest[https://www.youtube.com/results;GET;g3]]
+        ;
+        $let[checkythttp;$httpRequest[https://www.youtube.com;GET;g3]]
+        ]
+        $if[$get[checkythttp]==200;
         $if[$and[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;$advancedTextSplit[$env[g3];"LOGIN_INFO":";1;";0]==];
         $let[abortproscookies;true]
         $logger[Error;Cookies no longer active. Please put a new one - Youtube]
-        $logger[Info;Continuing process]
+        $if[$env[successlog]==true;$logger[Info;Continuing process]]
         ]
+        ;
+        $if[$env[successlog]==true;$logger[Warn;($get[checkythttp]) Can't retrieve web content$if[$env[ftst]!=false;. Some features might not available] - Youtube]]
+        $if[$env[ftst]==false;
+        $if[$env[successlog]==true;$logger[Warn;Re-trying (Fallback) - Youtube]]
+        $callLocalFunction[testfetchvtyt;true;true]
+        $return
+        ]]
+        ;dlk;ftst]
+        $callLocalFunction[testfetchvtyt;false;false]
+        $if[$advancedTextSplit[$env[g3];"visitorData":";1;";0]!=;
         $let[a32;$advancedTextSplit[$env[g3];"visitorData":";1;";0]]
+        $setCache[authmusic_youtube_visitor;$get[a32]]
+        ;
+        $if[$env[successlog]==true;$logger[Warn;InnerTube: Re-trying (Fallback)]]
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpAddHeader[Content-Type;application/json]
+        $httpSetBody[{"context":{"client":{"clientName":1,"clientVersion":"2.20261231"}}}]
+        $httpSetContentType[Text]
+        $!httpRequest[https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json&fields=responseContext(visitorData);POST]
+        $if[$isJSON[$httpResult];
+        $jsonLoad[fffyl;$httpResult]
+        $let[a32;$env[fffyl;responseContext;visitorData]]
+        $setCache[authmusic_youtube_visitor;$get[a32]]
+        ;
+        $if[$env[successlog]==true;$logger[Error;InnerTube: Can't continue the process]]
+        ]]
         $let[tempCookiesYT;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
-        $if[$get[a32]!=;$setCache[authmusic_youtube_visitor;$get[a32]]]
         $let[a33;$advancedTextSplit[$advancedTextSplit[$env[g3];"DATASYNC_ID":";1;";0];||;0]]
         $if[$get[a33]!=;$setCache[authmusic_youtube_datasync_id;$get[a33]]]
         $jsonLoad[listconfig;$getCache[system_file-config]]
@@ -83,10 +113,8 @@ module.exports = {
         $let[testitag;$arrayFindIndex[osav;v;$or[$env[v;itag]==251;$env[v;itag]==140]]]
         $logger[Info;InnerTube: Test Streaming | Itag $env[osav;$get[testitag];itag]]
         $let[ckec;$httpRequest[$env[osav;$get[testitag];url];HEAD]]
-        $if[$or[$get[ckec]==403;$get[ckec]==400];
+        $if[$or[$get[ckec]==403;$get[ckec]==429;$get[ckec]==400];
         $logger[Warn;InnerTube: $get[ckec] | These clients may not working normally: ANDROID, IOS, ANDROID_VR]
-        ;
-        $logger[Info;InnerTube: $get[ckec]]
         ]
         ]
         ]

@@ -102,21 +102,21 @@ function http2Request(url, opts = {}) {
 }
 
 (async () => {
-    if (ytcookies) {
-        try {
-            const embedRes = await http2Request("https://www.youtube.com/embed?html5=1", { method: "GET", headers: { "User-Agent": default_userAgent, "Cookie": ytcookies } });
-            const embedText = await embedRes.body.text();
-            vt = embedText.split('"visitorData":"')[1]?.split('"')[0] || "";
+    try {
+        if (ytcookies) {
+                const embedRes = await http2Request("https://www.youtube.com/embed?html5=1", { method: "GET", headers: { "User-Agent": default_userAgent, "Cookie": ytcookies } });
+                const embedText = await embedRes.body.text();
+                vt = embedText.split('"visitorData":"')[1]?.split('"')[0] || "";
+                actuallk.visitorData = vt;
+        }
+        
+        if (!vt) {
+            const res = await http2Request(`https://${hostdomain}/youtubei/v1/player?prettyPrint=false&alt=json&fields=responseContext(visitorData)`, { method: "POST", body: JSON.stringify(lk), headers: { "Origin": `https://${hostdomain}`, "Content-Type": "application/json", "User-Agent": APIuserAgent } });
+            const data = await res.body.json();
+            vt = data.responseContext.visitorData || "";
             actuallk.visitorData = vt;
-        } catch (e) { }
-    }
-    
-    if (!vt) {
-        const res = await http2Request(`https://${hostdomain}/youtubei/v1/player?prettyPrint=false&alt=json&fields=responseContext(visitorData)`, { method: "POST", body: JSON.stringify(lk), headers: { "Origin": `https://${hostdomain}`, "Content-Type": "application/json", "User-Agent": APIuserAgent } });
-        const data = await res.body.json();
-        vt = data.responseContext.visitorData || "";
-        actuallk.visitorData = vt;
-    }
+        }
+    } catch (e) { console.error(e) }
 })();
 
 async function fallbackYTStream(lstracks) {

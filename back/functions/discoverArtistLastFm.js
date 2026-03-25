@@ -45,6 +45,7 @@ $let[mrinyt;$arrayFindIndex[findindexch;p;$checkCondition[$env[p;channelRenderer
 $let[mrinyt;$if[$get[mrinyt]==-1;0;$get[mrinyt]]]
 $let[channelyturl;$env[a;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[mrinyt];channelRenderer;channelId]]
 $if[$get[channelyturl]!=;
+$httpAddHeader[Cookie;$getCache[authmusic_youtube_tempcookies]]
 $!httpRequest[https://www.youtube.com/channel/$get[channelyturl];GET]
 $jsonLoad[b;$advancedTextSplit[$httpResult;ytInitialData =;1;\\;</script>;0]]
 $let[bannerchannelurl;$replace[$env[b;header;pageHeaderRenderer;content;pageHeaderViewModel;banner;imageBannerViewModel;image;sources;0;url];w$env[b;header;pageHeaderRenderer;content;pageHeaderViewModel;banner;imageBannerViewModel;image;sources;0;width];s0]]
