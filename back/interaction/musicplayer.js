@@ -41,18 +41,48 @@ module.exports = {
     $setCache[musicplayer_message_$guildID_isshuffle;true]
     ]]
     $if[$advancedTextSplit[$customID;_;1]==lyrics;
+    $ephemeral
     $let[f-fetch;false]
+    $let[md5urltk;$md5[$trackInfo[url]]]
+    
+    $if[$callFunction[configMusic;preloadLyricsPlayer]==false;
+    $let[lrkggno;$getCache[musicplayer_cache-lyrics-$get[md5urltk]]]
+    $if[$get[lrkggno]==null;
+    $interactionReply[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
+    $stop
+    ]
     $async[
+    $if[$or[$get[lrkggno]==;$get[lrkggno]==undefined];
     $jsonLoad[result;$callFunction[getLyricsTrack;$if[$checkContains[$toLowercase[$toCamelCase[$trackInfo[title]]];$toLowercase[$toCamelCase[$trim[$advancedTextSplit[$trackInfo[author];-;0]]]]]==false;$trim[$advancedTextSplit[$trackInfo[author];-;0]] - $advancedTextSplit[$trackInfo[title];(;0];$advancedTextSplit[$trackInfo[title];(;0]];;false;false]]
+    ;
+    $jsonLoad[result;$get[lrkggno]]
+    ]
     $if[$env[result;results]==;$let[f-fetch;null];$let[f-fetch;true]]
     ]
-    $ephemeral
+    ;
+    $let[kkvnm;$if[$checkContains[$toLowercase[$toCamelCase[$trackInfo[title]]];$toLowercase[$toCamelCase[$trim[$advancedTextSplit[$trackInfo[author];-;0]]]]]==false;$trim[$advancedTextSplit[$trackInfo[author];-;0]] - $advancedTextSplit[$trackInfo[title];(;0];$advancedTextSplit[$trackInfo[title];(;0]]]
+    ]
     $defer
     $loop[-1;
+    $if[$callFunction[configMusic;preloadLyricsPlayer]==true;
+
+    $let[lrkggn;$getCache[musicplayer_cache-lyrics-$get[md5urltk]]]
+    $if[$get[lrkggn]!=undefined;
+    $if[$get[lrkggn]!=null;
+    $jsonLoad[result;$get[lrkggn]]
+    ;
+    $let[f-fetch;null]
+    ]
+    $break
+    ]]
     $if[$get[f-fetch]!=false;$break]
     $wait[5]
     ]
-    $onlyIf[$get[f-fetch]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
+    $if[$get[f-fetch]==null;
+    $setCache[musicplayer_cache-lyrics-$get[md5urltk];"null"]
+    $interactionReply[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
+    $stop
+    ]
     $let[loadlyrics;$env[result;results;lyric]]
     $interactionReply[
     $if[$charCount[$get[loadlyrics]]>3000;$attachment[$get[loadlyrics];lyrics-$getTimestamp.txt;true]]
@@ -63,6 +93,7 @@ module.exports = {
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
     ]
+    $setCache[musicplayer_cache-lyrics-$get[md5urltk];$jsonStringify[result]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==lastfm;
     $ephemeral
@@ -132,7 +163,6 @@ module.exports = {
     $!interactionDelete
     ]
     $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown;lastfm;actionplayer]!=true;]
-    $async[$!deferUpdate]
-    $callFunction[updateCurrentMusicPlayer]
+    $callFunction[updateCurrentMusicPlayer;true]
     `
 }

@@ -1,7 +1,9 @@
+// these clients apparently doesnt support cookies.
+// must be via 'Authorization' header but must oauth2 version, and idk how to get it
+
 module.exports = {
     // [ experimental client ]
     // most stable, doesn't support stream kids contents
-    // might not support cookies
     // some countries may not able to stream after 1 minute
     "VISIONOS": {
         "targetDomain": "m.youtube.com",
@@ -13,7 +15,6 @@ module.exports = {
         "osVersion": "1.3.21O771"
     },
     // least stable
-    // might not support cookies
     // can't stream after 1 minute
     "ANDROID": {
         "targetDomain": "youtubei.googleapis.com",
@@ -24,7 +25,6 @@ module.exports = {
         "osVersion": "11"
     },
     // [ "unofficial" client ]
-    // might not support cookies
     // some countries may not able to stream after 1 minute
     "ANDROID_REEL": {
         "targetDomain": "youtubei.googleapis.com",
@@ -63,7 +63,6 @@ module.exports = {
     },
     // [ "unofficial" client ]
     // least stable
-    // might not support cookies
     // can't stream live content normally
     // some countries may not able to stream after 1 minute
     "IOS_REEL": {

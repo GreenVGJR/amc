@@ -101,7 +101,7 @@ function http2Request(url, opts = {}) {
     });
 }
 
-(async () => {
+const generateVisitor = async () => {
     try {
         if (ytcookies) {
                 const embedRes = await http2Request("https://www.youtube.com/embed?html5=1", { method: "GET", headers: { "User-Agent": default_userAgent, "Cookie": ytcookies } });
@@ -117,7 +117,8 @@ function http2Request(url, opts = {}) {
             actuallk.visitorData = vt;
         }
     } catch (e) { console.error(e) }
-})();
+};
+generateVisitor().catch(console.error);
 
 async function fallbackYTStream(lstracks) {
     if (checklist = templist.find(l => l.id === lstracks)) {
@@ -129,7 +130,9 @@ async function fallbackYTStream(lstracks) {
         GTH = (sapisid = ytcookies?.match(/(?:^|;\\s*)SAPISID=([^;]*)/)?.[1], secure1psid = ytcookies?.match(/(?:^|;\\s*)__Secure-1PAPISID=([^;]*)/)?.[1], secure3psid = ytcookies?.match(/(?:^|;\\s*)__Secure-3PAPISID=([^;]*)/)?.[1], origin_url = `https://${hostdomain}`, datasyncid = datasyncID) => { const t = Math.floor(Date.now() / 1000).toString(); const dsi = (datasyncid && datasyncid !== "null" && datasyncid.trim() !== "") ? datasyncid + " " : ""; return "SAPISIDHASH " + t + "_" + require('crypto').createHash('sha1').update(dsi + t + " " + sapisid + " " + origin_url).digest('hex') + "_u" + " SAPISID1PHASH " + t + "_" + require('crypto').createHash('sha1').update(dsi + t + " " + secure1psid + " " + origin_url).digest('hex') + "_u" + " SAPISID3PHASH " + t + "_" + require('crypto').createHash('sha1').update(dsi + t + " " + secure3psid + " " + origin_url).digest('hex') + "_u"; };
         }
 
-        const buildRoute = { playerRequest: { videoId: lstracks.split('watch?v=')[1], contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, context: { client: { ...actuallk } } };
+        const cpn = randomBytes(12).toString('base64url');
+
+        const buildRoute = { playerRequest: { videoId: lstracks.split('watch?v=')[1], contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } } };
         
         let a = await http2Request(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
             method: "POST", body: JSON.stringify(buildRoute), headers: {
@@ -161,8 +164,11 @@ async function fallbackYTStream(lstracks) {
         const new_vt = a?.responseContext?.visitorData;
         if (new_vt) actuallk.visitorData = new_vt;
 
-        if(!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') throw new Error();
-        const cpn = randomBytes(12).toString('base64url');
+        if(!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
+            vt = "";
+            generateVisitor().catch(console.error);
+            throw new Error(`InnerTube Error: ${a?.playabilityStatus?.status || null} - ${a?.playabilityStatus?.message || null}`);
+        }
 
         if ((a?.videoDetails?.isLiveContent || streamTypeYT === 2) && a?.streamingData?.hlsManifestUrl) {
             if(targetClient === 'VISIONOS') {
@@ -177,12 +183,14 @@ async function fallbackYTStream(lstracks) {
             const fr = a.streamingData.adaptiveFormats.find(c => [140, 139].includes(c.itag));
             finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
         }
-        else if(a.streamingData?.formats?.[0]?.url || targetClient === 'ANDROID') {
-            finalurl = a.streamingData.formats[0].url + "&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
-        }
         else {
             const fr = a.streamingData.adaptiveFormats.find(c => [251, 140, 599].includes(c.itag));
-            finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+            const fs = a.streamingData?.formats?.[0]?.url;
+            if(fr && targetClient !== 'ANDROID') {
+                finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+            } else {
+                finalurl = fs + "&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+            }
         }
         // due youtube changes, i've change this to 1 minute
         templist.push({
@@ -193,19 +201,19 @@ async function fallbackYTStream(lstracks) {
         return finalurl;
     }
     catch (e) {
-        console.error(e);
-        throw new Error();
+        console.error(e.message);
+        return e;
     }
 }
 
 module.exports = {
     ...(ytcookies && { cookie: ytcookies }),
-    generateWithPoToken: false,
+    generateWithPoToken: true,
     disablePlayer: true,
     ignoreSignInErrors: true,
     slicePlaylist: true,
     streamOptions: {
-        useClient: useSABR ? "WEB" : "IOS"
+        useClient: "MWEB"
     },
     ...(!useSABR && {
         createStream: async (q) => {

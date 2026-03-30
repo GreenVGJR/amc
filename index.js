@@ -55,15 +55,14 @@ const music = new ForgeMusic({
         defaultFFmpegFilters: ["compressor"],
         disableResampler: true,
         disableFallbackStream: !toggles.useSABR,
+        disableCompressor: true,
         bufferingTimeout: 350,
         volume: 50,
         connectionTimeout: 10000,
         leaveOnEmpty: true,
         leaveOnEmptyCooldown: 15000,
         pauseOnEmpty: true
-    },
-    skipFFmpeg: true,
-    probeTimeout: 1
+    }
 });
 
 const client = new ForgeClient({

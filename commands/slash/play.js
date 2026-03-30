@@ -265,6 +265,6 @@ module.exports = {
   ]]
   $callLocalFunction[loadinteraction;3]
   $setTimeout[$async[$!interactionDelete];1s]
-  $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer]]
+  $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer;false]]
   ]`
 }

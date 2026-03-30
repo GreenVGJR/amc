@@ -6,32 +6,57 @@ module.exports = {
         required: true
     },
     {
+        name: "showEmbed", // bool
+        description: "Return embeds version",
+        required: false
+    },
+    {
         name: "userAgent", // string
         description: "Spoof Client",
         required: false
     }],
     code: `
 $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
+$let[showEmbed;$if[$or[$env[showEmbed]==null;$env[showEmbed]==];true;$env[showEmbed]]]
 $let[country;0]
+
+$let[cusque;$env[query]]
+$let[authorurl;https://www.last.fm/music/$encodeURI[$toLowercase[$get[cusque]]]]
+$let[lookCacheYT;$getCache[musicplayer_cache-lastfmyt-$md5[$get[cusque]]]]
+
 $localFunction[fetchlastfm;
-$if[$get[country]>=7;$return]
+$let[lookCache;$getCache[musicplayer_cache-lastfm-$md5[$get[cusque]]]]
+
+$if[$or[$get[lookCache]==null;$get[country]>=7];$return]
 $if[$env[retry]==true;$letSum[country;1]]
+$if[$or[$get[lookCache]==undefined;$get[lookCache]==];
 $try[
-$let[authorurl;https://www.last.fm/music/$encodeURI[$toLowercase[$env[query]]]]
 $httpAddHeader[Accept;text/html, */*]
 $httpAddHeader[Accept-Language;en]
 $httpAddHeader[User-Agent;$get[agent]]
 $httpAddHeader[Sec-Fetch-Dest;document]
 $httpAddHeader[Sec-Fetch-Site;none]
 $httpSetContentType[Text]
-$let[checkhttp;$httpRequest[$get[authorurl]?_pjax=%23content&top_tracks_date_preset=ALL;GET;reslast]]
+$let[checkhttp;$httpRequest[$get[authorurl]?_pjax=%23content&top_tracks_date_preset=ALL;GET]]
 $c[Last fm has weird anti-bot protect fr]
 $if[$or[$get[checkhttp]==502;$get[checkhttp]==416];$callLocalFunction[fetchlastfm;true] $return]
+$let[reslast;$httpResult]
+]
+;
+$let[reslast;$get[lookCache]]
 ]
 ;retry]
 $callLocalFunction[fetchlastfm;false]
-$onlyIf[$advancedTextSplit[$env[reslast];tnew-title;1;intabbr;1;">;1;</abbr>;0]!=;$return[null]]
-$let[actualauthorurl;$advancedTextSplit[$env[reslast];meta property="og:url";1;content=";1;";0;?;0]]
+$if[$advancedTextSplit[$get[reslast];tnew-title;1;intabbr;1;">;1;</abbr>;0]==;
+$setCache[musicplayer_cache-lastfm-$md5[$get[cusque]];"null"]
+$return[null]
+]
+$if[$or[$get[lookCache]==undefined;$get[lookCache]==];$setCache[musicplayer_cache-lastfm-$md5[$get[cusque]];$get[reslast]]]
+$if[$get[showEmbed]==false;$return[true]]
+$let[actualauthorurl;$advancedTextSplit[$get[reslast];meta property="og:url";1;content=";1;";0;?;0]]
+$if[$get[lookCacheYT]!=;
+$let[bannerchannelurl;$get[lookCacheYT]]
+;
 $httpAddHeader[Accept-Language;en]
 $httpAddHeader[User-Agent;$get[agent]]
 $httpSetContentType[Text]
@@ -49,12 +74,13 @@ $httpAddHeader[Cookie;$getCache[authmusic_youtube_tempcookies]]
 $!httpRequest[https://www.youtube.com/channel/$get[channelyturl];GET]
 $jsonLoad[b;$advancedTextSplit[$httpResult;ytInitialData =;1;\\;</script>;0]]
 $let[bannerchannelurl;$replace[$env[b;header;pageHeaderRenderer;content;pageHeaderViewModel;banner;imageBannerViewModel;image;sources;0;url];w$env[b;header;pageHeaderRenderer;content;pageHeaderViewModel;banner;imageBannerViewModel;image;sources;0;width];s0]]
-]
-$let[firstcovtop;$advancedTextSplit[$env[reslast];tbody;1;tbody;0;class="cover-art";1;src=";1;";0]]
-$let[achexternal;$advancedTextSplit[$env[reslast];ul class="resource-external-links";1;</ul>;0]]
+$if[$get[lookCacheYT]==;$setCache[musicplayer_cache-lastfmyt-$md5[$get[cusque]];$get[bannerchannelurl]]]
+]]
+$let[firstcovtop;$advancedTextSplit[$get[reslast];tbody;1;tbody;0;class="cover-art";1;src=";1;";0]]
+$let[achexternal;$advancedTextSplit[$get[reslast];ul class="resource-external-links";1;</ul>;0]]
 $arrayLoad[achjexternal;href=";$get[achexternal]]
 $!arrayShift[achjexternal]
-$arrayLoad[l;chartlist-row;$advancedTextSplit[$env[reslast];tbody;1;tbody;0]]
+$arrayLoad[l;chartlist-row;$advancedTextSplit[$get[reslast];tbody;1;tbody;0]]
 $arrayLoad[res]
 $arrayForEach[l;o;$if[$advancedTextSplit[$env[o];class="chartlist-image";1]!=;
 $let[lrfsmfm;$advancedTextSplit[$env[o];data-stat-value=";1;";0]]
@@ -63,9 +89,9 @@ $arrayPushJSON[res;-# $hyperlink[$bold[$advancedTextSplit[$env[o];alt=";1;loadin
 $let[conttracks;$arrayJoin[res;
 ]]
 $let[conttracks;$djsEval[require("entities").decodeHTML(ctx.getKeyword("conttracks"))]]
-$let[checkcolor;$if[$isValidHex[$advancedTextSplit[$env[reslast];"overlayColor";1;";1;";0]];$advancedTextSplit[$env[reslast];"overlayColor";1;";1;";0];$callFunction[useIcon;color_embed]]]
-$let[valthumbnail_author;$advancedTextSplit[$env[reslast];property="og:image";1;content=";1;";0]]
-$let[desc;$advancedTextSplit[$env[reslast];class="wiki-block-inner";1;wiki-truncate-4-lines;1;tabindex=";0;">
+$let[checkcolor;$if[$isValidHex[$advancedTextSplit[$get[reslast];"overlayColor";1;";1;";0]];$advancedTextSplit[$get[reslast];"overlayColor";1;";1;";0];$callFunction[useIcon;color_embed]]]
+$let[valthumbnail_author;$advancedTextSplit[$get[reslast];property="og:image";1;content=";1;";0]]
+$let[desc;$advancedTextSplit[$get[reslast];class="wiki-block-inner";1;wiki-truncate-4-lines;1;tabindex=";0;">
 ;1;
 ;1]]
 $if[$charCount[$get[desc];</a>]!=0;
@@ -74,23 +100,23 @@ $arrayMap[alk;ak;$return[$if[$advancedTextSplit[$env[ak];">;1;</a>;0]!=;$advance
 $let[desc;$trim[$advancedTextSplit[$arrayJoin[alk;];…;0]]]
 ]
 $let[desc;$djsEval[require("entities").decodeHTML(ctx.getKeyword("desc"))]]
-$let[latestre-t;$advancedTextSplit[$env[reslast];item-header;1;class="link-block-target";1;</a>;0;>;1]]
+$let[latestre-t;$advancedTextSplit[$get[reslast];item-header;1;class="link-block-target";1;</a>;0;>;1]]
 $let[latestre-t;$djsEval[require("entities").decodeHTML(ctx.getKeyword("latestre-t"))]]
-$let[latestre;$hyperlink[$get[latestre-t];https://www.last.fm$decodeURI[$advancedTextSplit[$env[reslast];item-header;1;href=";1;";0]]]\n-# $trimLines[$default[$advancedTextSplit[$env[reslast];item-header;1;item-date;1;">;1;</p>;0];Not Available]]]
-$let[popweek-t;$advancedTextSplit[$env[reslast];item-header;2;class="link-block-target";1;</a>;0;>;1]]
+$let[latestre;$hyperlink[$get[latestre-t];https://www.last.fm$decodeURI[$advancedTextSplit[$get[reslast];item-header;1;href=";1;";0]]]\n-# $trimLines[$default[$trim[$advancedTextSplit[$get[reslast];item-header;1;item-date;1;">;1;</p>;0]];Not Available]]]
+$let[popweek-t;$advancedTextSplit[$get[reslast];item-header;2;class="link-block-target";1;</a>;0;>;1]]
 $let[popweek-t;$djsEval[require("entities").decodeHTML(ctx.getKeyword("popweek-t"))]]
-$let[popweek;$hyperlink[$get[popweek-t];https://www.last.fm$decodeURI[$advancedTextSplit[$env[reslast];item-header;2;href=";1;";0]]]\n-# $toTitleCase[$trimLines[$default[$advancedTextSplit[$env[reslast];item-header;2;item-listeners;1;">;1;</p>;0];not available]]]]
-$let[simartist-t;$advancedTextSplit[$env[reslast];section class="artist-similar-sidebar";1;</section>;0]]
+$let[popweek;$hyperlink[$get[popweek-t];https://www.last.fm$decodeURI[$advancedTextSplit[$get[reslast];item-header;2;href=";1;";0]]]\n-# $toTitleCase[$trimLines[$default[$trim[$advancedTextSplit[$get[reslast];item-header;2;item-listeners;1;">;1;</p>;0]];not available]]]]
+$let[simartist-t;$advancedTextSplit[$get[reslast];section class="artist-similar-sidebar";1;</section>;0]]
 $let[simartist-t;$djsEval[require("entities").decodeHTML(ctx.getKeyword("simartist-t"))]]
 $arrayLoad[simartist-t-d;itemprop="name";$get[simartist-t]]
 $!arrayShift[simartist-t-d]
 $arrayMap[simartist-t-d;o;$return[$hyperlink[$advancedTextSplit[$env[o];href=";1;>;1;</a;0];https://www.last.fm$advancedTextSplit[$env[o];href=";1;";0]]];simartist-t-d]
 $if[$arrayLength[simartist-t-d]!=0;$let[simartist;$arrayJoin[simartist-t-d;, ]]]
-$arrayLoad[loadtag;class="tag";$advancedTextSplit[$env[reslast];tags-list--global;1;</li></ul>;0]]
+$arrayLoad[loadtag;class="tag";$advancedTextSplit[$get[reslast];tags-list--global;1;</li></ul>;0]]
 $!arrayShift[loadtag]
 $arrayMap[loadtag;tag;$return[$hyperlink[$advancedTextSplit[$env[tag];</a>;0;href=";1;>;1];https://www.last.fm$decodeURI[$advancedTextSplit[$env[tag];href=";1;";0]]]];loadtag]
-$author[$advancedTextSplit[$env[reslast];tnew-title;1;intabbr;1;">;1;</abbr>;0] Listened | $advancedTextSplit[$env[reslast];tnew-title;2;intabbr;1;">;1;</abbr>;0] Scrobbles;$advancedTextSplit[$env[reslast];rel="apple-music-app-icon";1;href=";1;";0];;0]
-$title[$advancedTextSplit[$env[reslast];resource-name=";1;data-page;0;";0];$get[actualauthorurl];0]
+$author[$advancedTextSplit[$get[reslast];tnew-title;1;intabbr;1;">;1;</abbr>;0] Listened | $advancedTextSplit[$get[reslast];tnew-title;2;intabbr;1;">;1;</abbr>;0] Scrobbles;$advancedTextSplit[$get[reslast];rel="apple-music-app-icon";1;href=";1;";0];;0]
+$title[$advancedTextSplit[$get[reslast];resource-name=";1;data-page;0;";0];$get[actualauthorurl];0]
 $color[$get[checkcolor];0]
 $if[$get[desc]!=;$description[-# $get[desc]]]
 $addField[> \`🏷️\` | Tags;$if[$arrayLength[loadtag]==0;-# Not Available;$arrayJoin[loadtag;, ]];false;0]
@@ -102,7 +128,7 @@ $if[$get[bannerchannelurl]!=;
 $image[$get[bannerchannelurl];0]
 ]
 $if[$get[conttracks]!=;
-$author[Top Tracks | All time;$advancedTextSplit[$env[reslast];rel="apple-music-app-icon";1;href=";1;";0];;1]
+$author[Top Tracks | All time;$advancedTextSplit[$get[reslast];rel="apple-music-app-icon";1;href=";1;";0];;1]
 $description[$get[conttracks];1]
 $if[$get[firstcovtop]!=;$thumbnail[$get[firstcovtop];1]]
 $color[$get[checkcolor];1]

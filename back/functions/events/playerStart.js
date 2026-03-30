@@ -40,6 +40,11 @@ module.exports = {
             name: "toggleInterval", // bool
             description: "For interval message",
             required: false
+        },
+        {
+            name: "bypassEdit", // bool
+            description: "Bypass Edit by using Interaction Update instead",
+            required: false
         }
     ],
     code: `
@@ -66,7 +71,7 @@ module.exports = {
     $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
     $setCache[musicplayer_message_$env[guildId]_channelid;"$env[channelId]"]
     $setCache[musicplayer_message_$env[guildId]_messageid;"$get[secmid]"]
-    $callFunction[updateCurrentMusicPlayer]
+    $callFunction[updateCurrentMusicPlayer;false]
     $stop
     ]
 
@@ -96,7 +101,7 @@ module.exports = {
     $jsonLoad[jsonmedia;$callFunction[filterMediaID;$get[url]]]
     ]
     $let[provider;$env[jsonmedia;type]]
-    $try[$!editMessage[$env[channelId];$env[messageId];
+    $localFunction[fetmusicmc;
     $if[$get[looknextsong];
     $author[» Next Playing\n$get[owner];$callFunction[useIcon;$get[provider]];;0]
     $title[$cropText[$get[title];0;253;...];$get[url];0]
@@ -143,11 +148,10 @@ module.exports = {
     $addButton[musicplayer_seekup_$env[messageId];+10s;Secondary;⏩;$or[$env[jsonmusicdata;durationMS]==0;$isPaused]]
     $addButton[musicplayer_actionplayer_$env[messageId];$if[$isPaused;Resume;Pause];Secondary;$if[$isPaused;▶️;⏸️];$checkCondition[$env[jsonmusicdata;durationMS]==0]]
     ]
-    ]
     ;
     $jsonLoad[aradio;$default[$getCache[radioplayer_data_$guildID_metadata];{}]]
     
-    $try[$!editMessage[$env[channelId];$env[messageId];
+    $localFunction[fetmusicmc;
     $author[Streaming Radio;https://cdn.onlineradiobox.com/img/android-chrome-192x192.png;;0]
     $title[$cropText[$env[aradio;title];0;253;...];$env[aradio;url];0]
     $if[$env[toggleInterval];$addField[Session Duration;$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]]]]
@@ -163,8 +167,13 @@ module.exports = {
     $addButton[musicplayer_volumeup_$env[messageId];+10%;Secondary;🔉;$checkCondition[$getVolume>=150]]
     ]
     ]
-    ]
+    
     $if[$env[toggleInterval];$setCache[musicplayer_message_$env[guildId]_waitinterval;false]]
+    $if[$env[bypassEdit]==true;
+    $try[$interactionUpdate[$callLocalFunction[fetmusicmc]]]
+    ;
+    $try[$!editMessage[$env[channelId];$env[messageId];$callLocalFunction[fetmusicmc]]]
+    ]
     $return
     `,
 };

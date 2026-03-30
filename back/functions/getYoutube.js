@@ -40,12 +40,13 @@ module.exports = [{
     $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $arrayForEach[dofetch;getfetch;
     $if[$and[$env[getfetch;videoRenderer;videoId]!=;$startsWith[$env[getfetch;videoRenderer;detailedMetadataSnippets;0;snippetText;runs;0;text];Provided to YouTube by]];
-    $arrayPushJSON[results;{
-        "title": "$advancedReplace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;;";\\\\"]",
-        "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",
-        "thumbnail": "https://i.ytimg.com/vi/$env[getfetch;videoRenderer;videoId]/maxres1.jpg",
-        "url": "https://music.youtube.com/watch?v=$env[getfetch;videoRenderer;videoId]"
-    }]]]
+    $jsonLoad[tempres;{}]
+    $!jsonSet[tempres;title;$env[getfetch;videoRenderer;title;runs;0;text]]
+    $!jsonSet[tempres;duration;"$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]"]
+    $!jsonSet[tempres;thumbnail;https://i.ytimg.com/vi/$env[getfetch;videoRenderer;videoId]/maxres1.jpg]
+    $!jsonSet[tempres;url;https://music.youtube.com/watch?v=$env[getfetch;videoRenderer;videoId]]
+    $arrayPushJSON[results;$env[tempres]]
+    ]]
     ;
     $arrayForEach[dofetch;getfetch;
     $if[$env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;navigationEndpoint;watchEndpoint;videoId]!=;
@@ -54,12 +55,12 @@ module.exports = [{
     $jsonLoad[cleanytmusictitle;$env[getfetch;musicResponsiveListItemRenderer;flexColumns;1;musicResponsiveListItemFlexColumnRenderer;text;runs]]
     $arraySlice[cleanytmusictitle;cleanytmusictitle;0;-4]
     $arrayMap[cleanytmusictitle;yt;$return[$env[yt;text]];cleanytmusictitle]
-    $arrayPushJSON[results;{
-        "title": "$advancedReplace[$arrayJoin[cleanytmusictitle;] - $env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;text];\\\\;;";\\\\";•;-]",
-        "duration": "$round[$divide[$unparseDigital[$env[getfetch;musicResponsiveListItemRenderer;flexColumns;1;musicResponsiveListItemFlexColumnRenderer;text;runs;$get[finduration];text]];1000];0]",
-        "thumbnail": "$advancedTextSplit[$env[getfetch;musicResponsiveListItemRenderer;thumbnail;musicThumbnailRenderer;thumbnail;thumbnails;0;url];=;0]=s0",
-        "url": "https://music.youtube.com/watch?v=$env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;navigationEndpoint;watchEndpoint;videoId]"
-    }]
+    $jsonLoad[tempres;{}]
+    $!jsonSet[tempres;title;$arrayJoin[cleanytmusictitle;] - $env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;text]]
+    $!jsonSet[tempres;duration;"$round[$divide[$unparseDigital[$env[getfetch;musicResponsiveListItemRenderer;flexColumns;1;musicResponsiveListItemFlexColumnRenderer;text;runs;$get[finduration];text]];1000];0]"]
+    $!jsonSet[tempres;thumbnail;$advancedTextSplit[$env[getfetch;musicResponsiveListItemRenderer;thumbnail;musicThumbnailRenderer;thumbnail;thumbnails;0;url];=;0]=s0]
+    $!jsonSet[tempres;url;https://music.youtube.com/watch?v=$env[getfetch;musicResponsiveListItemRenderer;flexColumns;0;musicResponsiveListItemFlexColumnRenderer;text;runs;0;navigationEndpoint;watchEndpoint;videoId]]
+    $arrayPushJSON[results;$env[tempres]]
     ]]]]
     $return[{"ping":"$httpPing", "results":$env[results]}]
     `
@@ -107,12 +108,12 @@ module.exports = [{
     ]
     $arrayForEach[dofetch;getfetch;
     $if[$env[getfetch;videoRenderer]!=;
-    $arrayPushJSON[results;{
-        "title": "$advancedReplace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;;";\\\\"]",
-        "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",
-        "thumbnail": "$default[$env[getfetch;videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url];https://i.ytimg.com/vi_webp/$env[getfetch;videoRenderer;videoId]/oardefault.webp]",
-        "url": "https://youtube.com/shorts/$env[getfetch;videoRenderer;videoId]"
-    }]]
+    $jsonLoad[tempres;{}]
+    $!jsonSet[tempres;title;$env[getfetch;videoRenderer;title;runs;0;text]]
+    $!jsonSet[tempres;duration;"$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]"]
+    $!jsonSet[tempres;thumbnail;$default[$env[getfetch;videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url];https://i.ytimg.com/vi_webp/$env[getfetch;videoRenderer;videoId]/oardefault.webp]]
+    $!jsonSet[tempres;url;https://youtube.com/shorts/$env[getfetch;videoRenderer;videoId]]
+    $arrayPushJSON[results;$env[tempres]]]
     ]]
     $return[{"ping":"$httpPing", "results":$env[results]}]
     `
@@ -146,12 +147,12 @@ module.exports = [{
     $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $arrayForEach[dofetch;getfetch;
     $if[$and[$env[getfetch;videoRenderer;videoId]!=;$startsWith[$env[getfetch;videoRenderer;detailedMetadataSnippets;0;snippetText;runs;0;text];Provided to YouTube by]==false];
-    $arrayPushJSON[results;{
-        "title": "$advancedReplace[$env[getfetch;videoRenderer;title;runs;0;text];\\\\;;";\\\\"]",
-        "duration": "$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]",
-        "thumbnail": "$default[$env[getfetch;videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url];https://i.ytimg.com/vi_webp/$env[getfetch;videoRenderer;videoId]/hq720.webp]",
-        "url": "https://youtube.com/watch?v=$env[getfetch;videoRenderer;videoId]"
-    }]]
+    $jsonLoad[tempres;{}]
+    $!jsonSet[tempres;title;$env[getfetch;videoRenderer;title;runs;0;text]]
+    $!jsonSet[tempres;duration;"$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]"]
+    $!jsonSet[tempres;thumbnail;$default[$env[getfetch;videoRenderer;richThumbnail;movingThumbnailRenderer;movingThumbnailDetails;thumbnails;0;url];https://i.ytimg.com/vi_webp/$env[getfetch;videoRenderer;videoId]/hq720.webp]]
+    $!jsonSet[tempres;url;https://youtube.com/watch?v=$env[getfetch;videoRenderer;videoId]]
+    $arrayPushJSON[results;$env[tempres]]]
     ]]
     $return[{"ping":"$httpPing", "results":$env[results]}]
     `

@@ -10,6 +10,9 @@
     "interval_message": true,
     "fetchMusicTitle_autocomplete": true,
 
+    "preloadLyricsPlayer": false,
+    "preloadLastFmPlayer": false,
+
     "_comment|stream": [
         "Having trouble while streaming youtube? Try switching the stream type, or enable SABR.",
         "This setting would also apply to spotify and applemusic",

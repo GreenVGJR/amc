@@ -191,13 +191,13 @@ module.exports = [{
     $callLocalFunction[loadinteraction;1]
 
     $try[
-    $let[testmessage;{
-    "title": "$advancedReplace[$get[title];\\\\;;";\\\\"]",
-    "url": "$get[url]",
-    "thumbnail": "$get[thumbnail]",
-    "durationMS": 0,
-    "requestedBy": {"id":"$authorID"}
-    }]
+    $jsonLoad[testmessage;{}]
+    $!jsonSet[testmessage;title;$get[title]]
+    $!jsonSet[testmessage;url;$get[url]]
+    $!jsonSet[testmessage;thumbnail;$get[thumbnail]]
+    $!jsonSet[testmessage;durationMS;0]
+    $!jsonSet[testmessage;requestedBy;{}]
+    $!jsonSet[testmessage;requestedBy;id;"$authorID"]
 
     $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
 
@@ -212,7 +212,7 @@ module.exports = [{
     $!interactionDelete
     ]
     $setCache[radioplayer_data_$guildID_checkplayer;true]
-    $setCache[radioplayer_data_$guildID_metadata;$get[testmessage]]
+    $setCache[radioplayer_data_$guildID_metadata;$jsonStringify[testmessage]]
     $setCache[radioplayer_data_$guildID_playerstatus;true]
     ;
     $callLocalFunction[loadinteraction;3]
