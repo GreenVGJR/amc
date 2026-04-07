@@ -1,12 +1,12 @@
 // Test replace yt stream
 const http2 = require('http2');
 const { randomBytes } = require('crypto');
-const { default_userAgent, streamTypeYT, useClientYT, useSABR } = require('../config.json');
+const { default_userAgent, streamTypeYT, useClientYT, useSABR, useBearer } = require('../config.json');
 const ytClients = require('./youtubeClients.js');
 const targetClient = useClientYT?.toUpperCase();
 
 let vt;
-let datasyncID = ""; // only worked for youtube embed client which idk how
+let datasyncID = "";
 
 const useClient = ytClients?.[targetClient];
 if (!useClient) {
@@ -14,17 +14,26 @@ if (!useClient) {
     throw new Error(`YouTube client "${targetClient}" does not exist. Available clients: ${available}`);
 }
 
-const buildQuery = (['ANDROID_REEL','IOS_REEL'].includes(targetClient) ? 'reel/reel_item_watch' : 'get_watch') + '?prettyPrint=false&alt=json&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url)),videoDetails(isLiveContent))';
+const buildQuery = 'reel/reel_item_watch?prettyPrint=false&alt=json&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url)),videoDetails(isLiveContent))';
 
 const APIuserAgent = useClient?.userAgent || default_userAgent;
 const ytcookies = process.env.YOUTUBE_COOKIES;
 const tempytcookies = process.env.YOUTUBE_ANONCOOKIES;
+let ytauth;
 const hostdomain = useClient.targetDomain;
 const lk = { context: { client: { clientName: useClient.clientName, clientVersion: useClient.clientVersion } } };
 var templist = [];
 
+function refreshYtAuth() {
+require('dotenv').config({ override: true, quiet: true });
+try { ytauth = JSON.parse(process.env.YOUTUBE_AUTH); } catch {}
+}
+refreshYtAuth();
+
 let actuallk = { ...useClient };
 delete actuallk.targetDomain;
+delete actuallk.client_id;
+delete actuallk.client_secret;
 actuallk.hl = "en";
 actuallk.gl = "US";
 
@@ -121,16 +130,20 @@ const generateVisitor = async () => {
 generateVisitor().catch(console.error);
 
 async function fallbackYTStream(lstracks) {
-    if (checklist = templist.find(l => l.id === lstracks)) {
+    const checklist = templist.find(l => l.id === lstracks);
+    if (checklist) {
         if (Date.now() <= checklist.ref) return checklist.url;
     }
     try {
         let GTH;
         if(ytcookies) {
-        GTH = (sapisid = ytcookies?.match(/(?:^|;\\s*)SAPISID=([^;]*)/)?.[1], secure1psid = ytcookies?.match(/(?:^|;\\s*)__Secure-1PAPISID=([^;]*)/)?.[1], secure3psid = ytcookies?.match(/(?:^|;\\s*)__Secure-3PAPISID=([^;]*)/)?.[1], origin_url = `https://${hostdomain}`, datasyncid = datasyncID) => { const t = Math.floor(Date.now() / 1000).toString(); const dsi = (datasyncid && datasyncid !== "null" && datasyncid.trim() !== "") ? datasyncid + " " : ""; return "SAPISIDHASH " + t + "_" + require('crypto').createHash('sha1').update(dsi + t + " " + sapisid + " " + origin_url).digest('hex') + "_u" + " SAPISID1PHASH " + t + "_" + require('crypto').createHash('sha1').update(dsi + t + " " + secure1psid + " " + origin_url).digest('hex') + "_u" + " SAPISID3PHASH " + t + "_" + require('crypto').createHash('sha1').update(dsi + t + " " + secure3psid + " " + origin_url).digest('hex') + "_u"; };
+        GTH = (sapisid = ytcookies?.match(/(?:^|;\s*)SAPISID=([^;]*)/)?.[1], secure1psid = ytcookies?.match(/(?:^|;\s*)__Secure-1PAPISID=([^;]*)/)?.[1], secure3psid = ytcookies?.match(/(?:^|;\s*)__Secure-3PAPISID=([^;]*)/)?.[1], origin_url = `https://${hostdomain}`, datasyncid = datasyncID) => { const t = Math.floor(Date.now() / 1000).toString(); const dsi = (datasyncid && datasyncid !== "null" && datasyncid.trim() !== "") ? datasyncid + " " : ""; return "SAPISIDHASH " + t + "_" + require('crypto').createHash('sha1').update(dsi + t + " " + sapisid + " " + origin_url).digest('hex') + "_u" + " SAPISID1PHASH " + t + "_" + require('crypto').createHash('sha1').update(dsi + t + " " + secure1psid + " " + origin_url).digest('hex') + "_u" + " SAPISID3PHASH " + t + "_" + require('crypto').createHash('sha1').update(dsi + t + " " + secure3psid + " " + origin_url).digest('hex') + "_u"; };
         }
 
         const cpn = randomBytes(12).toString('base64url');
+        const isVRnAuth = ytauth?.token && targetClient === "ANDROID_VR" && useBearer;
+
+        if(isVRnAuth) refreshYtAuth();
 
         const buildRoute = { playerRequest: { videoId: lstracks.split('watch?v=')[1], contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } } };
         
@@ -151,6 +164,9 @@ async function fallbackYTStream(lstracks) {
                     "Alt-Used": hostdomain,
                     "X-Goog-AuthUser": 0
                 } : {
+                    ...(isVRnAuth ? {
+                    "Authorization": "Bearer " + ytauth.token
+                    } : {}),
                     "Cookie": tempytcookies
                 })
             }
@@ -179,14 +195,14 @@ async function fallbackYTStream(lstracks) {
                 finalurl = a.streamingData.hlsManifestUrl + "?cver=" + useClient.clientVersion + "&cpn=" + cpn;
             }
         }
-        else if(['IOS', 'IOS_REEL'].includes(targetClient) && streamTypeYT === 1) {
+        else if(['IOS'].includes(targetClient) && streamTypeYT === 1) {
             const fr = a.streamingData.adaptiveFormats.find(c => [140, 139].includes(c.itag));
             finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
         }
         else {
-            const fr = a.streamingData.adaptiveFormats.find(c => [251, 140, 599].includes(c.itag));
+            const fr = a.streamingData?.adaptiveFormats?.find(c => [251, 140, 599].includes(c.itag));
             const fs = a.streamingData?.formats?.[0]?.url;
-            if(fr && targetClient !== 'ANDROID') {
+            if(fr) {
                 finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
             } else {
                 finalurl = fs + "&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;

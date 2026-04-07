@@ -28,6 +28,24 @@ module.exports = {
 
     $if[$or[$env[type]==all;$env[type]==youtube];
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Youtube             | Visitor;cyan]]
+    $if[$callFunction[configMusic;useBearer]==true;
+    $if[$env[successlog]==true;$logger[Info;Using Youtube Token. Looking auth]]
+    $jsonLoad[lrtuy;$callFunction[generateTokenYoutube;true]]
+    $if[$env[lrtuy]==false;
+    $logger[Warn;This client does not support OAuth2. Skipping]
+    ]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Content-Type;application/json]
+    $httpSetBody[{"context":{"client":{"clientName":1,"clientVersion":"2.20261231"}}}]
+    $httpSetContentType[Text]
+    $!httpRequest[https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json&fields=responseContext(visitorData);POST]
+    $if[$isJSON[$httpResult];
+    $jsonLoad[fffyl;$httpResult]
+    $let[a32;$env[fffyl;responseContext;visitorData]]
+    $setCache[authmusic_youtube_visitor;$get[a32]]
+    ]
+    $if[$env[successlog]==true;$logger[Info;$if[$get[a32]!=;$cropText[$get[a32];0;12;...];Failed to Retrieve] | Youtube / Visitor]]
+    ;
     $let[ytinitcookies;$trimLines[$trim[$djsEval[process.env.YOUTUBE_COOKIES]]]]
     $let[ytinitua;$trimLines[$trim[$djsEval[process.env.YOUTUBE_UA]]]]
     $try[
@@ -89,34 +107,6 @@ module.exports = {
         $setCache[authmusic_youtube_tempcookies;$get[tempCookiesYT]]
         $writeFile[.env;$replace[$readFile[.env];YOUTUBE_ANONCOOKIES=$djsEval[process.env.YOUTUBE_ANONCOOKIES];YOUTUBE_ANONCOOKIES=$get[tempCookiesYT]]]
         $!djsEval[require('dotenv').config({ override: true, quiet: true })]
-        $let[getpickclient;${tarClient()}]
-        $jsonLoad[listclient;$replace[${tarClientYT()};%SEMI%;\\;]]
-        $let[defytdomain;$env[listclient;targetDomain]]
-        $!jsonDelete[listclient;targetDomain]
-        $!jsonSet[listclient;visitorData;$getCache[authmusic_youtube_visitor]]
-        $!jsonSet[listclient;hl;en]
-        $!jsonSet[listclient;gl;US]
-        $c[-- Test Fetch Youtube Video --]
-        $httpAddHeader[Accept-Encoding;]
-        $httpAddHeader[User-Agent;$default[$env[listclient;userAgent];$callFunction[configMusic;default_userAgent]]]
-        $httpAddHeader[Content-Type;application/json]
-        $httpAddHeader[Cookie;$get[tempCookiesYT]]
-        $let[testvideoid;fa5IWHDbftI]
-        $httpSetBody[{"videoId":"$get[testvideoid]","context":{"client":$jsonStringify[listclient]}}]
-        $logger[Info;InnerTube: Test Fetching  | $get[testvideoid] ($get[getpickclient])]
-        $!httpRequest[https://$get[defytdomain]/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus(status),streamingData(adaptiveFormats(itag,url));POST]
-        $if[$httpResult[playabilityStatus;status]!=OK;
-        $logger[Warn;InnerTube: $default[$httpResult[playabilityStatus;status];Unknown] - Some features might not available]
-        ]
-        $if[$httpResult[playabilityStatus;status]==OK;
-        $jsonLoad[osav;$httpResult[streamingData;adaptiveFormats]]
-        $let[testitag;$arrayFindIndex[osav;v;$or[$env[v;itag]==251;$env[v;itag]==140]]]
-        $logger[Info;InnerTube: Test Streaming | Itag $env[osav;$get[testitag];itag]]
-        $let[ckec;$httpRequest[$env[osav;$get[testitag];url];HEAD]]
-        $if[$or[$get[ckec]==403;$get[ckec]==429;$get[ckec]==400];
-        $logger[Warn;InnerTube: $get[ckec] | These clients may not working normally: ANDROID, IOS, ANDROID_VR]
-        ]
-        ]
         ]
         $if[$and[$get[abortproscookies]!=true;$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false];
         $localFunction[cookiessid;
@@ -180,6 +170,7 @@ module.exports = {
         $httpAddHeader[User-Agent;$if[$or[$get[ytinitua]==;$get[ytinitua]==undefined]==false;$get[ytinitua];$get[agent]]]
         $let[httpytrotate;$httpRequest[https://accounts.youtube.com/RotateCookiesPage?origin=https://$get[ytdomain]&yt_pid=1;GET;g3_1]]
         ]
+        $if[$get[httpytrotate]==403;$logger[Warn;This client doesn't support cookies | Youtube Cookies]]
         $onlyIf[$get[httpytrotate]==200;$return[0]]
         $callLocalFunction[cookiessid;$httpGetHeader[Set-Cookie];false]
         $let[ytinitrotateid+hp_init;$advancedTextSplit[$env[g3_1];init(';1;';0]]
@@ -228,6 +219,8 @@ module.exports = {
         $jsonLoad[listclient;$replace[${tarClientYT()};%SEMI%;\\;]]
         $let[defytdomain;$env[listclient;targetDomain]]
         $!jsonDelete[listclient;targetDomain]
+        $!jsonDelete[listclient;client_id]
+        $!jsonDelete[listclient;client_secret]
         $!jsonSet[listclient;visitorData;$getCache[authmusic_youtube_visitor]]
         $!jsonSet[listclient;hl;en]
         $!jsonSet[listclient;gl;US]
@@ -235,7 +228,7 @@ module.exports = {
         $logger[Warn;Rotated. Test Fetching | $get[testvideoid] ($get[getpickclient])]
         $let[testtempcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
         $httpAddHeader[Accept-Encoding;]
-        $httpAddHeader[Authorization;$callFunction[generateBearerYt;$get[testtempcookies];;$get[defytdomain]]]
+        $httpAddHeader[Authorization;$callFunction[generateBearerYt;$get[testtempcookies];$getCache[authmusic_youtube_datasync_id];$get[defytdomain]]]
         $httpAddHeader[Cookie;$get[testtempcookies]]
         $httpAddHeader[Origin;https://$get[defytdomain]]
         $httpAddHeader[X-Origin;https://$get[defytdomain]]
@@ -258,6 +251,7 @@ module.exports = {
         $if[$env[successlog]==true;$logger[Info;$if[$get[a32]!=;$cropText[$get[a32];0;12;...];Failed to Retrieve] | Youtube / Visitor]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[a33]!=;$cropText[$get[a33];0;12;...];Failed to Retrieve] | Youtube / DataSyncID]]
     ;$if[$hasCache[retrycookiesyt]==false;$logger[Info;Failed to Retrieve - Youtube]]]
+    ]
     $if[$and[$get[a32]==;$get[abortproscookies]!=true];$logger[Warn;Re-trying - Youtube] $callFunction[generateAuthKeys;youtube;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==soundcloud];

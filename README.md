@@ -60,11 +60,7 @@ ___
 ___
 
 > [!WARNING]
-> By doing this you're risking your account getting temporary / permanent banned if you use for massive requests / users.<br>
-> Consider to use throwaway account. Only use this for certain cases.
-
-> [!NOTE]
-> You might also need to set for `YOUTUBE_UA=` User Agent same as previous.
+> This is unusable for now. Please use the 'YouTube Auth' version if you encounter sign-in problems.
 
 <details close>
 
@@ -80,6 +76,20 @@ ___
 4. Copy the `Cookie` from Request Headers
 > Doesn't show? do `Ctrl + F5`
 5. Put inside `.env` at `YOUTUBE_COOKIES=put_cookies_here`
+
+</details>
+
+<details close>
+
+<summary>
+
+## Find Youtube Auth
+
+</summary>
+
+1. Navigate to this file `back/config.json`
+2. Changes for 'useClientYT' to `ANDROID_VR` and 'useBearer' to `true`
+3. Restart the client and follow the instructions
 
 </details>
 

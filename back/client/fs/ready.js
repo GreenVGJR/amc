@@ -8,8 +8,12 @@ module.exports = {
     ]
     $logger[Info;Generating Auth]
     $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
-    $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined];
+    $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined;$callFunction[configMusic;useBearer]==true];
     $callFunction[generateAuthKeys;youtube;;true]
+    $if[$callFunction[configMusic;useBearer]==true;
+    $if[$env[lrtuy]!=false;
+    $setInterval[$let[yyugn;$callFunction[generateTokenYoutube;false]];30m]
+    ]]
     ;
     $localFunction[checkcookies;
     $let[checkcookie;$callFunction[generateAuthKeys;youtube;;$env[lfk];$env[toggle]]]
