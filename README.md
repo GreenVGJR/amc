@@ -63,13 +63,7 @@ _At least with known lavalink server_
 
 ___
 
-> [!WARNING]
-> By doing this you're risking your account getting temporary / permanent banned if you use for massive requests / users.<br>
-> Consider to use throwaway account. Only use this for certain cases.
-
-
-> [!NOTE]
-> You might also need to set for `YOUTUBE_UA=` User Agent same as previous.
+<details close>
 
 <summary>
 
