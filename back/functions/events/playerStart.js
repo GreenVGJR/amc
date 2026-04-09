@@ -40,6 +40,11 @@ module.exports = {
             name: "toggleInterval", // bool
             description: "For interval message",
             required: false
+        },
+        {
+            name: "bypassEdit", // bool
+            description: "Bypass Edit by using Interaction Update instead",
+            required: false
         }
     ],
     code: `
@@ -64,11 +69,12 @@ module.exports = {
     $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
     $setCache[musicplayer_message_$env[guildId]_channelid;"$env[channelId]"]
     $setCache[musicplayer_message_$env[guildId]_messageid;"$get[secmid]"]
-    $callFunction[updateCurrentMusicPlayer]
+    $callFunction[updateCurrentMusicPlayer;false]
     $stop
     ]
 
     $if[$env[toggleInterval];$setCache[musicplayer_message_$env[guildId]_waitinterval;true]]
+    $let[countVcMembers;$sub[$channelVoiceMemberCount[$voiceID[$guildID;$clientID]];2]]
     $if[$getCache[radioplayer_data_$env[guildId]_playerstatus]!=true;
 
     $jsonLoad[jsonmusicdata;$env[musicInfo]]
@@ -93,7 +99,7 @@ module.exports = {
     $jsonLoad[jsonmedia;$callFunction[filterMediaID;$get[url]]]
     ]
     $let[provider;$env[jsonmedia;type]]
-    $try[$!editMessage[$env[channelId];$env[messageId];
+    $localFunction[fetmusicmc;
     $if[$get[looknextsong];
     $author[» Next Playing\n$get[owner];$callFunction[useIcon;$get[provider]];;0]
     $title[$cropText[$get[title];0;253;...];$get[url];0]
@@ -101,7 +107,7 @@ module.exports = {
     $addField[Songs;$separateNumber[$sum[$playerQueueLength[$env[guildId]];1];.];true;0]
     $color[$default[$memberDisplayColor[$guildID;$get[requestedBy]];$callFunction[useIcon;color_embed]];0]
     $thumbnail[$if[$isValidLink[$get[thumbnail]]==false;$userAvatar[$get[requestedBy];1024];$get[thumbnail]];0]
-    $footer[$userDisplayName[$get[requestedBy]];$userAvatar[$get[requestedBy];1024];0]
+    $footer[$userDisplayName[$get[requestedBy]]$if[$get[countVcMembers]>=1;  •  +$get[countVcMembers] more];$userAvatar[$get[requestedBy];1024];0]
     ;
     $author[» Now Playing\n$env[jsonmusicdata;author];$callFunction[useIcon;$get[provider]];;0]
     $title[$cropText[$env[jsonmusicdata;title];0;253;...];$env[jsonmusicdata;url];0]
@@ -109,7 +115,7 @@ module.exports = {
     $addField[Duration;$if[$get[checkstream];$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]LIVE;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]$if[$advancedTextSplit[$parseDigital[$env[jsonmusicdata;durationMS]];:;0]==00;$cropText[$parseDigital[$env[jsonmusicdata;durationMS]];3;];$parseDigital[$env[jsonmusicdata;durationMS]]]];true;0]
     $addField[Songs;$separateNumber[$sum[$playerQueueLength[$env[guildId]];1];.];true;0]
     $thumbnail[$if[$isValidLink[$env[jsonmusicdata;thumbnail]]==false;$userAvatar[$playerTrackRequester[$guildID];1024];$env[jsonmusicdata;thumbnail]];0]
-    $footer[$userDisplayName[$playerTrackRequester[$guildID]];$userAvatar[$playerTrackRequester[$guildID];1024];0]
+    $footer[$userDisplayName[$playerTrackRequester[$guildID]]$if[$get[countVcMembers]>=1;  •  +$get[countVcMembers] more];$userAvatar[$playerTrackRequester[$guildID];1024];0]
     $color[$default[$memberDisplayColor[$guildID;$playerTrackRequester[$guildID]];$callFunction[useIcon;color_embed]];0]
     ]
     $addActionRow
@@ -140,16 +146,15 @@ module.exports = {
     $addButton[musicplayer_seekup_$env[messageId];+10s;Secondary;⏩;$or[$get[checkstream];$playerIsPaused[$env[guildId]]]]
     $addButton[musicplayer_actionplayer_$env[messageId];$if[$playerIsPaused[$env[guildId]];Resume;Pause];Secondary;$if[$playerIsPaused[$env[guildId]];▶️;⏸️];$get[checkstream]]
     ]
-    ]
     ;
     $jsonLoad[aradio;$default[$getCache[radioplayer_data_$guildID_metadata];{}]]
     
-    $try[$!editMessage[$env[channelId];$env[messageId];
+    $localFunction[fetmusicmc;
     $author[Streaming Radio;https://cdn.onlineradiobox.com/img/android-chrome-192x192.png;;0]
     $title[$cropText[$env[aradio;title];0;253;...];$env[aradio;url];0]
     $if[$callFunction[configMusic;interval_message];$addField[Session Duration;$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]]]]
     $thumbnail[$if[$isValidLink[$env[aradio;thumbnail]]==false;$userAvatar[$env[aradio;requestedBy;id];1024];$env[aradio;thumbnail]];0]
-    $footer[$userDisplayName[$env[aradio;requestedBy;id]];$userAvatar[$env[aradio;requestedBy;id];1024];0]
+    $footer[$userDisplayName[$env[aradio;requestedBy;id]]$if[$get[countVcMembers]>=1;  •  +$get[countVcMembers] more];$userAvatar[$env[aradio;requestedBy;id];1024];0]
     $color[$callFunction[useIcon;color_embed];0]
     $addActionRow
     $addButton[musicplayer_volumemute_$env[messageId];$if[$playerGetVolume[$env[guildId]]==0;Unmute;Mute];Secondary;🔈;false]
@@ -160,8 +165,13 @@ module.exports = {
     $addButton[musicplayer_volumeup_$env[messageId];+10%;Secondary;🔉;$checkCondition[$playerGetVolume[$env[guildId]]>=150]]
     ]
     ]
-    ]
+
     $if[$env[toggleInterval];$setCache[musicplayer_message_$env[guildId]_waitinterval;false]]
+    $if[$env[bypassEdit]==true;
+    $try[$interactionUpdate[$callLocalFunction[fetmusicmc]]]
+    ;
+    $try[$!editMessage[$env[channelId];$env[messageId];$callLocalFunction[fetmusicmc]]]
+    ]
     $return
     `,
 };

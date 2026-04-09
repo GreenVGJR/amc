@@ -54,7 +54,7 @@ module.exports = {
     ]
     $async[
     $!playerSeek[$guildID;$get[pest]]
-    $if[$callFunction[configMusic;interval_message]==false;$callFunction[updateCurrentMusicPlayer]]
+    $if[$callFunction[configMusic;interval_message]==false;$callFunction[updateCurrentMusicPlayer;false]]
     ]
     
     $let[a;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[pest]]]

@@ -29,7 +29,7 @@ $jsonLoad[finallvm;{"text":null,"acc":null}]
 $try[
 $httpAddHeader[Content-Type;application/json+protobuf]
 $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
-$httpAddHeader[X-Goog-Api-Key;AIzaSyATBXajvzQLTDHEQbcpq0Ihe0vWDHmO520]
+$httpAddHeader[X-Goog-Api-Key;$inflate[eJxz9KxKDK50DHGKSMwqqwr0CXHxcA1MSi4oNPDMSDUoC3fxyPU3NTIAAA12DPc;base64url]]
 $httpSetBody[$jsonStringify[51]]
 $httpSetContentType[Text]
 $!httpRequest[https://translate-pa.googleapis.com/v1/translateHtml;POST]

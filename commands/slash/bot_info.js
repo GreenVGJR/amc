@@ -43,7 +43,6 @@ module.exports = {
   $addField[Player Ping;\`$round[$if[$env[conflv;ws]==;0;$env[conflv;ws]]]ms\`;true;1]
   $addField[Total Connections;\`$if[$env[connections]==;Loading;$env[connections] / $guildCount]\`;true;1]
   $addField[Player Type;\`Lavalink\`;true;1]
-  $if[$get[client_banner]!=;$image[$get[client_banner];1]]
   $if[$env[connections]!=;
   $footer[CPU: $round[$divide[$cpu;$cpuCores];1]% :: RAM: $round[$ram;2]MB;;1]
   ;
@@ -62,7 +61,6 @@ module.exports = {
   ]]
   ;connections]
   $let[owner_banner;$try[$userBanner[$botOwnerID;2048]]]
-  $let[client_banner;$try[$userBanner[$clientID;2048]]]
   $let[av1;$userAvatar[$botOwnerID;2048]]
   $let[av2;$userAvatar[$clientID;2048]]
   $arrayLoad[guild;,;$guildIDs[,]]

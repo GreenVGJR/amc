@@ -175,7 +175,8 @@ $loop[-1;
 $if[$or[$isNumber[$get[httpstatus]];$get[f-fetch]==true];$break]
 $wait[5]
 ]
-$onlyIf[$or[$get[httpstatus]==200;$get[httpstatus]==206];$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$onlyIf[$get[httpstatus]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$onlyIf[$or[$get[httpstatus]==200;$get[httpstatus]==206];($get[httpstatus]) $callFunction[useCustomMusicMessage;config_generalForbiddenDownload]]
 $onlyIf[$get[clh]<=$get[limitsize];$replace[$callFunction[useCustomMusicMessage;config_generalOverDownload];{limit_size};$round[$divide[$get[limitsize];1024;1024];2]MB]\n$hyperlink[$advancedTextSplit[$get[gettitle];
 ;0];$trimLines[$get[getcdn]]]]
 $let[mediatype;$advancedTextSplit[$get[cly];/;0]]

@@ -225,7 +225,7 @@ module.exports = {
   $wait[1s]
   $if[$get[statusloop]==track;$!playerToggleLoop[$guildID;TRACK]]
   ]]
-  $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer]]
+  $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer;false]]
   $callLocalFunction[loadinteraction;3]
   $setTimeout[$async[$!interactionDelete];1s]
   ]`

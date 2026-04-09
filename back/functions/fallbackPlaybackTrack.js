@@ -31,39 +31,35 @@ module.exports = {
     $if[$env[whattype;type]==youtube;
 
     $let[videoid;$env[whattype;id]]
-    $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
+    $c[ANDROID_VR]
+    $jsonLoad[listclient;{"targetDomain":"youtubei.googleapis.com","clientName":28,"clientVersion":"1.00.0","deviceMake":"Oculus","deviceModel":"Quest 3","androidSdkVersion":30,"userAgent":"com.google.android.apps.youtube.vr.oculus/1.00.0 (Linux\\; U\\; Android 12L\\; eureka-user Build/SQ3A.220605.009.A1) gzip","osName":"Android","osVersion":"12L"}]
+    $let[defytdomain;$env[listclient;targetDomain]]
+    $!jsonDelete[listclient;targetDomain]
+    $!jsonDelete[listclient;client_id]
+    $!jsonDelete[listclient;client_secret]
+    $!jsonSet[listclient;visitorData;$getCache[authmusic_youtube_visitor]]
+    $!jsonSet[listclient;hl;en]
+    $!jsonSet[listclient;gl;US]
 
     $try[
-    $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;
-    $let[ytinitauth;$callFunction[generateBearerYt;$get[ytinitcookies];]]
-    $httpAddHeader[Authorization;$get[ytinitauth]]
-    $httpAddHeader[Cookie;$get[ytinitcookies]]
-    $httpAddHeader[Origin;https://www.youtube.com]
-    $httpAddHeader[X-Origin;https://www.youtube.com]
-    $httpAddHeader[Alt-Used;www.youtube.com]
-    $httpAddHeader[X-Goog-Visitor-Id;$getCache[authmusic_youtube_visitor]]
-    $httpAddHeader[X-Youtube-Bootstrap-Logged-In;true]
-    ;
     $httpAddHeader[Cookie;$getCache[authmusic_youtube_tempcookies]]
+    $httpAddHeader[X-Youtube-Client-Name;$env[listclient;clientName]]
+    $httpAddHeader[X-Youtube-Client-Version;$env[listclient;clientVersion]]
+    $httpAddHeader[Origin;https://$get[defytdomain]]
+    $httpAddHeader[X-Origin;https://$get[defytdomain]]
+    $httpAddHeader[User-Agent;$default[$env[listclient;userAgent];$callFunction[configMusic;default_userAgent]]]
+    $httpSetBody[{"playerRequest":{"videoId":"$get[videoid]","contentCheckOk":true,"racyCheckOk":true},"disablePlayerResponse":false,"cpn":"$toLowercase[$randomString[16]]","context":{"client":$jsonStringify[listclient]}}]
+    $!httpRequest[https://$get[defytdomain]/youtubei/v1/reel/reel_item_watch?prettyPrint=false&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(formats(itag,url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent));POST;reshttp]
+    $jsonLoad[reshttp;$env[reshttp;playerResponse]]
     ]
-    $if[$or[$env[types]==;$env[types]==v];
-    $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":101,"clientVersion":"0.1","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;www.youtube.com;m.youtube.com]/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent);POST;reshttp]
-    ]
-    $if[$env[types]==va;
-    $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
-    $httpSetBody[{"videoId":"$get[videoid]","context":{"client":{"hl":"en-US","gl":"US","clientName":28,"clientVersion":"1.00.0","visitorData":"$getCache[authmusic_youtube_visitor]","clientScreen":"WATCH","clientFormFactor":"UNKNOWN_FORM_FACTOR"},"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"racyCheckOk":true,"contentCheckOk":true}]
-    $!httpRequest[https://$if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false;www.youtube.com;m.youtube.com]/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus,streamingData(formats(itag,url)),videoDetails(isLiveContent);POST;reshttp]
-    ]]
+
     $if[$env[reshttp;playabilityStatus;status]!=OK;$return[$let[finalurl;bot|$default[$env[reshttp;playabilityStatus;reason];Precondition check failed]]]]
-    $if[$env[reshttp;videoDetails;isLiveContent];$return[$let[finalurl;live]]]
+    $if[$default[$env[reshttp;videoDetails;isLiveContent];false];$return[$let[finalurl;live]]]
+    $if[$env[reshttp;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[reshttp;responseContext;visitorData]]]
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
-    $if[$get[getindex251]==-1;$return[$let[finalurl;null]]]
+    $if[$get[getindex251]==-1;$return[$let[finalurl;bot|Format is not available]]]
     $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
     $if[$get[getcdnytlength]>=$env[size_limit];
     $let[checkindex139;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
@@ -88,7 +84,7 @@ module.exports = {
     $if[$env[types]==va;
     $jsonLoad[fts;$env[reshttp;streamingData;formats]]
     $let[getindex18;$arrayFindIndex[fts;aaa;$env[aaa;itag]==18]]
-    $if[$get[getindex18]==-1;$return[$let[finalurl;null]]]
+    $if[$get[getindex18]==-1;$return[$let[finalurl;bot|Format is not available]]]
     $let[getcdnyt;$env[fts;$get[getindex18];url]]
     $let[finalurl;$get[getcdnyt]&cpn=$randomString[16]&alr=no]
     ]
@@ -150,11 +146,15 @@ module.exports = {
     $let[ad6;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];lower_]]]
     $if[$get[ad6]==-1;$return[$let[finalurl;null]]]
     $let[findindex;$get[ad6]]
-    ]]]]]
+    $if[$get[ad6]==-1;
+    $let[ad7;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];comet_]]]
+    $if[$get[ad7]==-1;$return[$let[finalurl;null]]]
+    $let[findindex;$get[ad7]]
+    ]]]]]]
     $jsonLoad[b;$env[test;results;video;bitrateInfo;$get[findindex];PlayAddr;UrlList]]
     ]
     $if[$env[b;0]==;$return[$let[finalurl;null]]]
-    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1233;www.tiktok.com;api2.musical.ly]]
+    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1233;www.tiktok.com;api.tiktokv.com]]
     $let[finalurl;$djsEval[require("undici").request(ctx.getKeyword("finalurl"),{method:"GET"}).then(a => a.headers.location).catch()]]
     ]
     $if[$env[whattype;type]==tiktokmusic;

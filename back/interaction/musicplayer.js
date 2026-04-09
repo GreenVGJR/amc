@@ -122,6 +122,6 @@ module.exports = {
     ]
     $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown;lastfm]!=true;]
     $async[$!deferUpdate]
-    $callFunction[updateCurrentMusicPlayer]
+    $callFunction[updateCurrentMusicPlayer;true]
     `
 }

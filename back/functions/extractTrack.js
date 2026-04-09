@@ -40,6 +40,7 @@ module.exports = {
     $if[$and[$env[reshttp;playabilityStatus;status]!=OK;$env[reshttp;videoDetails;videoId]==];
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Cookie;$getCache[authmusic_youtube_tempcookies]]
     $httpSetContentType[Text]
     $let[http2;$httpRequest[https://www.youtube.com/watch?v=$env[filterid;id];GET]]
     $let[outputhtyt;$advancedTextSplit[$httpResult;var ytInitialData =;1;\\;;0]]

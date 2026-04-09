@@ -177,7 +177,7 @@ module.exports = {
     $httpAddHeader[Authorization;Bearer $getCache[authmusic_applemusic]]
     $httpAddHeader[Origin;https://music.apple.com]
     $httpAddHeader[Cookie;geo=US]
-    $let[httpal;$httpRequest[https://amp-edge-api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]]
+    $let[httpal;$httpRequest[https://api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]]
     $if[$or[$get[httpal]==401;$get[httpal]==400];
     $async[$callFunction[generateAuthKeys;applemusic;;false]]
     $let[httpal;429]
@@ -222,7 +222,7 @@ module.exports = {
     $!jsonSet[kls;title;$env[res3;title]$if[$env[res3;version]!=null; - $env[res3;version]]]
     $!jsonSet[kls;duration;$parseDigital[$round[$multi[$env[res3;duration];1000]]]]
     $!jsonSet[kls;thumbnail;https://resources.tidal.com/images/$replace[$env[res3;album;cover];-;/]/1280x1280.jpg]
-    $!jsonSet[kls;url;https://tidal.com/browse/track/$env[res3;id]?u]
+    $!jsonSet[kls;url;https://tidal.com/browse/track/$env[res3;id]/u]
     $arrayPush[results;$jsonStringify[kls]]
     ]
     ]

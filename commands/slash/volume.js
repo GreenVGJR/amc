@@ -38,6 +38,6 @@ module.exports = {
     $async[$!playerSetVolume[$guildID;$option[value]]]
     $interactionReply[$callFunction[useCustomMusicMessage;config_generalVolumeTrack] \`$playerGetVolume[$guildID]%\`]
     $setTimeout[$async[$!interactionDelete];1s]
-    $callFunction[updateCurrentMusicPlayer]
+    $callFunction[updateCurrentMusicPlayer;false]
     `
 }

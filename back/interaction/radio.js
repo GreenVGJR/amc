@@ -191,13 +191,13 @@ module.exports = [{
     $callLocalFunction[loadinteraction;1]
 
     $try[
-    $let[testmessage;{
-    "title": "$advancedReplace[$get[title];\\\\;;";\\\\"]",
-    "url": "$get[url]",
-    "thumbnail": "$get[thumbnail]",
-    "durationMS": 0,
-    "requestedBy": {"id":"$authorID"}
-    }]
+    $jsonLoad[testmessage;{}]
+    $!jsonSet[testmessage;title;$get[title]]
+    $!jsonSet[testmessage;url;$get[url]]
+    $!jsonSet[testmessage;thumbnail;$get[thumbnail]]
+    $!jsonSet[testmessage;durationMS;0]
+    $!jsonSet[testmessage;requestedBy;{}]
+    $!jsonSet[testmessage;requestedBy;id;"$authorID"]
 
     $let[iscreatedfirst;$checkCondition[$try[$checkCondition[$playerQueueLength[$guildID]>=0];false]==false]]
     $!playerCreate[$guildID;$voiceID;$channelID;50;true]
@@ -208,12 +208,12 @@ module.exports = [{
     $setCache[radioplayer_data_$guildID_checkplayer;true]
     $setCache[radioplayer_data_$guildID_playerstatus;true]
     $!playerAddTrack[$guildID;$trimLines[$get[stream]]]
-    $setCache[radioplayer_data_$guildID_metadata;$get[testmessage]]
+    $setCache[radioplayer_data_$guildID_metadata;$jsonStringify[testmessage]]
     ;
     $callLocalFunction[loadinteraction;2]
     $!playerAddTrack[$guildID;$trimLines[$get[stream]]]
     $if[$playerLoopStatus[$guildID]!=off;$!playerToggleLoop[$guildID;OFF] $wait[1s]]
-    $setCache[radioplayer_data_$guildID_metadata;$get[testmessage]]
+    $setCache[radioplayer_data_$guildID_metadata;$jsonStringify[testmessage]]
     $!playerSkip[$guildID;$playerQueueLength[$guildID]]
     $setCache[radioplayer_data_$guildID_checkplayer;true]
     $!interactionDelete

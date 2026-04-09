@@ -11,16 +11,15 @@ module.exports = [{
     $let[nextmessage_time;16000]
 
     $jsonLoad[currenttrack;$playerCurrentTrack[$guildID]]
-    $let[kltrack;{
-    "title": "$advancedReplace[$env[currenttrack;title];\\\\;;";\\\\"]",
-    "author": "$env[currenttrack;author]",
-    "url": "$env[currenttrack;uri]",
-    "thumbnail": "$env[currenttrack;artworkUrl]",
-    "duration": "$round[$divide[$env[currenttrack;duration];1000];0]",
-    "durationMS": "$env[currenttrack;duration]"
-    }]
+    $jsonLoad[kltrack;{}]
+    $!jsonSet[kltrack;title;$env[currenttrack;title]]
+    $!jsonSet[kltrack;author;$env[currenttrack;author]]
+    $!jsonSet[kltrack;url;$env[currenttrack;uri]]
+    $!jsonSet[kltrack;thumbnail;$env[currenttrack;artworkUrl]]
+    $!jsonSet[kltrack;duration;"$round[$divide[$env[currenttrack;duration];1000];0]"]
+    $!jsonSet[kltrack;durationMS;"$env[currenttrack;duration]"]
 
-    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$get[kltrack];$checkCondition[$sum[$playerElapsedTime[$guildID];$get[nextmessage_time]]>=$env[currenttrack;duration]];intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
+    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$jsonStringify[kltrack];$checkCondition[$sum[$playerElapsedTime[$guildID];$get[nextmessage_time]]>=$env[currenttrack;duration]];intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
     `
 },
 {
