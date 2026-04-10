@@ -27,10 +27,6 @@ const { SoundcloudExtractor } = require("discord-player-soundcloud");
 const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { AttachmentExtractor } = require("@discord-player/extractor");
-let YoutubeSabrExtractor;
-if(toggles.useSABR) {
-    ({ YoutubeSabrExtractor } = require('discord-player-googlevideo'));
-}
 
 const quorielDb = new QuorielDB({
     events: [
@@ -53,8 +49,8 @@ const music = new ForgeMusic({
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
         defaultFFmpegFilters: ["compressor"],
-        disableFallbackStream: !toggles.useSABR,
-        bufferingTimeout: 350,
+        disableFallbackStream: true,
+        // bufferingTimeout: 350,
         volume: 50,
         connectionTimeout: 10000,
         leaveOnEmpty: true,
@@ -98,7 +94,6 @@ client.applicationCommands.load("commands/slash");
 client.commands.load("back/interaction");
 client.commands.load("back/client/fs");
 client.commands.load("commands/basic");
-if(toggles.useSABR) music.player.extractors.register(YoutubeSabrExtractor, {});
 music.player.extractors.register(SoundcloudExtractor);
 music.player.extractors.register(SpotifyExtractor);
 music.player.extractors.register(AppleMusicExtractor);

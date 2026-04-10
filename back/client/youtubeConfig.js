@@ -1,7 +1,7 @@
 // Test replace yt stream
 const http2 = require('http2');
 const { randomBytes } = require('crypto');
-const { default_userAgent, streamTypeYT, useClientYT, useSABR, useBearer } = require('../config.json');
+const { default_userAgent, streamTypeYT, useClientYT, useBearer } = require('../config.json');
 const ytClients = require('./youtubeClients.js');
 const targetClient = useClientYT?.toUpperCase();
 
@@ -113,10 +113,11 @@ function http2Request(url, opts = {}) {
 const generateVisitor = async () => {
     try {
         if (ytcookies) {
-                const embedRes = await http2Request("https://www.youtube.com/embed?html5=1", { method: "GET", headers: { "User-Agent": default_userAgent, "Cookie": ytcookies } });
+                const embedRes = await http2Request("https://www.youtube.com/", { method: "GET", headers: { "User-Agent": default_userAgent, "Cookie": ytcookies } });
                 const embedText = await embedRes.body.text();
                 vt = embedText.split('"visitorData":"')[1]?.split('"')[0] || "";
                 actuallk.visitorData = vt;
+                datasyncID = embedText.split('"DATASYNC_ID":"')[1]?.split('"')[0]?.split('||')[0] || "";
         }
         
         if (!vt) {
@@ -157,7 +158,7 @@ async function fallbackYTStream(lstracks) {
                 "X-Youtube-Client-Name": useClient.clientName,
                 "X-Youtube-Client-Version": useClient.clientVersion,
                 "User-Agent": APIuserAgent,
-                ...(ytcookies ? {
+                ...(ytcookies && !isVRnAuth ? {
                     "Authorization": GTH(),
                     "Cookie": ytcookies,
                     "X-Youtube-Bootstrap-Logged-In": true,
@@ -183,7 +184,7 @@ async function fallbackYTStream(lstracks) {
         if(!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
             vt = "";
             generateVisitor().catch(console.error);
-            throw new Error(`InnerTube Error: ${a?.playabilityStatus?.status || null} - ${a?.playabilityStatus?.message || null}`);
+            throw new Error(`InnerTube Error: ${a?.playabilityStatus || null}`);
         }
 
         if ((a?.videoDetails?.isLiveContent || streamTypeYT === 2) && a?.streamingData?.hlsManifestUrl) {
@@ -200,7 +201,7 @@ async function fallbackYTStream(lstracks) {
             finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
         }
         else {
-            const fr = a.streamingData?.adaptiveFormats?.find(c => [251, 140, 599].includes(c.itag));
+            const fr = a.streamingData?.adaptiveFormats?.find(c => [774, 251, 140, 599].includes(c.itag));
             const fs = a.streamingData?.formats?.[0]?.url;
             if(fr) {
                 finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
@@ -208,11 +209,10 @@ async function fallbackYTStream(lstracks) {
                 finalurl = fs + "&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
             }
         }
-        // due youtube changes, i've change this to 1 minute
         templist.push({
             id: lstracks,
             url: finalurl,
-            ref: Date.now() + 60000
+            ref: Date.now() + 1800000
         });
         return finalurl;
     }
@@ -224,18 +224,16 @@ async function fallbackYTStream(lstracks) {
 
 module.exports = {
     ...(ytcookies && { cookie: ytcookies }),
-    generateWithPoToken: true,
+    generateWithPoToken: false,
     disablePlayer: true,
     ignoreSignInErrors: true,
     slicePlaylist: true,
-    streamOptions: {
-        useClient: "MWEB"
-    },
-    ...(!useSABR && {
-        createStream: async (q) => {
-            try { return await fallbackYTStream(q.url); }
-            catch { return; }
-        }
-    })
+    // streamOptions: {
+    //     useClient: "MUSIC"
+    // },
+    createStream: async (q) => {
+        try { return await fallbackYTStream(q.url); }
+        catch { return; }
+    }
 }
 

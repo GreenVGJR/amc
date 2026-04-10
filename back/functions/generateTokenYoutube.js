@@ -83,7 +83,6 @@ module.exports = {
     $if[$env[successlogs]==true;$logger[Info;Google - Token: $cropText[$env[lr;token];0;12;...]]]
     $writeFile[.env;$replace[$readFile[.env];YOUTUBE_AUTH=$get[lookauth];YOUTUBE_AUTH=$jsonStringify[lr]]]
     $!djsEval[require('dotenv').config({ override: true, quiet: true })]
-    $if[$env[successlogs]==true;$logger[Info;Continuing process]]
     $return[true]
     `
 }

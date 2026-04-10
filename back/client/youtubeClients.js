@@ -54,5 +54,14 @@ module.exports = {
         "userAgent": "com.google.ios.youtube/21.11.480 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)",
         "osName": "iPhone",
         "osVersion": "18.3.2.22D82"
+    },
+    // legacy formats only
+    // might support cookies
+    "WEB_PARENT": {
+        "targetDomain": "www.youtube.com",
+        "client_id": null,
+        "client_secret": null,
+        "clientName": 88,
+        "clientVersion": "1.20260410",
     }
 }

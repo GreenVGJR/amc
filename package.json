@@ -8,7 +8,6 @@
     "@tryforge/forgescript": "^2.6.0",
     "canvas": "^3.2.3",
     "discord-player-applemusic": "^1.0.3",
-    "discord-player-googlevideo": "^0.2.5",
     "discord-player-soundcloud": "^1.0.7",
     "discord-player-spotify": "^1.1.9",
     "discord-player-youtubei": "^2.0.0",
