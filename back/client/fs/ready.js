@@ -15,7 +15,10 @@ module.exports = {
     $async[$callFunction[generateAuthKeys;spotify_token;;true]]
     $async[$callFunction[generateAuthKeys;amazonmusic;;true]]
     $async[$callFunction[generateAuthKeys;applemusic;;true]]
-    $async[$callFunction[generateAuthKeys;tidal;;true]]
+    $async[
+    $callFunction[generateAuthKeys;tidal;;true]
+    $callFunction[generateAuthKeys;tidal_token;;true]
+    ]
     $async[$callFunction[generateAuthKeys;deezer;;true]]
     $async[$setCache[listcommands-help;$applicationCommands]]
     $callFunction[generateAuthKeys;twitter;;true]

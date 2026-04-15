@@ -111,6 +111,51 @@ module.exports = {
     $!jsonSet[results;results;autocomplete;$encodeURI[$env[r;title]]]
     $!jsonSet[results;results;lyric;$get[finallyric]]
     ;
+    $let[custtslmgt;false]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept;application/json]
+    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[X-Tidal-Token;$getCache[authmusic_tidal]]
+    $!httpRequest[https://api.tidal.com/v1/search/tracks?countryCode=US&locale=en_US&limit=1&offset=0&query=$env[query];GET;restt]
+    $if[$env[restt;items;0;id]==;$let[custtslmgt;true]]
+    $if[$get[custtslmgt]==false;
+    $let[checkcachelyric;$getCache[cachelyricsdata-$env[line]-$md5[tidal_$env[restt;items;0;id]]]]
+    $if[$get[checkcachelyric]!=;
+    $let[finallyric2;$get[checkcachelyric]]
+    ;
+    $localFunction[nttuf;
+    $if[$env[refauth]==true;$generateAuthKeys[tidal_token;;false]]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept;application/vnd.api+json]
+    $httpAddHeader[Origin;https://tidal.com]
+    $httpAddHeader[Authorization;Bearer $getCache[authmusic_tidal_token]]
+    $httpSetContentType[Text]
+    $let[http_1;$httpRequest[https://openapi.tidal.com/v2/tracks/$env[restt;items;0;id]?include=lyrics;GET;ttklr]]
+    $if[$or[$get[http_1]==401;$get[http_1]==400];$callLocalFunction[nttuf;true] $return]
+    $jsonLoad[ttklr;$env[ttklr]]
+    ;refauth]
+    $callLocalFunction[nttuf;false]
+    $if[$env[line]==true;
+    $if[$or[$env[ttklr;included;0;attributes;lrcText]==;$env[ttklr;included;0;attributes;lrcText]==null];$let[custtslmgt;true];$let[finallyric2;$env[ttklr;included;0;attributes;lrcText]]]
+    ;
+    $if[$or[$env[ttklr;included;0;attributes;text]==;$env[ttklr;included;0;attributes;text]==null];$let[custtslmgt;true];$let[finallyric2;$env[ttklr;included;0;attributes;text]]]
+    ]
+    ]
+    ]
+    $if[$get[custtslmgt]==false;
+    $!jsonSet[results;status_1;null]
+    $!jsonSet[results;status_2;null]
+    $!jsonSet[results;response_time;$sub[$getTimestamp;$get[time]]]
+    $!jsonSet[results;id;tidal_$env[restt;items;0;id]]
+    $!jsonSet[results;results;{}]
+    $!jsonSet[results;results;provider;tidal]
+    $!jsonSet[results;results;thumbnail;https://resources.tidal.com/images/$replace[$env[restt;items;0;album;cover];-;/]/1280x1280.jpg]
+    $!jsonSet[results;results;query;$encodeURI[$env[query]]]
+    $!jsonSet[results;results;url;https://tidal.com/browse/track/$env[restt;items;0;id]/u]
+    $!jsonSet[results;results;autocomplete;$encodeURI[$env[restt;items;0;title]]]
+    $!jsonSet[results;results;lyric;$get[finallyric2]]
+    ;
     $let[cusdezaborterls;false]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
@@ -219,7 +264,7 @@ module.exports = {
     $!jsonSet[results;results;url;$env[ges;response;sections;0;hits;0;result;url]]
     $!jsonSet[results;results;autocomplete;$encodeURI[$env[ges;response;sections;0;hits;0;result;title_with_featured]]]
     $!jsonSet[results;results;lyric;$get[a2_filtering]]
-    ]]]]]
+    ]]]]]]
     $async[
     $if[$env[results;results;autocomplete]!=;
     $setCache[cachelyricsdata-$env[line]-$md5[$env[results;id]];$env[results;results;lyric]]
