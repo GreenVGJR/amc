@@ -1,7 +1,7 @@
 module.exports = {
   data: {
     "name": "lyrics",
-    "description": "Search for lyrics | Providers: Youtube Music, Shazam, Deezer, Lrclib, Genius",
+    "description": "Search for lyrics | Providers: Youtube Music, Shazam, Tidal, Deezer, Lrclib, Genius",
     "options": [
       {
         "type": 3,
@@ -36,7 +36,7 @@ module.exports = {
       },
     ],
     "description_localizations": {
-      "id": "Cari lirik lagu | Sumber: Youtube Music, Shazam, Deezer, Lrclib, Genius"
+      "id": "Cari lirik lagu | Sumber: Youtube Music, Shazam, Tidal, Deezer, Lrclib, Genius"
     },
     "integration_types": [
       0,

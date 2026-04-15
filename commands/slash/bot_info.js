@@ -62,12 +62,6 @@ module.exports = {
   $let[owner_banner;$try[$userBanner[$botOwnerID;2048]]]
   $let[av1;$userAvatar[$botOwnerID;2048]]
   $let[av2;$userAvatar[$clientID;2048]]
-  $arrayLoad[guild;,;$guildIDs[,]]
-  $let[countnode;0]
-  $arrayForEach[guild;guilds;
-  $try[
-  $if[$djsEval[(0, require("discord-player").useMainPlayer)().nodes.has(ctx.client.guilds.cache.get("$env[guilds]"))];$letSum[countnode;1]]
-  ]]
-  $callLocalFunction[abcd;$get[countnode]]
+  $callLocalFunction[abcd;$getCache[countmusicnode]]
   `
 }

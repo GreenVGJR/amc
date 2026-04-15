@@ -11,11 +11,11 @@
     "discord-player-soundcloud": "^1.0.7",
     "discord-player-spotify": "^1.1.9",
     "discord-player-youtubei": "^2.0.0",
-    "dotenv": "^17.4.1",
+    "dotenv": "^17.4.2",
     "entities": "^8.0.0",
     "lmdb": "^3.5.3",
     "mediaplex": "^1.0.0",
-    "youtube-dl-exec": "^3.1.4"
+    "youtube-dl-exec": "^3.1.5"
   },
   "devDependencies": {
     "patch-package": "^8.0.1"

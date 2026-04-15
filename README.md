@@ -1,7 +1,6 @@
 <div align="center">
   
 # 🌠 AMC
-Simple yet powerful Discord music bot. Built with [Forgescript](https://github.com/tryForge/ForgeScript)<br>
 [![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/quoriel/db/main?label=@quoriel/db&color=2596be)](https://github.com/quoriel/db) [![QuorielEdge](https://img.shields.io/github/package-json/v/quoriel/edge/main?label=@quoriel/edge&color=2596be)](https://github.com/quoriel/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![License](https://img.shields.io/github/license/GreenVGJR/amc-discord-bot)](LICENSE)
 
 </div>
@@ -125,6 +124,7 @@ ___
   Providers:
   = > Youtube Music
     > Shazam
+    > Tidal
     > Deezer
     > Lrclib
     > Genius

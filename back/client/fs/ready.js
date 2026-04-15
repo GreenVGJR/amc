@@ -6,6 +6,16 @@ module.exports = {
     $logger[Warn;Caching Discord context for better performance]
     $async[$callFunction[fetchDiscordContext]]
     ]
+    $setCache[countmusicnode;"0"]
+    $setInterval[
+        $arrayLoad[guild;,;$guildIDs[,]]
+        $let[countnode;0]
+        $arrayForEach[guild;guilds;
+        $try[
+        $if[$djsEval[(0, require("discord-player").useMainPlayer)().nodes.has(ctx.client.guilds.cache.get("$env[guilds]"))];$letSum[countnode;1]]
+        ]]
+        $setCache[countmusicnode;"$get[countnode]"]
+    ;1m]
     $logger[Info;Generating Auth]
     $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
     $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined;$callFunction[configMusic;useBearer]==true];
@@ -34,7 +44,10 @@ module.exports = {
     $async[$callFunction[generateAuthKeys;spotify_token;;true]]
     $async[$callFunction[generateAuthKeys;amazonmusic;;true]]
     $async[$callFunction[generateAuthKeys;applemusic;;true]]
-    $async[$callFunction[generateAuthKeys;tidal;;true]]
+    $async[
+    $callFunction[generateAuthKeys;tidal;;true]
+    $callFunction[generateAuthKeys;tidal_token;;true]
+    ]
     $async[$callFunction[generateAuthKeys;deezer;;true]]
     $async[$setCache[listcommands-help;$applicationCommands]]
     $callFunction[generateAuthKeys;twitter;;true]
