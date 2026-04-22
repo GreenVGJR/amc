@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@evan/opus": "^1.0.3",
     "@quoriel/db": "github:quoriel/db",
     "@quoriel/edge": "github:quoriel/edge",
     "@snazzah/davey": "^0.1.11",
@@ -13,8 +12,7 @@
     "discord-player-youtubei": "^2.0.0",
     "dotenv": "^17.4.2",
     "entities": "^8.0.0",
-    "lmdb": "^3.5.3",
-    "mediaplex": "^1.0.0",
+    "lmdb": "^3.5.4",
     "youtube-dl-exec": "^3.1.5"
   },
   "devDependencies": {

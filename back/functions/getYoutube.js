@@ -177,7 +177,7 @@ module.exports = [{
     code: `
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
     $try[
-    $httpSetBody[{"videoId":"$env[videoId]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"videoId":"$env[videoId]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
@@ -186,7 +186,7 @@ module.exports = [{
     $!httpRequest[https://music.youtube.com/youtubei/v1/next?prettyPrint=false&fields=contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer(tabs.tabRenderer.endpoint.browseEndpoint.browseId);POST;res]
     $let[browseid;$advancedTextSplit[$env[res];"browseId":";1;";0]]
     $if[$env[line]==true;
-    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":21,"clientVersion":"8.36","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":21,"clientVersion":"8.47","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
@@ -200,7 +200,7 @@ module.exports = [{
     $let[finalyric;$arrayJoin[er;
 ]]
     ;
-    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en"}}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
@@ -230,7 +230,7 @@ module.exports = [{
     $arrayLoad[results]
     $localFunction[runfuncytpl;
     $let[checktoken;$or[$env[lotoken]==;$env[lotoken]==null]]
-    $httpSetBody[{"context":{"client":{"hl":"en","gl":"US","clientName":1,"clientVersion":"2.20261231"}},$if[$get[checktoken];"browseId":"VL$env[playlistId]";"continuation":"$env[lotoken]"]}]
+    $httpSetBody[{"context":{"client":{"hl":"en","gl":"US","clientName":1,"clientVersion":"2.20261231","visitorData":"$getCache[authmusic_youtube_visitor]"}},$if[$get[checktoken];"browseId":"VL$env[playlistId]";"continuation":"$env[lotoken]"]}]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Content-Type;application/json]

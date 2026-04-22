@@ -8,6 +8,7 @@
     "debug_auth": false,
     "autodelete_nextmessage": false,
     "interval_message": true,
+    "statusvc_message": true,
     "fetchMusicTitle_autocomplete": true,
 
     "preloadLyricsPlayer": false,
@@ -24,5 +25,5 @@
     "useBearer": false,
 
     "disable_YT": false,
-    "default_userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+    "default_userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
 }

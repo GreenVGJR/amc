@@ -27,16 +27,15 @@ module.exports = {
     ;
     $localFunction[checkcookies;
     $let[checkcookie;$callFunction[generateAuthKeys;youtube;;$env[lfk];$env[toggle]]]
-    $if[$getCache[retrycookiesyt]==true;$deleteCache[retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;true]]
+    $if[$getCache[retrycookiesyt]==true;$deleteCache[retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;false]]
     ;lfk;toggle]
     $callLocalFunction[checkcookies;true;false]
+    $if[$getCache[disablecookiesyt]!=true;
     $setInterval[
-    $localFunction[checkcookies;
-    $let[checkcookie;$callFunction[generateAuthKeys;youtube;;$env[lfk];$env[toggle]]]
-    $if[$getCache[retrycookiesyt]==true;$deleteCache[retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;true]]
-    ;lfk;toggle]
-    $callLocalFunction[checkcookies;true;false]
-    ;9m]
+    $callLocalFunction[checkcookies;false;false]
+    ;10m]
+    ]
+    $deleteCache[disablecookiesyt]
     ]
     $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]

@@ -72,6 +72,8 @@ module.exports = {
         $let[abortproscookies;true]
         $logger[Error;Cookies no longer active. Please put a new one - Youtube]
         $if[$env[successlog]==true;$logger[Info;Continuing process]]
+        ;
+        $if[$and[$checkContains[$httpGetHeader[Set-Cookie];SIDCC];$env[successlog]==true];$logger[Info;1 - Rotating | Youtube Cookies]]
         ]
         ;
         $if[$env[successlog]==true;$logger[Warn;($get[checkythttp]) Can't retrieve web content$if[$env[ftst]!=false;. Some features might not available] - Youtube]]
@@ -111,50 +113,9 @@ module.exports = {
         $if[$and[$get[abortproscookies]!=true;$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false];
         $localFunction[cookiessid;
         $let[tempgrinitcs;$default[$get[ytinitcookies_replacement];$get[ytinitcookies]]]
-        $arrayLoad[lkcinitcookies_1;\\;;$get[tempgrinitcs]]
-        $arrayMap[lkcinitcookies_1;b;$if[$charCount[$env[b];=]>=1;$return[$trim[$env[b]]]];lkcinitcookies_1]
-        $let[tempgt-gr-c-0_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__Secure-1PSIDCC]]]
-        $let[tempgt-gr-c-1_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__Secure-3PSIDCC]]]
-        $let[tempgt-gr-c-2_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];SIDCC]]]
-        $let[tempgt-gr-c-3_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];NID]]]
-        $let[tempgt-gr-c-4_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__Secure-ENID]]]
-        $let[tempgt-gr-c-5_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__Secure-1PSIDTS]]]
-        $let[tempgt-gr-c-6_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];__Secure-3PSIDTS]]]
-        $let[tempgt-gr-c-7_0;$arrayFindIndex[lkcinitcookies_1;a;$startsWith[$env[a];LOGIN_INFO]]]
-        $arrayLoad[lkcinitcookies_2;\\;;$env[56fe40cf]]
-        $arrayMap[lkcinitcookies_2;b;$return[$default[$advancedTextSplit[$env[b];, ;1];$advancedTextSplit[$env[b]; ;0]]];lkcinitcookies_2]
-        $arrayMap[lkcinitcookies_2;b;$if[$and[$charCount[$env[b]; ]==0;$charCount[$env[b]]!=0];$return[$env[b]]];lkcinitcookies_2]
-        $let[tempgt-gr-c-0_1;$arrayFindIndex[lkcinitcookies_2;a;$and[$startsWith[$env[a];__Secure-1PSIDCC];$advancedTextSplit[$env[a];__Secure-1PSIDCC=;1;\\;;0]!=]]]
-        $let[tempgt-gr-c-1_1;$arrayFindIndex[lkcinitcookies_2;a;$and[$startsWith[$env[a];__Secure-3PSIDCC];$advancedTextSplit[$env[a];__Secure-3PSIDCC=;1;\\;;0]!=]]]
-        $let[tempgt-gr-c-2_1;$arrayFindIndex[lkcinitcookies_2;a;$and[$startsWith[$env[a];SIDCC];$advancedTextSplit[$env[a];SIDCC=;1;\\;;0]!=]]]
-        $let[tempgt-gr-c-3_1;$arrayFindIndex[lkcinitcookies_2;a;$and[$startsWith[$env[a];NID];$advancedTextSplit[$env[a];NID=;1;\\;;0]!=]]]
-        $let[tempgt-gr-c-4_1;$arrayFindIndex[lkcinitcookies_2;a;$and[$startsWith[$env[a];__Secure-ENID];$advancedTextSplit[$env[a];__Secure-ENID=;1;\\;;0]!=]]]
-        $let[tempgt-gr-c-5_1;$arrayFindIndex[lkcinitcookies_2;a;$and[$startsWith[$env[a];__Secure-1PSIDTS];$advancedTextSplit[$env[a];__Secure-1PSIDTS=;1;\\;;0]!=]]]
-        $let[tempgt-gr-c-6_1;$arrayFindIndex[lkcinitcookies_2;a;$and[$startsWith[$env[a];__Secure-3PSIDTS];$advancedTextSplit[$env[a];__Secure-3PSIDTS=;1;\\;;0]!=]]]
-        $if[$and[$get[tempgt-gr-c-0_0]!=-1;$get[tempgt-gr-c-0_1]!=-1];
-        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-0_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-0_1]]]
-        ]
-        $if[$and[$get[tempgt-gr-c-1_0]!=-1;$get[tempgt-gr-c-1_1]!=-1];
-        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-1_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-1_1]]]
-        ]
-        $if[$and[$get[tempgt-gr-c-2_0]!=-1;$get[tempgt-gr-c-2_1]!=-1];
-        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-2_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-2_1]]]
-        ]
-        $if[$and[$get[tempgt-gr-c-3_0]!=-1;$get[tempgt-gr-c-3_1]!=-1];
-        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-3_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-3_1]]]
-        ]
-        $if[$and[$get[tempgt-gr-c-4_0]!=-1;$get[tempgt-gr-c-4_1]!=-1];
-        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-4_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-4_1]]]
-        ]
-        $if[$and[$get[tempgt-gr-c-7_0]!=-1;$advancedTextSplit[$env[g3];"LOGIN_INFO":";1;";0]!=];
-        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-7_0];LOGIN_INFO=$advancedTextSplit[$env[g3];"LOGIN_INFO":";1;";0]]
-        ]
-        $let[ytinitcookies_replacement;$arrayJoin[lkcinitcookies_1;\\; ]]
-        $if[$env[findtsidexist]==true;
-        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-5_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-5_1]]]
-        $!jsonSet[lkcinitcookies_1;$get[tempgt-gr-c-6_0];$env[lkcinitcookies_2;$get[tempgt-gr-c-6_1]]]
-        $let[ytinitcookies_replacement;$arrayJoin[lkcinitcookies_1;\\; ]]
-        ]
+        $let[tempfrreslm1;$callFunction[filterCookies;0;$get[tempgrinitcs]]]
+        $let[tempfrreslm2;$callFunction[filterCookies;1;$env[56fe40cf]]]
+        $let[ytinitcookies_replacement;$callFunction[filterCookies;2;$get[tempfrreslm1];$get[tempfrreslm2]]]
         $return
         ;56fe40cf;findtsidexist]
         $callLocalFunction[cookiessid;$httpGetHeader[Set-Cookie];false]
@@ -170,7 +131,10 @@ module.exports = {
         $httpAddHeader[User-Agent;$if[$or[$get[ytinitua]==;$get[ytinitua]==undefined]==false;$get[ytinitua];$get[agent]]]
         $let[httpytrotate;$httpRequest[https://accounts.youtube.com/RotateCookiesPage?origin=https://$get[ytdomain]&yt_pid=1;GET;g3_1]]
         ]
-        $if[$get[httpytrotate]==403;$logger[Warn;This client doesn't support cookies | Youtube Cookies]]
+        $if[$get[httpytrotate]==403;
+        $logger[Warn;This client doesn't support cookies | Youtube Cookies]
+        $setCache[disablecookiesyt;true]
+        ]
         $onlyIf[$get[httpytrotate]==200;$return[0]]
         $callLocalFunction[cookiessid;$httpGetHeader[Set-Cookie];false]
         $let[ytinitrotateid+hp_init;$advancedTextSplit[$env[g3_1];init(';1;';0]]
@@ -198,14 +162,12 @@ module.exports = {
         $return[$get[httpytrotate_2]]
         ]
         $if[$env[successlog]==true;
-        $wait[1s]
         $let[checkrotate-1;$callLocalFunction[attytrotate-1]]
-        $if[$get[checkrotate-1]!=200;$let[abortproscookies;true];$if[$env[successlog]==true;$logger[Info;1 - Rotating | Youtube Cookies]]]
+        $if[$get[checkrotate-1]!=200;$let[abortproscookies;true];$if[$env[successlog]==true;$logger[Info;2 - Rotating | Youtube Cookies]]]
         ]
         $if[$get[abortproscookies]!=true;
-        $wait[1s]
         $let[checkrotate-2;$callLocalFunction[attytrotate-2]]
-        $if[$get[checkrotate-2]!=200;$let[abortproscookies;true];$if[$env[successlog]==true;$logger[Info;2 - Rotating | Youtube Cookies]]]
+        $if[$get[checkrotate-2]!=200;$let[abortproscookies;true];$if[$env[successlog]==true;$logger[Info;3 - Rotating | Youtube Cookies]]]
         $if[$get[abortproscookies]==true;
         $logger[Error;Cookie doesn't appear.]
         $logger[Warn;Re-trying in 10 seconds - Youtube Cookies]
@@ -243,7 +205,7 @@ module.exports = {
         $httpAddHeader[X-Goog-AuthUser;0]
         $httpSetBody[{"videoId":"$get[testvideoid]","context":{"client":$jsonStringify[listclient],"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"racyCheckOk":true,"contentCheckOk":true}]
         $let[nncm;$httpRequest[https://$get[defytdomain]/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus(status);POST]]
-        $if[$httpResult[playabilityStatus;status]==OK;$logger[Info;Cookies & Auth are Valid. Continuing process];$logger[Warn;$if[$get[nncm]==400;This client doesn't support cookies.;Failed to fetch.\nYoutube may blocked the ip address or the client doesn't support cookies.] Continuing process]]
+        $if[$httpResult[playabilityStatus;status]==OK;$logger[Info;Cookies & Auth are Valid. Continuing process];$if[$get[nncm]==400;$setCache[disablecookiesyt;true]] $logger[Warn;$if[$get[nncm]==400;This client doesn't support cookies.;Failed to fetch.\nYoutube may blocked the ip address or the client doesn't support cookies.] Continuing process]]
         ]]
         ;
         $logger[Error;Cookie doesn't appear. Can't continue this process.]
@@ -340,7 +302,7 @@ module.exports = {
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpAddHeader[Content-Type;application/json]
         $httpAddHeader[Accept;application/json]
-        $httpSetBody[{"client_data":{"client_version":"1.0","client_id":"d8a5ed958d274c2e8ee717e6a4b0971d","js_sdk_data":{}}}]
+        $httpSetBody[{"client_data":{"client_version":"1.0","client_id":"f6a40776580943a7bc5173125a1e8832","js_sdk_data":{}}}]
         $!httpRequest[https://clienttoken.spotify.com/v1/clienttoken;POST]
         $let[token;$httpResult[granted_token;token]]
         $if[$get[token]!=;$setCache[authmusic_spotify_token;$get[token]]]
@@ -425,7 +387,7 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[\\[SEARCH\\] Generating Tiktok              | Token & Cookies;cyan]]
     $try[
         $let[finaljs;false]
-        $httpAddHeader[User-Agent;Mozilla/5.0 (Linux\\; Android 10\\; Pixel 3 XL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0]
+        $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
         $httpRequest[https://www.tiktok.com;GET]
@@ -436,14 +398,14 @@ module.exports = {
         $if[$get[lks]==0;$let[finaljs;true]]
         $if[$get[finaljs]==false;
         $httpAddHeader[Cookie;$get[lks]]
-        $httpAddHeader[User-Agent;Mozilla/5.0 (Linux\\; Android 10\\; Pixel 3 XL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0]
+        $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
         $httpRequest[https://www.tiktok.com;GET]
         $let[finalck;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
         $if[$get[finalck]==;$let[finaljs;true]]
         $if[$get[finaljs]==false;
-        $let[a13;$get[finalck]]
+        $let[a13;$callFunction[filterCookies;2;$get[finalck];$get[lks]]]
         $let[a12;$advancedTextSplit[$httpResult;"wid":";1;";0]]
         ]]]
         $if[$get[finaljs]==true;

@@ -1,6 +1,7 @@
 module.exports = [{
     type: "playerTrigger",
     code: `
+    $let[cachevid;$voiceID[$guildID;$clientID]]
     $if[$and[$default[$getCache[radioplayer_data_$guildID_playerstatus];false]==false;$callFunction[configMusic;autodelete_nextmessage]];
     $if[$env[reason]!=filters;
     $wait[500]
@@ -45,6 +46,16 @@ module.exports = [{
         $setCache[musicplayer_cache-lastfm-$get[kkcmb];"null"]
         ]]
     ]]
+
+    $c[Status VC]
+    $async[
+    $if[$and[$env[reason]!=filters;$callFunction[configMusic;statusvc_message]];
+    $if[$getCache[radioplayer_data_$env[guildId]_playerstatus]!=true;
+    $let[mm;$callFunction[channelStatus;$get[cachevid];🎶 [$if[$env[track;durationMS]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$env[track;durationMS]];:;0]==00;$cropText[$parseDigital[$env[track;durationMS]];3;];$parseDigital[$env[track;durationMS]]]]\\] $env[track;title]]]
+    ;
+    $jsonLoad[aradio;$default[$getCache[radioplayer_data_$guildID_metadata];{}]]
+    $let[mm;$callFunction[channelStatus;$get[cachevid];📻 $env[aradio;title]]]
+    ]]]
 
     $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[track];false;intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
 
@@ -117,10 +128,6 @@ module.exports = [{
     $if[$callFunction[configMusic;interval_message]==true;
     $deleteCache[musicplayer_message_$guildID_waitinterval]
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    ]
-    $async[
-    $let[al;$playerElapsedTime]
-    $!disableComponentsOf[$get[cid];$get[mid]]
     ]
     `
 }]

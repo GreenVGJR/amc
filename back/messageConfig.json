@@ -20,6 +20,7 @@
     "config_errorAttemptSearchJoinVC": "[WARNING] You must be on voice channel to use this.",
     "config_errorAttemptRadioPlayer": "[WARNING] Stop the current active player before switching player.",
     "config_errorAttemptSearchFetchTitle": "[INFO] Can't find the title.",
+    "config_errorAttemptSearchSkipTrack": "[INFO] Can't find the track.",
     "config_infoSearchFirst": "[INFO] What music you want to play?",
 
     "_inline|clienterror": "---",
@@ -43,6 +44,7 @@
     "config_errorPlayerBeforeSeek": "Disable loop mode to skip.",
     "config_errorPositionBeforeSeek": "Nothing to skip on position:",
     "config_errorStopTrack": "Already disconnect.",
+    "config_errorSkipTrackInvalid": "Invalid position.",
     "config_errorIntervalMessage": "Seems like the current message wasn't exist. This will be use to continue interval.",
     "config_errorRadioPlayer": "Stop the current active player before switching player.",
     "config_generalForceSkipTrack": "Attempting to Skip",

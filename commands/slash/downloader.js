@@ -204,18 +204,21 @@ $wait[5]
 $if[$get[isjsoncdn]==true;
 $callLocalFunction[runcodessync;Processing » Uploading;$advancedTextSplit[$trimLines[$get[getcdn]];/;2];true]
 $try[$!djsEval[
-  let chunks = ctx.getEnvironmentKey("yup_container")\\;
+let chunks = ctx.getEnvironmentKey("yup_container")\\;
   if (!Array.isArray(chunks)) chunks = [\\]\\;
-  let totalLength = 0\\;
-  let buffers = chunks.map(s => {
-    let b = Buffer.from(s, "base64")\\;
-    totalLength += b.length\\;
-    return b\\;
-  })\\;
-  let final = Buffer.concat(buffers, totalLength)\\;
+
+  const decoded = chunks.map((s) => Buffer.from(s, "base64"))\\;
+  const totalLength = decoded.reduce((n, b) => n + b.length, 0)\\;
+
+  const final = Buffer.allocUnsafe(totalLength)\\;
+  let offset = 0\\;
+  for (const buf of decoded) {
+    buf.copy(final, offset)\\;
+    offset += buf.length\\;
+  }
+
   ctx.setKeyword("condownbytes", final.toString("base64"))\\;
-  for (let i = 0\\; i < buffers.length\\; i++) buffers[i\\] = null\\;
-  final = null\\;
+  decoded.length = 0\\;
 ]]
 ]
 $onlyIf[$get[condownbytes]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]

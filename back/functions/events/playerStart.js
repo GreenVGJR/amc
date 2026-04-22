@@ -90,7 +90,7 @@ module.exports = {
     $let[statusshuffle;$default[$getCache[musicplayer_message_$env[guildId]_isshuffle];false]]
 
     $let[delayping;$checkCondition[$round[$executionTime;0]>=250]]
-    $let[checkdurationms;$if[$hasMusicNode;$if[$isPlaying;$trackInfo[durationMS];0];0]]
+    $let[checkdurationms;$if[$hasMusicNode;$if[$isPlaying;$env[jsonmusicdata;durationMS];0];0]]
     $let[looknextsong;$and[$env[toggleInterval]==true;$env[showNext]==true;$queueLength!=0;$getLoopMode!=TRACK;$get[checkdurationms]!=0]]
     $if[$get[looknextsong];
     $let[requestedBy;$queue[0;1;{track.requestedBy.id}]]
@@ -121,12 +121,14 @@ module.exports = {
     $footer[$userDisplayName[$env[jsonmusicdata;requestedBy;id]]$if[$get[countVcMembers]>=1;  •  +$get[countVcMembers] more];$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];0]
     ]
     $addActionRow
-    $addStringSelectMenu[musicplayer_nodequeue_$env[messageId];$cropText[Queue | $djsEval[require("entities").decodeHTML(\\\`$trackInfo[title]\\\`)];0;50;...];$or[$queueLength==0;$getLoopMode==TRACK];1;1]
+    $let[ttrktitle;$env[jsonmusicdata;title]]
+    $addStringSelectMenu[musicplayer_nodequeue_$env[messageId];$cropText[Queue | $djsEval[require("entities").decodeHTML(ctx.getKeyword("ttrktitle"))];0;50;...];$or[$queueLength==0;$getLoopMode==TRACK];1;1]
 
     $let[countqueue;0]
     $if[$queueLength!=0;
     $arrayForEach[rest;yesnt;
-    $addOption[$djsEval[require("entities").decodeHTML(\\\`$cropText[$env[yesnt];0;97;...]\\\`)];;$get[countqueue]]
+    $let[ttrknt;$cropText[$env[yesnt];0;97;...]]
+    $addOption[$djsEval[require("entities").decodeHTML(ctx.getKeyword("ttrknt"))];;$get[countqueue]]
     $letSum[countqueue;1]
     ]
     ;

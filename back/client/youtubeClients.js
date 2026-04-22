@@ -3,7 +3,7 @@ module.exports = {
     // most stable, doesn't support stream kids contents
     // some countries may not able to stream after 1 minute
     "VISIONOS": {
-        "targetDomain": "m.youtube.com",
+        "targetDomain": "youtubei.googleapis.com",
         "client_id": null,
         "client_secret": null,
         "clientName": 101,

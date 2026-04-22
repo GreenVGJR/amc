@@ -17,16 +17,24 @@ if (!useClient) {
 const buildQuery = 'reel/reel_item_watch?prettyPrint=false&alt=json&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent))';
 
 const APIuserAgent = useClient?.userAgent || default_userAgent;
-const ytcookies = process.env.YOUTUBE_COOKIES;
-const tempytcookies = process.env.YOUTUBE_ANONCOOKIES;
 let ytauth;
+let ytcookies;
+let tempytcookies;
 const hostdomain = useClient.targetDomain;
 const lk = { context: { client: { clientName: useClient.clientName, clientVersion: useClient.clientVersion } } };
 var templist = [];
 
 function refreshYtAuth() {
     require('dotenv').config({ override: true, quiet: true });
-    try { ytauth = JSON.parse(process.env.YOUTUBE_AUTH); } catch { }
+    if (process.env.YOUTUBE_AUTH) {
+        try { ytauth = JSON.parse(process.env.YOUTUBE_AUTH); } catch { }
+    }
+    if (process.env.YOUTUBE_COOKIES) {
+        ytcookies = process.env.YOUTUBE_COOKIES;
+    }
+    if (process.env.YOUTUBE_ANONCOOKIES) {
+        tempytcookies = process.env.YOUTUBE_ANONCOOKIES;
+    }
 }
 refreshYtAuth();
 
@@ -131,6 +139,7 @@ const generateVisitor = async () => {
 generateVisitor().catch(console.error);
 
 async function fallbackYTStream(lstracks) {
+    refreshYtAuth();
     const checklist = templist.find(l => l.id === lstracks);
     if (checklist) {
         if (Date.now() <= checklist.ref) {
@@ -146,8 +155,6 @@ async function fallbackYTStream(lstracks) {
 
         const cpn = randomBytes(12).toString('base64url');
         const isVRnAuth = ytauth?.token && targetClient === "ANDROID_VR" && useBearer;
-
-        if (isVRnAuth) refreshYtAuth();
 
         const buildRoute = { playerRequest: { videoId: lstracks.split('watch?v=')[1], contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } } };
 
@@ -190,7 +197,7 @@ async function fallbackYTStream(lstracks) {
         if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
             vt = "";
             generateVisitor().catch(console.error);
-            throw new Error(`InnerTube Error: ${a?.playabilityStatus || null}`);
+            throw new Error(`InnerTube Error: ${JSON.stringify(a?.playabilityStatus) || null}`);
         }
 
         if ((a?.videoDetails?.isLiveContent || streamTypeYT === 2) && a?.streamingData?.hlsManifestUrl) {
@@ -240,9 +247,9 @@ module.exports = {
     disablePlayer: true,
     ignoreSignInErrors: true,
     slicePlaylist: true,
-    // streamOptions: {
-    //     useClient: "MUSIC"
-    // },
+    innertubeConfigRaw: {
+        client_type: "WEB"
+    },
     createStream: async (q) => {
         try { return await fallbackYTStream(q.url); }
         catch { return; }

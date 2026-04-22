@@ -7,8 +7,8 @@ module.exports = {
       "type": 4,
       "name": "position",
       "description": "Skip to specific track",
-      "min_value": 1,
       "required": false,
+      "autocomplete": true
     },
   ],
   "integration_types": [
@@ -38,8 +38,10 @@ module.exports = {
     $let[nodes;$if[$hasMusicNode;$queueLength;0]]
     $onlyIf[$get[nodes]!=0;$callFunction[useCustomMusicMessage;config_errorNoTrackBeforeSeek]]
     $onlyIf[$getLoopMode!=TRACK;$callFunction[useCustomMusicMessage;config_errorPlayerBeforeSeek]]
+    $onlyIf[$or[$option[position]==;$isNumber[$option[position]]];$callFunction[useCustomMusicMessage;config_errorSkipTrackInvalid]]
 
     $if[$option[position]!=;
+    $onlyIf[$sub[$option[position];1]>=0;$callFunction[useCustomMusicMessage;config_errorSkipTrackInvalid]]
     $onlyIf[$sub[$option[position];1]<$queueLength;$callFunction[useCustomMusicMessage;config_errorPositionBeforeSeek] \`$option[position]\`]
     ]
 

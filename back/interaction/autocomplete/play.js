@@ -13,21 +13,51 @@ module.exports = {
     $if[$env[testing;results;0]==;
     $addChoice[$cropText[$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];0;100;];$cropText[$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];0;100;]]
     ;
-    $if[$env[testing;results;0]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;0];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;0];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;1]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;1];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;1];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;2]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;2];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;2];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;3]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;3];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;3];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;4]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;4];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;4];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;5]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;5];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;5];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;6]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;6];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;6];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;7]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;7];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;7];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;8]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;8];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;8];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;9]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;9];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;9];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;10]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;10];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;10];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;11]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;11];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;11];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;12]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;12];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;12];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;13]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;13];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;13];";\\\\"]\\\`)]]]
-    $if[$env[testing;results;14]!=;$addChoice[$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;14];";\\\\"]\\\`)];$djsEval[require("entities").decodeHTML(\\\`$replace[$env[testing;results;14];";\\\\"]\\\`)]]]
+    $if[$env[testing;results;0]!=;
+    $let[tempres0;$env[testing;results;0]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres0"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres0"))];0;100;]]]
+    $if[$env[testing;results;1]!=;
+    $let[tempres1;$env[testing;results;1]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres1"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres1"))];0;100;]]]
+    $if[$env[testing;results;2]!=;
+    $let[tempres2;$env[testing;results;2]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres2"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres2"))];0;100;]]]
+    $if[$env[testing;results;3]!=;
+    $let[tempres3;$env[testing;results;3]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres3"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres3"))];0;100;]]]
+    $if[$env[testing;results;4]!=;
+    $let[tempres4;$env[testing;results;4]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres4"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres4"))];0;100;]]]
+    $if[$env[testing;results;5]!=;
+    $let[tempres5;$env[testing;results;5]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres5"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres5"))];0;100;]]]
+    $if[$env[testing;results;6]!=;
+    $let[tempres6;$env[testing;results;6]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres6"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres6"))];0;100;]]]
+    $if[$env[testing;results;7]!=;
+    $let[tempres7;$env[testing;results;7]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres7"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres7"))];0;100;]]]
+    $if[$env[testing;results;8]!=;
+    $let[tempres8;$env[testing;results;8]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres8"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres8"))];0;100;]]]
+    $if[$env[testing;results;9]!=;
+    $let[tempres9;$env[testing;results;9]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres9"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres9"))];0;100;]]]
+    $if[$env[testing;results;10]!=;
+    $let[tempres10;$env[testing;results;10]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres10"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres10"))];0;100;]]]
+    $if[$env[testing;results;11]!=;
+    $let[tempres11;$env[testing;results;11]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres11"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres11"))];0;100;]]]
+    $if[$env[testing;results;12]!=;
+    $let[tempres12;$env[testing;results;12]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres12"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres12"))];0;100;]]]
+    $if[$env[testing;results;13]!=;
+    $let[tempres13;$env[testing;results;13]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres13"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres13"))];0;100;]]]
+    $if[$env[testing;results;14]!=;
+    $let[tempres14;$env[testing;results;14]]
+    $addChoice[$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres14"))];0;100;];$cropText[$djsEval[require("entities").decodeHTML(ctx.getKeyword("tempres14"))];0;100;]]]
     ]
     ;
     $onlyIf[$charCount[$focusedOptionValue]<=100]

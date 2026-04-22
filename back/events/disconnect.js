@@ -5,6 +5,9 @@ module.exports = {
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    $async[
+    $if[$callFunction[configMusic;statusvc_message];$let[mm;$callFunction[channelStatus;$voiceID[$guildID;$clientID];]]]
+    ]
     $jsonLoad[comp;$try[$getComponents[$get[cid];$get[mid]];{}]]
 
     $try[

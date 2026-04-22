@@ -2,53 +2,60 @@ module.exports = {
     type: "interactionCreate",
     allowedInteractionTypes: ["button"],
     code: `
-    $onlyIf[$advancedTextSplit[$customID;_;0]==musicplayerhidequeue]
-    $onlyIf[$advancedTextSplit[$customID;_;1]==$authorID]
+$onlyIf[$advancedTextSplit[$customID;_;0]==musicplayerhidequeue]
+$onlyIf[$advancedTextSplit[$customID;_;1]==$authorID]
 
-    $let[nodes;$if[$hasMusicNode;$isPlaying;false]]
-    $onlyIf[$get[nodes];$!deferUpdate $!interactionDelete]
+$let[nodes;$if[$hasMusicNode;$isPlaying;false]]
+$onlyIf[$get[nodes];$!deferUpdate $!interactionDelete]
 
-    $if[$advancedTextSplit[$customID;_;2]>15;
-    $!deferUpdate
-    ]
-    
-    $arrayload[rest;
-;$queue[;$multi[16;$advancedTextSplit[$customID;_;2]];{track.title} - <@{track.requestedBy.id}>;
+$if[$advancedTextSplit[$customID;_;2]>15;
+$!deferUpdate
+]
+
+$jsonLoad[rest;$try[$djsEval[JSON.stringify(require("discord-player").useQueue(ctx.interaction.guild).tracks.data)];{}]]
+$arrayMap[rest;rest2;$if[$env[rest2;id]!=;$return[$env[rest2]]];rest]
+$let[countFinal;$multi[9;$sub[$advancedTextSplit[$customID;_;2];1]]]
+$arraySlice[rest;rest;$get[countFinal];$sum[$get[countFinal];9]]
+
+$jsonLoad[jsonmedia;$callFunction[filterMediaID;$trackInfo[url]]]
+$let[provider;$replace[$env[jsonmedia;type];applemusic;apple music]]
+
+$!interactionUpdate[
+$addContainer[
+$addSection[
+$addTextDisplay[### » Currently Playing
+$hyperlink[$trackInfo[title];$trackInfo[url]]
+-# $bold[Requested by:] <@$trackInfo[requestedBy;id]>
+]
+$addThumbnail[$if[$isValidLink[$trackInfo[thumbnail]]==false;$userAvatar[$trackInfo[requestedBy;id];1024];$trackInfo[thumbnail]]]
+]
+$addTextDisplay[-# $bold[Duration:] $if[$trackInfo[durationMS]==0;LIVE;$parseDigital[$trackInfo[durationMS]]] | $bold[Source:] $toTitlecase[$get[provider]] | $bold[Songs:] $separateNumber[$sum[$queueLength;1];.]]
+;$callFunction[useIcon;color_embed]]
+
+$addContainer[
+$if[$arrayLength[rest]!=0;
+$arrayForEach[rest;lf;
+$addSection[
+$addTextDisplay[> ### $cropText[$env[lf;title];0;100;]
+> -# $if[$env[lf;durationMS]==0;LIVE;$parseDigital[$env[lf;durationMS]]] - <@$env[lf;requestedBy]>
+]
+$addThumbnail[$if[$isValidLink[$env[lf;thumbnail]];$env[lf;thumbnail];$userAvatar[$env[lf;requestedBy];1024]]]
 ]]
-    $arraySlice[rest;rest;$multi[15;$sub[$advancedTextSplit[$customID;_;2];1]]]
-    $arrayMap[rest;rest2;$if[$env[rest2]!=;$return[$env[rest2]]];rest]
-    $let[count;1]
-    $let[countsec;$sum[1;$multi[15;$sub[$advancedTextSplit[$customID;_;2];1]]]]
-    $while[$get[count]<=15;
-    $if[$env[rest;$sub[$get[count];1]]!=;
-    $let[contains;$get[contains]$get[countsec]. $env[rest;$sub[$get[count];1]]\n]
-    $letSum[countsec;1]
-    ]
-    $letSum[count;1]
-    ]
+;
+$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoQueueList]]
+]
+;$callFunction[useIcon;color_embed]]
 
-    $jsonLoad[jsonmedia;$callFunction[filterMediaID;$trackInfo[url]]]
-    $let[provider;$replace[$env[jsonmedia;type];applemusic;apple music]]
-
-    $!interactionUpdate[
-    $author[Currently Playing;$callFunction[useIcon;$env[jsonmedia;type]];;0]
-    $title[$cropText[$trackInfo[title];0;253;...];$trackInfo[url];0]
-    $addField[Owner;\`$trackInfo[author]\`;true;0]
-    $addField[Duration;$if[$trackInfo[durationMS]==0;LIVE;$parseDigital[$trackInfo[durationMS]]];true;0]
-    $thumbnail[$if[$isValidLink[$trackInfo[thumbnail]]==false;$userAvatar[$trackInfo[requestedBy;id];1024];$trackInfo[thumbnail]];0]
-    $color[$callFunction[useIcon;color_embed];0]
-    $footer[$userDisplayName[$trackInfo[requestedBy;id]];$userAvatar[$trackInfo[requestedBy;id];1024];0]
-    $author[Queue ($separateNumber[$queueLength;.]);;;1]
-    $description[$if[$queueLength==0;There's no track on this queue;$get[contains]];1]
-    $color[$callFunction[useIcon;color_embed];1]
-    $if[$queueLength!=0;$thumbnail[$if[$isValidLink[$queue[0;1;{track.thumbnail}]]==false;$userAvatar[$clientID;1024];$queue[0;1;{track.thumbnail}]];1]]
-    $timestamp[;1]
-    $if[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;
-    $addActionRow
-    $addButton[musicplayerhidequeue_$authorID_$sub[$advancedTextSplit[$customID;_;2];1];Back;Primary;;$checkCondition[$advancedTextSplit[$customID;_;2]==1]]
-    $addButton[musicplayerhidequeue_$authorID_disabled;Page $advancedTextSplit[$customID;_;2] / $advancedTextSplit[$sum[$divide[$queueLength;15];1];.;0];Secondary;;true]
-    $addButton[musicplayerhidequeue_$authorID_$sum[$advancedTextSplit[$customID;_;2];1];Next;Primary;;$or[$queueLength<=15;$advancedTextSplit[$customID;_;2]>=$advancedTextSplit[$sum[$divide[$queueLength;15];1];.;0]]]
-    ]
-    ]
-    `
+$if[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;
+$let[countPage;$divide[$queueLength;9]]
+$addContainer[
+$addActionRow
+$addButton[musicplayerhidequeue_$authorID_1_0;;Secondary;⏪;$checkCondition[$advancedTextSplit[$customID;_;2]==1]]
+$addButton[musicplayerhidequeue_$authorID_$sub[$advancedTextSplit[$customID;_;2];1]_1;;Secondary;◀️;$checkCondition[$advancedTextSplit[$customID;_;2]==1]]
+$addButton[musicplayerhidequeue_$authorID_disabled;Page $advancedTextSplit[$customID;_;2] / $if[$or[$queueLength==0;$advancedTextSplit[$get[countPage];.;1]!=];$sum[$advancedTextSplit[$get[countPage];.;0];1];$advancedTextSplit[$get[countPage];.;0]];Secondary;;true]
+$addButton[musicplayerhidequeue_$authorID_$sum[$advancedTextSplit[$customID;_;2];1]_0;;Secondary;▶️;$or[$queueLength<=9;$advancedTextSplit[$customID;_;2]>=$advancedTextSplit[$sum[$divide[$queueLength;9];1];.;0]]]
+$addButton[musicplayerhidequeue_$authorID_$if[$or[$queueLength==0;$advancedTextSplit[$get[countPage];.;1]!=];$sum[$advancedTextSplit[$get[countPage];.;0];1];$advancedTextSplit[$get[countPage];.;0]]_2;;Secondary;⏩;$or[$queueLength<=9;$advancedTextSplit[$customID;_;2]>=$advancedTextSplit[$sum[$divide[$queueLength;9];1];.;0]]]
+]]
+]
+`
 }

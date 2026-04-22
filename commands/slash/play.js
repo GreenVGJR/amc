@@ -77,6 +77,8 @@ module.exports = {
 
   $let[iscreatedfirst;$or[$hasMusicNode==false;$if[$hasMusicNode;$isPlaying;false]==false]]
 
+  $silent
+
   $localFunction[loadinteraction;
   $if[$env[typesload]==1-1;
   $let[mid;$interactionReply[
@@ -93,7 +95,7 @@ module.exports = {
   $let[mid;$interactionReply[
   $author[» Fetching\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
   $addField[Query;$codeBlock[$cropText[$get[filquery];0;1000]]]
-  $footer[none;$callFunction[useIcon;loading]]
+  $footer[none$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true]; - $callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
   $if[$or[$get[iscreatedfirst];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
@@ -107,7 +109,7 @@ module.exports = {
   $addField[$get[music_title];-# $if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]];true]
   $thumbnail[$get[music_thumbnail]]
   $color[$callFunction[useIcon;color_embed]]
-  $footer[$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]];$callFunction[useIcon;loading]]
+  $footer[$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]]$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true]; - $callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$callFunction[useIcon;loading]]
   ]
   ]
   $if[$env[typesload]==3;
@@ -260,11 +262,12 @@ module.exports = {
   $let[statusloop;$getLoopMode]
   $if[$get[statusloop]==TRACK;$setLoopMode[OFF] $wait[1s]]
   $!skipTo[$sub[$get[currentqueuern];1]]
-  $wait[1s]
-  $if[$get[statusloop]==TRACK;$setLoopMode[TRACK]]
+  $if[$get[statusloop]==TRACK;$wait[1s] $setLoopMode[TRACK]]
+  $!interactionDelete
   ]]
+  $if[$option[force_skip]!=true;
   $callLocalFunction[loadinteraction;3]
   $setTimeout[$async[$!interactionDelete];1s]
-  $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer;false]]
-  ]`
+  $callFunction[updateCurrentMusicPlayer;false]
+  ]]`
 }

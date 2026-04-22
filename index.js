@@ -44,13 +44,16 @@ const music = new ForgeMusic({
         GuildQueueEvent.PlayerPause,
         GuildQueueEvent.PlayerResume,
         GuildQueueEvent.PlayerTrigger,
-        GuildQueueEvent.PlayerFinish
+        GuildQueueEvent.PlayerFinish,
+        GuildQueueEvent.EmptyQueue
     ],
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
         defaultFFmpegFilters: ["compressor"],
+        disableHistory: true,
+        disableBiquad: true,
         disableFallbackStream: true,
-        // bufferingTimeout: 350,
+        bufferingTimeout: 350,
         volume: 50,
         connectionTimeout: 10000,
         leaveOnEmpty: true,

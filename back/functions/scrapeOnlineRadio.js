@@ -46,14 +46,15 @@ module.exports = {
     $arrayLoad[res;"stations__station";$advancedTextSplit[$httpResult;class="stations-list";1]]
     $arrayForEach[res;rest;
     $if[$advancedTextSplit[$env[rest];href=";1;";0]!=;
-    $arrayPushJSON[tempstore;{
-    "url":"https://onlineradiobox.com$advancedTextSplit[$env[rest];href=";1;";0]",
-    "thumbnail":"https:$advancedTextSplit[$env[rest];src=";1;";0]",
-    "radioId":"$advancedTextSplit[$env[rest];radioId=";1;";0]",
-    "radioName":"$djsEval[require("entities").decodeHTML(\\\`$advancedTextSplit[$env[rest];radioName=";1;";0]\\\`)]",
-    "streamFormat":"$advancedTextSplit[$env[rest];streamType=";1;";0]",
-    "stream":"$advancedTextSplit[$env[rest];stream=";1;";0]"
-    }]
+    $jsonLoad[cl;{}]
+    $!jsonSet[cl;url;https://onlineradiobox.com$advancedTextSplit[$env[rest];href=";1;";0]]
+    $!jsonSet[cl;thumbnail;https:$advancedTextSplit[$env[rest];src=";1;";0]]
+    $!jsonSet[cl;radioId;$advancedTextSplit[$env[rest];radioId=";1;";0]]
+    $let[radioNameBox;$advancedTextSplit[$env[rest];radioName=";1;";0]]
+    $!jsonSet[cl;radioName;$djsEval[require("entities").decodeHTML(ctx.getKeyword("radioNameBox"))]]
+    $!jsonSet[cl;streamFormat;$advancedTextSplit[$env[rest];streamType=";1;";0]]
+    $!jsonSet[cl;stream;$advancedTextSplit[$env[rest];stream=";1;";0]]
+    $arrayPushJSON[tempstore;$env[cl]]
     ]]
     ]
     $let[results;$env[tempstore]]
