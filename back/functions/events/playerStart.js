@@ -68,7 +68,7 @@ module.exports = {
     $async[$if[$getCache[musicplayer_message_$env[guildId]_attemptseek]!=;$deleteCache[musicplayer_message_$env[guildId]_attemptseek]]]
     $async[$if[$getCache[radioplayer_data_$env[guildId]_checkplayer]!=;$deleteCache[radioplayer_data_$env[guildId]_checkplayer]]]
     $if[$try[$messageExists[$env[channelId];$env[messageId]];false]==false;
-    $let[secmid;$sendMessage[$channelID;$callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
+    $let[secmid;$sendMessage[$channelID;$silent $callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
     $setCache[musicplayer_message_$env[guildId]_channelid;"$env[channelId]"]
     $setCache[musicplayer_message_$env[guildId]_messageid;"$get[secmid]"]
     $callFunction[updateCurrentMusicPlayer;false]

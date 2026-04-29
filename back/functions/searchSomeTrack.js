@@ -219,7 +219,7 @@ module.exports = {
     $jsonLoad[res2;$env[res;items]]
     $arrayForEach[res2;res3;
     $jsonLoad[kls;{}]
-    $!jsonSet[kls;title;$env[res3;title]$if[$env[res3;version]!=null; - $env[res3;version]]]
+    $!jsonSet[kls;title;$env[res3;title]$if[$and[$env[res3;version]!=;$env[res3;version]!=null]; - $env[res3;version]]]
     $!jsonSet[kls;duration;$parseDigital[$round[$multi[$env[res3;duration];1000]]]]
     $!jsonSet[kls;thumbnail;https://resources.tidal.com/images/$replace[$env[res3;album;cover];-;/]/1280x1280.jpg]
     $!jsonSet[kls;url;https://tidal.com/browse/track/$env[res3;id]/u]

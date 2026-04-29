@@ -14,7 +14,7 @@ if (!useClient) {
     throw new Error(`YouTube client "${targetClient}" does not exist. Available clients: ${available}`);
 }
 
-const buildQuery = 'reel/reel_item_watch?prettyPrint=false&alt=json&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent))';
+const buildQuery = 'reel/reel_item_watch?prettyPrint=false&alt=json&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds))';
 
 const APIuserAgent = useClient?.userAgent || default_userAgent;
 let ytauth;
@@ -138,7 +138,7 @@ const generateVisitor = async () => {
 };
 generateVisitor().catch(console.error);
 
-async function fallbackYTStream(lstracks) {
+async function fallbackYTStream(lstracks, targetSeconds) {
     refreshYtAuth();
     const checklist = templist.find(l => l.id === lstracks);
     if (checklist) {
@@ -188,6 +188,7 @@ async function fallbackYTStream(lstracks) {
         let changeLength = false;
         let streamingLength = null;
         let durationLength = null;
+        let fr = null;
         a = Array.isArray(a) ? a[0] : a;
         a = a?.playerResponse || a;
 
@@ -210,30 +211,52 @@ async function fallbackYTStream(lstracks) {
             }
         }
         else if (['IOS'].includes(targetClient) && streamTypeYT === 1) {
-            const fr = a.streamingData.adaptiveFormats.find(c => [140, 139].includes(c.itag));
+            fr = a.streamingData.adaptiveFormats.find(c => [140, 139].includes(c.itag));
             finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
             changeLength = true;
+            durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
             streamingLength = String(fr.contentLength);
         }
         else {
-            const fr = a.streamingData?.adaptiveFormats?.find(c => [774, 251, 140, 599].includes(c.itag));
+            fr = a.streamingData?.adaptiveFormats?.find(c => [774, 251, 140, 599].includes(c.itag));
             const fs = a.streamingData?.formats?.[0]?.url;
             if (fr) {
                 finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
                 changeLength = true;
+                durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
                 streamingLength = String(fr.contentLength);
             } else {
                 finalurl = fs + "&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
             }
         }
+
+        let actualfinalurl;
+
+        const filterlocation = await fetch(finalurl, {
+            method: "HEAD",
+            headers: { "User-Agent": APIuserAgent }
+        });
+
+        if (filterlocation.status === 403 && changeLength) {
+            const bytesPerSecond = parseInt(fr.contentLength) / durationLength;
+            const previewLength = String(Math.floor(bytesPerSecond * 60));
+            actualfinalurl = filterlocation.url + `&range=0-${previewLength}`;
+            streamingLength = previewLength;
+        }
+        else {
+            actualfinalurl = filterlocation.url + (changeLength ? `&range=0-${streamingLength}` : "");
+        }
+
+        if (filterlocation.body) await filterlocation.body.cancel();
+
         templist.push({
             id: lstracks,
-            url: finalurl,
+            url: actualfinalurl,
             ref: Date.now() + 1800000,
             allowLength: changeLength,
             contentLength: streamingLength
         });
-        return finalurl + (changeLength ? `&range=0-${streamingLength}` : "");
+        return actualfinalurl;
     }
     catch (e) {
         console.error(e.message);
@@ -251,7 +274,7 @@ module.exports = {
         client_type: "WEB"
     },
     createStream: async (q) => {
-        try { return await fallbackYTStream(q.url); }
+        try { return await fallbackYTStream(q.url, q.targetSeconds); }
         catch { return; }
     }
 }

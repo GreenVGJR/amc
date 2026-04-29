@@ -1,4 +1,4 @@
-const { tarClientYT } = require('./clientYoutube.js');
+const { androidVrClientYT } = require('./clientYoutube.js');
 
 module.exports = {
     name: "fallbackPlaybackTrack",
@@ -34,7 +34,7 @@ module.exports = {
 
     $let[videoid;$env[whattype;id]]
     $let[ytinitauth;$djsEval[process.env.YOUTUBE_AUTH]]
-    $jsonLoad[listclient;${tarClientYT()}]
+    $jsonLoad[listclient;${androidVrClientYT()}]
     $let[defytdomain;$env[listclient;targetDomain]]
     $let[tempclientid;$env[listclient;client_id]]
     $let[tempclientsecret;$env[listclient;client_secret]]

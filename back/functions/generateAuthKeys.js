@@ -390,7 +390,7 @@ module.exports = {
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
-        $httpRequest[https://www.tiktok.com;GET]
+        $httpRequest[https://www.tiktok.com/foryou;GET]
         $let[los;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
         $if[$get[los]==;
         $if[$env[successlog]==true;$logger[Warn;WAF detected. Solving challenge - Tiktok]]
@@ -401,7 +401,7 @@ module.exports = {
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
-        $httpRequest[https://www.tiktok.com;GET]
+        $let[checkstatustt;$httpRequest[https://www.tiktok.com/foryou;GET]]
         $let[finalck;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
         $if[$get[finalck]==;$let[finaljs;true]]
         $if[$get[finaljs]==false;
@@ -409,7 +409,12 @@ module.exports = {
         $let[a12;$advancedTextSplit[$httpResult;"wid":";1;";0]]
         ]]]
         $if[$get[finaljs]==true;
-        $if[$env[successlog]==true;$logger[Warn;Failed to solve. Using fallback - Tiktok]]
+        $if[$env[successlog]==true;
+        $if[$get[checkstatustt]==403;
+        $logger[Warn;You have been blocked. Using fallback - Tiktok]
+        ;
+        $logger[Warn;Failed to solve. Using fallback - Tiktok]]
+        ]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept;application/json]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
