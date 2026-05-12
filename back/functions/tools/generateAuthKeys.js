@@ -1,4 +1,4 @@
-const { tarClient, tarClientYT } = require('./clientYoutube.js');
+const { tarClient, tarClientYT } = require('../helpers/clientYoutube.js');
 
 module.exports = {
     name: "generateAuthKeys",
@@ -101,13 +101,14 @@ module.exports = {
         ;
         $if[$env[successlog]==true;$logger[Error;InnerTube: Can't continue the process]]
         ]]
-        $let[tempCookiesYT;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
+        $let[tempCookiesYTEnv;$djsEval[process.env.YOUTUBE_ANONCOOKIES]]
+        $let[tempCookiesYT;$callFunction[filterCookies;2;$get[tempCookiesYTEnv];$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]]
         $let[a33;$advancedTextSplit[$advancedTextSplit[$env[g3];"DATASYNC_ID":";1;";0];||;0]]
         $if[$get[a33]!=;$setCache[authmusic_youtube_datasync_id;$get[a33]]]
         $jsonLoad[listconfig;$getCache[system_file-config]]
         $if[$and[$env[successlog]==true;$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]];
         $setCache[authmusic_youtube_tempcookies;$get[tempCookiesYT]]
-        $writeFile[.env;$replace[$readFile[.env];YOUTUBE_ANONCOOKIES=$djsEval[process.env.YOUTUBE_ANONCOOKIES];YOUTUBE_ANONCOOKIES=$get[tempCookiesYT]]]
+        $writeFile[.env;$replace[$readFile[.env];YOUTUBE_ANONCOOKIES=$get[tempCookiesYTEnv];YOUTUBE_ANONCOOKIES=$get[tempCookiesYT]]]
         $!djsEval[require('dotenv').config({ override: true, quiet: true })]
         ]
         $if[$and[$get[abortproscookies]!=true;$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false];
@@ -295,6 +296,23 @@ module.exports = {
     ;$logger[Info;Failed to Retrieve - Spotify]]
     $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuthKeys;spotify;;true]]
     ]
+    $if[$or[$env[type]==all;$env[type]==spotify_player];
+    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Key;cyan]]
+    $try[
+    $let[spinitcookies;$trimLines[$trim[$djsEval[process.env.SPOTIFY_COOKIES]]]]
+    $httpAddHeader[Cookie;$get[spinitcookies]]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+    $httpSetContentType[Text]
+    $!httpRequest[https://open.spotify.com/embed/track/$randomText[4PTG3Z6ehGkBFwjybzWkR8;2yR2sziCF4WEs3klW1F38d;0IuVhCflrQPMGRrOyoY5RW;2yWlGEgEfPot0lv3OAjuG3;4Xfp9BcKrKYmxJPxn68Yb8;7uuJqaRjSXzja6VGgDpWem;3BP1klbHxsOf6IxscNIX0r;6BYzwbWg1Z2EB6VUXTYnhm];GET]
+    $let[parsejsspo;$advancedTextSplit[$httpResult;id="__NEXT_DATA__" type="application/json">;1;</script>;0]]
+    $jsonLoad[parsejsspo;$default[$get[parsejsspo];{}]]
+    $let[token;$env[parsejsspo;props;pageProps;state;settings;session;accessToken]]
+    $if[$get[token]!=;$setCache[authmusic_spotify_fall;$get[token]]]
+    $if[$env[successlog]==true;$logger[Info;$if[$get[token]!=;$cropText[$get[token];0;12;...];Failed to Retrieve] | Spotify - Alt / Key$if[$env[parsejsspo;props;pageProps;state;settings;session;isAnonymous]==false; (with Cookies)]]]
+    ;$logger[Info;Failed to Retrieve - Spotify]]
+    $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuthKeys;spotify_player;;true]]
+    ]
     $if[$or[$env[type]==all;$env[type]==spotify_token];
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Token;cyan]]
     $try[
@@ -389,32 +407,36 @@ module.exports = {
         $let[finaljs;false]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+        $httpAddHeader[Referer;https://www.tiktok.com/]
         $httpSetContentType[Text]
-        $httpRequest[https://www.tiktok.com/foryou;GET]
+        $let[checkstatustt;$httpRequest[https://www.tiktok.com/node-webapp/api/common-app-context;GET;nioang]]
         $let[los;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
-        $if[$get[los]==;
-        $if[$env[successlog]==true;$logger[Warn;WAF detected. Solving challenge - Tiktok]]
-        $let[lks;$callFunction[wafTiktok;$httpResult]]
-        $if[$get[lks]==0;$let[finaljs;true]]
-        $if[$get[finaljs]==false;
-        $httpAddHeader[Cookie;$get[lks]]
+        $if[$or[$env[nioang]==;$get[los]==];
+        $let[finaljs;true]
+        ;
+        $jsonLoad[nioang;$env[nioang]]
+        $let[a12;$env[nioang;wid]]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+        $httpAddHeader[Cookie;$get[los]]
+        $httpAddHeader[Referer;https://www.tiktok.com/]
         $httpSetContentType[Text]
-        $let[checkstatustt;$httpRequest[https://www.tiktok.com/foryou;GET]]
-        $let[finalck;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
-        $if[$get[finalck]==;$let[finaljs;true]]
-        $if[$get[finaljs]==false;
-        $let[a13;$callFunction[filterCookies;2;$get[finalck];$get[lks]]]
-        $let[a12;$advancedTextSplit[$httpResult;"wid":";1;";0]]
-        ]]]
+        $let[checkstatustt;$httpRequest[https://www.tiktok.com/node-webapp/api/biz-context?app_name=desktop;GET;nioang2]]
+        $let[los2;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
+        $if[$or[$env[nioang2]==;$get[los2]==];
+        $let[finaljs;true]
+        ;
+        $let[lod;$callFunction[filterCookies;2;$get[los];$get[los2]]]
+        $let[a13;$get[lod]]
+        ]]
         $if[$get[finaljs]==true;
         $if[$env[successlog]==true;
-        $if[$get[checkstatustt]==403;
+        $c[Sometime 200 but blank page but i didnt test further]
+        $if[$or[$get[checkstatustt]==403;$get[checkstatustt]==429];
         $logger[Warn;You have been blocked. Using fallback - Tiktok]
         ;
-        $logger[Warn;Failed to solve. Using fallback - Tiktok]]
-        ]
+        $logger[Error;Can't retrieve contents. Using fallback - Tiktok]
+        ]]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept;application/json]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
@@ -423,11 +445,7 @@ module.exports = {
         $let[a13;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
         $jsonLoad[runtik;$httpResult]
         $let[a12;$env[runtik;body;webId]]
-        ;
-        $if[$has[finalck]==false;
-        $let[a13;$get[los]]
-        $let[a12;$advancedTextSplit[$httpResult;"wid":";1;";0]]
-        ]]
+        ]
         $if[$get[a13]!=;$setCache[authmusic_tiktok;$deflate[$get[a13];base64]]]
         $if[$get[a12]!=;$setCache[authmusic_tiktok_did;"$get[a12]"]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[a13]!=;$cropText[$deflate[$get[a13];base64];0;12;...];Failed to Retrieve] | Tiktok / Cookie]]

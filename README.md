@@ -16,12 +16,12 @@
 > This branch is only for testing and development. Expect errors.
 
 > [!NOTE]
-> These 2 intents are required to use all features.
+> These both intents are required to use all features.
 > ![image](https://github.com/user-attachments/assets/4beb3e93-40f9-4253-99f4-c6ec8d5a7e67)
 
 ___
 
-1. Make sure you have [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v21.7.3 for node.js
+1. Required [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v21.7.3 for node.js
 2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-dev-local.zip) this branch (.zip)
 3. Extract it, and rename `.env.example` file to `.env` inside folder you did extract
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
@@ -31,9 +31,6 @@ npm install
 npm update
 node .
 ```
-> How about for Pterodactyl user?
-
-Ignore first & last installation step.
 
 ___
 
@@ -45,21 +42,18 @@ ___
 
 </summary>
 
-| Streaming     | Extractor     |
-| ------------- | ------------- |
-| Youtube       | Youtube       |
-| Soundcloud    | Soundcloud    |
-| -             | Spotify*      |
-| -             | Apple Music*  |
-| Local/HTTP    | Local/HTTP    |
+| Streaming     | Extractor     | Dynamic Queue     |
+| ------------- | ------------- | ----------------- |
+| Youtube       | Youtube       | Youtube           |
+| Soundcloud    | Soundcloud    | Soundcloud        |
+| -             | Spotify*      | Spotify           |
+| -             | Apple Music*  | Apple Music       |
+| Local/HTTP    | Local/HTTP    | -                 |
 > *Stream via Youtube
 
 </details>
 
 ___
-
-> [!WARNING]
-> This is unusable for now. Please use the 'YouTube Auth' version if you encounter sign-in problems.
 
 <details close>
 
@@ -173,7 +167,8 @@ ___
 - Lyrics Translation
 - Playlist
 - Radio
-- Queue
+- 24/7
+- Dynamic Queue
 - DJ
 - Show bot information
 ```

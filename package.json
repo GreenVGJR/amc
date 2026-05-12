@@ -6,16 +6,17 @@
     "@tryforge/forge.music": "github:tryforge/ForgeMusic#main",
     "@tryforge/forgescript": "^2.6.0",
     "canvas": "^3.2.3",
+    "discord-player": "^7.2.0",
     "discord-player-applemusic": "^1.0.3",
     "discord-player-soundcloud": "^1.0.7",
     "discord-player-spotify": "^1.1.9",
     "discord-player-youtubei": "^2.0.0",
     "dotenv": "^17.4.2",
     "entities": "^8.0.0",
-    "lmdb": "^3.5.4",
-    "youtube-dl-exec": "^3.1.5"
+    "lmdb": "^3.5.4"
   },
   "devDependencies": {
-    "patch-package": "^8.0.1"
+    "patch-package": "^8.0.1",
+    "youtube-dl-exec": "^3.1.6"
   }
 }

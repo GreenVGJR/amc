@@ -28,7 +28,7 @@ $!jsonSet[51;1;wt_lib]
 $jsonLoad[finallvm;{"text":null,"acc":null}]
 $try[
 $httpAddHeader[Content-Type;application/json+protobuf]
-$httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
+$httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent_desktop]]
 $httpAddHeader[X-Goog-Api-Key;$inflate[eJxz9KxKDK50DHGKSMwqqwr0CXHxcA1MSi4oNPDMSDUoC3fxyPU3NTIAAA12DPc;base64url]]
 $httpSetBody[$jsonStringify[51]]
 $httpSetContentType[Text]

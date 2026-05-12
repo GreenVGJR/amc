@@ -12,7 +12,7 @@ module.exports = {
     }],
     code: `
     $let[cco;$if[$or[$env[cco]==null;$env[cco]==];;$env[cco]]]
-    $let[discordAgent;$try[$djsEval[require("@discordjs/rest").DefaultUserAgent]]]
+    $let[discordAgent;$getCache[system_filetp-defaultDiscordAgent]]
     $try[
     $if[$get[cco]!=;
     $jsonLoad[fn;{}]

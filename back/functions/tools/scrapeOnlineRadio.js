@@ -37,7 +37,7 @@ module.exports = {
     }],
     code: `
     $arrayLoad[tempstore]
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $if[$env[checkCache]==false;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]

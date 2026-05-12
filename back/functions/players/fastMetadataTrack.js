@@ -16,7 +16,7 @@ module.exports = {
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $let[tryattempt;0]
     $jsonLoad[reslac;{}]
     $localFunction[refreshing;

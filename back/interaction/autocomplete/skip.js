@@ -8,10 +8,9 @@ module.exports = {
     $onlyIf[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];-1]]
     
     $let[nodes;$if[$hasMusicNode;$isPlaying;false]]
-    $onlyIf[$get[nodes];$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchJoinVC];-1]]
+    $onlyIf[$get[nodes];$autocomplete]
 
     $jsonLoad[rest;$try[$djsEval[JSON.stringify(require("discord-player").useQueue(ctx.interaction.guild).tracks.data)];{}]]
-    $arrayMap[rest;rest2;$if[$env[rest2;id]!=;$return[$env[rest2]]];rest]
     $if[$or[$focusedOptionValue==;$isNumber[$focusedOptionValue]];
     $let[value;$if[$sub[$focusedOptionValue;1]>=0;$sub[$focusedOptionValue;1];0]]
     $arraySlice[rest;rest;$get[value];$sum[$get[value];25]]
@@ -20,7 +19,8 @@ module.exports = {
     ;
     $let[counting;$get[value]]
     $arrayForEach[rest;rest2;
-        $addChoice[[$cropText[$if[$env[rest2;durationMS]==0;LIVE;$parseDigital[$env[rest2;durationMS]]]\\] $env[rest2;title];0;100;];$sum[$get[counting];1]]
+        $let[tempstoretext;$env[rest2;title]]
+        $addChoice[$cropText[$sum[$get[counting];1] - $get[tempstoretext];0;100;];$sum[$get[counting];1]]
         $letSum[counting;1]
     ]]
     ;
@@ -29,8 +29,9 @@ module.exports = {
     $addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchSkipTrack];-1]
     ;
     $arrayForEach[rest3;rest4;
+        $let[tempstoretext;$env[rest4;title]]
         $let[lookIndex;$arrayFindIndex[rest;checkrest;$checkCondition[$env[checkrest;url]==$env[rest4;url]]]]
-        $addChoice[[$cropText[$if[$env[rest4;durationMS]==0;LIVE;$parseDigital[$env[rest4;durationMS]]]\\] $env[rest4;title];0;100;];$sum[$get[lookIndex];1]]
+        $addChoice[$cropText[$sum[$get[lookIndex];1] - $get[tempstoretext];0;100;];$sum[$get[lookIndex];1]]
     ]]]
 `
 }

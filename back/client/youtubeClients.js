@@ -1,6 +1,6 @@
 module.exports = {
     // [ experimental client ]
-    // most stable, doesn't support stream kids contents
+    // doesn't support stream kids contents
     // some countries may not able to stream after 1 minute
     "VISIONOS": {
         "targetDomain": "youtubei.googleapis.com",
@@ -13,20 +13,20 @@ module.exports = {
         "osName": "visionOS",
         "osVersion": "1.3.21O771"
     },
-    // least stable
+    // some countries may not able to stream after 1 minute
     "ANDROID": {
         "targetDomain": "youtubei.googleapis.com",
         "client_id": null,
         "client_secret": null,
         "clientName": 3,
-        "clientVersion": "21.11.480",
+        "clientVersion": "21.19.286",
         "androidSdkVersion": 30,
-        "userAgent": "com.google.android.youtube/21.11.480 (Linux; U; Android 11) gzip",
+        "userAgent": "com.google.android.youtube/21.19.286 (Linux; U; Android 11) gzip",
         "osName": "Android",
         "osVersion": "11"
     },
     // doesn't support stream kids contents
-    // this client might no longer working in future
+    // support oauth2
     "ANDROID_VR": {
         "targetDomain": "youtubei.googleapis.com",
         "client_id": "652469312169-4lvs9bnhr9lpns9v451j5oivd81vjvu1.apps.googleusercontent.com",
@@ -40,7 +40,6 @@ module.exports = {
         "osName": "Android",
         "osVersion": "12L"
     },
-    // least stable
     // can't stream live content normally
     // can't stream after 1 minute
     "IOS": {
@@ -48,15 +47,15 @@ module.exports = {
         "client_id": null,
         "client_secret": null,
         "clientName": 5,
-        "clientVersion": "21.11.480",
+        "clientVersion": "21.19.02",
         "deviceMake": "Apple",
-        "deviceModel": "iPhone16,2",
-        "userAgent": "com.google.ios.youtube/21.11.480 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)",
+        "deviceModel": "iPhone17,2",
+        "userAgent": "com.google.ios.youtube/21.19.02 (iPhone17,2; U; CPU iOS 26_5 like Mac OS X;)",
         "osName": "iPhone",
-        "osVersion": "18.3.2.22D82"
+        "osVersion": "26.5"
     },
     // legacy formats only
-    // might support cookies
+    // support cookies
     "WEB_PARENT": {
         "targetDomain": "www.youtube.com",
         "client_id": null,

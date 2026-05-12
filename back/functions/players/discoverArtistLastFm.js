@@ -16,7 +16,7 @@ module.exports = {
         required: false
     }],
     code: `
-$let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
+$let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
 $let[showEmbed;$if[$or[$env[showEmbed]==null;$env[showEmbed]==];true;$env[showEmbed]]]
 $let[country;0]
 

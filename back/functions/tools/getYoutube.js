@@ -11,7 +11,7 @@ module.exports = [{
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $arrayLoad[results]
     $try[
     $jsonLoad[inputhttpquery;{"params":"EgWKAQIIAWoQEAMQCRAFEAQQChAVEBAQEQ%3D%3D","context":{"client":{"clientName":67,"clientVersion":"1.20261231","hl":"en","gl":"US"}}}]
@@ -78,7 +78,7 @@ module.exports = [{
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $arrayLoad[results]
     $try[
     $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}}}]
@@ -131,7 +131,7 @@ module.exports = [{
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $arrayLoad[results]
     $try[
     $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}}}]
@@ -170,12 +170,12 @@ module.exports = [{
         required: false
     },
     {
-       name: "line", // bool
-       description: "Get line synced version",
-       required: false 
+        name: "line", // bool
+        description: "Get line synced version",
+        required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $try[
     $httpSetBody[{"videoId":"$env[videoId]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en"}}}]
     $httpSetContentType[Text]
@@ -226,7 +226,7 @@ module.exports = [{
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $arrayLoad[results]
     $localFunction[runfuncytpl;
     $let[checktoken;$or[$env[lotoken]==;$env[lotoken]==null]]
@@ -253,5 +253,34 @@ module.exports = [{
     ;lotoken]
     $callLocalFunction[runfuncytpl;]
     $return[$env[results]]
+    `
+},
+{
+    name: "getYoutubeFeed",
+    params: [{
+        name: "videoId", // string
+        description: "VideoID",
+        required: true
+    },
+    {
+        name: "userAgent", // string
+        description: "Spoof client",
+        required: false
+    }],
+    code: `
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
+    $let[ytinitcookietest1;$getCache[authmusic_youtube_tempcookies]]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$get[ytinitcookietest1]]
+    $httpSetContentType[Text]
+    $!httpRequest[https://www.youtube.com/watch?v=$env[videoId];GET;oisdn]
+    $try[$jsonLoad[outputhtyt;$advancedTextSplit[$env[oisdn];var ytInitialData =;1;\\;;0]]]
+    $if[$env[outputhtyt]==;$return[{}]]
+    $jsonLoad[oisdn;$default[$env[outputhtyt;contents;twoColumnWatchNextResults;secondaryResults;secondaryResults;results;0;itemSectionRenderer;contents];{}]]
+    $arrayMap[oisdn;pulllockview;$if[$and[$env[pulllockview;lockupViewModel]!=;$endsWith[$env[pulllockview;lockupViewModel;contentType];_VIDEO]];$return[$env[pulllockview;lockupViewModel]]];oisdn]
+
+    $return[$default[$jsonStringify[oisdn];{}]]
     `
 }]

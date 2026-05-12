@@ -11,7 +11,7 @@ module.exports = {
         required: false
     }],
     code: `
-    $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];$callFunction[configMusic;default_userAgent];$env[userAgent]]]
+    $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]

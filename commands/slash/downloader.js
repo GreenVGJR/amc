@@ -80,7 +80,7 @@ $timestamp
 ;true]]
 $return
 ;msg1;msg2;togload]
-$let[agent;$callFunction[configMusic;default_userAgent]]
+$let[agent;$callFunction[configMusic;default_userAgent_desktop]]
 $let[isactivelyric;$and[$option[yt_option]!=2;$option[yt_option]!=3;$option[lyrics]==true;$or[$env[musictype;type]==youtube;$env[musictype;type]==soundcloud;$env[musictype;type]==spotify;$env[musictype;type]==bandcamp]]]
 $try[
 $if[$env[musictype;type]==spotify;

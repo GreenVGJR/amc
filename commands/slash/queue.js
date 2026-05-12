@@ -46,11 +46,12 @@ $addTextDisplay[-# $bold[Duration:] $if[$trackInfo[durationMS]==0;LIVE;$parseDig
 $addContainer[
 $if[$queueLength!=0;
 $arrayForEach[rest;lf;
+$let[onSpecificRequest;$if[$or[$env[lf;requestedBy]==;$env[lf;requestedBy]==null];$clientID;$env[lf;requestedBy]]]
 $addSection[
 $addTextDisplay[> ### $cropText[$env[lf;title];0;100;]
-> -# $if[$env[lf;durationMS]==0;LIVE;$parseDigital[$env[lf;durationMS]]] - <@$env[lf;requestedBy]>
+> -# $if[$env[lf;durationMS]==0;LIVE;$parseDigital[$env[lf;durationMS]]] - <@$get[onSpecificRequest]>
 ]
-$addThumbnail[$if[$isValidLink[$env[lf;thumbnail]];$env[lf;thumbnail];$userAvatar[$env[lf;requestedBy];1024]]]
+$addThumbnail[$if[$isValidLink[$env[lf;thumbnail]];$env[lf;thumbnail];$userAvatar[$get[onSpecificRequest];1024]]]
 ]]
 ;
 $addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoQueueList]]

@@ -10,7 +10,7 @@ module.exports = {
     $fetchResponse
     $disableComponents
     ]]
-    $onlyIf[$voiceID[$guildID;$clientID]!=;]
+    $onlyIf[$try[$isPlaying;false]]
     $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
     $if[$get[crdjcs_0f]==false;
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;]
@@ -119,7 +119,19 @@ module.exports = {
     $if[$advancedTextSplit[$customID;_;1]==stopplayer;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $deleteCache[cachesearchistory_user_autocomplete_$authorID]
+    $deleteCache[musicplayer_message_$guildID_isdynamicmusic]
+    $if[$getCache[musicplayer_message_$guildID_is247music]!=true;
     $async[$leaveVoiceChannel]
+    ;
+    $async[
+    $if[$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]==true;
+    $loop[-1;
+    $let[cf-fetch;$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]]
+    $if[$get[cf-fetch]!=true;$break]
+    $wait[10]
+    ]]
+    $!stopTrack
+    ]]
     $!deferUpdate
     ]
     $if[$advancedTextSplit[$customID;_;1]==actionplayer;
@@ -161,6 +173,12 @@ module.exports = {
     $!seekTrack[$get[resseek]]
     ]
     $!interactionDelete
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==dynamic;
+    $callFunction[setAutoplay]
+    ]
+    $if[$advancedTextSplit[$customID;_;1]==247music;
+    $setCache[musicplayer_message_$guildID_is247music;$checkCondition[$getCache[musicplayer_message_$guildID_is247music]!=true]]
     ]
     $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown;lastfm;actionplayer]!=true;]
     $callFunction[updateCurrentMusicPlayer;true]

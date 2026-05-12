@@ -7,15 +7,16 @@ module.exports = {
     $async[$callFunction[fetchDiscordContext]]
     ]
     $setCache[countmusicnode;"0"]
+    $setCache[system_filetp-defaultDiscordAgent;$try[$djsEval[require("@discordjs/rest").DefaultUserAgent]]]
     $setInterval[
         $arrayLoad[guild;,;$guildIDs[,]]
         $let[countnode;0]
         $arrayForEach[guild;guilds;
         $try[
-        $if[$djsEval[(0, require("discord-player").useMainPlayer)().nodes.has(ctx.client.guilds.cache.get("$env[guilds]"))];$letSum[countnode;1]]
+        $if[$djsEval[(0, require("discord-player").useMainPlayer)().queues.get(ctx.client.guilds.cache.get("$env[guilds]"))?.isPlaying() || false];$letSum[countnode;1]]
         ]]
         $setCache[countmusicnode;"$get[countnode]"]
-    ;1m]
+    ;30s]
     $logger[Info;Generating Auth]
     $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
     $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined;$callFunction[configMusic;useBearer]==true];
@@ -40,6 +41,7 @@ module.exports = {
     $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]
     $async[$callFunction[generateAuthKeys;spotify;;true]]
+    $async[$callFunction[generateAuthKeys;spotify_player;;true]]
     $async[$callFunction[generateAuthKeys;spotify_token;;true]]
     $async[$callFunction[generateAuthKeys;amazonmusic;;true]]
     $async[$callFunction[generateAuthKeys;applemusic;;true]]

@@ -1,7 +1,6 @@
 // Test replace yt stream
-const http2 = require('http2');
 const { randomBytes } = require('crypto');
-const { default_userAgent, streamTypeYT, useClientYT, useBearer } = require('../config.json');
+const { default_userAgent_desktop, streamTypeYT, useClientYT, useBearer } = require('../config.json');
 const ytClients = require('./youtubeClients.js');
 const targetClient = useClientYT?.toUpperCase();
 
@@ -16,7 +15,7 @@ if (!useClient) {
 
 const buildQuery = 'reel/reel_item_watch?prettyPrint=false&alt=json&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds))';
 
-const APIuserAgent = useClient?.userAgent || default_userAgent;
+const APIuserAgent = useClient?.userAgent || default_userAgent_desktop;
 let ytauth;
 let ytcookies;
 let tempytcookies;
@@ -45,92 +44,18 @@ delete actuallk.client_secret;
 actuallk.hl = "en";
 actuallk.gl = "US";
 
-// HTTP/2 session cache: reuse connections per origin
-const h2Sessions = new Map();
-
-function getH2Session(origin) {
-    let session = h2Sessions.get(origin);
-    if (session && !session.closed && !session.destroyed) return session;
-    session = http2.connect(origin);
-    session.on('error', () => { session.close(); h2Sessions.delete(origin); });
-    session.on('close', () => h2Sessions.delete(origin));
-    session.setTimeout(30000, () => { session.close(); h2Sessions.delete(origin); });
-    h2Sessions.set(origin, session);
-    return session;
-}
-
-/**
- * HTTP/2 request helper
- * @param {string} url - Full URL to request
- * @param {{ method?: string, headers?: object, body?: string }} opts
- * @returns {Promise<{ statusCode: number, headers: object, body: { json: () => Promise<any>, text: () => Promise<string> } }>}
- */
-function http2Request(url, opts = {}) {
-    return new Promise((resolve, reject) => {
-        const parsed = new URL(url);
-        const origin = parsed.origin;
-        const session = getH2Session(origin);
-
-        const reqHeaders = {
-            [http2.constants.HTTP2_HEADER_METHOD]: opts.method || 'GET',
-            [http2.constants.HTTP2_HEADER_PATH]: parsed.pathname + parsed.search,
-            [http2.constants.HTTP2_HEADER_SCHEME]: parsed.protocol.replace(':', ''),
-            [http2.constants.HTTP2_HEADER_AUTHORITY]: parsed.host,
-        };
-
-        // Map user headers into h2 headers (lowercase)
-        if (opts.headers) {
-            for (const [key, value] of Object.entries(opts.headers)) {
-                reqHeaders[key.toLowerCase()] = String(value);
-            }
-        }
-
-        const req = session.request(reqHeaders);
-        req.on('error', reject);
-
-        const chunks = [];
-        let statusCode;
-        let resHeaders;
-
-        req.on('response', (headers) => {
-            statusCode = headers[http2.constants.HTTP2_HEADER_STATUS];
-            resHeaders = headers;
-        });
-
-        req.on('data', (chunk) => chunks.push(chunk));
-
-        req.on('end', () => {
-            const buf = Buffer.concat(chunks);
-            resolve({
-                statusCode,
-                headers: resHeaders,
-                body: {
-                    json: () => Promise.resolve(JSON.parse(buf.toString())),
-                    text: () => Promise.resolve(buf.toString()),
-                }
-            });
-        });
-
-        if (opts.body) {
-            req.write(opts.body);
-        }
-        req.end();
-    });
-}
 
 const generateVisitor = async () => {
     try {
         if (ytcookies) {
-            const embedRes = await http2Request("https://www.youtube.com/", { method: "GET", headers: { "User-Agent": default_userAgent, "Cookie": ytcookies } });
-            const embedText = await embedRes.body.text();
+            const embedText = await fetch("https://www.youtube.com/", { method: "GET", headers: { "User-Agent": default_userAgent_desktop, "Cookie": ytcookies } }).then(r => r.text());
             vt = embedText.split('"visitorData":"')[1]?.split('"')[0] || "";
             actuallk.visitorData = vt;
             datasyncID = embedText.split('"DATASYNC_ID":"')[1]?.split('"')[0]?.split('||')[0] || "";
         }
 
         if (!vt) {
-            const res = await http2Request(`https://${hostdomain}/youtubei/v1/player?prettyPrint=false&alt=json&fields=responseContext(visitorData)`, { method: "POST", body: JSON.stringify(lk), headers: { "Origin": `https://${hostdomain}`, "Content-Type": "application/json", "User-Agent": APIuserAgent } });
-            const data = await res.body.json();
+            const data = await fetch(`https://${hostdomain}/youtubei/v1/player?prettyPrint=false&alt=json&fields=responseContext(visitorData)`, { method: "POST", body: JSON.stringify(lk), headers: { "Origin": `https://${hostdomain}`, "Content-Type": "application/json", "User-Agent": APIuserAgent } }).then(r => r.json());
             vt = data.responseContext.visitorData || "";
             actuallk.visitorData = vt;
         }
@@ -138,7 +63,7 @@ const generateVisitor = async () => {
 };
 generateVisitor().catch(console.error);
 
-async function fallbackYTStream(lstracks, targetSeconds) {
+async function fallbackYTStream(lstracks) {
     refreshYtAuth();
     const checklist = templist.find(l => l.id === lstracks);
     if (checklist) {
@@ -158,8 +83,9 @@ async function fallbackYTStream(lstracks, targetSeconds) {
 
         const buildRoute = { playerRequest: { videoId: lstracks.split('watch?v=')[1], contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } } };
 
-        let a = await http2Request(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
+        let a = await fetch(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
             method: "POST", body: JSON.stringify(buildRoute), headers: {
+                "Accept-Encoding": "gzip",
                 "Accept-Language": "en",
                 "Content-Type": "application/json",
                 "X-Goog-Visitor-Id": vt,
@@ -181,8 +107,7 @@ async function fallbackYTStream(lstracks, targetSeconds) {
                     "Cookie": tempytcookies
                 })
             }
-        })
-            .then(b => b.body.json());
+        }).then(r => r.json());
 
         let finalurl;
         let changeLength = false;
@@ -203,7 +128,7 @@ async function fallbackYTStream(lstracks, targetSeconds) {
 
         if ((a?.videoDetails?.isLiveContent || streamTypeYT === 2) && a?.streamingData?.hlsManifestUrl) {
             if (targetClient === 'VISIONOS') {
-                finalurl = await http2Request(a.streamingData.hlsManifestUrl + "?cver=" + useClient.clientVersion + "&cpn=" + cpn, { method: "GET" }).then(a => a.body.text()).then(b => b.split('GROUP-ID="234"')[0].split('URI="')[2].split('"')[0]);
+                finalurl = await fetch(a.streamingData.hlsManifestUrl + "?cver=" + useClient.clientVersion + "&cpn=" + cpn).then(r => r.text()).then(b => b.split('GROUP-ID="234"')[0].split('URI="')[2].split('"')[0]);
             }
             else {
                 // let extractor handle this
@@ -270,11 +195,16 @@ module.exports = {
     disablePlayer: true,
     ignoreSignInErrors: true,
     slicePlaylist: true,
+    useYoutubeDL: false,
+    useClient: {
+        clientType: "ANDROID"
+    },
     innertubeConfigRaw: {
-        client_type: "WEB"
+        client_type: "WEB",
+        retrieve_player: false
     },
     createStream: async (q) => {
-        try { return await fallbackYTStream(q.url, q.targetSeconds); }
+        try { return await fallbackYTStream(q.url); }
         catch { return; }
     }
 }

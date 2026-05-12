@@ -52,6 +52,9 @@
     "config_generalStopTrack": "OK",
     "config_generalSkipTrack": "Skipped.",
     "config_generalVolumeTrack": "Volume changed to:",
+    "config_generalIdleTrack": "Nothing is playing now.\nPlay again if you want disable 24/7",
+    "config_generalRefreshYoutubeTrack": "Refreshing Extractor",
+    "config_generalDynamicQueue": "Fetching Related Tracks",
 
     "_inline|downloader": "---",
 

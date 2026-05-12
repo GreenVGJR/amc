@@ -1,4 +1,4 @@
-const { androidVrClientYT } = require('./clientYoutube.js');
+const { androidVrClientYT } = require('../helpers/clientYoutube.js');
 
 module.exports = {
     name: "fallbackPlaybackTrack",
@@ -61,7 +61,7 @@ module.exports = {
     $httpAddHeader[X-Youtube-Client-Version;$env[listclient;clientVersion]]
     $httpAddHeader[Origin;https://$get[defytdomain]]
     $httpAddHeader[X-Origin;https://$get[defytdomain]]
-    $httpAddHeader[User-Agent;$default[$env[listclient;userAgent];$callFunction[configMusic;default_userAgent]]]
+    $httpAddHeader[User-Agent;$default[$env[listclient;userAgent];$callFunction[configMusic;default_userAgent_desktop]]]
     $httpSetBody[{"playerRequest":{"videoId":"$get[videoid]","contentCheckOk":true,"racyCheckOk":true},"disablePlayerResponse":false,"cpn":"$toLowercase[$randomString[16]]","context":{"client":$jsonStringify[listclient]}}]
     $!httpRequest[https://$get[defytdomain]/youtubei/v1/reel/reel_item_watch?prettyPrint=false&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(formats(itag,url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent));POST;reshttp]
     $jsonLoad[reshttp;$env[reshttp;playerResponse]]
@@ -126,13 +126,13 @@ module.exports = {
     ]
     $if[$env[whattype;type]==tiktokmob;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $if[$env[test;results;error]!=;$return[$let[finalurl;bot|$env[test;results;error]]]]
+    $if[$env[test;results;error]!=;$let[finalurl;bot|$env[test;results;error]] $return]
     $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $return]
     $jsonLoad[whattype;$callFunction[filterMediaID;$if[$or[$env[test;results;video;id]!=;$env[test;results;music_info]!=];https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
     ]
     $if[$env[whattype;type]==tiktok;
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $if[$env[test;results;error]!=;$return[$let[finalurl;bot|$env[test;results;error]]]]
+    $if[$env[test;results;error]!=;$let[finalurl;bot|$env[test;results;error]] $return]
     $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $return]
     $if[$env[test;results;video_info;url_list;0]!=;
     $let[finalurl;$env[test;results;video_info;url_list;0]]
@@ -142,6 +142,9 @@ module.exports = {
     $jsonLoad[b;$env[test;results;video;PlayAddrStruct;UrlList]]
     ;
     $jsonLoad[elindex;$env[test;results;video;bitrateInfo]]
+    $let[ad0;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];original_]]]
+    $let[findindex;$get[ad0]]
+    $if[$get[ad0]==-1;
     $let[ad1;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];adapt_lowest_]]]
     $let[findindex;$get[ad1]]
     $if[$get[ad1]==-1;
@@ -158,18 +161,20 @@ module.exports = {
     $let[findindex;$get[ad5]]
     $if[$get[ad5]==-1;
     $let[ad6;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];lower_]]]
-    $if[$get[ad6]==-1;$return[$let[finalurl;null]]]
     $let[findindex;$get[ad6]]
     $if[$get[ad6]==-1;
     $let[ad7;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];comet_]]]
-    $if[$get[ad7]==-1;$return[$let[finalurl;null]]]
     $let[findindex;$get[ad7]]
-    ]]]]]]
+    $if[$get[ad7]==-1;
+    $let[ad8;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];group_]]]
+    $if[$get[ad8]==-1;$return[$let[finalurl;null]]]
+    $let[findindex;$get[ad8]]
+    ]]]]]]]]
     $jsonLoad[b;$env[test;results;video;bitrateInfo;$get[findindex];PlayAddr;UrlList]]
     ]
     $if[$env[b;0]==;$return[$let[finalurl;null]]]
-    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1233;www.tiktok.com;api.tiktokv.com]]
-    $let[finalurl;$djsEval[require("undici").request(ctx.getKeyword("finalurl"),{method:"GET"}).then(a => a.headers.location).catch()]]
+    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1180]]
+    $let[finalurl;$djsEval[fetch(ctx.getKeyword("finalurl"),{method:"GET",redirect:"manual"}).then(a => a.headers?.get("location") || ctx.getKeyword("finalurl")).catch(() => ctx.getKeyword("finalurl"))]]
     ]
     $if[$env[whattype;type]==tiktokmusic;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
@@ -185,7 +190,7 @@ module.exports = {
     $if[$env[whattype;type]==applemusic;
     $try[
     $httpAddHeader[Accept-Encoding;gzip, deflate, br]
-    $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent]]
+    $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent_desktop]]
     $httpSetContentType[Text]
     $!httpRequest[$env[url];GET;a]
     ]

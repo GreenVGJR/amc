@@ -25,7 +25,7 @@ module.exports = {
     $onlyIf[$guildID!=;]
     $ephemeral
     $onlyIf[$voiceID!=;$callFunction[useCustomMusicMessage;config_errorJoin]]
-    $onlyIf[$voiceID[$guildID;$clientID]!=;$callFunction[useCustomMusicMessage;config_errorClientPlayer]]
+    $onlyIf[$try[$isPlaying;false];$callFunction[useCustomMusicMessage;config_errorClientPlayer]]
     $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
     $if[$get[crdjcs_0f]==false;
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;$replace[$callFunction[useCustomMusicMessage;config_errorIsSameVC];{client};<@$clientID>] <#$voiceID[$guildID;$clientID]>.]

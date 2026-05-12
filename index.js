@@ -39,7 +39,6 @@ const quorielDb = new QuorielDB({
 const music = new ForgeMusic({
     events: [
         GuildQueueEvent.ConnectionDestroyed,
-        GuildQueueEvent.Error,
         GuildQueueEvent.PlayerError,
         GuildQueueEvent.PlayerPause,
         GuildQueueEvent.PlayerResume,
@@ -55,10 +54,11 @@ const music = new ForgeMusic({
         disableFallbackStream: true,
         bufferingTimeout: 350,
         volume: 50,
-        connectionTimeout: 10000,
-        leaveOnEmpty: true,
-        leaveOnEmptyCooldown: 15000,
-        pauseOnEmpty: true
+        connectionTimeout: 30000,
+        leaveOnEmpty: false,
+        leaveOnEnd: false,
+        leaveOnStop: false,
+        pauseOnEmpty: false
     }
 });
 
@@ -91,17 +91,21 @@ const client = new ForgeClient({
 
 client.login();
 
+music.player.extractors.register(SoundcloudExtractor);
+music.player.extractors.register(SpotifyExtractor);
+music.player.extractors.register(AppleMusicExtractor);
+music.player.extractors.register(AttachmentExtractor);
+music.player.extractors.register(YoutubeiExtractor, youtube);
+
 quorielDb.commands.load("back/client/fdb");
 client.functions.load("back/functions");
 client.applicationCommands.load("commands/slash");
 client.commands.load("back/interaction");
 client.commands.load("back/client/fs");
 client.commands.load("commands/basic");
-music.player.extractors.register(SoundcloudExtractor);
-music.player.extractors.register(SpotifyExtractor);
-music.player.extractors.register(AppleMusicExtractor);
-music.player.extractors.register(AttachmentExtractor);
-music.player.extractors.register(YoutubeiExtractor, youtube);
-music.commands.load("back/events");
+music.commands.load("back/events/fm");
+client.commands.load("back/events/fs");
+
+module.exports = { music }; // for $joinVC
 
 console.clear();

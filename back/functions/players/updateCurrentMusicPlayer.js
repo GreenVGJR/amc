@@ -8,6 +8,9 @@ module.exports = {
     }],
     code: `
     $if[$try[$queueLength;-1]==-1;$return]
+    $if[$callFunction[configMusic;interval_message];
+    $setCache[musicplayer_message_$guildID_waitinterval;false]
+    ]
     $let[bypassEdit;$if[$or[$env[bypassEdit]==null;$env[bypassEdit]==];false;$env[bypassEdit]]]
     $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
@@ -24,5 +27,9 @@ module.exports = {
     $!jsonSet[testmessage;requestedBy;id;"$trackInfo[requestedBy;id]"]
 
     $callFunction[musicPlayerMessage;$get[cid];$get[mid];$jsonStringify[testmessage];false;intervalmusicmessage_$guildID_$get[cid];$guildID;true;$callFunction[configMusic;interval_message];$get[bypassEdit]]
+
+    $if[$callFunction[configMusic;interval_message];
+    $setCache[musicplayer_message_$guildID_waitinterval;true]
+    ]
     `
 }

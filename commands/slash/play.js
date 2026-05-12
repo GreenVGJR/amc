@@ -86,7 +86,7 @@ module.exports = {
   $footer[none;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
-  $if[$or[$get[iscreatedfirst];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
+  $if[$or[$and[$getCache[musicplayer_message_$guildID_is247music]!=true;$get[iscreatedfirst]];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
   $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
   $setCache[musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
@@ -98,7 +98,7 @@ module.exports = {
   $footer[none$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true]; - $callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
-  $if[$or[$get[iscreatedfirst];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
+  $if[$or[$and[$getCache[musicplayer_message_$guildID_is247music]!=true;$get[iscreatedfirst]];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
   $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
   $setCache[musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
@@ -176,6 +176,9 @@ module.exports = {
   ]
   ]
   ]
+  $if[$get[iscreatedfirst];
+  $let[ml;$try[$callFunction[joinVC]]]
+  ]
   $callLocalFunction[loadinteraction;1-1]
   $loop[-1;
   $if[$get[fsearch]!=false;$break]
@@ -206,7 +209,7 @@ module.exports = {
   $let[donetry;5]
   $async[
   $let[queue_lengthtemp;$if[$hasMusicNode;$try[$queueLength;0];0]]
-  $let[lockprovyt;youtubeVideo]
+  $let[lockprovyt;youtube]
 
   $if[$get[basic_type];
   $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[music_playurl]]]
@@ -216,6 +219,16 @@ module.exports = {
     $try[
     $if[$env[whatmusictype;type]==youtube;
     $playTrack[$voiceID;$trimLines[$get[music_playurl]];$get[lockprovyt]]
+    $if[$get[iscreatedfirst];
+    $setCache[musicplayer_checkmessage_ytwarm_$guildID;pending]
+    $loop[-1;
+      $let[activecheckytarm;$getCache[musicplayer_checkmessage_ytwarm_$guildID]]
+      $if[$get[activecheckytarm]!=pending;$break]
+      $wait[20]
+    ]
+    $playTrack[$voiceID;$trimLines[$get[music_playurl]];$get[lockprovyt]]
+    $!skipTrack
+    ]
     ;
     $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==applemusic;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
     $playTrack[$voiceID;$trimLines[$get[music_playurl]];$env[whatmusictype;type]]
@@ -225,11 +238,14 @@ module.exports = {
     $let[found;true]
     ;
     $if[$env[whatmusictype;type]==youtube;
-    $if[$get[attemptry]==2;$let[lockprovyt;youtube]]
+    $logger[Error;$env[causeplayerror]]
+    $if[$get[attemptry]==2;$let[lockprovyt;youtubeVideo]]
     ]
     $letSum[attemptry;1]
     ;causeplayerror]
   ]
+
+  $deleteCache[musicplayer_checkmessage_ytwarm_$guildID]
   ]
 
   $if[$get[basic_type];
@@ -269,5 +285,12 @@ module.exports = {
   $callLocalFunction[loadinteraction;3]
   $setTimeout[$async[$!interactionDelete];1s]
   $callFunction[updateCurrentMusicPlayer;false]
-  ]]`
+  ]
+  $stop
+  ]
+  
+  $if[$getCache[musicplayer_message_$guildID_is247music]==true;
+  $async[$!interactionDelete]
+  ]
+  `
 }
