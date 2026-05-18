@@ -1,6 +1,11 @@
 // Test replace yt stream
+const { Readable } = require('stream');
 const { randomBytes } = require('crypto');
-const { default_userAgent_desktop, streamTypeYT, useClientYT, useBearer } = require('../config.json');
+const fs = require('fs');
+const path = require('path');
+const cacheDir = path.join(__dirname, 'ytCacheTracks');
+fs.mkdirSync(cacheDir, { recursive: true });
+const { default_userAgent_desktop, streamTypeYT, useClientYT, useBearer, cacheTrackYT } = require('../config.json');
 const ytClients = require('./youtubeClients.js');
 const targetClient = useClientYT?.toUpperCase();
 
@@ -44,7 +49,6 @@ delete actuallk.client_secret;
 actuallk.hl = "en";
 actuallk.gl = "US";
 
-
 const generateVisitor = async () => {
     try {
         if (ytcookies) {
@@ -63,13 +67,145 @@ const generateVisitor = async () => {
 };
 generateVisitor().catch(console.error);
 
+function createChunkedStream(url, totalSize, videoId, ext) {
+    let start = 0;
+    const chunkSize = 1024 * 1024 * 10; // 10MB
+    let isEnded = false;
+    let abortController = null;
+    let isReading = false;
+    let isSuccess = false;
+
+    const tempFilePath = path.join(cacheDir, `${videoId}.${Date.now()}.${randomBytes(4).toString('hex')}.temp`);
+    const finalFilePath = path.join(cacheDir, `${videoId}.${ext}`);
+
+    let writeStream = null;
+    let writeErrorOccurred = false;
+
+    if (cacheTrackYT) {
+        writeStream = fs.createWriteStream(tempFilePath);
+        writeStream.on('error', (err) => {
+            console.error("Cache Write Error:", err);
+            writeErrorOccurred = true;
+        });
+    }
+
+    return new Readable({
+        async read() {
+            if (isEnded || isReading) return;
+            isReading = true;
+
+            let end = start + chunkSize - 1;
+            if (end >= totalSize) {
+                isEnded = true;
+                end = totalSize - 1;
+            }
+
+            abortController = new AbortController();
+            const chunkUrl = `${url}&range=${start}-${end}`;
+
+            try {
+                const response = await fetch(chunkUrl, {
+                    headers: { "User-Agent": APIuserAgent },
+                    signal: abortController.signal
+                });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                if (!response.body) {
+                    return;
+                }
+
+                const reader = response.body.getReader();
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const buffer = Buffer.from(value);
+                    this.push(buffer);
+                    if (writeStream && !writeErrorOccurred) {
+                        writeStream.write(buffer);
+                    }
+                }
+
+                if (isEnded) {
+                    isSuccess = true;
+                    if (writeStream) {
+                        writeStream.end(() => {
+                            if (!writeErrorOccurred) {
+                                fs.rename(tempFilePath, finalFilePath, (err) => {
+                                    if (err) console.error("Cache rename failed:", err);
+                                });
+                            } else {
+                                fs.unlink(tempFilePath, () => { });
+                            }
+                        });
+                    }
+                    this.push(null);
+                } else {
+                    start = end + 1;
+                }
+            } catch (err) {
+                if (writeStream && !isSuccess) {
+                    writeStream.end(() => {
+                        fs.unlink(tempFilePath, () => { });
+                    });
+                }
+                if (abortController?.signal?.aborted || err.name === 'AbortError') {
+                    this.destroy();
+                } else {
+                    this.destroy(err);
+                }
+            } finally {
+                isReading = false;
+            }
+        },
+        destroy(err, callback) {
+            if (abortController) {
+                abortController.abort();
+            }
+            if (writeStream && !isSuccess) {
+                writeStream.end(() => {
+                    fs.unlink(tempFilePath, () => { });
+                });
+            }
+            if (callback) callback(err);
+        }
+    });
+}
+
 async function fallbackYTStream(lstracks) {
     refreshYtAuth();
+
+    const videoId = lstracks.includes('watch?v=') ? lstracks.split('watch?v=')[1].split('&')[0] : lstracks;
+    const cacheFilePathWebm = path.join(cacheDir, `${videoId}.webm`);
+    const cacheFilePathM4a = path.join(cacheDir, `${videoId}.m4a`);
+    if (cacheTrackYT) {
+        if (fs.existsSync(cacheFilePathWebm)) {
+            return fs.createReadStream(cacheFilePathWebm);
+        }
+        if (fs.existsSync(cacheFilePathM4a)) {
+            return fs.createReadStream(cacheFilePathM4a);
+        }
+    }
+
     const checklist = templist.find(l => l.id === lstracks);
     if (checklist) {
         if (Date.now() <= checklist.ref) {
+            if (cacheTrackYT) {
+                if (fs.existsSync(cacheFilePathWebm)) {
+                    return fs.createReadStream(cacheFilePathWebm);
+                }
+                if (fs.existsSync(cacheFilePathM4a)) {
+                    return fs.createReadStream(cacheFilePathM4a);
+                }
+            }
             const isAllowLength = checklist.allowLength;
-            return checklist.url + (isAllowLength ? `&range=0-${checklist.contentLength}` : "");
+            if (isAllowLength && checklist.contentLength) {
+                const ext = checklist.url.includes('mime=audio/webm') || checklist.url.includes('itag=251') || checklist.url.includes('itag=774') ? 'webm' : 'm4a';
+                return createChunkedStream(checklist.url, parseInt(checklist.contentLength), videoId, ext);
+            }
+            return checklist.url;
         }
     }
     try {
@@ -81,7 +217,7 @@ async function fallbackYTStream(lstracks) {
         const cpn = randomBytes(12).toString('base64url');
         const isVRnAuth = ytauth?.token && targetClient === "ANDROID_VR" && useBearer;
 
-        const buildRoute = { playerRequest: { videoId: lstracks.split('watch?v=')[1], contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } } };
+        const buildRoute = { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } } };
 
         let a = await fetch(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
             method: "POST", body: JSON.stringify(buildRoute), headers: {
@@ -165,14 +301,13 @@ async function fallbackYTStream(lstracks) {
         if (filterlocation.status === 403 && changeLength) {
             const bytesPerSecond = parseInt(fr.contentLength) / durationLength;
             const previewLength = String(Math.floor(bytesPerSecond * 60));
-            actualfinalurl = filterlocation.url + `&range=0-${previewLength}`;
+            actualfinalurl = filterlocation.url;
             streamingLength = previewLength;
+            changeLength = true;
         }
         else {
-            actualfinalurl = filterlocation.url + (changeLength ? `&range=0-${streamingLength}` : "");
+            actualfinalurl = filterlocation.url;
         }
-
-        if (filterlocation.body) await filterlocation.body.cancel();
 
         templist.push({
             id: lstracks,
@@ -181,6 +316,12 @@ async function fallbackYTStream(lstracks) {
             allowLength: changeLength,
             contentLength: streamingLength
         });
+
+        if (changeLength && streamingLength && parseInt(streamingLength) > 0) {
+            const ext = [251, 774].includes(fr?.itag) ? "webm" : "m4a";
+            return createChunkedStream(actualfinalurl, parseInt(streamingLength), videoId, ext);
+        }
+
         return actualfinalurl;
     }
     catch (e) {
@@ -192,17 +333,10 @@ async function fallbackYTStream(lstracks) {
 module.exports = {
     ...(ytcookies && { cookie: ytcookies }),
     generateWithPoToken: false,
-    disablePlayer: true,
+    disablePlayer: false,
     ignoreSignInErrors: true,
     slicePlaylist: true,
     useYoutubeDL: false,
-    useClient: {
-        clientType: "ANDROID"
-    },
-    innertubeConfigRaw: {
-        client_type: "WEB",
-        retrieve_player: false
-    },
     createStream: async (q) => {
         try { return await fallbackYTStream(q.url); }
         catch { return; }

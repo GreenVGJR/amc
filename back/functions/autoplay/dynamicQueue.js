@@ -25,7 +25,7 @@ module.exports = {
     $let[llgntvdc;$env[startlsfd;url]]
     $jsonLoad[lljntvdc;$callFunction[filterMediaID;$get[llgntvdc]]]
         
-        $let[lockprovyt;youtube]
+        $let[lockprovyt;youtubeVideo]
         $let[found;false]
         $let[attemptry;0]
         $let[donetry;5]
@@ -50,7 +50,7 @@ module.exports = {
         $let[found;true]
         ;
         $if[$env[lljntvdc;type]==youtube;
-        $if[$get[attemptry]==2;$let[lockprovyt;youtubeVideo]]
+        $if[$get[attemptry]==2;$let[lockprovyt;youtube]]
         ]
         $letSum[attemptry;1]
         ;causeplayerror]

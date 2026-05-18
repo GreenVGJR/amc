@@ -209,7 +209,7 @@ module.exports = {
   $let[donetry;5]
   $async[
   $let[queue_lengthtemp;$if[$hasMusicNode;$try[$queueLength;0];0]]
-  $let[lockprovyt;youtube]
+  $let[lockprovyt;youtubeVideo]
 
   $if[$get[basic_type];
   $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[music_playurl]]]
@@ -219,16 +219,6 @@ module.exports = {
     $try[
     $if[$env[whatmusictype;type]==youtube;
     $playTrack[$voiceID;$trimLines[$get[music_playurl]];$get[lockprovyt]]
-    $if[$get[iscreatedfirst];
-    $setCache[musicplayer_checkmessage_ytwarm_$guildID;pending]
-    $loop[-1;
-      $let[activecheckytarm;$getCache[musicplayer_checkmessage_ytwarm_$guildID]]
-      $if[$get[activecheckytarm]!=pending;$break]
-      $wait[20]
-    ]
-    $playTrack[$voiceID;$trimLines[$get[music_playurl]];$get[lockprovyt]]
-    $!skipTrack
-    ]
     ;
     $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==applemusic;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
     $playTrack[$voiceID;$trimLines[$get[music_playurl]];$env[whatmusictype;type]]
@@ -238,8 +228,7 @@ module.exports = {
     $let[found;true]
     ;
     $if[$env[whatmusictype;type]==youtube;
-    $logger[Error;$env[causeplayerror]]
-    $if[$get[attemptry]==2;$let[lockprovyt;youtubeVideo]]
+    $if[$get[attemptry]==2;$let[lockprovyt;youtube]]
     ]
     $letSum[attemptry;1]
     ;causeplayerror]

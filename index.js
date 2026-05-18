@@ -51,7 +51,6 @@ const music = new ForgeMusic({
         defaultFFmpegFilters: ["compressor"],
         disableHistory: true,
         disableBiquad: true,
-        disableFallbackStream: true,
         bufferingTimeout: 350,
         volume: 50,
         connectionTimeout: 30000,
