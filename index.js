@@ -1,3 +1,4 @@
+// Removes youtubei logs appear
 ['log', 'warn', 'error', 'info', 'debug'].forEach(method => {
     const original = console[method];
     console[method] = (...args) => {
@@ -5,8 +6,8 @@
         original(...args);
     };
 });
-try { require('youtubei.js').Log.setLevel(0); } catch (e) {}
-try { require('discord-player-youtubei/node_modules/youtubei.js').Log.setLevel(0); } catch (e) {}
+try { require('youtubei.js').Log.setLevel(0); } catch (e) { }
+try { require('discord-player-youtubei/node_modules/youtubei.js').Log.setLevel(0); } catch (e) { }
 
 // Config
 const toggles = require('./back/config.json');
@@ -28,6 +29,14 @@ const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { AttachmentExtractor } = require("@discord-player/extractor");
 
+// Disable DSP compressor by default for discord-player
+const { FiltersChain } = require("@discord-player/equalizer");
+const _origFiltersChainCreate = FiltersChain.prototype.create;
+FiltersChain.prototype.create = function (src, presets = this.presets) {
+    presets = { ...presets, compressor: { ...presets?.compressor, disabled: true } };
+    return _origFiltersChainCreate.call(this, src, presets);
+};
+
 const quorielDb = new QuorielDB({
     events: [
         "databaseConnect",
@@ -48,12 +57,11 @@ const music = new ForgeMusic({
     ],
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
-        defaultFFmpegFilters: ["compressor"],
         disableHistory: true,
         disableBiquad: true,
         bufferingTimeout: 350,
-        volume: 50,
         connectionTimeout: 30000,
+        volume: 50,
         leaveOnEmpty: false,
         leaveOnEnd: false,
         leaveOnStop: false,

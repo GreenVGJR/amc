@@ -25,7 +25,7 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $if[$env[provider]==youtube;
-    $jsonLoad[a;$getYoutubeVideo[$env[query]]]
+    $jsonLoad[a;$getYoutubeVideoLite[$env[query]]]
     $onlyIf[$env[a;results;0]!=;$return]
     $!jsonSet[reslac;id;$advancedTextSplit[$env[a;results;0;url];watch?v=;1]]
     $!jsonSet[reslac;dynamic_thumbnail;]

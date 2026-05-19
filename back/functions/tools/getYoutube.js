@@ -158,6 +158,45 @@ module.exports = [{
     `
 },
 {
+    name: "getYoutubeVideoLite",
+    params: [{
+        name: "query", // string
+        description: "Query",
+        required: true
+    },
+    {
+        name: "userAgent", // string
+        description: "Spoof client",
+        required: false
+    }],
+    code: `
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
+    $arrayLoad[results]
+    $try[
+    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":7,"clientVersion":"7.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
+    $!jsonSet[inputhttpquery;query;$env[query]]
+    $httpSetBody[$jsonStringify[inputhttpquery]]
+    $httpSetContentType[Text]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Content-Type;application/json]
+    $httpAddHeader[Accept-Language;en]
+    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.sectionListRenderer.contents.shelfRenderer.content.horizontalListRenderer.items(tileRenderer(contentType,header,onLongPressCommand(showMenuCommand)));POST;res]
+    $jsonLoad[res;$env[res]]
+    $jsonLoad[dofetch;$env[res;contents;sectionListRenderer;contents;0;shelfRenderer;content;horizontalListRenderer;items]]
+    $arrayForEach[dofetch;getfetch;
+    $if[$and[$env[getfetch;tileRenderer;contentType]==TILE_CONTENT_TYPE_VIDEO;$env[getfetch;tileRenderer;onLongPressCommand;showMenuCommand;contentId]!=];
+    $jsonLoad[tempres;{}]
+    $!jsonSet[tempres;title;$env[getfetch;tileRenderer;onLongPressCommand;showMenuCommand;subtitle;simpleText] - $env[getfetch;tileRenderer;onLongPressCommand;showMenuCommand;title;simpleText]]
+    $!jsonSet[tempres;duration;"$if[$and[$env[getfetch;tileRenderer;header;tileHeaderRenderer;thumbnailOverlays;0;thumbnailOverlayTimeStatusRenderer;text;simpleText]==;$env[getfetch;tileRenderer;header;tileHeaderRenderer;thumbnailOverlays;1;thumbnailOverlayTimeStatusRenderer;style]!=LIVE];-1;$round[$divide[$unparseDigital[$env[getfetch;tileRenderer;header;tileHeaderRenderer;thumbnailOverlays;0;thumbnailOverlayTimeStatusRenderer;text;simpleText]];1000];0]]"]
+    $!jsonSet[tempres;thumbnail;$if[$env[getfetch;tileRenderer;header;tileHeaderRenderer;thumbnailOverlays]!=;https://i.ytimg.com/vi_webp/$env[getfetch;tileRenderer;onLongPressCommand;showMenuCommand;contentId]/hq720.webp;$advancedTextSplit[$env[getfetch;tileRenderer;header;tileHeaderRenderer;thumbnail;thumbnails;0;url];=;0]=s0]]
+    $!jsonSet[tempres;url;https://youtube.com/watch?v=$env[getfetch;tileRenderer;onLongPressCommand;showMenuCommand;contentId]]
+    $arrayPushJSON[results;$env[tempres]]]
+    ]]
+    $return[{"ping":"$httpPing", "results":$env[results]}]
+    `
+},
+{
     name: "getYTLyricsMusic",
     params: [{
         name: "videoId", // string

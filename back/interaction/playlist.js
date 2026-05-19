@@ -469,14 +469,40 @@ $setCache[musicplayer_message_$guildID_messageid;"$get[mid2]"]
 ]
 
 $loop[$arrayLength[a];
-$let[ctrs;$sub[$env[sdgk];1]]
+$let[found;false]
+$let[attemptry;0]
+$let[donetry;5]
 
-$try[
-$playTrack[$voiceID;$default[$env[listrs;$env[a;$get[ctrs]];url];$env[listrs;$env[a;$get[ctrs]];title]];auto]
-$letSum[successplay;1]
+$let[ctrs;$sub[$env[sdgk];1]]
+$let[lockprovyt;youtubeVideo]
+$if[$and[$env[listrs;$env[a;$get[ctrs]];url]!=;$env[listrs;$env[a;$get[ctrs]];url]!=null;$env[listrs;$env[a;$get[ctrs]];url]!=undefined];
+$let[ktnmplaytt;$env[listrs;$env[a;$get[ctrs]];url]]
 ;
-$letSum[errorplay;1]
+$let[ktnmplaytt;$env[listrs;$env[a;$get[ctrs]];title]]
 ]
+
+$jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[ktnmplaytt]]]
+
+$while[$and[$get[attemptry]<=$get[donetry];$get[found]==false];
+    $try[
+    $if[$env[whatmusictype;type]==youtube;
+    $playTrack[$voiceID;$trimLines[$get[ktnmplaytt]];$get[lockprovyt]]
+    ;
+    $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==applemusic;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
+    $playTrack[$voiceID;$trimLines[$get[ktnmplaytt]];$env[whatmusictype;type]]
+    ;
+    $playTrack[$voiceID;$trimLines[$get[ktnmplaytt]];auto]
+    ]]
+    $let[found;true]
+    ;
+    $if[$env[whatmusictype;type]==youtube;
+    $if[$get[attemptry]==2;$let[lockprovyt;youtube]]
+    ]
+    $letSum[attemptry;1]
+    ;causeplayerror]
+]
+
+$if[$get[found]==true;$letSum[successplay;1];$letSum[errorplay;1]]
 
 ;sdgk;true]
 $interactionUpdate[
@@ -486,5 +512,7 @@ $addField[Error;\`$get[errorplay]\`;true]
 $footer[Done]
 $color[$callFunction[useIcon;color_embed]]
 ]
+$wait[2s]
+$async[$!interactionDelete]
 `
     }]

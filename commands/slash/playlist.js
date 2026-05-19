@@ -24,6 +24,7 @@ module.exports = {
 type: 0,
 code: `
 $ephemeral
+$silent
 $interactionReply[$callFunction[loadPlaylistUser;0;$option[name]]]
 `
 }

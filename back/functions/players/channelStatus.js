@@ -22,7 +22,7 @@ module.exports = {
     $httpSetBody[$env[fn]]
     ]
     $httpAddHeader[Authorization;Bot $clientToken]
-    $let[kfkv;$httpRequest[https://discord.com/api/v10/channels/$env[ccl]/voice-status;PUT]]
+    $let[kfkv;$httpRequest[https://discord.com/api/v10/channels/$env[ccl]/voice-status;PUT;sdbnja]]
     ]
     $return[$checkCondition[$get[kfkv]==204]]
     `

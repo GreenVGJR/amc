@@ -106,7 +106,7 @@ module.exports = {
   $if[$env[typesload]==2;
   $interactionReply[
   $author[» Fetching\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
-  $addField[$get[music_title];-# $if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]];true]
+  $addField[$get[music_title];-# $if[$get[music_duration]==-1;MUSIC;$if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]]];true]
   $thumbnail[$get[music_thumbnail]]
   $color[$callFunction[useIcon;color_embed]]
   $footer[$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]]$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true]; - $callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$callFunction[useIcon;loading]]
@@ -116,7 +116,7 @@ module.exports = {
   $interactionReply[
   $if[$get[basic_type];
   $author[$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
-  $addField[$get[music_title];-# $if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]];true]
+  $addField[$get[music_title];-# $if[$get[music_duration]==-1;MUSIC;$if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]]];true]
   $thumbnail[$if[$isValidLink[$get[music_thumbnail]];$get[music_thumbnail];$userAvatar[$authorID;1024]];0]
   $color[$callFunction[useIcon;color_embed];0]
   $footer[$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]];$callFunction[useIcon;$get[use_provider];0]]
@@ -191,7 +191,7 @@ module.exports = {
   ]
   $let[music_title;$env[result;title]]
   $let[music_id;$env[result;id]]
-  $let[music_duration;$multi[$env[result;duration];1000]]
+  $let[music_duration;$if[$env[result;duration]==-1;-1;$multi[$env[result;duration];1000]]]
   $let[music_thumbnail;$default[$env[result;dynamic_thumbnail];$env[result;thumbnail]]]
   $let[music_thumbnail;$if[$isValidLink[$get[music_thumbnail]];$get[music_thumbnail];$userAvatar[$authorID;1024]]]
   $let[music_provider;$get[use_provider]]
