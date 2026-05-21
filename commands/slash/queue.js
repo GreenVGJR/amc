@@ -46,7 +46,7 @@ $addTextDisplay[-# $bold[Duration:] $if[$trackInfo[durationMS]==0;LIVE;$parseDig
 $addContainer[
 $if[$queueLength!=0;
 $arrayForEach[rest;lf;
-$let[onSpecificRequest;$if[$or[$env[lf;requestedBy]==;$env[lf;requestedBy]==null];$clientID;$env[lf;requestedBy]]]
+$let[onSpecificRequest;$if[$or[$env[lf;requestedBy]==;$env[lf;requestedBy]==null;$env[lf;requestedBy;id]==;$env[lf;requestedBy;id]==null];$clientID;$env[lf;requestedBy]]]
 $addSection[
 $addTextDisplay[> ### $cropText[$env[lf;title];0;100;]
 > -# $if[$env[lf;durationMS]==0;LIVE;$parseDigital[$env[lf;durationMS]]] - <@$get[onSpecificRequest]>

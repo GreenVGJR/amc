@@ -80,7 +80,7 @@ module.exports = {
     $jsonLoad[jsonmusicdata;$env[musicInfo]]
     $let[checkautoplaystatus;$callFunction[checkAutoplayStatus]]
     $if[$get[checkautoplaystatus];
-    $if[$or[$env[jsonmusicdata;requestedBy;id]==;$env[jsonmusicdata;requestedBy;id]==null];
+    $if[$or[$env[jsonmusicdata;requestedBy]==;$env[jsonmusicdata;requestedBy]==null;$env[jsonmusicdata;requestedBy;id]==;$env[jsonmusicdata;requestedBy;id]==null];
     $!jsonSet[jsonmusicdata;requestedBy;{}]
     $!jsonSet[jsonmusicdata;requestedBy;id;"$clientID"]
     ]]

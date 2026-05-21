@@ -48,6 +48,7 @@ const quorielDb = new QuorielDB({
 const music = new ForgeMusic({
     events: [
         GuildQueueEvent.ConnectionDestroyed,
+        GuildQueueEvent.Error,
         GuildQueueEvent.PlayerError,
         GuildQueueEvent.PlayerPause,
         GuildQueueEvent.PlayerResume,
@@ -59,7 +60,7 @@ const music = new ForgeMusic({
     connectOptions: {
         disableHistory: true,
         disableBiquad: true,
-        bufferingTimeout: 350,
+        bufferingTimeout: 250,
         connectionTimeout: 30000,
         volume: 50,
         leaveOnEmpty: false,

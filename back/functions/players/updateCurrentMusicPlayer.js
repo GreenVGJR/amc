@@ -24,7 +24,7 @@ module.exports = {
     $!jsonSet[testmessage;duration;$trackInfo[duration]]
     $!jsonSet[testmessage;durationMS;"$trackInfo[durationMS]"]
     $!jsonSet[testmessage;requestedBy;{}]
-    $!jsonSet[testmessage;requestedBy;id;"$trackInfo[requestedBy;id]"]
+    $!jsonSet[testmessage;requestedBy;id;"$if[$or[$trackInfo[requestedBy]==;$trackInfo[requestedBy]==null;$trackInfo[requestedBy;id]==;$trackInfo[requestedBy;id]==null];$clientID;$trackInfo[requestedBy;id]]"]
 
     $callFunction[musicPlayerMessage;$get[cid];$get[mid];$jsonStringify[testmessage];false;intervalmusicmessage_$guildID_$get[cid];$guildID;true;$callFunction[configMusic;interval_message];$get[bypassEdit]]
 
