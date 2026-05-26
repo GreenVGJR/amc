@@ -12,6 +12,16 @@ const targetClient = useClientYT?.toUpperCase();
 let vt;
 let datasyncID = "";
 
+function generateAnonPOT() {
+    const b = Buffer.alloc(10);
+    b[0] = 0x22;
+    b[1] = 0x08;
+    for (let i = 0; i < 8; i++) b[2 + i] = Math.floor(Math.random() * 256);
+    return b.toString('base64url');
+}
+
+let poToken = generateAnonPOT();
+
 const useClient = ytClients?.[targetClient];
 if (!useClient) {
     const available = Object.keys(ytClients).join(", ");
@@ -217,7 +227,7 @@ async function fallbackYTStream(lstracks) {
         const cpn = randomBytes(12).toString('base64url');
         const isVRnAuth = ytauth?.token && targetClient === "ANDROID_VR" && useBearer;
 
-        const buildRoute = { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } } };
+        const buildRoute = { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
 
         let a = await fetch(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
             method: "POST", body: JSON.stringify(buildRoute), headers: {

@@ -109,6 +109,16 @@ module.exports = {
     ;retry]
     $callLocalFunction[refreshspotify;false]
     ]]
+    $if[$env[filterid;type]==applemusic;
+    $httpAddHeader[Accept-Encoding;br, gzip]
+    $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Accept;*/*]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpSetContentType[Text]
+    $let[http;$httpRequest[https://itunes.apple.com/lookup?id=$env[filterid;id];GET;a]]
+    $jsonLoad[a;$env[a]]
+    $let[results;{"status":$get[http],"results":$if[$env[a;results;0]==;null;$env[a;results;0]]}]
+    ]
     $if[$env[filterid;type]==tiktokmob;
     $let[testtempjr;$djsEval[fetch("$replace[$get[url];vm.tiktok.com;vt.tiktok.com]", { method: 'GET' }).then(a => a.url).catch()]]
     $jsonLoad[filterid;$callFunction[filterMediaID;$get[testtempjr]]]

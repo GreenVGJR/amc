@@ -154,6 +154,7 @@ ___
   = > Youtube
     > Soundcloud
     > Spotify (from Youtube)
+    > Apple Music (from Youtube)
     > Tiktok
     > Instagram
     > Facebook

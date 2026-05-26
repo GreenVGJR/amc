@@ -1,12 +1,12 @@
 module.exports = {
   data: {
     "name": "download",
-    "description": "Download a media",
+    "description": "Download a media (Only supports Video, Audio)",
     "options": [
       {
         "type": 3,
         "name": "url",
-        "description": "URL media | Youtube, Soundcloud, Spotify, Tiktok, Twitter, Instagram, Facebook, Bandcamp",
+        "description": "Support: Youtube, Soundcloud, Spotify, Apple Music, Tiktok, Twitter, Instagram, Facebook, Bandcamp",
         "required": true,
         "min_length": 8
       },
@@ -99,7 +99,32 @@ $onlyIf[$env[b;results;0]!=;$let[m-fetch;null]]
 $let[m-fetch;true]
 ]
 $if[$get[m-fetch]==false;
-$defer
+$callLocalFunction[runcodessync;Fetching;none;true]
+]
+$loop[-1;
+$if[$get[m-fetch]!=false;$break]
+$wait[5]
+]
+$onlyIf[$get[m-fetch]!=null;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$let[getcdn;$callFunction[fallbackPlaybackTrack;$env[b;results;0;url];v;$get[storeobjecthttp];$get[limitsize]]]
+;
+$if[$env[musictype;type]==applemusic;
+$let[m-fetch;false]
+$let[storeobjecthttp;]
+$let[gettitle;]
+$let[getpuretitle;]
+$let[getcdn;]
+$async[
+$let[storeobjecthttp;$callFunction[extractTrack;https://music.apple.com/us/song//$env[musictype;id]]]
+$let[gettitle;$cropText[$callFunction[fetchTitleTrack;https://music.apple.com/us/song//$env[musictype;id];$get[storeobjecthttp]];0;479;]]
+$onlyIf[$get[gettitle]!=;$let[m-fetch;null]]
+$let[getpuretitle;$cropText[$callFunction[fetchTitleTrack;https://music.apple.com/us/song//$env[musictype;id];$get[storeobjecthttp]];0;1024;]]
+$jsonLoad[b;$callFunction[getYoutubeMusic;$get[getpuretitle]]]
+$onlyIf[$env[b;results;0]!=;$let[m-fetch;null]]
+$let[m-fetch;true]
+]
+$if[$get[m-fetch]==false;
+$callLocalFunction[runcodessync;Fetching;none;true]
 ]
 $loop[-1;
 $if[$get[m-fetch]!=false;$break]
@@ -117,11 +142,12 @@ $let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictyp
 $let[s-fetch;true]
 ]
 $if[$get[s-fetch]==false;
-$defer
+$callLocalFunction[runcodessync;Fetching;none;true]
 ]
 $loop[-1;
 $if[$get[s-fetch]!=false;$break]
 $wait[5]
+]
 ]
 ]
 $onlyIf[$advancedTextSplit[$trimLines[$get[getcdn]];|;0]!=bot;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]\nError: $advancedTextSplit[$trimLines[$get[getcdn]];|;1]]
@@ -150,7 +176,7 @@ $let[lyricnames;$if[$option[file_name]!=;$option[file_name];$get[gettitle]].lrc]
 ]]
 $let[checkcdn_headers;{
 "Accept": "*/*",
-"Accept-Encoding": "",
+"Accept-Encoding": "identity",
 "Sec-Fetch-Site": "none",
 "User-Agent": "$get[agent]"
 }]

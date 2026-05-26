@@ -29,6 +29,7 @@ $arraySlice[rest;rest;0;9]
 
 $jsonLoad[jsonmedia;$callFunction[filterMediaID;$trackInfo[url]]]
 $let[provider;$replace[$env[jsonmedia;type];applemusic;apple music]]
+$let[requestedBy;$if[$or[$trackInfo[requestedBy;id]==;$trackInfo[requestedBy;id]==null;$trackInfo[requestedBy]==;$trackInfo[requestedBy]==null];$clientID;$trackInfo[requestedBy;id]]]
 
 $interactionReply[
 $silent
@@ -36,9 +37,9 @@ $addContainer[
 $addSection[
 $addTextDisplay[### » Currently Playing
 $hyperlink[$trackInfo[title];$trackInfo[url]]
--# $bold[Requested by:] <@$trackInfo[requestedBy;id]>
+-# $bold[Requested by:] <@$get[requestedBy]>
 ]
-$addThumbnail[$if[$isValidLink[$trackInfo[thumbnail]]==false;$userAvatar[$trackInfo[requestedBy;id];1024];$trackInfo[thumbnail]]]
+$addThumbnail[$if[$isValidLink[$trackInfo[thumbnail]]==false;$userAvatar[$get[requestedBy];1024];$trackInfo[thumbnail]]]
 ]
 $addTextDisplay[-# $bold[Duration:] $if[$trackInfo[durationMS]==0;LIVE;$parseDigital[$trackInfo[durationMS]]] | $bold[Source:] $toTitlecase[$get[provider]] | $bold[Songs:] $separateNumber[$sum[$queueLength;1];.]]
 ;$callFunction[useIcon;color_embed]]

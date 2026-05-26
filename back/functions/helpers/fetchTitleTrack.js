@@ -37,6 +37,13 @@ module.exports = {
     $let[author;$env[a;results;artists;0;name]]
     $let[title;$env[a;results;name]]
     ]]
+    $if[$env[filtype;type]==applemusic;
+    $let[author;$env[a;results;artistName]]
+    $if[$env[a;results;trackName]!=;
+    $let[title;$env[a;results;trackName]]
+    ;
+    $let[title;$env[a;results;collectionName]]
+    ]]
     $if[$env[filtype;type]==tiktokmob;
     $if[$env[a;results;id_str]!=;
     $if[$env[a;results;mid]!=;

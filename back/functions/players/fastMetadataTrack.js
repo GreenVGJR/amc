@@ -26,7 +26,10 @@ module.exports = {
     ]
     $if[$env[provider]==youtube;
     $jsonLoad[a;$getYoutubeVideoLite[$env[query]]]
+    $if[$env[a;results;0]==;
+    $jsonLoad[a;$getYoutubeVideo[$env[query]]]
     $onlyIf[$env[a;results;0]!=;$return]
+    ]
     $!jsonSet[reslac;id;$advancedTextSplit[$env[a;results;0;url];watch?v=;1]]
     $!jsonSet[reslac;dynamic_thumbnail;]
     $!jsonSet[reslac;thumbnail;$env[a;results;0;thumbnail]]

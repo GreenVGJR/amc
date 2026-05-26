@@ -188,14 +188,9 @@ module.exports = {
     $if[$get[finalurl]==;$return[$let[finalurl;null]]]
     ]
     $if[$env[whattype;type]==applemusic;
-    $try[
-    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
-    $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent_desktop]]
-    $httpSetContentType[Text]
-    $!httpRequest[$env[url];GET;a]
-    ]
-    $if[$env[a]==;$callLocalFunction[oncecode;true] $return]
-    $let[finalurl;$advancedTextSplit[$env[a];"contentUrl":";1;";0]]
+    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[a;results]==null;$callLocalFunction[oncecode;true] $return]
+    $let[finalurl;$env[a;results;previewUrl]]
     ]]
     $if[$env[whattype;type]==facebook;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]

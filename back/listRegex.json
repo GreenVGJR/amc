@@ -23,6 +23,11 @@
         "^(?:https?:\\/\\/)?(?:open\\.spotify\\.com\\/|spotify:)((?:user|episode|playlist|track|album|artist)[\\/:][A-Za-z0-9]+)(?:\\?.*)?$",
         1
     ],
+    "applemusic": [
+        "^(?:https?:\/\/)?(?:[^\/]+\\.)?music\\.apple\\.com\/[^\/]+\/(?:song\/[^\/?#]*\/(\\d+)(?:[\/?#].*)?|album\/[^\/?#]*\/\\d+\\?(?:[^#&]+&)*i=(\\d+)(?:&[^#]*)?(?:#.*)?)$",
+        1,
+        2
+    ],
     "tiktok": [
         "^(?:https?:\\/\\/)?(?:(?:www\\.)?(?:m\\.)?tiktok\\.com\\/(?:(?:@[^\\/]*\\/video\\/)|v\\/)|t\\.tiktok\\.com\\/i18n\\/share\\/video\\/)(\\d{18,21})(?:\\.html)?(?:[\\/\\?#].*)?$",
         1
