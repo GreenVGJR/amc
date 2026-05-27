@@ -43,14 +43,15 @@ const lavalink = new ForgeLinked({
     }
   ],
   playerOptions: {
-    defaultSearchPlatform: "ytm",
+    defaultSearchPlatform: "ytsearch",
     onDisconnect: {
       autoReconnect: true,
       destroyPlayer: true
     },
     onEmptyQueue: {
       destroyAfterMs: 0
-    }
+    },
+    useUnresolvedData: true
   }
 });
 

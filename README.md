@@ -5,6 +5,9 @@
 
 </div>
 
+> [!NOTE]
+> You may want use Local version instead as i am not updating like usual anymore.
+
 [Check another version](https://github.com/GreenVGJR/amc-discord-bot/blob/landing/README.md#choose-version)
 
 ## Installation

@@ -128,7 +128,7 @@ module.exports = {
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpAddHeader[Content-Type;application/json]
         $httpAddHeader[Accept;application/json]
-        $httpSetBody[{"client_data":{"client_version":"1.0","client_id":"d8a5ed958d274c2e8ee717e6a4b0971d","js_sdk_data":{}}}]
+        $httpSetBody[{"client_data":{"client_version":"1.0","client_id":"f6a40776580943a7bc5173125a1e8832","js_sdk_data":{}}}]
         $!httpRequest[https://clienttoken.spotify.com/v1/clienttoken;POST]
         $let[token;$httpResult[granted_token;token]]
         $if[$get[token]!=;$setCache[authmusic_spotify_token;$get[token]]]
@@ -194,11 +194,26 @@ module.exports = {
     $if[$env[successlog]==true;$logger[Info;$if[$get[finaltoken]!=;$cropText[$get[finaltoken];0;12;...];Failed to Retrieve] | Tidal / Token]]
     $if[$get[finaltoken]==;$logger[Warn;Re-trying - Tidal] $callFunction[generateAuthKeys;tidal;;true]]
     ]
+    $if[$or[$env[type]==all;$env[type]==tidal_token];
+    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Tidal               | Auth;cyan]]
+    $try[
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+        $httpAddHeader[Content-Type;application/x-www-form-urlencoded]
+        $c[Seems static]
+        $httpSetBody[client_id=$getCache[authmusic_tidal]&client_secret=dQjy0MinCEvxi1O4UmxvxWnDjt4cgHBPw8ll6nYBk98%3D&grant_type=client_credentials]
+        $!httpRequest[https://auth.tidal.com/v1/oauth2/token;POST;jjgk]
+        $let[finalauth;$env[jjgk;access_token]]
+        $if[$get[finalauth]!=;$setCache[authmusic_tidal_token;$get[finalauth]]]
+        $if[$env[successlog]==true;$logger[Info;$if[$get[finalauth]!=;$cropText[$get[finalauth];0;12;...];Failed to Retrieve] | Tidal / Auth]]
+    ;$logger[Info;Failed to Retrieve - Tidal]]
+    $if[$get[finalauth]==;$logger[Warn;Re-trying - Tidal] $callFunction[generateAuthKeys;tidal_token;;true]]
+    ]
     $if[$or[$env[type]==all;$env[type]==tiktok];
     $if[$get[typedebug];$chalkLog[\\[SEARCH\\] Generating Tiktok              | Token & Cookies;cyan]]
     $try[
         $let[finaljs;false]
-        $httpAddHeader[User-Agent;Mozilla/5.0 (Linux\\; Android 10\\; Pixel 3 XL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0]
+        $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
         $httpRequest[https://www.tiktok.com;GET]
@@ -209,14 +224,14 @@ module.exports = {
         $if[$get[lks]==0;$let[finaljs;true]]
         $if[$get[finaljs]==false;
         $httpAddHeader[Cookie;$get[lks]]
-        $httpAddHeader[User-Agent;Mozilla/5.0 (Linux\\; Android 10\\; Pixel 3 XL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0]
+        $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
         $httpRequest[https://www.tiktok.com;GET]
         $let[finalck;$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]
         $if[$get[finalck]==;$let[finaljs;true]]
         $if[$get[finaljs]==false;
-        $let[a13;$get[finalck]]
+        $let[a13;$callFunction[filterCookies;2;$get[finalck];$get[lks]]]
         $let[a12;$advancedTextSplit[$httpResult;"wid":";1;";0]]
         ]]]
         $if[$get[finaljs]==true;

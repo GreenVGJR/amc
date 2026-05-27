@@ -230,8 +230,8 @@ module.exports = {
     $httpSetContentType[Text]
     $!httpRequest[https://www.instagram.com/reel/$advancedTextSplit[$env[filterid;id];/;$charCount[$env[filterid;id];/]]/embedded;GET]
     $arrayLoad[iru;script type="application/json";$httpResult]
-    $jsonLoad[irk;$advancedTextSplit[$env[iru;$arrayFindIndex[iru;r;$checkCondition[$advancedTextSplit[$env[r];RelayPrefetchedStreamCache;1;xdt_api__v1__media__shortcode__web_info;1]!=]]];data-sjs>;1;</script>;0]]
-    $jsonLoad[lck;$env[irk;require;0;3;0;__bbox;require;0;3;1;__bbox;result;data;xdt_api__v1__media__shortcode__web_info;items;0]]
+    $jsonLoad[irk;$default[$advancedTextSplit[$env[iru;$arrayFindIndex[iru;r;$checkCondition[$advancedTextSplit[$env[r];RelayPrefetchedStreamCache;1;xdt_api__v1__media__shortcode__web_info;1]!=]]];data-sjs>;1;</script>;0];{}]]
+    $jsonLoad[lck;$default[$env[irk;require;0;3;0;__bbox;require;0;3;1;__bbox;result;data;xdt_api__v1__media__shortcode__web_info;items;0];{}]]
     $onlyIf[$env[lck;pk]!=;$return]
     $let[results;{"status":null,"results":$if[$env[lck;id]==;null;$env[lck]]}]
     ;

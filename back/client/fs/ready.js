@@ -7,6 +7,16 @@ module.exports = {
     $logger[Warn;Caching Discord context for better performance]
     $async[$callFunction[fetchDiscordContext]]
     ]
+    $setCache[countmusicnode;"0"]
+    $setInterval[
+        $arrayLoad[guild;,;$guildIDs[,]]
+        $let[countnode;0]
+        $arrayForEach[guild;guilds;
+        $try[
+        $if[$playerQueueLength[$env[guilds]]>=0;$letSum[countnode;1]]
+        ]]
+        $setCache[countmusicnode;"$get[countnode]"]
+    ;1m]
     $logger[Info;Generating Auth]
     $async[$callFunction[generateAuthKeys;youtube;;true]]
     $async[$callFunction[generateAuthKeys;tiktok;;true]]

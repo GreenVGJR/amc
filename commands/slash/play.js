@@ -222,8 +222,8 @@ module.exports = {
   $let[statusloop;$playerLoopStatus[$guildID]]
   $if[$get[statusloop]==track;$!playerToggleLoop[$guildID;OFF] $wait[1s]]
   $!playerSkip[$guildID;$get[currentqueuern]]
-  $wait[1s]
-  $if[$get[statusloop]==track;$!playerToggleLoop[$guildID;TRACK]]
+  $if[$get[statusloop]==track;$wait[1s] $!playerToggleLoop[$guildID;TRACK]]
+  $!interactionDelete
   ]]
   $if[$option[force_skip]!=true;$callFunction[updateCurrentMusicPlayer;false]]
   $callLocalFunction[loadinteraction;3]
