@@ -62,17 +62,18 @@ module.exports = {
     $httpAddHeader[Origin;https://$get[defytdomain]]
     $httpAddHeader[X-Origin;https://$get[defytdomain]]
     $httpAddHeader[User-Agent;$default[$env[listclient;userAgent];$callFunction[configMusic;default_userAgent_desktop]]]
-    $httpSetBody[{"playerRequest":{"videoId":"$get[videoid]","contentCheckOk":true,"racyCheckOk":true},"disablePlayerResponse":false,"cpn":"$toLowercase[$randomString[16]]","context":{"client":$jsonStringify[listclient]}}]
-    $!httpRequest[https://$get[defytdomain]/youtubei/v1/reel/reel_item_watch?prettyPrint=false&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(formats(itag,url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent));POST;reshttp]
-    $jsonLoad[reshttp;$env[reshttp;playerResponse]]
+    $httpSetBody[{"playerRequest":{"videoId":"$get[videoid]","contentCheckOk":true,"racyCheckOk":true},"disablePlayerResponse":false,"cpn":"$toLowercase[$randomString[16]]","context":{"client":$jsonStringify[listclient]},"serviceIntegrityDimensions":{"poToken":"$getCache[authmusic_youtube_pot]"},"attestationRequest":{"omitBotguardData":false}}]
+    $!httpRequest[https://$get[defytdomain]/youtubei/v1/reel/reel_item_watch?prettyPrint=false&fields=responseContext,playerResponse(responseContext(visitorData),playabilityStatus,streamingData(formats(itag,url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent));POST;reshttpm]
+    $jsonLoad[reshttp;$env[reshttpm;playerResponse]]
     ]
 
-    $if[$env[reshttp;playabilityStatus;status]!=OK;$return[$let[finalurl;bot|$default[$env[reshttp;playabilityStatus;reason];Precondition check failed]]]]
+    $if[$env[reshttp;playabilityStatus;status]!=OK;$return[$let[finalurl;bot|$default[$default[$env[reshttp;playabilityStatus;reason];$env[reshttpm;responseContext;status]];Precondition check failed]]]]
     $if[$default[$env[reshttp;videoDetails;isLiveContent];false];$return[$let[finalurl;live]]]
-    $if[$env[reshttp;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[reshttp;responseContext;visitorData]]]
+    $if[$env[reshttpm;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[reshttpm;responseContext;visitorData]]]
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
+    $if[$and[$get[getindex251]==-1;$env[reshttp;streamingData;formats;0]!=];$return[$let[finalurl;bot|Format is not available due youtube may enforce SABR-only for this client]]]
     $if[$get[getindex251]==-1;$return[$let[finalurl;bot|Format is not available]]]
     $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
     $if[$get[getcdnytlength]>=$env[size_limit];

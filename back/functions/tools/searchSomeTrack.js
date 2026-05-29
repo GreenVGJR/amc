@@ -31,6 +31,18 @@ module.exports = {
     $arrayPush[results;$jsonStringify[kls]]
     ]
     ]
+    $if[$env[provider]==youtubetv;
+    $jsonLoad[loadser;$try[$getYoutubeVideoLite[$env[query]];{}]]
+    $jsonLoad[loadser2;$env[loadser;results]]
+    $arrayForEach[loadser2;result;
+    $jsonLoad[kls;{}]
+    $!jsonSet[kls;title;$env[result;title]]
+    $!jsonSet[kls;duration;$if[$env[result;duration]==-1;Unknown;$if[$env[result;duration]==0;LIVE;$parseDigital[$multi[$env[result;duration];1000]]]]]
+    $!jsonSet[kls;thumbnail;$env[result;thumbnail]]
+    $!jsonSet[kls;url;$env[result;url]]
+    $arrayPush[results;$jsonStringify[kls]]
+    ]
+    ]
     $if[$env[provider]==youtubeshorts;
     $jsonLoad[ser;$try[$getYoutubeShorts[$env[query]];{}]]
     $jsonLoad[loadser;$env[ser;results]]

@@ -14,19 +14,21 @@ module.exports = {
         "osVersion": "1.3.21O771"
     },
     // some countries may not able to stream after 1 minute
+    // may enforce SABR-only
     "ANDROID": {
         "targetDomain": "youtubei.googleapis.com",
         "client_id": null,
         "client_secret": null,
         "clientName": 3,
-        "clientVersion": "21.19.286",
-        "androidSdkVersion": 30,
-        "userAgent": "com.google.android.youtube/21.19.286 (Linux; U; Android 11) gzip",
+        "clientVersion": "20.05.46",
+        "androidSdkVersion": 34,
+        "userAgent": "com.google.android.youtube/20.05.46 (Linux; U; Android 11) gzip",
         "osName": "Android",
         "osVersion": "11"
     },
     // doesn't support stream kids contents
     // support oauth2
+    // may enforce SABR-only
     "ANDROID_VR": {
         "targetDomain": "youtubei.googleapis.com",
         "client_id": "652469312169-4lvs9bnhr9lpns9v451j5oivd81vjvu1.apps.googleusercontent.com",

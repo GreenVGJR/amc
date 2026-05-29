@@ -3,7 +3,10 @@ module.exports = [{
     code: `
     $!openDB[user;guild;global]
     $logger[Debug;Refreshing cache data]
-    $async[$setCache[system_file-config;$readFile[./back/config.json]]]
+    $async[
+        $setCache[system_file-config;$readFile[./back/config.json]]
+        $if[$or[$toLowerCase[$callFunction[configMusic;useClientYT]]==android_vr;$toLowerCase[$callFunction[configMusic;useClientYT]]==android];$logger[Warn;Youtube may enforcing SABR-only for this client ($callFunction[configMusic;useClientYT])]]
+    ]
     $async[$setCache[system_file-filterMedia;$readFile[./back/listRegex.json]]]
     $async[$setCache[system_file-useCustom;$readFile[./back/messageConfig.json]]]
     $async[$setCache[system_file-useIcon;$readFile[./back/iconsURL.json]]]

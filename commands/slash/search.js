@@ -10,6 +10,7 @@ module.exports = {
         "required": true,
         "choices": [
           { "name": "YouTube", "value": "youtube" },
+          { "name": "YouTube (TV)", "value": "youtubetv" },
           { "name": "YouTube Shorts", "value": "youtubeshorts" },
           { "name": "YouTube Music", "value": "youtubemusic" },
           { "name": "Soundcloud", "value": "soundcloud" },

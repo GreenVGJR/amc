@@ -175,16 +175,30 @@ module.exports = [{
     $try[
     $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":7,"clientVersion":"7.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
     $!jsonSet[inputhttpquery;query;$env[query]]
+    $!jsonSet[inputhttpquery;isPrefetch;true]
+    $!jsonSet[inputhttpquery;isZeroPrefixQuery;false]
+    $!jsonSet[inputhttpquery;suggestionSearchParams;{}]
+    $!jsonSet[inputhttpquery;suggestionSearchParams;subtypes;[\\]]
     $httpSetBody[$jsonStringify[inputhttpquery]]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
-    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.sectionListRenderer.contents.shelfRenderer.content.horizontalListRenderer.items(tileRenderer(contentType,header,onLongPressCommand(showMenuCommand)));POST;res]
+    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.sectionListRenderer.contents.shelfRenderer.content.horizontalListRenderer.items;POST;res]
     $jsonLoad[res;$env[res]]
     $jsonLoad[dofetch;$env[res;contents;sectionListRenderer;contents;0;shelfRenderer;content;horizontalListRenderer;items]]
     $arrayForEach[dofetch;getfetch;
+    $if[$env[getfetch;lockupViewModel;contentId]!=;
+    $if[$or[$env[getfetch;lockupViewModel;contentType]==LOCKUP_CONTENT_TYPE_MUSIC;$env[getfetch;lockupViewModel;contentType]==LOCKUP_CONTENT_TYPE_VIDEO];
+    $jsonLoad[tempres;{}]
+    $!jsonSet[tempres;title;$env[getfetch;lockupViewModel;metadata;lockupMetadataViewModel;title;content]]
+    $!jsonSet[tempres;duration;"$if[$env[getfetch;lockupViewModel;contentImage;thumbnailViewModel;overlays]==;-1;$round[$divide[$unparseDigital[$env[getfetch;lockupViewModel;contentImage;thumbnailViewModel;overlays;0;thumbnailBottomOverlayViewModel;badges;0;thumbnailBadgeViewModel;text]];1000];0]]"]
+    $!jsonSet[tempres;thumbnail;$if[$env[getfetch;lockupViewModel;contentImage;thumbnailViewModel;overlays]!=;https://i.ytimg.com/vi_webp/$env[getfetch;lockupViewModel;contentId]/hq720.webp;$advancedTextSplit[$env[getfetch;lockupViewModel;contentImage;thumbnailViewModel;image;sources;0;url];=;0]=s0]]
+    $!jsonSet[tempres;url;https://youtube.com/watch?v=$env[getfetch;lockupViewModel;contentId]]
+    $arrayPushJSON[results;$env[tempres]]
+    ]
+    ;
     $if[$and[$env[getfetch;tileRenderer;contentType]==TILE_CONTENT_TYPE_VIDEO;$env[getfetch;tileRenderer;onLongPressCommand;showMenuCommand;contentId]!=];
     $jsonLoad[tempres;{}]
     $!jsonSet[tempres;title;$env[getfetch;tileRenderer;onLongPressCommand;showMenuCommand;subtitle;simpleText] - $env[getfetch;tileRenderer;onLongPressCommand;showMenuCommand;title;simpleText]]
@@ -192,8 +206,8 @@ module.exports = [{
     $!jsonSet[tempres;thumbnail;$if[$env[getfetch;tileRenderer;header;tileHeaderRenderer;thumbnailOverlays]!=;https://i.ytimg.com/vi_webp/$env[getfetch;tileRenderer;onLongPressCommand;showMenuCommand;contentId]/hq720.webp;$advancedTextSplit[$env[getfetch;tileRenderer;header;tileHeaderRenderer;thumbnail;thumbnails;0;url];=;0]=s0]]
     $!jsonSet[tempres;url;https://youtube.com/watch?v=$env[getfetch;tileRenderer;onLongPressCommand;showMenuCommand;contentId]]
     $arrayPushJSON[results;$env[tempres]]]
-    ]]
-    $return[{"ping":"$httpPing", "results":$env[results]}]
+    ]]]
+    $return[{"ping":"$httpPing","results":$env[results]}]
     `
 },
 {
@@ -309,15 +323,19 @@ module.exports = [{
     code: `
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $let[ytinitcookietest1;$getCache[authmusic_youtube_tempcookies]]
+
+    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
+    $!jsonSet[inputhttpquery;videoId;$env[videoId]]
+    $httpSetBody[$jsonStringify[inputhttpquery]]
+    $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Cookie;$get[ytinitcookietest1]]
-    $httpSetContentType[Text]
-    $!httpRequest[https://www.youtube.com/watch?v=$env[videoId];GET;oisdn]
-    $try[$jsonLoad[outputhtyt;$advancedTextSplit[$env[oisdn];var ytInitialData =;1;\\;;0]]]
-    $if[$env[outputhtyt]==;$return[{}]]
-    $jsonLoad[oisdn;$default[$env[outputhtyt;contents;twoColumnWatchNextResults;secondaryResults;secondaryResults;results;0;itemSectionRenderer;contents];{}]]
+    $httpAddHeader[Accept-Language;en]
+    $!httpRequest[https://m.youtube.com/youtubei/v1/next?prettyPrint=false&fields=contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results(lockupViewModel);POST;oisdn]
+    $jsonLoad[oisdn;$env[oisdn]]
+    $jsonLoad[oisdn;$default[$env[oisdn;contents;twoColumnWatchNextResults;secondaryResults;secondaryResults;results];{}]]
     $arrayMap[oisdn;pulllockview;$if[$and[$env[pulllockview;lockupViewModel]!=;$endsWith[$env[pulllockview;lockupViewModel;contentType];_VIDEO]];$return[$env[pulllockview;lockupViewModel]]];oisdn]
 
     $return[$default[$jsonStringify[oisdn];{}]]

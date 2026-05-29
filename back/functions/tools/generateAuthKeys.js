@@ -28,6 +28,11 @@ module.exports = {
 
     $if[$or[$env[type]==all;$env[type]==youtube];
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Youtube             | Visitor;cyan]]
+    $if[$env[successlog]==true;
+    $let[genpotytlk;$callFunction[generateAPOTYoutube]]
+    $setCache[authmusic_youtube_pot;$get[genpotytlk]]
+    $logger[Info;$if[$get[genpotytlk]!=;$cropText[$get[genpotytlk];0;12;...];Failed to Retrieve] | Youtube / POT]
+    ]
     $if[$callFunction[configMusic;useBearer]==true;
     $if[$env[successlog]==true;$logger[Info;Using Youtube Token. Looking auth]]
     $jsonLoad[lrtuy;$callFunction[generateTokenYoutube;true]]
