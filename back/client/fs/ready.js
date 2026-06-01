@@ -38,6 +38,10 @@ module.exports = {
     ]
     $deleteCache[disablecookiesyt]
     ]
+    $async[
+    $callFunction[generateAuthKeys;twitter;;true]
+    $callFunction[generateAuthKeys;twitter_cookies;;true]
+    ]
     $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]
     $async[$callFunction[generateAuthKeys;spotify;;true]]
@@ -51,8 +55,10 @@ module.exports = {
     ]
     $async[$callFunction[generateAuthKeys;deezer;;true]]
     $async[$setCache[listcommands-help;$applicationCommands]]
-    $callFunction[generateAuthKeys;twitter;;true]
-    $callFunction[generateAuthKeys;twitter_cookies;;true]
-    $setInterval[$logger[Info;Re-generating keys - $getTimestamp] $callFunction[generateAuthKeys;all;;false] $logger[Info;Done - $getTimestamp];6h]
+    $setInterval[
+    $logger[Info;Re-generating keys - $getTimestamp]
+    $callFunction[generateAuthKeys;all;;false]
+    $logger[Info;Done - $getTimestamp]
+    ;6h]
     `
 }

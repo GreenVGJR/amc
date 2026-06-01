@@ -104,12 +104,16 @@ module.exports = {
   ]
   ]
   $if[$env[typesload]==2;
-  $interactionReply[
+  $let[mid;$interactionReply[
   $author[» Fetching\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
   $addField[$get[music_title];-# $if[$get[music_duration]==-1;MUSIC;$if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]]];true]
   $thumbnail[$get[music_thumbnail]]
   $color[$callFunction[useIcon;color_embed]]
   $footer[$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]]$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true]; - $callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$callFunction[useIcon;loading]]
+  ;$get[iscreatedfirst]]]
+  $if[$or[$and[$getCache[musicplayer_message_$guildID_is247music]!=true;$get[iscreatedfirst]];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
+  $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
+  $setCache[musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
   ]
   $if[$env[typesload]==3;
@@ -207,6 +211,15 @@ module.exports = {
   $let[found;false]
   $let[attemptry;0]
   $let[donetry;5]
+
+  $if[$get[basic_type];
+  $if[$get[found]==false;
+  $callLocalFunction[loadinteraction;2]
+  ]
+  ;
+  $callLocalFunction[loadinteraction;1-2]
+  ]
+
   $async[
   $let[queue_lengthtemp;$if[$hasMusicNode;$try[$queueLength;0];0]]
   $let[lockprovyt;youtubeVideo]
@@ -235,14 +248,6 @@ module.exports = {
   ]
 
   $deleteCache[musicplayer_checkmessage_ytwarm_$guildID]
-  ]
-
-  $if[$get[basic_type];
-  $if[$get[found]==false;
-  $callLocalFunction[loadinteraction;2]
-  ]
-  ;
-  $callLocalFunction[loadinteraction;1-2]
   ]
 
   $loop[-1;

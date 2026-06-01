@@ -72,7 +72,7 @@ module.exports = {
     $if[$env[reshttpm;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[reshttpm;responseContext;visitorData]]]
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
-    $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
+    $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==140]]
     $if[$and[$get[getindex251]==-1;$env[reshttp;streamingData;formats;0]!=];$return[$let[finalurl;bot|Format is not available due youtube may enforce SABR-only for this client]]]
     $if[$get[getindex251]==-1;$return[$let[finalurl;bot|Format is not available]]]
     $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
@@ -80,6 +80,32 @@ module.exports = {
     $let[checkindex139;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
     $if[$get[checkindex139]!=-1;
     $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==139]]
+    $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
+    ]]
+    $let[getcdnyt;$env[afs;$get[getindex251];url]]
+    $if[$get[getcdnytlength]>=10000000;
+    $arrayLoad[las]
+    $let[trackytlength;0]
+    $loop[-1;
+    $arrayPush[las;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=$get[trackytlength]-$if[$sum[$get[trackytlength];10000000]>=$get[getcdnytlength];$get[getcdnytlength];$sum[$get[trackytlength];10000000]];1]]
+    $letSum[trackytlength;10000000]
+    $if[$get[trackytlength]>=$get[getcdnytlength];
+    $break
+    ]]
+    $let[finalurl;{"length":"$get[getcdnytlength]","container":$jsonStringify[las],"original":"$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no"}]
+    ;
+    $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no]
+    ]]
+    $if[$env[types]==vs;
+    $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
+    $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
+    $if[$and[$get[getindex251]==-1;$env[reshttp;streamingData;formats;0]!=];$return[$let[finalurl;bot|Format is not available due youtube may enforce SABR-only for this client]]]
+    $if[$get[getindex251]==-1;$return[$let[finalurl;bot|Format is not available]]]
+    $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
+    $if[$get[getcdnytlength]>=$env[size_limit];
+    $let[checkindex139;$arrayFindIndex[afs;aaa;$env[aaa;itag]==249]]
+    $if[$get[checkindex139]!=-1;
+    $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==249]]
     $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
     ]]
     $let[getcdnyt;$env[afs;$get[getindex251];url]]
@@ -135,11 +161,15 @@ module.exports = {
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $if[$env[test;results;error]!=;$let[finalurl;bot|$env[test;results;error]] $return]
     $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $return]
+    $if[$env[test;results;profiles;0;play_addr;url_list;0]!=;
+    $let[finalurl;$env[test;results;profiles;0;play_addr;url_list;0]]
+    $return
+    ]
     $if[$env[test;results;video_info;url_list;0]!=;
     $let[finalurl;$env[test;results;video_info;url_list;0]]
     $return
     ]
-    $if[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList]==;
+    $if[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList;0]==;
     $jsonLoad[b;$env[test;results;video;PlayAddrStruct;UrlList]]
     ;
     $jsonLoad[elindex;$env[test;results;video;bitrateInfo]]

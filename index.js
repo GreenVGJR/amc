@@ -13,7 +13,7 @@ try { require('discord-player-youtubei/node_modules/youtubei.js').Log.setLevel(0
 const toggles = require('./back/config.json');
 const youtube = require('./back/client/youtubeConfig');
 
-require('dotenv').config(); // Load Environment
+require('dotenv').config({ quiet: true }); // Load Environment
 
 // Main
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");

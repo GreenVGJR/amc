@@ -16,12 +16,16 @@ module.exports = {
         "description": "Override download options for Youtube",
         "required": false,
         "choices": [{
-          "name": "Audio",
-          "value": "1"
+          "name": "Audio - M4A",
+          "value": "v"
+        },
+        {
+          "name": "Audio - OPUS",
+          "value": "vs"
         },
         {
           "name": "Audio + Video (Legacy)",
-          "value": "2"
+          "value": "va"
         }],
       },
       {
@@ -81,7 +85,7 @@ $timestamp
 $return
 ;msg1;msg2;togload]
 $let[agent;$callFunction[configMusic;default_userAgent_desktop]]
-$let[isactivelyric;$and[$option[yt_option]!=2;$option[yt_option]!=3;$option[lyrics]==true;$or[$env[musictype;type]==youtube;$env[musictype;type]==soundcloud;$env[musictype;type]==spotify;$env[musictype;type]==bandcamp]]]
+$let[isactivelyric;$and[$option[yt_option]!=va;$option[lyrics]==true;$or[$env[musictype;type]==youtube;$env[musictype;type]==soundcloud;$env[musictype;type]==spotify;$env[musictype;type]==bandcamp]]]
 $try[
 $if[$env[musictype;type]==spotify;
 $let[m-fetch;false]
@@ -138,7 +142,7 @@ $let[getcdn;]
 $let[s-fetch;false]
 $async[
 $let[storeobjecthttp;$callFunction[extractTrack;$get[url]]]
-$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$and[$env[musictype;type]==youtube;$option[yt_option]==2];va;v];$get[storeobjecthttp];$get[limitsize]]]
+$let[getcdn;$callFunction[fallbackPlaybackTrack;$get[url];$if[$env[musictype;type]==youtube;$option[yt_option];v];$get[storeobjecthttp];$get[limitsize]]]
 $let[s-fetch;true]
 ]
 $if[$get[s-fetch]==false;
@@ -155,7 +159,6 @@ $onlyIf[$or[$trimLines[$get[getcdn]]==null;$trimLines[$get[getcdn]]==live;$trimL
 $if[$has[gettitle]==false;
 $let[gettitle;$cropText[$callFunction[fetchTitleTrack;$get[url];$get[storeobjecthttp]];0;479;]]
 $if[$get[gettitle]==;$let[gettitle;$getTimestamp-$env[musictype;type]];
-$let[getpuretitle;$cropText[$callFunction[fetchTitleTrack;$get[url];$get[storeobjecthttp]];0;1024;]]
 ]
 ]
 $if[$isJSON[$get[getcdn]];
@@ -248,6 +251,7 @@ let chunks = ctx.getEnvironmentKey("yup_container")\\;
 ]]
 ]
 $onlyIf[$get[condownbytes]!=;$callFunction[useCustomMusicMessage;config_generalEmptyDownload]]
+$let[getpuretitle;$cropText[($round[$divide[$get[clh];1024;1024];2] MB) $callFunction[fetchTitleTrack;$get[url];$get[storeobjecthttp]];0;1024;]]
 $#interactionReply[
 $if[$and[$option[lyrics]==true;$get[checklyric]];$#attachment[$get[loadlyrics];$get[lyricnames];true]]
 $#attachment[$get[condownbytes];$get[names];true;base64;$get[getpuretitle]]

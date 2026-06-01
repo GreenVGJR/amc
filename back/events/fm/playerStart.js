@@ -25,6 +25,14 @@ module.exports = [{
     $setCache[musicplayer_checkmessage_ytwarm_$guildID;true]
     ]
 
+    $c[Dynamic Queue]
+    $async[
+    $if[$and[$env[reason]!=filters;$getCache[radioplayer_data_$env[guildId]_playerstatus]!=true;$callFunction[checkAutoplayStatus]==true;$get[ytwarmc]!=true];
+    $callFunction[dynamicQueue]
+    ]]
+
+    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[track];false;intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
+
     $c[Preload Lyrics Track]
     $if[$and[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$callFunction[configMusic;preloadLyricsPlayer]==true];
     $async[
@@ -64,14 +72,6 @@ module.exports = [{
     $jsonLoad[aradio;$default[$getCache[radioplayer_data_$guildID_metadata];{}]]
     $let[mm;$callFunction[channelStatus;$get[cachevid];📻 $env[aradio;title]]]
     ]]]
-
-    $c[Dynamic Queue]
-    $async[
-    $if[$and[$env[reason]!=filters;$getCache[radioplayer_data_$env[guildId]_playerstatus]!=true;$callFunction[checkAutoplayStatus]==true;$get[ytwarmc]!=true];
-    $callFunction[dynamicQueue]
-    ]]
-
-    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[track];false;intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
 
     $if[$callFunction[configMusic;interval_message];
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
