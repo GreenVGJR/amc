@@ -13,7 +13,8 @@
     "discord-player-youtubei": "^2.0.0",
     "dotenv": "^17.4.2",
     "entities": "^8.0.0",
-    "lmdb": "^3.5.4"
+    "lmdb": "^3.5.5",
+    "youtubei.js": "^17.0.1"
   },
   "devDependencies": {
     "patch-package": "^8.0.1",

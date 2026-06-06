@@ -11,6 +11,10 @@ const targetClient = useClientYT?.toUpperCase();
 
 let vt;
 let datasyncID = "";
+let configInfoPromise = null;
+let signatureTimestamp = null;
+let signatureTimestampPromise = null;
+let webPlayer = null;
 
 function generateAnonPOT() {
     const b = Buffer.alloc(10);
@@ -21,6 +25,7 @@ function generateAnonPOT() {
 }
 
 let poToken = generateAnonPOT();
+let poTokenStream = generateAnonPOT();
 
 const useClient = ytClients?.[targetClient];
 if (!useClient) {
@@ -28,7 +33,12 @@ if (!useClient) {
     throw new Error(`YouTube client "${targetClient}" does not exist. Available clients: ${available}`);
 }
 
-const buildQuery = 'reel/reel_item_watch?prettyPrint=false&alt=json&fields=playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds))';
+const isWebClient = targetClient === 'WEB_SAFARI';
+const apiEndpoint = isWebClient ? 'player' : 'reel/reel_item_watch';
+const apiFields = isWebClient
+    ? 'responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds)'
+    : 'playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds))';
+const buildQuery = apiEndpoint + '?prettyPrint=false&alt=json&fields=' + apiFields;
 
 const APIuserAgent = useClient?.userAgent || default_userAgent_desktop;
 let ytauth;
@@ -75,11 +85,96 @@ const generateVisitor = async () => {
         }
     } catch (e) { console.error(e) }
 };
-generateVisitor().catch(console.error);
+
+async function fetchWebConfigInfo() {
+    if (!isWebClient || actuallk.configInfo?.coldConfigData) return;
+    if (configInfoPromise) return configInfoPromise;
+
+    configInfoPromise = fetch(`https://${hostdomain}/youtubei/v1/config?prettyPrint=false&alt=json`, {
+        method: "POST",
+        headers: {
+            "Accept-Language": "en",
+            "Content-Type": "application/json",
+            "Origin": `https://${hostdomain}`,
+            "X-Origin": `https://${hostdomain}`,
+            "X-Goog-Visitor-Id": vt || "",
+            "X-Youtube-Client-Name": useClient.clientName,
+            "X-Youtube-Client-Version": useClient.clientVersion,
+            "User-Agent": APIuserAgent,
+            ...(ytcookies ? { "Cookie": ytcookies } : {})
+        },
+        body: JSON.stringify({ context: { client: { ...actuallk } } })
+    }).then(r => r.json()).then(res => {
+        const gcg = res?.responseContext?.globalConfigGroup;
+        const configInfo = {
+            coldConfigData: gcg?.rawColdConfigGroup?.configData,
+            coldHashData: gcg?.coldHashData,
+            hotHashData: gcg?.hotHashData
+        };
+        if (configInfo.coldConfigData && configInfo.coldHashData && configInfo.hotHashData) {
+            actuallk.configInfo = configInfo;
+        }
+    }).finally(() => {
+        configInfoPromise = null;
+    });
+
+    return configInfoPromise;
+}
+
+async function fetchSignatureTimestamp(force = false) {
+    if (!force && !isWebClient) return;
+    if (signatureTimestamp || (webPlayer && !force)) return;
+    if (signatureTimestampPromise) return signatureTimestampPromise;
+
+    signatureTimestampPromise = Promise.resolve().then(async () => {
+        const { Player, Log, Platform } = require('youtubei.js');
+        try { Log.setLevel(Log.Level.ERROR); } catch { }
+        Platform.shim.eval = (data, env) => {
+            return new Function(...Object.keys(env), data.output)(...Object.values(env));
+        };
+        const player = await Player.create();
+        webPlayer = player;
+        signatureTimestamp = player?.signature_timestamp;
+    }).finally(() => {
+        signatureTimestampPromise = null;
+    });
+
+    return signatureTimestampPromise;
+}
+
+async function decipherYoutubeUrl(url) {
+    if (!webPlayer || !url) return url;
+    let processedUrl = url;
+
+    const nPathMatch = processedUrl.match(/\/n\/([^\/]+)/);
+    if (nPathMatch) {
+        const rawN = nPathMatch[1];
+        try {
+            const dummyUrl = `https://www.youtube.com/watch?n=${encodeURIComponent(rawN)}`;
+            const decipheredDummyUrl = await webPlayer.decipher(dummyUrl);
+            const decipheredN = new URL(decipheredDummyUrl).searchParams.get('n');
+            if (decipheredN) {
+                processedUrl = processedUrl.replace(`/n/${rawN}/`, `/n/${decipheredN}/`);
+            }
+        } catch (e) {
+            console.error("Error deciphering path-based n-token:", e);
+        }
+    }
+
+    try {
+        processedUrl = await webPlayer.decipher(processedUrl);
+    } catch (e) {
+        console.error("Error deciphering query-based parameters:", e);
+    }
+
+    return processedUrl;
+}
+
+generateVisitor().then(() => Promise.all([fetchWebConfigInfo(), fetchSignatureTimestamp()])).catch(console.error);
 
 function createChunkedStream(url, totalSize, videoId, ext) {
     let start = 0;
-    const chunkSize = 1024 * 1024 * 10; // 10MB
+    const chunkSize = 1024 * 1024 * 10;
     let isEnded = false;
     let abortController = null;
     let isReading = false;
@@ -184,6 +279,14 @@ function createChunkedStream(url, totalSize, videoId, ext) {
     });
 }
 
+function isHlsUrl(url) {
+    return typeof url === "string" && (url.includes('googlevideo.com/api/manifest/') || url.includes('.m3u8'));
+}
+
+function getFormatUrl(format) {
+    return format?.url || format?.signatureCipher || format?.cipher || null;
+}
+
 async function fallbackYTStream(lstracks) {
     refreshYtAuth();
 
@@ -210,6 +313,7 @@ async function fallbackYTStream(lstracks) {
                     return fs.createReadStream(cacheFilePathM4a);
                 }
             }
+            if (isHlsUrl(checklist.url)) return checklist.url;
             const isAllowLength = checklist.allowLength;
             if (isAllowLength && checklist.contentLength) {
                 const ext = checklist.url.includes('mime=audio/webm') || checklist.url.includes('itag=251') || checklist.url.includes('itag=774') ? 'webm' : 'm4a';
@@ -225,35 +329,51 @@ async function fallbackYTStream(lstracks) {
         }
 
         const cpn = randomBytes(12).toString('base64url');
+
+        let a;
         const isVRnAuth = ytauth?.token && targetClient === "ANDROID_VR" && useBearer;
 
-        const buildRoute = { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
+        if (isWebClient && !actuallk.configInfo?.coldConfigData) {
+            if (!vt) await generateVisitor();
+            await fetchWebConfigInfo();
+        }
+        if (isWebClient && !signatureTimestamp) await fetchSignatureTimestamp();
+        else if (!isWebClient && !webPlayer) await fetchSignatureTimestamp(true);
 
-        let a = await fetch(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
-            method: "POST", body: JSON.stringify(buildRoute), headers: {
-                "Accept-Encoding": "gzip",
-                "Accept-Language": "en",
-                "Content-Type": "application/json",
-                "X-Goog-Visitor-Id": vt,
-                "Origin": `https://${hostdomain}`,
-                "X-Origin": `https://${hostdomain}`,
-                "X-Youtube-Client-Name": useClient.clientName,
-                "X-Youtube-Client-Version": useClient.clientVersion,
-                "User-Agent": APIuserAgent,
-                ...(ytcookies && !isVRnAuth ? {
-                    "Authorization": GTH(),
-                    "Cookie": ytcookies,
-                    "X-Youtube-Bootstrap-Logged-In": true,
-                    "Alt-Used": hostdomain,
-                    "X-Goog-AuthUser": 0
-                } : {
-                    ...(isVRnAuth ? {
-                        "Authorization": "Bearer " + ytauth.token
-                    } : {}),
-                    "Cookie": tempytcookies
-                })
-            }
+        const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp } } } : {};
+
+        const buildRoute = targetClient === 'WEB_SAFARI'
+            ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk } }, ...playbackContext, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: isWebClient } }
+            : { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
+        const requestHeaders = {
+            "Accept-Encoding": "gzip",
+            "Accept-Language": "en",
+            "Content-Type": "application/json",
+            "X-Goog-Visitor-Id": vt,
+            "Origin": `https://${hostdomain}`,
+            "X-Origin": `https://${hostdomain}`,
+            "X-Youtube-Client-Name": useClient.clientName,
+            "X-Youtube-Client-Version": useClient.clientVersion,
+            "User-Agent": APIuserAgent,
+            ...(ytcookies && !isVRnAuth ? {
+                "Authorization": GTH(),
+                "Cookie": ytcookies,
+                "X-Youtube-Bootstrap-Logged-In": true,
+                "Alt-Used": hostdomain,
+                "X-Goog-AuthUser": 0
+            } : {
+                ...(isVRnAuth ? {
+                    "Authorization": "Bearer " + ytauth.token
+                } : {}),
+                "Cookie": tempytcookies
+            })
+        };
+        const fetchPlayerResponse = (query = buildQuery) => fetch(`https://${hostdomain}/youtubei/v1/${query}`, {
+            method: "POST",
+            body: JSON.stringify(buildRoute),
+            headers: requestHeaders
         }).then(r => r.json());
+        a = await fetchPlayerResponse();
 
         let finalurl;
         let changeLength = false;
@@ -268,42 +388,93 @@ async function fallbackYTStream(lstracks) {
 
         if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
             vt = "";
-            generateVisitor().catch(console.error);
+            await generateVisitor();
             throw new Error(`InnerTube Error: ${JSON.stringify(a?.playabilityStatus) || null}`);
         }
 
-        if ((a?.videoDetails?.isLiveContent || streamTypeYT === 2) && a?.streamingData?.hlsManifestUrl) {
-            if (targetClient === 'VISIONOS') {
-                finalurl = await fetch(a.streamingData.hlsManifestUrl + "?cver=" + useClient.clientVersion + "&cpn=" + cpn).then(r => r.text()).then(b => b.split('GROUP-ID="234"')[0].split('URI="')[2].split('"')[0]);
-            }
-            else {
-                // let extractor handle this
-                finalurl = a.streamingData.hlsManifestUrl + "?cver=" + useClient.clientVersion + "&cpn=" + cpn;
-            }
+        const hasUsableFormatUrl = !!(a?.streamingData?.adaptiveFormats || []).find(getFormatUrl) || !!(a?.streamingData?.formats || []).find(getFormatUrl);
+        if (!isWebClient && !hasUsableFormatUrl) {
+            const fullResponse = await fetchPlayerResponse(`${apiEndpoint}?prettyPrint=false&alt=json`);
+            let fullPlayerResponse = Array.isArray(fullResponse) ? fullResponse[0] : fullResponse;
+            fullPlayerResponse = fullPlayerResponse?.playerResponse || fullPlayerResponse;
+            if (fullPlayerResponse?.playabilityStatus?.status === 'OK') a = fullPlayerResponse;
         }
-        else if (['IOS'].includes(targetClient) && streamTypeYT === 1) {
-            fr = a.streamingData.adaptiveFormats.find(c => [140, 139].includes(c.itag));
-            finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
-            changeLength = true;
-            durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
-            streamingLength = String(fr.contentLength);
+
+        if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
+            finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
         }
-        else {
-            fr = a.streamingData?.adaptiveFormats?.find(c => [774, 251, 140, 599].includes(c.itag));
-            const fs = a.streamingData?.formats?.[0]?.url;
+        else if (targetClient === 'WEB_SAFARI' && a?.streamingData?.hlsManifestUrl) {
+            finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+        }
+        else if (['IOS'].includes(targetClient)) {
+            fr = a.streamingData?.adaptiveFormats?.find(c => [140, 139].includes(c.itag) && getFormatUrl(c));
             if (fr) {
-                finalurl = fr.url + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+                const rawFormatUrl = getFormatUrl(fr);
+                const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
+                finalurl = decipheredUrl + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+                changeLength = true;
+                durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
+                streamingLength = String(fr.contentLength);
+            } else if (a?.videoDetails?.isLiveContent && a?.streamingData?.hlsManifestUrl) {
+                finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+            } else {
+                throw new Error(`No playable format for IOS`);
+            }
+        }
+        else if (['ANDROID', 'ANDROID_VR', 'VISIONOS'].includes(targetClient)) {
+            fr = a.streamingData?.adaptiveFormats?.find(c => [251, 250, 249, 774].includes(c.itag) && getFormatUrl(c));
+            if (!fr) fr = a.streamingData?.adaptiveFormats?.find(c => [141, 140, 599].includes(c.itag) && getFormatUrl(c));
+            if (fr) {
+                const rawFormatUrl = getFormatUrl(fr);
+                const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
+                finalurl = decipheredUrl + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
                 changeLength = true;
                 durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
                 streamingLength = String(fr.contentLength);
             } else {
-                finalurl = fs + "&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+                const fs = a.streamingData?.formats?.find(getFormatUrl);
+                if (fs) {
+                    const rawFormatUrl = getFormatUrl(fs);
+                    const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
+                    finalurl = decipheredUrl + "&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+                } else if (a?.videoDetails?.isLiveContent && a?.streamingData?.hlsManifestUrl) {
+                    finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+                } else {
+                    throw new Error(`No playable format for ${targetClient}`);
+                }
             }
+        }
+        else {
+            const fs = a.streamingData?.formats?.find(getFormatUrl);
+            if (fs) {
+                const rawFormatUrl = getFormatUrl(fs);
+                const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
+                finalurl = decipheredUrl + "&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+            } else if (a?.videoDetails?.isLiveContent && a?.streamingData?.hlsManifestUrl) {
+                finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+            } else {
+                throw new Error(`No playable format for ${targetClient}`);
+            }
+        }
+
+        if (!finalurl) {
+            throw new Error(`No playable YouTube format URL for ${targetClient}`);
+        }
+
+        if (isHlsUrl(finalurl)) {
+            templist.push({
+                id: lstracks,
+                url: finalurl,
+                ref: Date.now() + 1800000,
+                allowLength: false,
+                contentLength: null
+            });
+            return finalurl;
         }
 
         let actualfinalurl;
 
-        const filterlocation = await fetch(finalurl, {
+        const filterlocation = await fetch(finalurl + "&pot=" + poTokenStream, {
             method: "HEAD",
             headers: { "User-Agent": APIuserAgent }
         });
@@ -327,7 +498,7 @@ async function fallbackYTStream(lstracks) {
             contentLength: streamingLength
         });
 
-        if (changeLength && streamingLength && parseInt(streamingLength) > 0) {
+        if (changeLength && streamingLength && parseInt(streamingLength) > 0 && !actualfinalurl?.includes('googlevideo.com/api/manifest/')) {
             const ext = [251, 774].includes(fr?.itag) ? "webm" : "m4a";
             return createChunkedStream(actualfinalurl, parseInt(streamingLength), videoId, ext);
         }

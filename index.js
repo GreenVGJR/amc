@@ -6,8 +6,20 @@
         original(...args);
     };
 });
-try { require('youtubei.js').Log.setLevel(0); } catch (e) { }
-try { require('discord-player-youtubei/node_modules/youtubei.js').Log.setLevel(0); } catch (e) { }
+try {
+    const yt = require('youtubei.js');
+    yt.Platform.shim.eval = (data, env) => {
+        return new Function(...Object.keys(env), data.output)(...Object.values(env));
+    };
+    yt.Log.setLevel(0);
+} catch (e) { }
+try {
+    const ytAlt = require('discord-player-youtubei/node_modules/youtubei.js');
+    ytAlt.Platform.shim.eval = (data, env) => {
+        return new Function(...Object.keys(env), data.output)(...Object.values(env));
+    };
+    ytAlt.Log.setLevel(0);
+} catch (e) { }
 
 // Config
 const toggles = require('./back/config.json');
@@ -59,6 +71,7 @@ const music = new ForgeMusic({
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
         disableHistory: true,
+        disableFallbackStream: true,
         disableBiquad: true,
         bufferingTimeout: 250,
         connectionTimeout: 30000,
@@ -71,6 +84,7 @@ const music = new ForgeMusic({
 });
 
 const client = new ForgeClient({
+    mobile: true,
     token: process.env.DISCORD_TOKEN,
     logLevel: LogPriority.Medium,
     intents: [
@@ -97,8 +111,6 @@ const client = new ForgeClient({
     ]
 });
 
-client.login();
-
 music.player.extractors.register(SoundcloudExtractor);
 music.player.extractors.register(SpotifyExtractor);
 music.player.extractors.register(AppleMusicExtractor);
@@ -113,6 +125,8 @@ client.commands.load("back/client/fs");
 client.commands.load("commands/basic");
 music.commands.load("back/events/fm");
 client.commands.load("back/events/fs");
+
+client.login();
 
 module.exports = { music }; // for $joinVC
 

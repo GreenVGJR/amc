@@ -15,7 +15,7 @@ module.exports = {
     ]
     $setCache[musicplayer_message_$guildID_isdynamicmusic;$env[mytlsbl]]
     $let[countQueueMLength;$queueLength]
-    $if[$get[countQueueMLength]<20;
+    $if[$get[countQueueMLength]<10;
     $let[trkkgl;$trackInfo[url]]
     $let[countQueueMLengthSub;$sub[20;$get[countQueueMLength]]]
     $jsonLoad[filtymcr;$callFunction[filterMediaID;$get[trkkgl]]]

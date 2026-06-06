@@ -1,5 +1,5 @@
 module.exports = {
-    name: "generateAPOTYoutube",
+    name: "generateColdPotYoutube",
     code: `
     $return[$try[$djsEval[    const b = Buffer.alloc(10)\\;
     b[0\\] = 0x22\\;

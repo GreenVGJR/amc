@@ -29,11 +29,11 @@ module.exports = {
     $if[$or[$env[type]==all;$env[type]==youtube];
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Youtube             | Visitor;cyan]]
     $if[$env[successlog]==true;
-    $let[genpotytlk;$callFunction[generateAPOTYoutube]]
+    $let[genpotytlk;$callFunction[generateColdPotYoutube]]
     $setCache[authmusic_youtube_pot;$get[genpotytlk]]
     $logger[Info;$if[$get[genpotytlk]!=;$cropText[$get[genpotytlk];0;12;...];Failed to Retrieve] | Youtube / POT]
     ]
-    $if[$callFunction[configMusic;useBearer]==true;
+    $if[$and[$callFunction[configMusic;useClientYT]==ANDROID_VR;$callFunction[configMusic;useBearer]==true];
     $if[$env[successlog]==true;$logger[Info;Using Youtube Token. Looking auth]]
     $jsonLoad[lrtuy;$callFunction[generateTokenYoutube;true]]
     $if[$env[lrtuy]==false;
@@ -193,8 +193,33 @@ module.exports = {
         $!jsonSet[listclient;hl;en]
         $!jsonSet[listclient;gl;US]
         $let[testvideoid;fa5IWHDbftI]
-        $logger[Warn;Rotated. Test Fetching | $get[testvideoid] ($get[getpickclient])]
+        $logger[Warn;Solving challenge - Youtube Cookies]
+
         $let[testtempcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
+        $let[signatureTimestamp;$djsEval[require('youtubei.js').Player.create().then(p=>p.signature_timestamp)]]
+
+        $httpAddHeader[Accept-Encoding;]
+        $httpAddHeader[Cookie;$get[testtempcookies]]
+        $httpAddHeader[Origin;https://$get[defytdomain]]
+        $httpAddHeader[X-Origin;https://$get[defytdomain]]
+        $httpAddHeader[X-Youtube-Bootstrap-Logged-In;true]
+        $httpAddHeader[Content-Type;application/json]
+        $httpAddHeader[X-Goog-Visitor-Id;$getCache[authmusic_youtube_visitor]]
+        $httpAddHeader[User-Agent;$default[$env[listclient;userAgent];$callFunction[configMusic;default_userAgent]]]
+        $httpAddHeader[X-Youtube-Client-Name;$env[listclient;clientName]]
+        $httpAddHeader[X-Youtube-Client-Version;$env[listclient;clientVersion]]
+        $httpSetBody[{"context":{"client":$jsonStringify[listclient]}}]
+        $let[nncps;$httpRequest[https://$get[defytdomain]/youtubei/v1/config?prettyPrint=false;POST]]
+
+        $if[$httpResult[responseContext;globalConfigGroup]!=;
+        $jsonLoad[cfgytweb;{}]
+        $!jsonSet[cfgytweb;coldConfigData;$httpResult[responseContext;globalConfigGroup;rawColdConfigGroup;configData]]
+        $!jsonSet[cfgytweb;coldHashData;$httpResult[responseContext;globalConfigGroup;coldHashData]]
+        $!jsonSet[cfgytweb;hotHashData;$httpResult[responseContext;globalConfigGroup;hotHashData]]
+        $!jsonSet[listclient;configInfo;$env[cfgytweb]]
+        ]
+
+        $logger[Info;Cookies Rotated. Test Fetching | $get[testvideoid] ($get[getpickclient])]
         $httpAddHeader[Accept-Encoding;]
         $httpAddHeader[Authorization;$callFunction[generateBearerYt;$get[testtempcookies];$getCache[authmusic_youtube_datasync_id];$get[defytdomain]]]
         $httpAddHeader[Cookie;$get[testtempcookies]]
@@ -209,7 +234,7 @@ module.exports = {
         $httpAddHeader[X-Youtube-Client-Name;$env[listclient;clientName]]
         $httpAddHeader[X-Youtube-Client-Version;$env[listclient;clientVersion]]
         $httpAddHeader[X-Goog-AuthUser;0]
-        $httpSetBody[{"videoId":"$get[testvideoid]","context":{"client":$jsonStringify[listclient],"request":{"useSsl":true,"internalExperimentFlags":\\[\\],"consistencyTokenJars":\\[\\]}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":true,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1"}},"racyCheckOk":true,"contentCheckOk":true}]
+        $httpSetBody[{"videoId":"$get[testvideoid]","context":{"client":$jsonStringify[listclient]},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":false,"html5Preference":"HTML5_PREF_WANTS","lactMilliseconds":"-1","signatureTimestamp":"$get[signatureTimestamp]"}},"racyCheckOk":true,"contentCheckOk":true,"cpn":"$randomString[16]"}]
         $let[nncm;$httpRequest[https://$get[defytdomain]/youtubei/v1/player?prettyPrint=false&fields=playabilityStatus(status);POST]]
         $if[$httpResult[playabilityStatus;status]==OK;$logger[Info;Cookies & Auth are Valid. Continuing process];$if[$get[nncm]==400;$setCache[disablecookiesyt;true]] $logger[Warn;$if[$get[nncm]==400;This client doesn't support cookies.;Failed to fetch.\nYoutube may blocked the ip address or the client doesn't support cookies.] Continuing process]]
         ]]
@@ -228,7 +253,14 @@ module.exports = {
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
-        $!httpRequest[https://w.soundcloud.com/player/;GET]
+        $let[schttp;$httpRequest[https://w.soundcloud.com/player/;GET]]
+        $if[$get[schttp]==403;
+        $if[$env[successlog]==true;
+        $logger[Warn;You have been blocked. - Soundcloud]
+        ]
+        $let[abortscht;true]
+        $return
+        ]
         $arrayLoad[storeclientid]
         $arrayLoad[conres;script crossorigin src=";$httpResult]
         $arrayMap[conres;conrest;$return[$advancedTextSplit[$env[conrest];";0]];conres2]
@@ -250,7 +282,7 @@ module.exports = {
     $if[$env[successlog]==true;$logger[Info;$if[$env[storeclientid;0]!=;$cropText[$env[storeclientid;0];0;12;...];Failed to Retrieve] | Soundcloud / Player]]
     $if[$env[successlog]==true;$logger[Info;$if[$env[storeclientid;1]!=;$cropText[$env[storeclientid;1];0;12;...];Failed to Retrieve] | Soundcloud / Stream]]
     ;$logger[Info;Failed to Retrieve - Soundcloud]]
-    $if[$and[$env[storeclientid;0]==;$env[storeclientid;1]==];$logger[Warn;Re-trying - Soundcloud] $callFunction[generateAuthKeys;soundcloud;;true]]
+    $if[$and[$env[storeclientid;0]==;$env[storeclientid;1]==;$get[abortscht]!=true];$logger[Warn;Re-trying - Soundcloud] $callFunction[generateAuthKeys;soundcloud;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==spotify];
     $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Key;cyan]]
