@@ -49,7 +49,7 @@ module.exports = {
   ]
   $color[$callFunction[useIcon;color_embed];1]
   $addActionRow
-  $addButton[https://discord.com/api/oauth2/authorize?client_id=$clientID&scope=bot+applications.commands&permissions=3263488;Invite Bot;Link]
+  $addButton[https://discord.com/api/oauth2/authorize?client_id=$clientID&scope=bot+applications.commands&permissions=281474979974144;Invite Bot;Link]
   $addButton[https://discord.com/oauth2/authorize?client_id=$clientID&integration_type=1&scope=applications.commands;Install Apps;Link]
   $if[$botOwnerID==$authorID;
   $addActionRow

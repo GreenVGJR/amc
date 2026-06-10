@@ -31,7 +31,28 @@ module.exports = [{
     $callFunction[dynamicQueue]
     ]]
 
-    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[track];false;intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
+    $if[$getCache[musicplayer_message_$guildID_waitloadmsg]!=true;
+    $callFunction[updateCurrentMusicPlayer;false]
+    ;
+    $deleteCache[musicplayer_message_$guildID_waitloadmsg]
+    ]
+
+    $if[$callFunction[configMusic;interval_message];
+    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
+    $setInterval[
+    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
+
+    $let[calculatetime;$sum[$callFunction[musicVirtualDuration;$guildID;$get[cid]];$get[interval_time]]]
+    $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[calculatetime]];0]]
+    $if[$getCache[musicplayer_message_$guildID_waitinterval]!=false;
+    $setCache[musicplayer_message_$guildID_waitinterval;false]
+    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[track];$checkCondition[$sum[$get[elapsedtime];$get[nextmessage_time]]>=$env[track;durationMS]];intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
+    $setCache[musicplayer_message_$guildID_waitinterval;true]
+    ]
+
+    ;$get[interval_time];intervalmusicmessage_$guildID_$get[cid]]
+    ]
 
     $c[Preload Lyrics Track]
     $if[$and[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$callFunction[configMusic;preloadLyricsPlayer]==true];
@@ -72,23 +93,6 @@ module.exports = [{
     $jsonLoad[aradio;$default[$getCache[radioplayer_data_$guildID_metadata];{}]]
     $let[mm;$callFunction[channelStatus;$get[cachevid];📻 $env[aradio;title]]]
     ]]]
-
-    $if[$callFunction[configMusic;interval_message];
-    $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $setInterval[
-    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
-    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
-
-    $let[calculatetime;$sum[$callFunction[musicVirtualDuration;$guildID;$get[cid]];$get[interval_time]]]
-    $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$guildID;$get[cid];$get[calculatetime]];0]]
-    $if[$getCache[musicplayer_message_$guildID_waitinterval]!=false;
-    $setCache[musicplayer_message_$guildID_waitinterval;false]
-    $callFunction[musicPlayerMessage;$get[cid];$get[mid];$env[track];$checkCondition[$sum[$get[elapsedtime];$get[nextmessage_time]]>=$env[track;durationMS]];intervalmusicmessage_$guildID_$get[cid];$guildID;;$callFunction[configMusic;interval_message]]
-    $setCache[musicplayer_message_$guildID_waitinterval;true]
-    ]
-
-    ;$get[interval_time];intervalmusicmessage_$guildID_$get[cid]]
-    ]
     `
 },
 {

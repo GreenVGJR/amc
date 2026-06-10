@@ -17,6 +17,7 @@ module.exports = {
     $deleteCache[musicplayer_message_$guildID_waitinterval]
     $deleteCache[radioplayer_data_$guildID_playerstatus]
     $deleteCache[radioplayer_data_$guildID_metadata]
+    $deleteCache[musicplayer_message_$guildID_waitloadmsg]
     $async[
     $if[$callFunction[configMusic;statusvc_message];
     $let[mm;$callFunction[channelStatus;$voiceID[$guildID;$clientID];💤 Idling...]]

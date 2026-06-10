@@ -79,6 +79,9 @@ module.exports = {
 
   $silent
 
+  $let[tempcidlk;$getCache[musicplayer_message_$guildID_channelid]]
+  $let[tempmidlk;$getCache[musicplayer_message_$guildID_messageid]]
+
   $localFunction[loadinteraction;
   $if[$env[typesload]==1-1;
   $let[mid;$interactionReply[
@@ -86,7 +89,7 @@ module.exports = {
   $footer[none;$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
-  $if[$or[$and[$getCache[musicplayer_message_$guildID_is247music]!=true;$get[iscreatedfirst]];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
+  $if[$or[$get[iscreatedfirst];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
   $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
   $setCache[musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
@@ -98,7 +101,7 @@ module.exports = {
   $footer[none$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true]; - $callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$callFunction[useIcon;loading]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
-  $if[$or[$and[$getCache[musicplayer_message_$guildID_is247music]!=true;$get[iscreatedfirst]];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
+  $if[$or[$get[iscreatedfirst];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
   $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
   $setCache[musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
@@ -111,7 +114,7 @@ module.exports = {
   $color[$callFunction[useIcon;color_embed]]
   $footer[$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]]$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true]; - $callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$callFunction[useIcon;loading]]
   ;$get[iscreatedfirst]]]
-  $if[$or[$and[$getCache[musicplayer_message_$guildID_is247music]!=true;$get[iscreatedfirst]];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
+  $if[$or[$get[iscreatedfirst];$getCache[musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
   $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
   $setCache[musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
@@ -267,6 +270,12 @@ module.exports = {
   $stop
   ]
 
+  $if[$and[$get[iscreatedfirst];$getCache[musicplayer_message_$guildID_is247music]!=true];
+  $setCache[musicplayer_message_$guildID_waitloadmsg;true]
+  $let[akm;$callFunction[musicVirtualDuration;$guildID;$getCache[musicplayer_message_$guildID_channelid];0]]
+  $callFunction[updateCurrentMusicPlayer;false]
+  ]
+
   $if[$and[$get[currentqueuern]!=0;$get[iscreatedfirst]==false];
   $async[$if[$option[force_skip]==true;
   $let[statusloop;$getLoopMode]
@@ -284,7 +293,8 @@ module.exports = {
   ]
   
   $if[$getCache[musicplayer_message_$guildID_is247music]==true;
-  $async[$!interactionDelete]
+  $async[$!deleteMessages[$get[tempcidlk];$get[tempmidlk]]]
+  $if[$get[iscreatedfirst]==false;$async[$!interactionDelete]]
   ]
   `
 }

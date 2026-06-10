@@ -59,10 +59,10 @@
     "_inline|downloader": "---",
 
     "config_generalInvalidLinkDownload": "Must be link.",
-    "config_generalInvalidProviderDownload": "Invalid provider or the url you inputed is not a expected. Only accepts:\n`Youtube, Soundcloud, Spotify, Apple Music, Tiktok, Twitter, Instagram, Facebook, Bandcamp`",
+    "config_generalInvalidProviderDownload": "Invalid provider or the url you inputed is not a expected.`",
     "config_generalEmptyDownload": "Can't download this.",
     "config_generalForbiddenDownload": "Can't access the file.",
-    "config_generalOverDownload": "Can't download this media if it's above {limit_size}.\n\nStill want to download? You can try access this url to direct downloads.",
+    "config_generalOverDownload": "This media exceeded size limit ({limit_size}).",
 
     "_inline|playlistuser": "---",
 

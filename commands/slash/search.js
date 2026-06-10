@@ -26,10 +26,6 @@ module.exports = {
           { "name": "JioSaavn", "value": "jiosaavn" },
           { "name": "BiliBili.tv", "value": "bilibili" },
           { "name": "Twitch", "value": "twitch" },
-          { "name": "Facebook Reels", "value": "facebookreels" },
-          { "name": "Tiktok", "value": "tiktok" },
-          { "name": "Tiktok Music", "value": "tiktokmusic" },
-          { "name": "Tiktok Sound", "value": "tiktoksound" },
           { "name": "NCS", "value": "ncs" },
           { "name": "Capcut - Templates", "value": "capcut" },
           { "name": "Roblox Music", "value": "robloxmusic" }
