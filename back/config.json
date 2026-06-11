@@ -6,7 +6,7 @@
     "_comment|provider2": "For playlist command",
     "playlistmetadata_provider": "youtubemusic",
 
-    "cacheAllContextNeed": true,
+    "cacheAllContextNeed": false,
     "usePlayerForFetchLyrics": false,
     "debug_auth": false,
     "autodelete_nextmessage": false,
