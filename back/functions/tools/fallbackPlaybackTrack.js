@@ -62,13 +62,13 @@ module.exports = {
     $httpAddHeader[Origin;https://$get[defytdomain]]
     $httpAddHeader[X-Origin;https://$get[defytdomain]]
     $httpAddHeader[User-Agent;$default[$env[listclient;userAgent];$callFunction[configMusic;default_userAgent_desktop]]]
-    $httpSetBody[{"playerRequest":{"videoId":"$get[videoid]","contentCheckOk":true,"racyCheckOk":true},"disablePlayerResponse":false,"cpn":"$toLowercase[$randomString[16]]","context":{"client":$jsonStringify[listclient]},"serviceIntegrityDimensions":{"poToken":"$getCache[authmusic_youtube_pot]"},"attestationRequest":{"omitBotguardData":false}}]
-    $!httpRequest[https://$get[defytdomain]/youtubei/v1/reel/reel_item_watch?prettyPrint=false&fields=responseContext,playerResponse(responseContext(visitorData),playabilityStatus,streamingData(formats(itag,url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent));POST;reshttpm]
-    $jsonLoad[reshttp;$env[reshttpm;playerResponse]]
+    $httpSetBody[{"videoId":"$get[videoid]","contentCheckOk":true,"racyCheckOk":true,"cpn":"$toLowercase[$randomString[16]]","context":{"client":$jsonStringify[listclient]},"serviceIntegrityDimensions":{"poToken":"$getCache[authmusic_youtube_pot]"},"attestationRequest":{"omitBotguardData":false}}]
+    $!httpRequest[https://$get[defytdomain]/youtubei/v1/player?prettyPrint=false&fields=responseContext(visitorData),playabilityStatus,streamingData(formats(itag,url),adaptiveFormats(itag,url,contentLength)),videoDetails(lengthSeconds,isLiveContent);POST;reshttpm]
+    $jsonLoad[reshttp;$env[reshttpm]]
     ]
 
     $if[$env[reshttp;playabilityStatus;status]!=OK;$return[$let[finalurl;bot|$default[$default[$env[reshttp;playabilityStatus;reason];$env[reshttpm;responseContext;status]];Precondition check failed]]]]
-    $if[$default[$env[reshttp;videoDetails;isLiveContent];false];$return[$let[finalurl;live]]]
+    $if[$and[$env[reshttp;videoDetails;lengthSeconds]==0;$default[$env[reshttp;videoDetails;isLiveContent];false]];$return[$let[finalurl;live]]]
     $if[$env[reshttpm;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[reshttpm;responseContext;visitorData]]]
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]

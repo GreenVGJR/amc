@@ -34,7 +34,7 @@ if (!useClient) {
 }
 
 const isWebClient = targetClient === 'WEB_SAFARI';
-const apiEndpoint = isWebClient ? 'player' : 'reel/reel_item_watch';
+const apiEndpoint = isWebClient ? 'player' : 'get_watch';
 const apiFields = isWebClient
     ? 'responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds)'
     : 'playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds))';
@@ -175,8 +175,9 @@ generateVisitor().then(() => Promise.all([fetchWebConfigInfo(), fetchSignatureTi
 function createChunkedStream(url, totalSize, videoId, ext) {
     let start = 0;
     const chunkSize = 1024 * 1024 * 10;
+    const concurrency = 5;
     let isEnded = false;
-    let abortController = null;
+    let abortControllers = [];
     let isReading = false;
     let isSuccess = false;
 
@@ -194,60 +195,124 @@ function createChunkedStream(url, totalSize, videoId, ext) {
         });
     }
 
+    const maxRetries = 3;
+
+    async function fetchChunk(startByte) {
+        let end = startByte + chunkSize - 1;
+        let chunkIsLast = false;
+        if (end >= totalSize) {
+            chunkIsLast = true;
+            end = totalSize - 1;
+        }
+
+        const chunkUrl = `${url}&range=${startByte}-${end}`;
+        let lastError = null;
+
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            const ac = new AbortController();
+            abortControllers.push(ac);
+
+            try {
+                const response = await fetch(chunkUrl, {
+                    headers: { "User-Agent": APIuserAgent },
+                    signal: ac.signal
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status} for range ${startByte}-${end}`);
+                }
+
+                if (!response.body) {
+                    throw new Error(`No response body for range ${startByte}-${end}`);
+                }
+
+                const chunks = [];
+                const reader = response.body.getReader();
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    chunks.push(Buffer.from(value));
+                }
+
+                return { buffer: Buffer.concat(chunks), isLast: chunkIsLast, end };
+            } catch (err) {
+                lastError = err;
+                if (err?.name === 'AbortError') throw err;
+                if (attempt < maxRetries) {
+                    await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+                }
+            }
+        }
+
+        throw lastError;
+    }
+
     return new Readable({
         async read() {
             if (isEnded || isReading) return;
             isReading = true;
 
-            let end = start + chunkSize - 1;
-            if (end >= totalSize) {
-                isEnded = true;
-                end = totalSize - 1;
-            }
-
-            abortController = new AbortController();
-            const chunkUrl = `${url}&range=${start}-${end}`;
-
             try {
-                const response = await fetch(chunkUrl, {
-                    headers: { "User-Agent": APIuserAgent },
-                    signal: abortController.signal
-                });
+                const batchStart = start;
+                const tasks = [];
 
-                if (!response.ok) {
+                for (let i = 0; i < concurrency; i++) {
+                    const chunkStart = batchStart + i * chunkSize;
+                    if (chunkStart >= totalSize) break;
+                    tasks.push(fetchChunk(chunkStart));
+                }
+
+                if (tasks.length === 0) {
+                    isEnded = true;
+                    this.push(null);
+                    isReading = false;
                     return;
                 }
 
-                if (!response.body) {
-                    return;
-                }
+                abortControllers = [];
+                const results = await Promise.allSettled(tasks);
 
-                const reader = response.body.getReader();
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const buffer = Buffer.from(value);
+                for (const result of results) {
+                    if (result.status === 'rejected') {
+                        const err = result.reason;
+                        if (writeStream && !isSuccess) {
+                            writeStream.end(() => {
+                                fs.unlink(tempFilePath, () => { });
+                            });
+                        }
+                        if (err?.name === 'AbortError') {
+                            this.destroy();
+                        } else {
+                            this.destroy(err);
+                        }
+                        return;
+                    }
+
+                    const { buffer, isLast, end } = result.value;
+
                     this.push(buffer);
                     if (writeStream && !writeErrorOccurred) {
                         writeStream.write(buffer);
                     }
-                }
 
-                if (isEnded) {
-                    isSuccess = true;
-                    if (writeStream) {
-                        writeStream.end(() => {
-                            if (!writeErrorOccurred) {
-                                fs.rename(tempFilePath, finalFilePath, (err) => {
-                                    if (err) console.error("Cache rename failed:", err);
-                                });
-                            } else {
-                                fs.unlink(tempFilePath, () => { });
-                            }
-                        });
+                    if (isLast) {
+                        isEnded = true;
+                        isSuccess = true;
+                        if (writeStream) {
+                            writeStream.end(() => {
+                                if (!writeErrorOccurred) {
+                                    fs.rename(tempFilePath, finalFilePath, (err) => {
+                                        if (err) console.error("Cache rename failed:", err);
+                                    });
+                                } else {
+                                    fs.unlink(tempFilePath, () => { });
+                                }
+                            });
+                        }
+                        this.push(null);
+                        return;
                     }
-                    this.push(null);
-                } else {
+
                     start = end + 1;
                 }
             } catch (err) {
@@ -256,18 +321,14 @@ function createChunkedStream(url, totalSize, videoId, ext) {
                         fs.unlink(tempFilePath, () => { });
                     });
                 }
-                if (abortController?.signal?.aborted || err.name === 'AbortError') {
-                    this.destroy();
-                } else {
-                    this.destroy(err);
-                }
+                this.destroy(err);
             } finally {
                 isReading = false;
             }
         },
         destroy(err, callback) {
-            if (abortController) {
-                abortController.abort();
+            for (const ac of abortControllers) {
+                ac.abort();
             }
             if (writeStream && !isSuccess) {
                 writeStream.end(() => {
@@ -289,6 +350,8 @@ function getFormatUrl(format) {
 
 async function fallbackYTStream(lstracks) {
     refreshYtAuth();
+    poToken = generateAnonPOT();
+    poTokenStream = generateAnonPOT();
 
     const videoId = lstracks.includes('watch?v=') ? lstracks.split('watch?v=')[1].split('&')[0] : lstracks;
     const cacheFilePathWebm = path.join(cacheDir, `${videoId}.webm`);
@@ -462,13 +525,6 @@ async function fallbackYTStream(lstracks) {
         }
 
         if (isHlsUrl(finalurl)) {
-            templist.push({
-                id: lstracks,
-                url: finalurl,
-                ref: Date.now() + 1800000,
-                allowLength: false,
-                contentLength: null
-            });
             return finalurl;
         }
 
@@ -493,7 +549,7 @@ async function fallbackYTStream(lstracks) {
         templist.push({
             id: lstracks,
             url: actualfinalurl,
-            ref: Date.now() + 1800000,
+            ref: Date.now() + 3600000,
             allowLength: changeLength,
             contentLength: streamingLength
         });

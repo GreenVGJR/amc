@@ -60,7 +60,7 @@ module.exports = {
     $return
     ]
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$env[guildId];$env[channelId]];0]]
-    $let[changeevery_time;5000]
+    $let[changeevery_time;8000]
 
     $if[$or[$getCache[musicplayer_message_$env[guildId]_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[elapsedtime];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$return]
     $async[$if[$getCache[musicplayer_message_$env[guildId]_attemptseek]!=;$deleteCache[musicplayer_message_$env[guildId]_attemptseek]]]

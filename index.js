@@ -84,7 +84,6 @@ const music = new ForgeMusic({
 });
 
 const client = new ForgeClient({
-    mobile: true,
     token: process.env.DISCORD_TOKEN,
     logLevel: LogPriority.Medium,
     intents: [

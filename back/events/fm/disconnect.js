@@ -8,7 +8,7 @@ module.exports = {
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $if[$getCache[musicplayer_message_$guildID_is247music]==true;
     $if[$and[$channelExists[$get[vid]];$messageExists[$get[cid];$get[mid]]];
-    $wait[500]
+    $wait[1s]
     $let[checkvccount;$channelVoiceMemberCount[$get[vid]]]
     $let[ml;$callFunction[joinVC;$get[vid]]]
     $if[$callFunction[configMusic;statusvc_message];
