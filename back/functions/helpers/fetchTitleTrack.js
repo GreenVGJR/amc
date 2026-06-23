@@ -94,8 +94,8 @@ module.exports = {
     $let[title;$env[a;results;title]]
     ]
     $if[$env[filtype;type]==twitter;
-    $let[author;$env[a;results;core;user_results;result;core;screen_name]]
-    $let[title;$default[$advancedTextSplit[$env[a;results;legacy;full_text];https://t.co;0];$default[$env[a;results;post_video_description];$env[a;results;rest_id]]]]
+    $let[author;$env[a;results;user;screen_name]]
+    $let[title;$default[$advancedTextSplit[$env[a;results;text];https://t.co;0];$env[a;results;id_str]]]
     ]
     $let[author;$trim[$if[$checkContains[$toLowercase[$toCamelCase[$get[title]]];$toLowercase[$toCamelCase[$get[author]]]]==false;$get[author]]]]
     $let[finaltitle;$get[author]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]

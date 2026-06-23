@@ -38,10 +38,6 @@ module.exports = {
     ]
     $deleteCache[disablecookiesyt]
     ]
-    $async[
-    $callFunction[generateAuthKeys;twitter;;true]
-    $callFunction[generateAuthKeys;twitter_cookies;;true]
-    ]
     $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]
     $async[$callFunction[generateAuthKeys;spotify;;true]]

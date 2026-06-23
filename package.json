@@ -2,7 +2,7 @@
   "dependencies": {
     "@quoriel/db": "github:quoriel/db",
     "@quoriel/edge": "github:quoriel/edge",
-    "@snazzah/davey": "^0.1.11",
+    "@snazzah/davey": "^0.1.12",
     "@tryforge/forge.music": "github:tryforge/ForgeMusic#main",
     "@tryforge/forgescript": "^2.6.0",
     "canvas": "^3.2.3",
@@ -14,7 +14,7 @@
     "dotenv": "^17.4.2",
     "entities": "^8.0.0",
     "lmdb": "^3.5.6",
-    "youtubei.js": "^17.0.1"
+    "youtubei.js": "^17.1.0"
   },
   "devDependencies": {
     "patch-package": "^8.0.1",

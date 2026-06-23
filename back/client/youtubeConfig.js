@@ -15,6 +15,7 @@ let configInfoPromise = null;
 let signatureTimestamp = null;
 let signatureTimestampPromise = null;
 let webPlayer = null;
+let authRequiredUntil = 0;
 
 function generateAnonPOT() {
     const b = Buffer.alloc(10);
@@ -408,35 +409,44 @@ async function fallbackYTStream(lstracks) {
         const buildRoute = targetClient === 'WEB_SAFARI'
             ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk } }, ...playbackContext, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: isWebClient } }
             : { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
-        const requestHeaders = {
-            "Accept-Encoding": "gzip",
-            "Accept-Language": "en",
-            "Content-Type": "application/json",
-            "X-Goog-Visitor-Id": vt,
-            "Origin": `https://${hostdomain}`,
-            "X-Origin": `https://${hostdomain}`,
-            "X-Youtube-Client-Name": useClient.clientName,
-            "X-Youtube-Client-Version": useClient.clientVersion,
-            "User-Agent": APIuserAgent,
-            ...(ytcookies && !isVRnAuth ? {
-                "Authorization": GTH(),
-                "Cookie": ytcookies,
-                "X-Youtube-Bootstrap-Logged-In": true,
-                "Alt-Used": hostdomain,
-                "X-Goog-AuthUser": 0
-            } : {
-                ...(isVRnAuth ? {
-                    "Authorization": "Bearer " + ytauth.token
-                } : {}),
-                "Cookie": tempytcookies
-            })
+
+        const buildHeaders = (useAuth) => {
+            const base = {
+                "Accept-Encoding": "gzip",
+                "Accept-Language": "en",
+                "Content-Type": "application/json",
+                "X-Goog-Visitor-Id": vt,
+                "Origin": `https://${hostdomain}`,
+                "X-Origin": `https://${hostdomain}`,
+                "X-Youtube-Client-Name": useClient.clientName,
+                "X-Youtube-Client-Version": useClient.clientVersion,
+                "User-Agent": APIuserAgent,
+            };
+            if (useAuth && isVRnAuth) {
+                return { ...base, "Authorization": "Bearer " + ytauth.token, "Cookie": tempytcookies };
+            }
+            if (useAuth && ytcookies) {
+                return { ...base, "Authorization": GTH(), "Cookie": ytcookies, "X-Youtube-Bootstrap-Logged-In": true, "Alt-Used": hostdomain, "X-Goog-AuthUser": 0 };
+            }
+            return { ...base, "Cookie": tempytcookies };
         };
-        const fetchPlayerResponse = (query = buildQuery) => fetch(`https://${hostdomain}/youtubei/v1/${query}`, {
+
+        const fetchPlayerResponse = (headers, query = buildQuery) => fetch(`https://${hostdomain}/youtubei/v1/${query}`, {
             method: "POST",
             body: JSON.stringify(buildRoute),
-            headers: requestHeaders
+            headers
         }).then(r => r.json());
-        a = await fetchPlayerResponse();
+
+        let usedAuth = false;
+        const hasAuth = isVRnAuth || !!ytcookies;
+        const shouldUseAuth = !hasAuth || Date.now() < authRequiredUntil;
+
+        if (shouldUseAuth) {
+            usedAuth = true;
+            a = await fetchPlayerResponse(buildHeaders(true));
+        } else {
+            a = await fetchPlayerResponse(buildHeaders(false));
+        }
 
         let finalurl;
         let changeLength = false;
@@ -450,14 +460,26 @@ async function fallbackYTStream(lstracks) {
         if (new_vt) actuallk.visitorData = new_vt;
 
         if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
-            vt = "";
-            await generateVisitor();
-            throw new Error(`InnerTube Error: ${JSON.stringify(a?.playabilityStatus) || null}`);
+            const playabilityError = a?.playabilityStatus?.status || '';
+            if (!usedAuth && hasAuth && playabilityError === 'LOGIN_REQUIRED') {
+                authRequiredUntil = Date.now() + 3600000;
+                usedAuth = true;
+                a = await fetchPlayerResponse(buildHeaders(true));
+                a = Array.isArray(a) ? a[0] : a;
+                a = a?.playerResponse || a;
+                const retry_vt = a?.responseContext?.visitorData;
+                if (retry_vt) actuallk.visitorData = retry_vt;
+            }
+            if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
+                vt = "";
+                await generateVisitor();
+                throw new Error(`InnerTube Error: ${JSON.stringify(a?.playabilityStatus) || null}`);
+            }
         }
 
         const hasUsableFormatUrl = !!(a?.streamingData?.adaptiveFormats || []).find(getFormatUrl) || !!(a?.streamingData?.formats || []).find(getFormatUrl);
         if (!isWebClient && !hasUsableFormatUrl) {
-            const fullResponse = await fetchPlayerResponse(`${apiEndpoint}?prettyPrint=false&alt=json`);
+            const fullResponse = await fetchPlayerResponse(buildHeaders(usedAuth), `${apiEndpoint}?prettyPrint=false&alt=json`);
             let fullPlayerResponse = Array.isArray(fullResponse) ? fullResponse[0] : fullResponse;
             fullPlayerResponse = fullPlayerResponse?.playerResponse || fullPlayerResponse;
             if (fullPlayerResponse?.playabilityStatus?.status === 'OK') a = fullPlayerResponse;

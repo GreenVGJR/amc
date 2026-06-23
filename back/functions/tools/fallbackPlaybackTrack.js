@@ -255,19 +255,18 @@ module.exports = {
     $if[$env[whattype;type]==twitter;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $if[$env[a;results]==null;$return[$let[finalurl;null]]]
-    $if[$env[a;results;legacy;entities;media;0;video_info]!=;
-    $jsonLoad[b;$env[a;results;legacy;entities;media;0;video_info;variants]]
+    $if[$env[a;results;video]!=;
+    $jsonLoad[b;$env[a;results;video;variants]]
     ;
-    $if[$env[a;results;card;legacy;binding_values;0;value;string_value]!=;
-    $jsonLoad[b1;$env[a;results;card;legacy;binding_values;0;value;string_value]]
-    $jsonLoad[b1;$env[b1;media_entities]]
+    $if[$env[a;results;entities;card_legacy;0;value;string_value]!=;
+    $jsonLoad[b1;$env[a;results;entities;card_legacy;0;value;string_value]]
+    $jsonLoad[b1;$env[b1;mediaDetails]]
     $jsonLoad[b1;$jsonEntries[b1]]
-    $jsonLoad[b;$env[b1;0;1;video_info;variants]]
+    $jsonLoad[b;$env[b1;0;1;video;variants]]
     ;
-    $jsonLoad[b;$env[a;results;quoted_status_result;result;legacy;entities;media;0;video_info;variants]]
+    $jsonLoad[b;$env[a;results;quoted_tweet;video;variants]]
     ]]
-    $arrayMap[b;c;$if[$env[c;bitrate]!=;$return[$env[c]]];b]
-    $let[finalurl;$env[b;$sub[$arrayLength[b];1];url]]
+    $let[finalurl;$default[$env[b;$sub[$arrayLength[b];1];src];$env[b;$sub[$arrayLength[b];1];url]]]
     $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Video not available]]]
     ]
     ;retry]
