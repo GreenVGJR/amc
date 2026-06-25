@@ -14,7 +14,7 @@ const list_clients = {
         "osVersion": "1.3.21O771"
     },
     // some countries may not able to stream after 1 minute
-    // may enforce SABR-only
+    // might enforce SABR-only
     "ANDROID": {
         "targetDomain": "youtubei.googleapis.com",
         "client_id": null,
@@ -28,7 +28,7 @@ const list_clients = {
     },
     // doesn't support stream kids contents
     // support oauth2
-    // may enforce SABR-only
+    // might enforce SABR-only
     "ANDROID_VR": {
         "targetDomain": "youtubei.googleapis.com",
         "client_id": "652469312169-4lvs9bnhr9lpns9v451j5oivd81vjvu1.apps.googleusercontent.com",

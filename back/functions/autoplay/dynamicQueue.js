@@ -30,7 +30,7 @@ module.exports = {
         $let[attemptry;0]
         $let[donetry;5]
 
-        $while[$and[$get[attemptry]<=$get[donetry];$get[found]==false];
+        $while[$and[$get[attemptry]<=$get[donetry];$get[found]==false;$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]==true];
         $jsonLoad[llgntmpms;$getCache[musicplayer_message_$guildID_isdynamicmusic]]
         $if[$and[$queueLength<20;$default[$env[llgntmpms;status];false]==true];
         $try[

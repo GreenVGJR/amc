@@ -69,5 +69,6 @@
     "config_generalPlaylistExistsUser": "You already have this playlist.",
     "config_generalPlaylistNotExistUser": "Can't find the playlist.",
     "config_generalPlaylistErrorUser": "Can't access this playlist.",
-    "config_generalPlaylistTempNotExistUser": "Something just happened. Can't continue this process."
+    "config_generalPlaylistTempNotExistUser": "Something just happened. Can't continue this process.",
+    "config_generalPlaylistOnGoingProcessing": "Someone's playlist is still on progress. Try again later."
 }

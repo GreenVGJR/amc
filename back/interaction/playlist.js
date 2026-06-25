@@ -76,9 +76,9 @@ $jsonLoad[ketdata;$get[ketdata]]
 $jsonLoad[listracks;$env[ketdata;value;tracks]]
 $let[totaltrack;$arrayLength[listracks]]
 $let[curpage;$default[$advancedTextSplit[$customID;_;2];1]]
-$let[nextpage;$sum[$advancedTextSplit[$divide[$get[totaltrack];25];.;0];1]]
+$let[nextpage;$sum[$advancedTextSplit[$divide[$get[totaltrack];24];.;0];1]]
 $let[checkdbtempact;$checkCondition[$getRecord[user;;storetempl-act_ls_user-$get[hash]]!={}]]
-$arraySlice[listracks;listracks;$multi[25;$if[$get[curpage]==1;0;$sub[$get[curpage];1]]];$multi[25;$sum[1;$if[$get[curpage]==1;0;$sub[$get[curpage];1]]]]]
+$arraySlice[listracks;listracks;$multi[24;$if[$get[curpage]==1;0;$sub[$get[curpage];1]]];$multi[24;$sum[1;$if[$get[curpage]==1;0;$sub[$get[curpage];1]]]]]
 $let[cotsr;]
 $loop[10;$if[$env[listracks;$sub[$env[cotrsls];1]]==;$break]$let[cotsr;$get[cotsr]- $cropText[$default[$env[listracks;$sub[$env[cotrsls];1];title];$env[listracks;$sub[$env[cotrsls];1];url]];0;90;...]\n];cotrsls;true]
 $interactionUpdate[
@@ -90,12 +90,13 @@ $thumbnail[$if[$and[$checkContains[$env[listracks;0;url];youtube.com/playlist]==
 $footer[$separateNumber[$get[totaltrack];.] Tracks;$callFunction[useIcon;null]]
 $addActionRow
 $addStringSelectMenu[awaitplaytrackplts_$get[hash];Pick Tracks to Play;$checkCondition[$arrayLength[listracks]==0];1;$arrayLength[listracks]]
-$let[countpr;$multi[$sub[$get[curpage];1];25]]
+$let[countpr;$multi[$sub[$get[curpage];1];24]]
 $if[$arrayLength[listracks]==0;
 $addOption[null;;null]
 ;
+$addOption[Play All;Play $separateNumber[$get[totaltrack]] songs at once.;all;▶️]
 $arrayForEach[listracks;lotr;
-$addOption[$cropText[$default[$env[lotr;title];$env[lotr;url]];0;100];$cropText[$advancedTextSplit[$env[lotr;url];https://;1;/;0];0;100];$get[countpr]]
+$addOption[$cropText[$default[$env[lotr;title];$env[lotr;url]];0;100];$cropText[$advancedTextSplit[$env[lotr;url];https://;1;/;0];0;100];$get[countpr];🎼]
 $letSum[countpr;1]
 ]]
 $jsonLoad[confplaylistdb;$getRecord[user;;configplaylistuser_vgjra9f_$authorID]]
@@ -451,7 +452,10 @@ $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
 
 $let[checkdb;$callFunction[findPlaylistUser;$advancedTextSplit[$customID;_;1];$authorID]]
 $onlyIf[$get[checkdb]!=;$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistNotExistUser]]
-$arrayLoad[a;,;$selectMenuValues[;,]]
+
+$onlyIf[$hasCache[musicplayer_message_$guildID_ongoingplaylistmusic]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistOnGoingProcessing]]
+
+$setCache[musicplayer_message_$guildID_ongoingplaylistmusic;true]
 
 $interactionUpdate[
 $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
@@ -461,6 +465,16 @@ $color[$callFunction[useIcon;color_embed]]
 
 $jsonLoad[trs;$get[checkdb]]
 $jsonLoad[listrs;$env[trs;value;tracks]]
+
+$arrayLoad[a;,;$selectMenuValues[;,]]
+$let[doespickallsongsinstead;$arrayFindIndex[a;ap;$checkCondition[$env[ap]==all]]]
+$if[$get[doespickallsongsinstead]!=-1;
+$c[Override other values with all instead]
+$arrayLoad[a]
+$loop[$arrayLength[listrs];
+$let[hnihklk;$sub[$env[hnihkl];1]]
+$arrayPush[a;$get[hnihklk]]
+;hnihkl;true]]
 
 $let[successplay;0]
 $let[errorplay;0]
@@ -477,6 +491,7 @@ $setCache[musicplayer_message_$guildID_messageid;"$get[mid2]"]
 ]
 
 $loop[$arrayLength[a];
+$if[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic]!=true;$break]
 $let[found;false]
 $let[attemptry;0]
 $let[donetry;5]
@@ -491,7 +506,7 @@ $let[ktnmplaytt;$env[listrs;$env[a;$get[ctrs]];title]]
 
 $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[ktnmplaytt]]]
 
-$while[$and[$get[attemptry]<=$get[donetry];$get[found]==false];
+$while[$and[$get[attemptry]<=$get[donetry];$get[found]==false;$getCache[musicplayer_message_$guildID_ongoingplaylistmusic]==true];
     $try[
     $if[$env[whatmusictype;type]==youtube;
     $playTrack[$voiceID;$trimLines[$get[ktnmplaytt]];$get[lockprovyt]]
@@ -513,6 +528,9 @@ $while[$and[$get[attemptry]<=$get[donetry];$get[found]==false];
 $if[$get[found]==true;$letSum[successplay;1];$letSum[errorplay;1]]
 
 ;sdgk;true]
+
+$deleteCache[musicplayer_message_$guildID_ongoingplaylistmusic]
+
 $interactionUpdate[
 $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
 $addField[Success;\`$get[successplay]\`;true]

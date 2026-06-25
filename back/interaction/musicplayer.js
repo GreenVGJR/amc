@@ -124,10 +124,16 @@ module.exports = {
     $async[$leaveVoiceChannel]
     ;
     $async[
+    $if[$or[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic]==true;$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]==true];
     $if[$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]==true;
+    $setCache[musicplayer_message_$guildID_ongoingdynamicmusic;false]
+    ]
+    $if[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic]==true;
+    $setCache[musicplayer_message_$guildID_ongoingplaylistmusic;false]
+    ]
     $loop[-1;
-    $let[cf-fetch;$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]]
-    $if[$get[cf-fetch]!=true;$break]
+    $let[cf-fetch;$default[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic];$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]]]
+    $if[$or[$get[cf-fetch]==false;$get[cf-fetch]==true]==false;$break]
     $wait[10]
     ]]
     $!stopTrack

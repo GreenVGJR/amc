@@ -5,9 +5,7 @@ module.exports = {
     $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     
-    $try[
-    $if[$try[$isPlaying;]!=;$!leaveVoiceChannel]
-    ]
+    $if[$try[$isPlaying;]!=;$async[$!leaveVoiceChannel]]
     
     $deleteCache[musicplayer_message_$guildID_messageid]
     $deleteCache[musicplayer_message_$guildID_channelid]
@@ -17,6 +15,8 @@ module.exports = {
     $deleteCache[radioplayer_data_$guildID_playerstatus]
     $deleteCache[radioplayer_data_$guildID_metadata]
     $deleteCache[musicplayer_message_$guildID_waitloadmsg]
+    $deleteCache[musicplayer_message_$guildID_ongoingdynamicmusic]
+    $deleteCache[musicplayer_message_$guildID_ongoingplaylistmusic]
 
     $try[
     $if[$messageExists[$get[cid];$get[mid]];
