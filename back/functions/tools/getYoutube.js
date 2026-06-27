@@ -14,7 +14,7 @@ module.exports = [{
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $arrayLoad[results]
     $try[
-    $jsonLoad[inputhttpquery;{"params":"EgWKAQIIAWoQEAMQCRAFEAQQChAVEBAQEQ%3D%3D","context":{"client":{"clientName":67,"clientVersion":"1.20261231","hl":"en","gl":"US"}}}]
+    $jsonLoad[inputhttpquery;{"params":"EgWKAQIIAWoQEAMQCRAFEAQQChAVEBAQEQ%3D%3D","context":{"client":{"clientName":67,"clientVersion":"1.20261231","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
     $!jsonSet[inputhttpquery;query;$env[query]]
     $httpSetBody[$jsonStringify[inputhttpquery]]
     $httpSetContentType[Text]
@@ -27,7 +27,7 @@ module.exports = [{
     $jsonLoad[testfetch;$env[res;contents;tabbedSearchResultsRenderer;tabs;0;tabRenderer;content;sectionListRenderer;contents]]
     $jsonLoad[dofetch;$env[res;contents;tabbedSearchResultsRenderer;tabs;0;tabRenderer;content;sectionListRenderer;contents;$arrayFindIndex[testfetch;resfetch;$checkCondition[$env[resfetch;musicShelfRenderer]!=]];musicShelfRenderer;contents]]
     $if[$env[dofetch]==;
-    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}}}]
+    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
     $!jsonSet[inputhttpquery;query;$env[query]]
     $httpSetBody[$jsonStringify[inputhttpquery]]
     $httpSetContentType[Text]
@@ -81,7 +81,7 @@ module.exports = [{
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $arrayLoad[results]
     $try[
-    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}}}]
+    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
     $!jsonSet[inputhttpquery;query;$env[query]]
     $httpSetBody[$jsonStringify[inputhttpquery]]
     $httpAddHeader[User-Agent;$get[agent]]
@@ -96,7 +96,7 @@ module.exports = [{
     $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
     $arrayMap[dofetch;docatch;$if[$env[docatch;videoRenderer;navigationEndpoint;commandMetadata;webCommandMetadata;webPageType]==WEB_PAGE_TYPE_SHORTS;$return[$env[docatch]]];dofetch]
     ;
-    $httpSetBody[{"continuation": "$get[tokens]","context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}}}]
+    $httpSetBody[{"continuation": "$get[tokens]","context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
@@ -134,7 +134,7 @@ module.exports = [{
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $arrayLoad[results]
     $try[
-    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}}}]
+    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
     $!jsonSet[inputhttpquery;query;$env[query]]
     $httpSetBody[$jsonStringify[inputhttpquery]]
     $httpSetContentType[Text]
@@ -173,7 +173,7 @@ module.exports = [{
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $arrayLoad[results]
     $try[
-    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":7,"clientVersion":"7.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
+    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":7,"clientVersion":"7.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
     $!jsonSet[inputhttpquery;query;$env[query]]
     $!jsonSet[inputhttpquery;isPrefetch;true]
     $!jsonSet[inputhttpquery;isZeroPrefixQuery;false]
@@ -230,7 +230,7 @@ module.exports = [{
     code: `
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $try[
-    $httpSetBody[{"videoId":"$env[videoId]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en"}}}]
+    $httpSetBody[{"videoId":"$env[videoId]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en"}},"attestationRequest":{"omitBotguardData":false}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip, br]
@@ -239,7 +239,7 @@ module.exports = [{
     $!httpRequest[https://music.youtube.com/youtubei/v1/next?prettyPrint=false&fields=contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer(tabs.tabRenderer.endpoint.browseEndpoint.browseId);POST;res]
     $let[browseid;$advancedTextSplit[$env[res];"browseId":";1;";0]]
     $if[$env[line]==true;
-    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":21,"clientVersion":"8.47","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en"}}}]
+    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":21,"clientVersion":"9.25.50","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en"}},"attestationRequest":{"omitBotguardData":false}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip, br]
@@ -253,7 +253,7 @@ module.exports = [{
     $let[finalyric;$arrayJoin[er;
 ]]
     ;
-    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en"}}}]
+    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en"}},"attestationRequest":{"omitBotguardData":false}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip, br]
@@ -328,7 +328,7 @@ module.exports = [{
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $let[ytinitcookietest1;$getCache[authmusic_youtube_tempcookies]]
 
-    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}}}]
+    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","visitorData":"$getCache[authmusic_youtube_visitor]","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
     $!jsonSet[inputhttpquery;videoId;$env[videoId]]
     $httpSetBody[$jsonStringify[inputhttpquery]]
     $httpSetContentType[Text]

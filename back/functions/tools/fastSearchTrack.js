@@ -12,22 +12,17 @@ module.exports = {
     }],
     code: `
     $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
+    $arrayLoad[results]
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Accept-Language;en]
-    $let[http;$httpRequest[https://suggestqueries-clients6.youtube.com/complete/search?ds=yt&hl=en&client=youtube&gs_ri=youtube&q=$env[query];GET;test]]
-    $onlyIf[$or[$get[http]==429;$get[http]==403]!=true]
-    $textSplit[$advancedTextSplit[$env[test];(\\[;1];\\["] 
-    $let[splitcount;$sub[$getTextSplitLength;1]]
-    $let[count;1]
-    $arrayLoad[results]
-    $while[$get[count]<=$get[splitcount];
-    $arrayPushJSON[results;$advancedTextSplit[$splitText[$get[count]];",;0]]
-    $letSum[count;1]
-    ]
-    ;
-    $arrayLoad[results]
+    $httpSetContentType[Text]
+    $let[http;$httpRequest[https://suggestqueries-clients6.youtube.com/complete/search?ds=yt&hl=en&client=youtube&gs_ri=youtube&ytvs=1&q=$env[query];GET;aoni]]
+    $onlyIf[$get[http]==200]
+    $jsonLoad[results;$cropText[$env[aoni];19;-1]]
+    $jsonLoad[results;$env[results;1]]
+    $arrayMap[results;restm;$return[$env[restm;0]];results]
     ]
     $return[{"status":$get[http],"respondTime":"$httpResponseTime","results":$env[results]}]
     `

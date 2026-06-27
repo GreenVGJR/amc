@@ -26,7 +26,6 @@ function generateAnonPOT() {
 }
 
 let poToken = generateAnonPOT();
-let poTokenStream = generateAnonPOT();
 
 const useClient = ytClients?.[targetClient];
 if (!useClient) {
@@ -175,7 +174,7 @@ generateVisitor().then(() => Promise.all([fetchWebConfigInfo(), fetchSignatureTi
 
 function createChunkedStream(url, totalSize, videoId, ext) {
     let start = 0;
-    const chunkSize = 1024 * 1024 * 10;
+    const chunkSize = 1024 * 1024 * 5;
     const concurrency = 5;
     let isEnded = false;
     let abortControllers = [];
@@ -215,7 +214,8 @@ function createChunkedStream(url, totalSize, videoId, ext) {
 
             try {
                 const response = await fetch(chunkUrl, {
-                    headers: { "User-Agent": APIuserAgent },
+                    headers: { "Content-Length": 0, "User-Agent": APIuserAgent },
+                    method: "POST",
                     signal: ac.signal
                 });
 
@@ -352,8 +352,7 @@ function getFormatUrl(format) {
 async function fallbackYTStream(lstracks) {
     refreshYtAuth();
     poToken = generateAnonPOT();
-    poTokenStream = generateAnonPOT();
-
+    
     const videoId = lstracks.includes('watch?v=') ? lstracks.split('watch?v=')[1].split('&')[0] : lstracks;
     const cacheFilePathWebm = path.join(cacheDir, `${videoId}.webm`);
     const cacheFilePathM4a = path.join(cacheDir, `${videoId}.m4a`);
@@ -496,7 +495,7 @@ async function fallbackYTStream(lstracks) {
             if (fr) {
                 const rawFormatUrl = getFormatUrl(fr);
                 const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                finalurl = decipheredUrl + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+                finalurl = decipheredUrl + "&ratebypass=true&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
                 changeLength = true;
                 durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
                 streamingLength = String(fr.contentLength);
@@ -512,7 +511,7 @@ async function fallbackYTStream(lstracks) {
             if (fr) {
                 const rawFormatUrl = getFormatUrl(fr);
                 const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                finalurl = decipheredUrl + "&ratebypass=true&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+                finalurl = decipheredUrl + "&ratebypass=true&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
                 changeLength = true;
                 durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
                 streamingLength = String(fr.contentLength);
@@ -521,7 +520,7 @@ async function fallbackYTStream(lstracks) {
                 if (fs) {
                     const rawFormatUrl = getFormatUrl(fs);
                     const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                    finalurl = decipheredUrl + "&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+                    finalurl = decipheredUrl + "&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
                 } else if (a?.videoDetails?.isLiveContent && a?.streamingData?.hlsManifestUrl) {
                     finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
                 } else {
@@ -534,7 +533,7 @@ async function fallbackYTStream(lstracks) {
             if (fs) {
                 const rawFormatUrl = getFormatUrl(fs);
                 const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                finalurl = decipheredUrl + "&rn=0&alr=no&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+                finalurl = decipheredUrl + "&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
             } else if (a?.videoDetails?.isLiveContent && a?.streamingData?.hlsManifestUrl) {
                 finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
             } else {
@@ -552,9 +551,9 @@ async function fallbackYTStream(lstracks) {
 
         let actualfinalurl;
 
-        const filterlocation = await fetch(finalurl + "&pot=" + poTokenStream, {
+        const filterlocation = await fetch(finalurl, {
             method: "HEAD",
-            headers: { "User-Agent": APIuserAgent }
+            headers: { "Range": "bytes=0-","User-Agent": APIuserAgent }
         });
 
         if (filterlocation.status === 403 && changeLength) {
