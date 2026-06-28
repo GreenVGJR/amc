@@ -9,11 +9,11 @@ module.exports = {
     code: `
     $if[$try[$queueLength;-1]==-1;$return]
     $if[$callFunction[configMusic;interval_message];
-    $setCache[musicplayer_message_$guildID_waitinterval;false]
+    $setCache[initclientmusic;musicplayer_message_$guildID_waitinterval;false]
     ]
     $let[bypassEdit;$if[$or[$env[bypassEdit]==null;$env[bypassEdit]==];false;$env[bypassEdit]]]
-    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
-    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
+    $let[cid;$getCache[initclientmusic;musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[initclientmusic;musicplayer_message_$guildID_messageid]]
 
     $jsonLoad[testmessage;{}]
     $!jsonSet[testmessage;id;$trackInfo[id]]
@@ -29,7 +29,7 @@ module.exports = {
     $callFunction[musicPlayerMessage;$get[cid];$get[mid];$jsonStringify[testmessage];false;intervalmusicmessage_$guildID_$get[cid];$guildID;true;$callFunction[configMusic;interval_message];$get[bypassEdit]]
 
     $if[$callFunction[configMusic;interval_message];
-    $setCache[musicplayer_message_$guildID_waitinterval;true]
+    $setCache[initclientmusic;musicplayer_message_$guildID_waitinterval;true]
     ]
     `
 }

@@ -6,8 +6,8 @@ module.exports = {
     $logger[Warn;Caching Discord context for better performance]
     $async[$callFunction[fetchDiscordContext]]
     ]
-    $setCache[countmusicnode;"0"]
-    $setCache[system_filetp-defaultDiscordAgent;$try[$djsEval[require("@discordjs/rest").DefaultUserAgent]]]
+    $setCache[initclientmusic;countmusicnode;"0"]
+    $setCache[initclientmusic;system_filetp-defaultDiscordAgent;$try[$djsEval[require("@discordjs/rest").DefaultUserAgent]]]
     $setInterval[
         $arrayLoad[guild;,;$guildIDs[,]]
         $let[countnode;0]
@@ -15,7 +15,7 @@ module.exports = {
         $try[
         $if[$djsEval[(0, require("discord-player").useMainPlayer)().queues.get(ctx.client.guilds.cache.get("$env[guilds]"))?.isPlaying() || false];$letSum[countnode;1]]
         ]]
-        $setCache[countmusicnode;"$get[countnode]"]
+        $setCache[initclientmusic;countmusicnode;"$get[countnode]"]
     ;30s]
     $logger[Info;Generating Auth]
     $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
@@ -28,15 +28,15 @@ module.exports = {
     ;
     $localFunction[checkcookies;
     $let[checkcookie;$callFunction[generateAuthKeys;youtube;;$env[lfk];$env[toggle]]]
-    $if[$getCache[retrycookiesyt]==true;$deleteCache[retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;false]]
+    $if[$getCache[initclientmusic;retrycookiesyt]==true;$deleteCache[initclientmusic;retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;false]]
     ;lfk;toggle]
     $callLocalFunction[checkcookies;true;false]
-    $if[$getCache[disablecookiesyt]!=true;
+    $if[$getCache[initclientmusic;disablecookiesyt]!=true;
     $setInterval[
     $callLocalFunction[checkcookies;false;false]
     ;10m]
     ]
-    $deleteCache[disablecookiesyt]
+    $deleteCache[initclientmusic;disablecookiesyt]
     ]
     $async[$callFunction[generateAuthKeys;tiktok;;true]]
     $async[$callFunction[generateAuthKeys;soundcloud;;true]]
@@ -50,7 +50,7 @@ module.exports = {
     $callFunction[generateAuthKeys;tidal_token;;true]
     ]
     $async[$callFunction[generateAuthKeys;deezer;;true]]
-    $async[$setCache[listcommands-help;$applicationCommands]]
+    $async[$setCache[initclientmusic;listcommands-help;$applicationCommands]]
     $setInterval[
     $logger[Info;Re-generating keys - $getTimestamp]
     $callFunction[generateAuthKeys;all;;false]

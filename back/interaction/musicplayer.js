@@ -3,8 +3,8 @@ module.exports = {
     allowedInteractionTypes: ["button", "selectMenu"],
     code: `
     $onlyIf[$advancedTextSplit[$customID;_;0]==musicplayer;]
-    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
-    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
+    $let[cid;$getCache[initclientmusic;musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[initclientmusic;musicplayer_message_$guildID_messageid]]
     $onlyIf[$get[mid]==$messageID;
     $interactionUpdate[
     $fetchResponse
@@ -32,13 +32,13 @@ module.exports = {
     $if[$getLoopMode==TRACK;$setLoopMode[QUEUE];$setLoopMode[OFF]
     ]]]
     $if[$advancedTextSplit[$customID;_;1]==shuffle;
-    $let[statusshuffle;$getCache[musicplayer_message_$guildID_isshuffle]]
+    $let[statusshuffle;$getCache[initclientmusic;musicplayer_message_$guildID_isshuffle]]
     $if[$get[statusshuffle];
     $!unShuffleQueue
-    $setCache[musicplayer_message_$guildID_isshuffle;false]
+    $setCache[initclientmusic;musicplayer_message_$guildID_isshuffle;false]
     ;
     $!shuffleQueue
-    $setCache[musicplayer_message_$guildID_isshuffle;true]
+    $setCache[initclientmusic;musicplayer_message_$guildID_isshuffle;true]
     ]]
     $if[$advancedTextSplit[$customID;_;1]==lyrics;
     $ephemeral
@@ -46,7 +46,7 @@ module.exports = {
     $let[md5urltk;$md5[$trackInfo[url]]]
     
     $if[$callFunction[configMusic;preloadLyricsPlayer]==false;
-    $let[lrkggno;$getCache[musicplayer_cache-lyrics-$get[md5urltk]]]
+    $let[lrkggno;$getCache[initclientmusic;musicplayer_cache-lyrics-$get[md5urltk]]]
     $if[$get[lrkggno]==null;
     $interactionReply[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
     $stop
@@ -66,7 +66,7 @@ module.exports = {
     $loop[-1;
     $if[$callFunction[configMusic;preloadLyricsPlayer]==true;
 
-    $let[lrkggn;$getCache[musicplayer_cache-lyrics-$get[md5urltk]]]
+    $let[lrkggn;$getCache[initclientmusic;musicplayer_cache-lyrics-$get[md5urltk]]]
     $if[$get[lrkggn]!=undefined;
     $if[$get[lrkggn]!=null;
     $jsonLoad[result;$get[lrkggn]]
@@ -79,7 +79,7 @@ module.exports = {
     $wait[5]
     ]
     $if[$get[f-fetch]==null;
-    $setCache[musicplayer_cache-lyrics-$get[md5urltk];"null"]
+    $setCache[initclientmusic;musicplayer_cache-lyrics-$get[md5urltk];"null"]
     $interactionReply[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]
     $stop
     ]
@@ -93,7 +93,7 @@ module.exports = {
     $color[$callFunction[useIcon;color_embed]]
     $timestamp
     ]
-    $setCache[musicplayer_cache-lyrics-$get[md5urltk];$jsonStringify[result]]
+    $setCache[initclientmusic;musicplayer_cache-lyrics-$get[md5urltk];$jsonStringify[result]]
     ]
     $if[$advancedTextSplit[$customID;_;1]==lastfm;
     $ephemeral
@@ -118,21 +118,21 @@ module.exports = {
     ]
     $if[$advancedTextSplit[$customID;_;1]==stopplayer;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $deleteCache[cachesearchistory_user_autocomplete_$authorID]
-    $deleteCache[musicplayer_message_$guildID_isdynamicmusic]
-    $if[$getCache[musicplayer_message_$guildID_is247music]!=true;
+    $deleteCache[initclientmusic;cachesearchistory_user_autocomplete_$authorID]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_isdynamicmusic]
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_is247music]!=true;
     $async[$leaveVoiceChannel]
     ;
     $async[
-    $if[$or[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic]==true;$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]==true];
-    $if[$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]==true;
-    $setCache[musicplayer_message_$guildID_ongoingdynamicmusic;false]
+    $if[$or[$getCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic]==true;$getCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic]==true];
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic]==true;
+    $setCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic;false]
     ]
-    $if[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic]==true;
-    $setCache[musicplayer_message_$guildID_ongoingplaylistmusic;false]
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic]==true;
+    $setCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic;false]
     ]
     $loop[-1;
-    $let[cf-fetch;$default[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic];$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]]]
+    $let[cf-fetch;$default[$getCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic];$getCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic]]]
     $if[$or[$get[cf-fetch]==false;$get[cf-fetch]==true]==false;$break]
     $wait[10]
     ]]
@@ -145,36 +145,36 @@ module.exports = {
     $!deferUpdate
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekdown;
-    $if[$getCache[musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
     $ephemeral
     $defer
     $if[$callFunction[configMusic;interval_message]==true;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $setCache[musicplayer_message_$guildID_attemptseek;true]
+    $setCache[initclientmusic;musicplayer_message_$guildID_attemptseek;true]
     ]
     $async[
     $let[curduration;$if[$callFunction[configMusic;interval_message];$callFunction[musicVirtualDuration;$guildID;$get[cid]];$playerElapsedTime]]
     $let[seeks;10000]
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sub[$get[curduration];$get[seeks]]]]
-    $setCache[musicplayer_message_$guildID_attemptseek;true]
+    $setCache[initclientmusic;musicplayer_message_$guildID_attemptseek;true]
     $let[resseek;$if[$sub[$get[curduration];$get[seeks]]<0;0;$sub[$get[curduration];$get[seeks]]]]
     $!seekTrack[$get[resseek]]
     ]
     $!interactionDelete
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekup;
-    $if[$getCache[musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
     $ephemeral
     $defer
     $if[$callFunction[configMusic;interval_message]==true;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $setCache[musicplayer_message_$guildID_attemptseek;true]
+    $setCache[initclientmusic;musicplayer_message_$guildID_attemptseek;true]
     ]
     $async[
     $let[curduration;$if[$callFunction[configMusic;interval_message];$callFunction[musicVirtualDuration;$guildID;$get[cid]];$playerElapsedTime]]
     $let[seeks;10000]
     $let[tests;$callFunction[musicVirtualDuration;$guildID;$get[cid];$sum[$get[curduration];$get[seeks]]]]
-    $setCache[musicplayer_message_$guildID_attemptseek;true]
+    $setCache[initclientmusic;musicplayer_message_$guildID_attemptseek;true]
     $let[resseek;$if[$sum[$get[curduration];$get[seeks]]<0;0;$sum[$get[curduration];$get[seeks]]]]
     $!seekTrack[$get[resseek]]
     ]
@@ -184,7 +184,7 @@ module.exports = {
     $callFunction[setAutoplay]
     ]
     $if[$advancedTextSplit[$customID;_;1]==247music;
-    $setCache[musicplayer_message_$guildID_is247music;$checkCondition[$getCache[musicplayer_message_$guildID_is247music]!=true]]
+    $setCache[initclientmusic;musicplayer_message_$guildID_is247music;$checkCondition[$getCache[initclientmusic;musicplayer_message_$guildID_is247music]!=true]]
     ]
     $onlyIf[$checkContains[$advancedTextSplit[$customID;_;1];stopplayer;lyrics;nodequeue;seekup;seekdown;lastfm;actionplayer]!=true;]
     $callFunction[updateCurrentMusicPlayer;true]

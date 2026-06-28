@@ -203,17 +203,17 @@ module.exports = [{
 
     $playTrack[$voiceID;$trimLines[$get[stream]];auto;FILE]
     $if[$get[iscreatedfirst];
-    $setCache[musicplayer_message_$guildID_channelid;"$channelID"]
-    $setCache[musicplayer_message_$guildID_messageid;"$messageID"]
+    $setCache[initclientmusic;musicplayer_message_$guildID_channelid;"$channelID"]
+    $setCache[initclientmusic;musicplayer_message_$guildID_messageid;"$messageID"]
     ;
     $callLocalFunction[loadinteraction;2]
     $if[$getLoopMode!=OFF;$setLoopMode[OFF] $wait[1s]]
     $!skipTo[$sub[$queueLength;1]]
     $!interactionDelete
     ]
-    $setCache[radioplayer_data_$guildID_checkplayer;true]
-    $setCache[radioplayer_data_$guildID_metadata;$jsonStringify[testmessage]]
-    $setCache[radioplayer_data_$guildID_playerstatus;true]
+    $setCache[initclientmusic;radioplayer_data_$guildID_checkplayer;true]
+    $setCache[initclientmusic;radioplayer_data_$guildID_metadata;$jsonStringify[testmessage]]
+    $setCache[initclientmusic;radioplayer_data_$guildID_playerstatus;true]
     ;
     $callLocalFunction[loadinteraction;3]
     $let[mid2;$sendMessage[$channelID;

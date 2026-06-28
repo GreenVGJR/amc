@@ -1,22 +1,22 @@
 module.exports = {
     type: "playerError",
     code: `
-    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
-    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
+    $let[cid;$getCache[initclientmusic;musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[initclientmusic;musicplayer_message_$guildID_messageid]]
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     
     $if[$try[$isPlaying;]!=;$async[$!leaveVoiceChannel]]
     
-    $deleteCache[musicplayer_message_$guildID_messageid]
-    $deleteCache[musicplayer_message_$guildID_channelid]
-    $deleteCache[musicplayer_message_$guildID_isshuffle]
-    $deleteCache[musicplayer_message_$guildID_attemptseek]
-    $deleteCache[musicplayer_message_$guildID_waitinterval]
-    $deleteCache[radioplayer_data_$guildID_playerstatus]
-    $deleteCache[radioplayer_data_$guildID_metadata]
-    $deleteCache[musicplayer_message_$guildID_waitloadmsg]
-    $deleteCache[musicplayer_message_$guildID_ongoingdynamicmusic]
-    $deleteCache[musicplayer_message_$guildID_ongoingplaylistmusic]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_messageid]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_channelid]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_isshuffle]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_attemptseek]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_waitinterval]
+    $deleteCache[initclientmusic;radioplayer_data_$guildID_playerstatus]
+    $deleteCache[initclientmusic;radioplayer_data_$guildID_metadata]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_waitloadmsg]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic]
 
     $try[
     $if[$messageExists[$get[cid];$get[mid]];

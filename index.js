@@ -57,6 +57,10 @@ const quorielDb = new QuorielDB({
     ]
 });
 
+const quorielEdge = new QuorielEdge({
+    caches: ["initclientmusic"]
+});
+
 const music = new ForgeMusic({
     events: [
         GuildQueueEvent.ConnectionDestroyed,
@@ -105,7 +109,7 @@ const client = new ForgeClient({
     extensions: [
         // new ForgeDB(),
         quorielDb,
-        new QuorielEdge(),
+        quorielEdge,
         music
     ]
 });

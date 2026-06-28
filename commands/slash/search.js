@@ -117,8 +117,8 @@ module.exports = {
   $arrayReverse[loadser;loadser]
   $callLocalFunction[loadinteraction;2]
   $if[$get[check]!={};
-  $setCache[storecachesearchusersfetch-q_$djsEval[ctx.interaction.id];$option[query]]
-  $setCache[storecachesearchusersfetch-p_$djsEval[ctx.interaction.id];$option[provider]]
+  $setCache[initclientmusic;storecachesearchusersfetch-q_$djsEval[ctx.interaction.id];$option[query]]
+  $setCache[initclientmusic;storecachesearchusersfetch-p_$djsEval[ctx.interaction.id];$option[provider]]
   ]
   `
 }

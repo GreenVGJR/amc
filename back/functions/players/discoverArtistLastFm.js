@@ -22,10 +22,10 @@ $let[country;0]
 
 $let[cusque;$env[query]]
 $let[authorurl;https://www.last.fm/music/$encodeURI[$toLowercase[$get[cusque]]]]
-$let[lookCacheYT;$getCache[musicplayer_cache-lastfmyt-$md5[$get[cusque]]]]
+$let[lookCacheYT;$getCache[initclientmusic;musicplayer_cache-lastfmyt-$md5[$get[cusque]]]]
 
 $localFunction[fetchlastfm;
-$let[lookCache;$getCache[musicplayer_cache-lastfm-$md5[$get[cusque]]]]
+$let[lookCache;$getCache[initclientmusic;musicplayer_cache-lastfm-$md5[$get[cusque]]]]
 
 $if[$or[$get[lookCache]==null;$get[country]>=7];$return]
 $if[$env[retry]==true;$letSum[country;1]]
@@ -48,10 +48,10 @@ $let[reslast;$get[lookCache]]
 ;retry]
 $callLocalFunction[fetchlastfm;false]
 $if[$advancedTextSplit[$get[reslast];tnew-title;1;intabbr;1;">;1;</abbr>;0]==;
-$setCache[musicplayer_cache-lastfm-$md5[$get[cusque]];"null"]
+$setCache[initclientmusic;musicplayer_cache-lastfm-$md5[$get[cusque]];"null"]
 $return[null]
 ]
-$if[$or[$get[lookCache]==undefined;$get[lookCache]==];$setCache[musicplayer_cache-lastfm-$md5[$get[cusque]];$get[reslast]]]
+$if[$or[$get[lookCache]==undefined;$get[lookCache]==];$setCache[initclientmusic;musicplayer_cache-lastfm-$md5[$get[cusque]];$get[reslast]]]
 $if[$get[showEmbed]==false;$return[true]]
 $let[actualauthorurl;$advancedTextSplit[$get[reslast];meta property="og:url";1;content=";1;";0;?;0]]
 $if[$get[lookCacheYT]!=;
@@ -70,11 +70,11 @@ $let[mrinyt;$arrayFindIndex[findindexch;p;$checkCondition[$env[p;channelRenderer
 $let[mrinyt;$if[$get[mrinyt]==-1;0;$get[mrinyt]]]
 $let[channelyturl;$env[a;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[mrinyt];channelRenderer;channelId]]
 $if[$get[channelyturl]!=;
-$httpAddHeader[Cookie;$getCache[authmusic_youtube_tempcookies]]
+$httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
 $!httpRequest[https://www.youtube.com/channel/$get[channelyturl];GET]
 $jsonLoad[b;$advancedTextSplit[$httpResult;ytInitialData =;1;\\;</script>;0]]
 $let[bannerchannelurl;$replace[$env[b;header;pageHeaderRenderer;content;pageHeaderViewModel;banner;imageBannerViewModel;image;sources;0;url];w$env[b;header;pageHeaderRenderer;content;pageHeaderViewModel;banner;imageBannerViewModel;image;sources;0;width];s0]]
-$if[$get[lookCacheYT]==;$setCache[musicplayer_cache-lastfmyt-$md5[$get[cusque]];$get[bannerchannelurl]]]
+$if[$get[lookCacheYT]==;$setCache[initclientmusic;musicplayer_cache-lastfmyt-$md5[$get[cusque]];$get[bannerchannelurl]]]
 ]]
 $let[firstcovtop;$advancedTextSplit[$get[reslast];tbody;1;tbody;0;class="cover-art";1;src=";1;";0]]
 $let[achexternal;$advancedTextSplit[$get[reslast];ul class="resource-external-links";1;</ul>;0]]

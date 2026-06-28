@@ -52,7 +52,7 @@ module.exports = {
     $!clearInterval[$env[intervalName]]
     $return
     ]
-    $if[$getCache[musicplayer_checkmessage_ytwarm_$env[guildId]]==true;
+    $if[$getCache[initclientmusic;musicplayer_checkmessage_ytwarm_$env[guildId]]==true;
     $!clearInterval[$env[intervalName]]
     ]
     $if[$or[$env[messageId]==;$channelExists[$env[channelId]]==false];
@@ -62,20 +62,20 @@ module.exports = {
     $let[elapsedtime;$if[$hasMusicNode;$callFunction[musicVirtualDuration;$env[guildId];$env[channelId]];0]]
     $let[changeevery_time;8000]
 
-    $if[$or[$getCache[musicplayer_message_$env[guildId]_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[elapsedtime];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$return]
-    $async[$if[$getCache[musicplayer_message_$env[guildId]_attemptseek]!=;$deleteCache[musicplayer_message_$env[guildId]_attemptseek]]]
-    $async[$if[$getCache[radioplayer_data_$env[guildId]_checkplayer]!=;$deleteCache[radioplayer_data_$env[guildId]_checkplayer]]]
+    $if[$or[$getCache[initclientmusic;musicplayer_message_$env[guildId]_attemptseek]==true;$get[elapsedtime]==0;$modulo[$get[elapsedtime];$get[changeevery_time]]==0;$env[bypassRestrict]==true]==false;$return]
+    $async[$if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_attemptseek]!=;$deleteCache[initclientmusic;musicplayer_message_$env[guildId]_attemptseek]]]
+    $async[$if[$getCache[initclientmusic;radioplayer_data_$env[guildId]_checkplayer]!=;$deleteCache[initclientmusic;radioplayer_data_$env[guildId]_checkplayer]]]
     $if[$try[$messageExists[$env[channelId];$env[messageId]];false]==false;
     $let[secmid;$sendMessage[$channelID;$silent $callFunction[useCustomMusicMessage;config_errorIntervalMessage];true]]
-    $setCache[musicplayer_message_$env[guildId]_channelid;"$env[channelId]"]
-    $setCache[musicplayer_message_$env[guildId]_messageid;"$get[secmid]"]
+    $setCache[initclientmusic;musicplayer_message_$env[guildId]_channelid;"$env[channelId]"]
+    $setCache[initclientmusic;musicplayer_message_$env[guildId]_messageid;"$get[secmid]"]
     $callFunction[updateCurrentMusicPlayer;false]
     $stop
     ]
 
     $let[countVcMembers;$sub[$channelVoiceMemberCount[$voiceID[$env[guildId];$clientID]];2]]
 
-    $if[$getCache[radioplayer_data_$env[guildId]_playerstatus]!=true;
+    $if[$getCache[initclientmusic;radioplayer_data_$env[guildId]_playerstatus]!=true;
 
     $jsonLoad[jsonmusicdata;$env[musicInfo]]
     $let[checkautoplaystatus;$callFunction[checkAutoplayStatus]]
@@ -94,7 +94,7 @@ module.exports = {
 ;$queue[;23;{track.title};
 ]]
 
-    $let[statusshuffle;$default[$getCache[musicplayer_message_$env[guildId]_isshuffle];false]]
+    $let[statusshuffle;$default[$getCache[initclientmusic;musicplayer_message_$env[guildId]_isshuffle];false]]
 
     $let[delayping;$checkCondition[$round[$executionTime;0]>=250]]
     $let[checkdurationms;$if[$hasMusicNode;$if[$isPlaying;$env[jsonmusicdata;durationMS];0];0]]
@@ -114,7 +114,7 @@ module.exports = {
     $let[provider;$env[jsonmedia;type]]
     $localFunction[fetmusicmc;
     $if[$get[looknextsong];
-    $author[» Next Playing$if[$getCache[musicplayer_message_$env[guildId]_is247music]==true; - 24/7 Mode]\n$get[owner];$callFunction[useIcon;$get[provider]];;0]
+    $author[» Next Playing$if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]==true; - 24/7 Mode]\n$get[owner];$callFunction[useIcon;$get[provider]];;0]
     $title[$cropText[$get[title];0;253;...];$get[url];0]
     $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]LIVE;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]$if[$advancedTextSplit[$parseDigital[$env[jsonmusicdata;durationMS]];:;0]==00;$cropText[$parseDigital[$env[jsonmusicdata;durationMS]];3;];$parseDigital[$env[jsonmusicdata;durationMS]]]];true;0]
     $addField[Songs;$separateNumber[$sum[$queueLength;1];.];true;0]
@@ -124,13 +124,13 @@ module.exports = {
     $color[$memberDisplayColor[$env[guildId];$get[requestedBy]];0]
     ]
     $thumbnail[$if[$isValidLink[$get[thumbnail]]==false;$userAvatar[$get[requestedBy];1024];$if[$endsWith[$get[owner]; - Topic];https://i.ytimg.com/vi/$advancedTextSplit[$get[thumbnail];/;4]/frame0.jpg;$if[$get[provider]==applemusic;$replace[$get[thumbnail];1200x630wp-60;1x1ss];$get[thumbnail]]]];0]
-    $if[$getCache[musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true;
+    $if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true;
     $footer[$callFunction[useCustomMusicMessage;config_generalDynamicQueue];$callFunction[useIcon;loading]]
     ;
     $footer[$userDisplayName[$get[requestedBy]]$if[$get[countVcMembers]>=1;  •  +$get[countVcMembers] more];$userAvatar[$get[requestedBy];1024];0]
     ]
     ;
-    $author[» Now Playing$if[$getCache[musicplayer_message_$env[guildId]_is247music]==true; - 24/7 Mode]\n$env[jsonmusicdata;author];$callFunction[useIcon;$get[provider]];;0]
+    $author[» Now Playing$if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]==true; - 24/7 Mode]\n$env[jsonmusicdata;author];$callFunction[useIcon;$get[provider]];;0]
     $title[$cropText[$env[jsonmusicdata;title];0;253;...];$env[jsonmusicdata;url];0]
     $if[$and[$get[delayping];$env[toggleInterval]];$description[Bad connection.\nThe current music playing may be sound robotic.;0]]
     $addField[Duration;$if[$env[jsonmusicdata;durationMS]==0;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]LIVE;$if[$env[toggleInterval];$if[$advancedTextSplit[$parseDigital[$get[elapsedtime]];:;0]==00;$cropText[$parseDigital[$get[elapsedtime]];3;];$parseDigital[$get[elapsedtime]]] - ]$if[$advancedTextSplit[$parseDigital[$env[jsonmusicdata;durationMS]];:;0]==00;$cropText[$parseDigital[$env[jsonmusicdata;durationMS]];3;];$parseDigital[$env[jsonmusicdata;durationMS]]]];true;0]
@@ -141,10 +141,10 @@ module.exports = {
     ;
     $color[$memberDisplayColor[$env[guildId];$env[jsonmusicdata;requestedBy;id]];0]
     ]
-    $if[$getCache[musicplayer_checkmessage_ytwarm_$env[guildId]]==true;
+    $if[$getCache[initclientmusic;musicplayer_checkmessage_ytwarm_$env[guildId]]==true;
     $footer[$callFunction[useCustomMusicMessage;config_generalRefreshYoutubeTrack];$callFunction[useIcon;loading]]
     ;
-    $if[$getCache[musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true;
+    $if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true;
     $footer[$callFunction[useCustomMusicMessage;config_generalDynamicQueue];$callFunction[useIcon;loading]]
     ;
     $footer[$userDisplayName[$env[jsonmusicdata;requestedBy;id]]$if[$get[countVcMembers]>=1;  •  +$get[countVcMembers] more];$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];0]
@@ -181,11 +181,11 @@ module.exports = {
     $addButton[musicplayer_seekup_$env[messageId];+10s;Secondary;⏩;$or[$env[jsonmusicdata;durationMS]==0;$isPaused]]
     $addButton[musicplayer_actionplayer_$env[messageId];$if[$isPaused;Resume;Pause];Secondary;$if[$isPaused;▶️;⏸️];$checkCondition[$env[jsonmusicdata;durationMS]==0]]
     $addActionRow
-    $addButton[musicplayer_dynamic_$env[messageId];Dynamic Queue: $if[$get[checkautoplaystatus]!=true;Off;On];$if[$get[checkautoplaystatus]!=true;Secondary;Success];🎼;$checkCondition[$getCache[musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true]]
-    $addButton[musicplayer_247music_$env[messageId];24/7: $if[$getCache[musicplayer_message_$env[guildId]_is247music]!=true;Off;On];Secondary;$if[$getCache[musicplayer_message_$env[guildId]_is247music]!=true;🌇;🌃];false]
+    $addButton[musicplayer_dynamic_$env[messageId];Dynamic Queue: $if[$get[checkautoplaystatus]!=true;Off;On];$if[$get[checkautoplaystatus]!=true;Secondary;Success];🎼;$checkCondition[$getCache[initclientmusic;musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true]]
+    $addButton[musicplayer_247music_$env[messageId];24/7: $if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]!=true;Off;On];Secondary;$if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]!=true;🌇;🌃];false]
     ]
     ;
-    $jsonLoad[aradio;$default[$getCache[radioplayer_data_$env[guildId]_metadata];{}]]
+    $jsonLoad[aradio;$default[$getCache[initclientmusic;radioplayer_data_$env[guildId]_metadata];{}]]
     
     $localFunction[fetmusicmc;
     $author[Streaming Radio;https://cdn.onlineradiobox.com/img/android-chrome-192x192.png;;0]
@@ -197,7 +197,7 @@ module.exports = {
     $addActionRow
     $addButton[musicplayer_volumemute_$env[messageId];$if[$getVolume==0;Unmute;Mute];Secondary;🔈;false]
     $addButton[null0;$getVolume%;Secondary;🔈;true]
-    $addButton[musicplayer_247music_$env[messageId];24/7: $if[$getCache[musicplayer_message_$env[guildId]_is247music]!=true;Off;On];Secondary;$if[$getCache[musicplayer_message_$env[guildId]_is247music]!=true;🌇;🌃];false]
+    $addButton[musicplayer_247music_$env[messageId];24/7: $if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]!=true;Off;On];Secondary;$if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]!=true;🌇;🌃];false]
     $addActionRow
     $addButton[musicplayer_volumedown_$env[messageId];-10%;Secondary;🔉;$checkCondition[$getVolume==0]]
     $addButton[musicplayer_stopplayer_$env[messageId];Stop;Danger;⏹️;false]
@@ -208,12 +208,12 @@ module.exports = {
     $if[$env[bypassEdit]==true;
     $try[$interactionUpdate[
         $callLocalFunction[fetmusicmc]
-        $if[$getCache[musicplayer_checkmessage_ytwarm_$env[guildId]]==true;$disableComponents]
+        $if[$getCache[initclientmusic;musicplayer_checkmessage_ytwarm_$env[guildId]]==true;$disableComponents]
     ]]
     ;
     $try[$!editMessage[$env[channelId];$env[messageId];
         $callLocalFunction[fetmusicmc]
-        $if[$getCache[musicplayer_checkmessage_ytwarm_$env[guildId]]==true;$disableComponents]
+        $if[$getCache[initclientmusic;musicplayer_checkmessage_ytwarm_$env[guildId]]==true;$disableComponents]
     ]]
     ]
     $return

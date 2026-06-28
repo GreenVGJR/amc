@@ -446,16 +446,16 @@ $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$replace[$callFunction[use
 ]
 
 $onlyIf[$or[$channelUserLimit[$voiceID]==0;$sum[$channelVoiceMemberCount[$voiceID];$if[$voiceID[$guildID;$clientID]==;1;0]]<=$channelUserLimit[$voiceID]];$ephemeral $callFunction[useCustomMusicMessage;config_errorIsLimitVC]]
-$onlyIf[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
-$let[cid;$getCache[musicplayer_message_$guildID_channelid]]
-$let[mid;$getCache[musicplayer_message_$guildID_messageid]]
+$onlyIf[$getCache[initclientmusic;radioplayer_data_$guildID_playerstatus]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
+$let[cid;$getCache[initclientmusic;musicplayer_message_$guildID_channelid]]
+$let[mid;$getCache[initclientmusic;musicplayer_message_$guildID_messageid]]
 
 $let[checkdb;$callFunction[findPlaylistUser;$advancedTextSplit[$customID;_;1];$authorID]]
 $onlyIf[$get[checkdb]!=;$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistNotExistUser]]
 
-$onlyIf[$hasCache[musicplayer_message_$guildID_ongoingplaylistmusic]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistOnGoingProcessing]]
+$onlyIf[$hasCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistOnGoingProcessing]]
 
-$setCache[musicplayer_message_$guildID_ongoingplaylistmusic;true]
+$setCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic;true]
 
 $interactionUpdate[
 $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
@@ -486,12 +486,12 @@ $title[Playlist | $cropText[$env[trs;value;title];0;20;...]]
 $footer[Fetching;$callFunction[useIcon;loading]]
 $color[$callFunction[useIcon;color_embed]]
 ;true]]
-$setCache[musicplayer_message_$guildID_channelid;"$channelID"]
-$setCache[musicplayer_message_$guildID_messageid;"$get[mid2]"]
+$setCache[initclientmusic;musicplayer_message_$guildID_channelid;"$channelID"]
+$setCache[initclientmusic;musicplayer_message_$guildID_messageid;"$get[mid2]"]
 ]
 
 $loop[$arrayLength[a];
-$if[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic]!=true;$break]
+$if[$getCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic]!=true;$break]
 $let[found;false]
 $let[attemptry;0]
 $let[donetry;5]
@@ -506,7 +506,7 @@ $let[ktnmplaytt;$env[listrs;$env[a;$get[ctrs]];title]]
 
 $jsonLoad[whatmusictype;$callFunction[filterMediaID;$get[ktnmplaytt]]]
 
-$while[$and[$get[attemptry]<=$get[donetry];$get[found]==false;$getCache[musicplayer_message_$guildID_ongoingplaylistmusic]==true];
+$while[$and[$get[attemptry]<=$get[donetry];$get[found]==false;$getCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic]==true];
     $try[
     $if[$env[whatmusictype;type]==youtube;
     $playTrack[$voiceID;$trimLines[$get[ktnmplaytt]];$get[lockprovyt]]
@@ -529,7 +529,7 @@ $if[$get[found]==true;$letSum[successplay;1];$letSum[errorplay;1]]
 
 ;sdgk;true]
 
-$deleteCache[musicplayer_message_$guildID_ongoingplaylistmusic]
+$deleteCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic]
 
 $interactionUpdate[
 $author[$username[$authorID];$userAvatar[$authorID;1024];;0]

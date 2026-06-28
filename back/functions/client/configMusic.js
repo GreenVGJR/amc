@@ -5,7 +5,7 @@ module.exports = {
         description: "Config name",
         required: true
     }],
-    code: `$jsonLoad[result;$getCache[system_file-config]]
+    code: `$jsonLoad[result;$getCache[initclientmusic;system_file-config]]
     $let[name;$env[name]]
     $let[res;$env[result;$get[name]]]
     $return[$get[res]]`

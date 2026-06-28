@@ -25,23 +25,23 @@ module.exports = {
     $let[crdjcr_0f;$advancedTextSplit[$get[crdjcs_0f];|;1]]
     $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
     ]
-    $!clearInterval[intervalmusicmessage_$guildID_$getCache[musicplayer_message_$guildID_channelid]]
-    $deleteCache[cachesearchistory_user_autocomplete_$authorID]
-    $deleteCache[musicplayer_message_$guildID_isdynamicmusic]
-    $if[$getCache[musicplayer_message_$guildID_is247music]!=true;
+    $!clearInterval[intervalmusicmessage_$guildID_$getCache[initclientmusic;musicplayer_message_$guildID_channelid]]
+    $deleteCache[initclientmusic;cachesearchistory_user_autocomplete_$authorID]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_isdynamicmusic]
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_is247music]!=true;
     $async[$leaveVoiceChannel]
     ;
     $async[
-    $if[$or[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic]==true;$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]==true];
-    $if[$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]==true;
-    $setCache[musicplayer_message_$guildID_ongoingdynamicmusic;false]
+    $if[$or[$getCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic]==true;$getCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic]==true];
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic]==true;
+    $setCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic;false]
     ]
-    $if[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic]==true;
-    $setCache[musicplayer_message_$guildID_ongoingplaylistmusic;false]
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic]==true;
+    $setCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic;false]
     ]
     $defer
     $loop[-1;
-    $let[cf-fetch;$default[$getCache[musicplayer_message_$guildID_ongoingplaylistmusic];$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]]]
+    $let[cf-fetch;$default[$getCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic];$getCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic]]]
     $if[$or[$get[cf-fetch]==false;$get[cf-fetch]==true]==false;$break]
     $wait[10]
     ]]

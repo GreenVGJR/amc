@@ -41,7 +41,7 @@ module.exports = {
     $!jsonDelete[listclient;targetDomain]
     $!jsonDelete[listclient;client_id]
     $!jsonDelete[listclient;client_secret]
-    $!jsonSet[listclient;visitorData;$getCache[authmusic_youtube_visitor]]
+    $!jsonSet[listclient;visitorData;$getCache[initclientmusic;authmusic_youtube_visitor]]
     $!jsonSet[listclient;hl;en]
     $!jsonSet[listclient;gl;US]
 
@@ -54,7 +54,7 @@ module.exports = {
     $httpAddHeader[X-Goog-AuthUser;0]
     ]
     ;
-    $httpAddHeader[Cookie;$getCache[authmusic_youtube_tempcookies]]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     ]
 
     $httpAddHeader[X-Youtube-Client-Name;$env[listclient;clientName]]
@@ -62,14 +62,14 @@ module.exports = {
     $httpAddHeader[Origin;https://$get[defytdomain]]
     $httpAddHeader[X-Origin;https://$get[defytdomain]]
     $httpAddHeader[User-Agent;$default[$env[listclient;userAgent];$callFunction[configMusic;default_userAgent_desktop]]]
-    $httpSetBody[{"videoId":"$get[videoid]","contentCheckOk":true,"racyCheckOk":true,"cpn":"$toLowercase[$randomString[16]]","context":{"client":$jsonStringify[listclient]},"serviceIntegrityDimensions":{"poToken":"$getCache[authmusic_youtube_pot]"},"attestationRequest":{"omitBotguardData":false}}]
+    $httpSetBody[{"videoId":"$get[videoid]","contentCheckOk":true,"racyCheckOk":true,"cpn":"$toLowercase[$randomString[16]]","context":{"client":$jsonStringify[listclient]},"serviceIntegrityDimensions":{"poToken":"$getCache[initclientmusic;authmusic_youtube_pot]"},"attestationRequest":{"omitBotguardData":false}}]
     $!httpRequest[https://$get[defytdomain]/youtubei/v1/player?prettyPrint=false&fields=responseContext(visitorData),playabilityStatus,streamingData(formats(itag,url),adaptiveFormats(itag,url,contentLength)),videoDetails(lengthSeconds,isLiveContent);POST;reshttpm]
     $jsonLoad[reshttp;$env[reshttpm]]
     ]
 
     $if[$env[reshttp;playabilityStatus;status]!=OK;$return[$let[finalurl;bot|$default[$default[$env[reshttp;playabilityStatus;reason];$env[reshttpm;responseContext;status]];Precondition check failed]]]]
     $if[$and[$env[reshttp;videoDetails;lengthSeconds]==0;$default[$env[reshttp;videoDetails;isLiveContent];false]];$return[$let[finalurl;live]]]
-    $if[$env[reshttpm;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[reshttpm;responseContext;visitorData]]]
+    $if[$env[reshttpm;responseContext;visitorData]!=;$setCache[initclientmusic;authmusic_youtube_visitor;$env[reshttpm;responseContext;visitorData]]]
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==140]]
@@ -92,9 +92,9 @@ module.exports = {
     $if[$get[trackytlength]>=$get[getcdnytlength];
     $break
     ]]
-    $let[finalurl;{"length":"$get[getcdnytlength]","container":$jsonStringify[las],"original":"$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no&pot=$getCache[authmusic_youtube_pot]"}]
+    $let[finalurl;{"length":"$get[getcdnytlength]","container":$jsonStringify[las],"original":"$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no&pot=$getCache[initclientmusic;authmusic_youtube_pot]"}]
     ;
-    $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no&pot=$getCache[authmusic_youtube_pot]]
+    $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no&pot=$getCache[initclientmusic;authmusic_youtube_pot]]
     ]]
     $if[$env[types]==vs;
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
@@ -233,9 +233,15 @@ module.exports = {
     ]]
     $if[$env[whattype;type]==instagram;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[a;results;error]!=;$return[$let[finalurl;bot|$env[a;results;error]]]]
     $if[$env[a;results]==null;$return[$let[finalurl;bot|This video may no longer exist, or you don't have permission to view it]]]
-    $let[finalurl;$default[$env[a;results;video_versions;0;url];$env[a;results;video_url]]]
-    ]
+    $if[$env[a;results;video_versions;0;url]!=;
+    $let[finalurl;$env[a;results;video_versions;0;url]]
+    ;
+    $jsonLoad[jysv;$default[$env[a;results;carousel_media];{}]]
+    $log[Test: $env[jysv]]
+    $let[finalurl;$env[jysv;$arrayFindIndex[jysv;iuy;$checkCondition[$env[iuy;video_versions;0;url]]];video_versions;0;url]]
+    ]]
     $if[$env[whattype;type]==instagramaudio;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $if[$env[a;results]==null;$return[$let[finalurl;null]]]

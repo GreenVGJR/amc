@@ -5,7 +5,7 @@ module.exports = {
         required: false
     }],
     code: `
-    $let[textCID;$getCache[musicplayer_message_$guildID_channelid]]
+    $let[textCID;$getCache[initclientmusic;musicplayer_message_$guildID_channelid]]
     $return[$try[$djsEval[
     const { useMainPlayer } = require('discord-player')\\;
     const { music } = require(process.cwd() + '/index.js')\\;

@@ -77,7 +77,7 @@ module.exports = {
     ]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
-    $let[httpsc;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[authmusic_soundcloud]&limit=10;GET;tests]]
+    $let[httpsc;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[initclientmusic;authmusic_soundcloud]&limit=10;GET;tests]]
     $if[$or[$get[httpsc]==401;$get[httpsc]==403];$callLocalFunction[refreshsc;true] $return]
     $if[$get[httpsc]==429;$return]
     $jsonLoad[res;$env[tests;collection]]
@@ -106,7 +106,7 @@ module.exports = {
     "Accept": "application/json",
     "Accept-Language": "en",
     "App-Platform": "WebPlayer",
-    "Authorization": "Bearer $getCache[authmusic_spotify]",
+    "Authorization": "Bearer $getCache[initclientmusic;authmusic_spotify]",
     "User-Agent": "$get[agent]"
     }]
     $let[mdquery;https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=10]
@@ -117,8 +117,8 @@ module.exports = {
     "Accept": "application/json",
     "Accept-Language": "en",
     "App-Platform": "WebPlayer",
-    "Authorization": "Bearer $getCache[authmusic_spotify]",
-    "Client-Token": "$getCache[authmusic_spotify_token]",
+    "Authorization": "Bearer $getCache[initclientmusic;authmusic_spotify]",
+    "Client-Token": "$getCache[initclientmusic;authmusic_spotify_token]",
     "Content-Type": "application/json",
     "User-Agent": "$get[agent]"
     }]
@@ -186,7 +186,7 @@ module.exports = {
     $if[$env[provider]==applemusic;
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[Authorization;Bearer $getCache[authmusic_applemusic]]
+    $httpAddHeader[Authorization;Bearer $getCache[initclientmusic;authmusic_applemusic]]
     $httpAddHeader[Origin;https://music.apple.com]
     $httpAddHeader[Cookie;geo=US]
     $let[httpal;$httpRequest[https://api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]]
@@ -226,7 +226,7 @@ module.exports = {
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept;application/json]
     $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[X-Tidal-Token;$getCache[authmusic_tidal]]
+    $httpAddHeader[X-Tidal-Token;$getCache[initclientmusic;authmusic_tidal]]
     $!httpRequest[https://api.tidal.com/v1/search/tracks?countryCode=US&locale=en_US&limit=10&offset=0&query=$env[query];GET;res]
     $jsonLoad[res2;$env[res;items]]
     $arrayForEach[res2;res3;
@@ -272,7 +272,7 @@ module.exports = {
     $callFunction[generateAuthKeys;amazonmusic;;false]
     $letSum[tryattempt;1]
     ]
-    $jsonLoad[a;$default[$getCache[authmusic_amazonmusic];{}]]
+    $jsonLoad[a;$default[$getCache[initclientmusic;authmusic_amazonmusic];{}]]
     $httpSetBody[{"keyword":"{\\\\"interface\\\\":\\\\"Web.TemplatesInterface.v1_0.Touch.SearchTemplateInterface.SearchKeywordClientInformation\\\\",\\\\"keyword\\\\":\\\\"$advancedReplace[$env[query];\\\\;;";\\\\\\\\"]\\\\"}","userHash":"{\\\\"level\\\\":\\\\"LIBRARY_MEMBER\\\\"}","headers":"{\\\\"x-amzn-authentication\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"ClientAuthenticationInterface.v1_0.ClientTokenElement\\\\\\\\\\\\",\\\\\\\\\\\\"accessToken\\\\\\\\\\\\":\\\\\\\\\\\\"\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-device-model\\\\":\\\\"WEBPLAYER\\\\",\\\\"x-amzn-device-width\\\\":\\\\"1920\\\\",\\\\"x-amzn-device-family\\\\":\\\\"WebPlayer\\\\",\\\\"x-amzn-device-id\\\\":\\\\"$env[a;deviceId]\\\\",\\\\"x-amzn-user-agent\\\\":\\\\"$get[agent]\\\\",\\\\"x-amzn-session-id\\\\":\\\\"$env[a;sessionId]\\\\",\\\\"x-amzn-device-height\\\\":\\\\"1080\\\\",\\\\"x-amzn-request-id\\\\":\\\\"$randomUUID\\\\",\\\\"x-amzn-device-language\\\\":\\\\"$env[a;displayLanguage]\\\\",\\\\"x-amzn-currency-of-preference\\\\":\\\\"USD\\\\",\\\\"x-amzn-os-version\\\\":\\\\"$advancedTextSplit[$env[a;version];.;0].$advancedTextSplit[$env[a;version];.;1]\\\\",\\\\"x-amzn-application-version\\\\":\\\\"$env[a;version]\\\\",\\\\"x-amzn-device-time-zone\\\\":\\\\"$djsEval[Intl.DateTimeFormat().resolvedOptions().timeZone]\\\\",\\\\"x-amzn-timestamp\\\\":\\\\"$getTimestamp\\\\",\\\\"x-amzn-csrf\\\\":\\\\"{\\\\\\\\\\\\"interface\\\\\\\\\\\\":\\\\\\\\\\\\"CSRFInterface.v1_0.CSRFHeaderElement\\\\\\\\\\\\",\\\\\\\\\\\\"token\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;token]\\\\\\\\\\\\",\\\\\\\\\\\\"timestamp\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;ts]\\\\\\\\\\\\",\\\\\\\\\\\\"rndNonce\\\\\\\\\\\\":\\\\\\\\\\\\"$env[a;csrf;rnd]\\\\\\\\\\\\"}\\\\",\\\\"x-amzn-music-domain\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-referer\\\\":\\\\"music.amazon.com\\\\",\\\\"x-amzn-affiliate-tags\\\\":\\\\"\\\\",\\\\"x-amzn-ref-marker\\\\":\\\\"\\\\",\\\\"x-amzn-page-url\\\\":\\\\"https://music.amazon.com/search\\\\",\\\\"x-amzn-weblab-id-overrides\\\\":\\\\"\\\\",\\\\"x-amzn-video-player-token\\\\":\\\\"\\\\",\\\\"x-amzn-feature-flags\\\\":\\\\"\\\\",\\\\"x-amzn-has-profile-id\\\\":\\\\"\\\\"}"}]
     $httpAddHeader[Origin;https://music.amazon.com]
     $httpAddHeader[Accept-Encoding;]

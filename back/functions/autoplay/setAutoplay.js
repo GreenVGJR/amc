@@ -1,7 +1,7 @@
 module.exports = {
     name: "setAutoplay",
     code: `
-    $jsonLoad[ccjm;$default[$getCache[musicplayer_message_$guildID_isdynamicmusic];{}]]
+    $jsonLoad[ccjm;$default[$getCache[initclientmusic;musicplayer_message_$guildID_isdynamicmusic];{}]]
     $let[lookStatus;$checkCondition[$default[$env[ccjm;status];false]!=true]]
     $if[$default[$env[ccjm;status];false]==false;
     $!jsonSet[ccjm;tracks;[\\]]
@@ -14,7 +14,7 @@ module.exports = {
     ;klvb;false]
     ]
     $!jsonSet[ccjm;status;$get[lookStatus]]
-    $setCache[musicplayer_message_$guildID_isdynamicmusic;$jsonStringify[ccjm]]
+    $setCache[initclientmusic;musicplayer_message_$guildID_isdynamicmusic;$jsonStringify[ccjm]]
     $if[$get[lookStatus]==true;$async[$callFunction[dynamicQueue]]]
     $return
     `

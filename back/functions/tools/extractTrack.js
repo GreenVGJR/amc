@@ -22,7 +22,7 @@ module.exports = {
     $jsonLoad[filterid;$callFunction[filterMediaID;https://$get[spliturl]]]
     $onlyIf[$or[$env[filterid;id]==null;$env[filterid;type]==null]!=true;$return]
     $arrayLoad[results]
-    $try[
+    
     $if[$env[filterid;type]==youtube;
     $let[tryattempt;0]
     $localFunction[refreshyt;
@@ -31,7 +31,7 @@ module.exports = {
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpSetBody[{"videoId":"$env[filterid;id]","context":{"client":{"clientName":2,"clientVersion":"2.20261231","visitorData":"$getCache[authmusic_youtube_visitor]"}}}]
+    $httpSetBody[{"videoId":"$env[filterid;id]","context":{"client":{"clientName":2,"clientVersion":"2.20261231","visitorData":"$getCache[initclientmusic;authmusic_youtube_visitor]"}}}]
     $httpAddHeader[Accept-Encoding;br, gzip]
     $httpSetContentType[Text]
     $let[http;$httpRequest[https://m.youtube.com/youtubei/v1/player?prettyPrint=false&fields=responseContext(visitorData),playabilityStatus,videoDetails(videoId,title,lengthSeconds,channelId,isCrawlable,viewCount,author,isPrivate,isLiveContent);POST;reshttp]]
@@ -40,7 +40,7 @@ module.exports = {
     $if[$and[$env[reshttp;playabilityStatus;status]!=OK;$env[reshttp;videoDetails;videoId]==];
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;br, gzip]
-    $httpAddHeader[Cookie;$getCache[authmusic_youtube_tempcookies]]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $httpSetContentType[Text]
     $let[http2;$httpRequest[https://www.youtube.com/watch?v=$env[filterid;id];GET]]
     $let[outputhtyt;$advancedTextSplit[$httpResult;var ytInitialData =;1;\\;;0]]
@@ -59,7 +59,7 @@ module.exports = {
     $!jsonSet[reshttptest;isLiveContent;$if[$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;viewCount;videoViewCountRenderer;isLive]!=;$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;viewCount;videoViewCountRenderer;isLive];$startsWith[$env[reshttp2;contents;twoColumnWatchNextResults;results;results;contents;$arrayFindIndex[resfindindex;g;$checkCondition[$env[g;videoPrimaryInfoRenderer]!=]];videoPrimaryInfoRenderer;dateText;simpleText];Started streaming]]]
     $let[results;{"status":$get[http2],"results":$if[$env[reshttptest;videoId]==;null;$env[reshttptest]]}]
     ;
-    $if[$env[reshttp;responseContext;visitorData]!=;$setCache[authmusic_youtube_visitor;$env[reshttp;responseContext;visitorData]]]
+    $if[$env[reshttp;responseContext;visitorData]!=;$setCache[initclientmusic;authmusic_youtube_visitor;$env[reshttp;responseContext;visitorData]]]
     $let[results;{"status":$get[http],"results":$if[$env[reshttp;videoDetails]==;null;$env[reshttp;videoDetails]]}]
     ]
     ;retry]
@@ -71,9 +71,9 @@ module.exports = {
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;br, gzip]
     $httpSetContentType[Text]
-    $let[http;$httpRequest[https://api-v2.soundcloud.com/resolve?url=$get[keturl]&client_id=$getCache[authmusic_soundcloud];GET;reshttp]]
+    $let[http;$httpRequest[https://api-v2.soundcloud.com/resolve?url=$get[keturl]&client_id=$getCache[initclientmusic;authmusic_soundcloud];GET;reshttp]]
     $let[a;$env[reshttp]]
-    $let[results;{"status":$get[http],"results":$if[$get[a]=={};null;$advancedReplace[$get[a];/preview/progressive;/preview/progressive?client_id=$getCache[authmusic_soundcloud_fall];/stream/progressive;/stream/progressive?client_id=$getCache[authmusic_soundcloud_fall];/preview/hls;/preview/hls?client_id=$getCache[authmusic_soundcloud_fall];/stream/hls;/stream/hls?client_id=$getCache[authmusic_soundcloud_fall]]]}]
+    $let[results;{"status":$get[http],"results":$if[$get[a]=={};null;$advancedReplace[$get[a];/preview/progressive;/preview/progressive?client_id=$getCache[initclientmusic;authmusic_soundcloud_fall];/stream/progressive;/stream/progressive?client_id=$getCache[initclientmusic;authmusic_soundcloud_fall];/preview/hls;/preview/hls?client_id=$getCache[initclientmusic;authmusic_soundcloud_fall];/stream/hls;/stream/hls?client_id=$getCache[initclientmusic;authmusic_soundcloud_fall]]]}]
     ]
     $if[$env[filterid;type]==spotify;
     $let[tryattempt;0]
@@ -85,7 +85,7 @@ module.exports = {
     ]
     $let[mdhedroute_spotify;{
     "App-Platform": "WebPlayer",
-    "Authorization": "Bearer $getCache[authmusic_spotify]",
+    "Authorization": "Bearer $getCache[initclientmusic;authmusic_spotify]",
     "Sec-Fetch-Site": "none",
     "User-Agent": "$get[agent]"
     }]
@@ -132,7 +132,7 @@ module.exports = {
     $httpAddHeader[Accept-Encoding;br, gzip]
     $httpAddHeader[Accept-Language;en]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
+    $httpAddHeader[Cookie;$inflate[$getCache[initclientmusic;authmusic_tiktok];base64]]
     $httpSetContentType[Text]
     $let[http;$httpRequest[https://m.tiktok.com/v/$env[filterid;id];GET]]
     $jsonLoad[a;$advancedTextSplit[$httpResult;"webapp.video-detail":;1;,"webapp;0]]
@@ -145,7 +145,7 @@ module.exports = {
     $httpAddHeader[Accept-Encoding;br, gzip]
     $httpAddHeader[Accept-Language;en]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
+    $httpAddHeader[Cookie;$inflate[$getCache[initclientmusic;authmusic_tiktok];base64]]
     $httpSetContentType[Text]
     $let[http;$httpRequest[https://www.tiktok.com/player/api/v1/items?item_ids=$env[filterid;id];GET]]
     $if[$or[$get[http]==200;$isJSON[$httpResult]]==false;$return[{"status":null,"results":{"error":"IP blocked"}}]]
@@ -167,7 +167,7 @@ module.exports = {
     $httpAddHeader[Accept;application/json]
     $httpAddHeader[Accept-Encoding;br, gzip]
     $httpAddHeader[Accept-Language;en]
-    $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
+    $httpAddHeader[Cookie;$inflate[$getCache[initclientmusic;authmusic_tiktok];base64]]
     $httpAddHeader[X-Khronos;$round[$divide[$getTimestamp;1000]]]
     $httpAddHeader[X-Argus;]
     $c[Doesn't require to solve challenge for this, for now]
@@ -193,9 +193,9 @@ module.exports = {
     $httpAddHeader[Accept-Language;en]
     $httpAddHeader[Accept;*/*]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Cookie;$inflate[$getCache[authmusic_tiktok];base64]]
-    $let[xgnarly;$callFunction[xGnarlyTiktok;count=10&cursor=0&aid=1180&device_id=$getCache[authmusic_tiktok_did]&user_is_login=true&cookie_enabled=true&region=&referer=&keyword=$encodeURI[$get[stctitle]];$get[agent]]]
-    $!httpRequest[https://api-boot.tiktokv.com/aweme/v1/music/search/?count=10&cursor=0&aid=1180&device_id=$getCache[authmusic_tiktok_did]&user_is_login=true&cookie_enabled=true&region=&referer=&keyword=$encodeURI[$get[stctitle]]&X-Gnarly=$get[xgnarly];GET;c]
+    $httpAddHeader[Cookie;$inflate[$getCache[initclientmusic;authmusic_tiktok];base64]]
+    $let[xgnarly;$callFunction[xGnarlyTiktok;count=10&cursor=0&aid=1180&device_id=$getCache[initclientmusic;authmusic_tiktok_did]&user_is_login=true&cookie_enabled=true&region=&referer=&keyword=$encodeURI[$get[stctitle]];$get[agent]]]
+    $!httpRequest[https://api-boot.tiktokv.com/aweme/v1/music/search/?count=10&cursor=0&aid=1180&device_id=$getCache[initclientmusic;authmusic_tiktok_did]&user_is_login=true&cookie_enabled=true&region=&referer=&keyword=$encodeURI[$get[stctitle]]&X-Gnarly=$get[xgnarly];GET;c]
     $onlyIf[$env[c]!=;$return]
     $jsonLoad[c;$env[c]]
     $jsonLoad[c;$env[c;music_info_list]]
@@ -226,33 +226,36 @@ module.exports = {
     $let[results;{"status":null,"results":$env[b]}]
     ]
     $if[$env[filterid;type]==instagram;
-    $httpAddHeader[Accept;*/*]
+    $httpAddHeader[Accept;text/html, */*]
     $httpAddHeader[Accept-Language;en]
     $httpAddHeader[Accept-Encoding;br, gzip]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Sec-Fetch-Site;same-origin]
-    $httpAddHeader[Origin;https://i.instagram.com]
+    $httpAddHeader[Sec-Fetch-Site;none]
+    $httpAddHeader[Sec-Fetch-Dest;document]
     $httpSetContentType[Text]
-    $!httpRequest[https://i.instagram.com/graphql/query/?doc_id=8845758582119845&variables={"shortcode":"$advancedTextSplit[$env[filterid;id];/;$charCount[$env[filterid;id];/]]"};GET]
-    $onlyIf[$isJSON[$httpResult];$return]
-    $jsonLoad[lkck;$httpResult]
-    $if[$env[lkck;require_login]==true;
+    $let[uynsd;$httpRequest[https://www.instagram.com/$env[filterid;id];GET]]
+    $if[$get[uynsd]!=200;
     $httpAddHeader[Accept;text/html, */*]
     $httpAddHeader[Accept-Language;en]
     $httpAddHeader[Sec-Fetch-Dest;iframe]
     $httpAddHeader[Sec-Fetch-Site;none]
     $httpAddHeader[Accept-Encoding;br, gzip]
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Referer;https://www.instagram.com/]
     $httpSetContentType[Text]
-    $!httpRequest[https://www.instagram.com/reel/$advancedTextSplit[$env[filterid;id];/;$charCount[$env[filterid;id];/]]/embedded;GET]
-    $arrayLoad[iru;script type="application/json";$httpResult]
-    $jsonLoad[irk;$default[$advancedTextSplit[$env[iru;$arrayFindIndex[iru;r;$checkCondition[$advancedTextSplit[$env[r];RelayPrefetchedStreamCache;1;xdt_api__v1__media__shortcode__web_info;1]!=]]];data-sjs>;1;</script>;0];{}]]
-    $jsonLoad[lck;$default[$env[irk;require;0;3;0;__bbox;require;0;3;1;__bbox;result;data;xdt_api__v1__media__shortcode__web_info;items;0];{}]]
-    $onlyIf[$env[lck;pk]!=;$return]
-    $let[results;{"status":null,"results":$if[$env[lck;id]==;null;$env[lck]]}]
+    $let[uynsdf;$httpRequest[https://www.instagram.com/p/$advancedTextSplit[$env[filterid;id];/;$charCount[$env[filterid;id];/]]/embedded;GET]]
+    $onlyIf[$or[$get[uynsdf]==403;$get[uynsdf]==429]!=true;$return[{"status":null,"results":{"error":"Sign in for view this content"}}]]
     ;
-    $let[results;{"status":null,"results":$if[$env[lkck;data;xdt_shortcode_media;id]==;null;$env[lkck;data;xdt_shortcode_media]]}]
-    ]]
+    $c[Idk]
+    ]
+    $arrayLoad[iru;script type="application/json";$httpResult]
+    $jsonLoad[irk;$default[$advancedTextSplit[$env[iru;$arrayFindIndex[iru;r;$checkCondition[$advancedTextSplit[$env[r];"RelayPrefetchedStreamCache";1;"xig_polaris_media";1]!=]]];data-sjs>;1;</script>;0];{}]]
+    $jsonLoad[lcpr;$default[$env[irk;require;0;3;0;__bbox;require];{}]]
+    $let[findbboxindex;$arrayFindIndex[lcpr;ot;$checkCondition[$env[ot;3;1;__bbox;result;data;xig_polaris_media]!=]]]
+    $jsonLoad[lck;$default[$env[irk;require;0;3;0;__bbox;require;$get[findbboxindex];3;1;__bbox;result;data;xig_polaris_media;if_not_gated_logged_out];{}]]
+    $onlyIf[$env[lck;pk]!=;$return[{"status":null,"results":{"error":"Not a video or you don't have permission to view it"}}]]
+    $let[results;{"status":null,"results":$jsonStringify[lck]}]
+    ]
     $if[$env[filterid;type]==instagramaudio;
     $httpSetBody[audio_cluster_id=$env[filterid;id]&max_id&original_sound_audio_asset_id=$env[filterid;id]]
     $httpAddHeader[Content-Type;application/x-www-form-urlencoded]
@@ -293,7 +296,7 @@ module.exports = {
     $jsonLoad[thers;$httpResult]
     $let[results;{"status":null,"results":$if[$env[thers]==;null;$env[thers]]}]
     ]
-    ]
+
     $let[resultforeturn;$get[results]]
     $return[$if[$and[$env[limitChar]==true;$env[limitChar]!=false];$cropText[$get[resultforeturn];0;2000;];$get[resultforeturn]]]
     `

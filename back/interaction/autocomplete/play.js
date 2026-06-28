@@ -5,13 +5,13 @@ module.exports = {
     $onlyIf[$and[$applicationCommandName==play;$focusedOptionName==query]]
     $onlyIf[$guildID!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearch];__null__]]
     $onlyIf[$voiceID[$guildID;$authorID]!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchJoinVC];__null1__]]
-    $onlyIf[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];__null2__]]
-    $onlyIf[$or[$focusedOptionValue!=;$getCache[cachesearchistory_user_autocomplete_$authorID]!=];$addChoice[$callFunction[useCustomMusicMessage;config_infoSearchFirst];__infointer-$authorID__]]
+    $onlyIf[$getCache[initclientmusic;radioplayer_data_$guildID_playerstatus]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];__null2__]]
+    $onlyIf[$or[$focusedOptionValue!=;$getCache[initclientmusic;cachesearchistory_user_autocomplete_$authorID]!=];$addChoice[$callFunction[useCustomMusicMessage;config_infoSearchFirst];__infointer-$authorID__]]
     $if[$isValidLink[$focusedOptionValue]==false;
-    $jsonLoad[testing;$callFunction[fastSearchTrack;$if[$focusedOptionValue!=;$focusedOptionValue;$getCache[cachesearchistory_user_autocomplete_$authorID]]]]
-    $async[$if[$focusedOptionValue!=;$setCache[cachesearchistory_user_autocomplete_$authorID;"$focusedOptionValue"]]]
+    $jsonLoad[testing;$callFunction[fastSearchTrack;$if[$focusedOptionValue!=;$focusedOptionValue;$getCache[initclientmusic;cachesearchistory_user_autocomplete_$authorID]]]]
+    $async[$if[$focusedOptionValue!=;$setCache[initclientmusic;cachesearchistory_user_autocomplete_$authorID;"$focusedOptionValue"]]]
     $if[$env[testing;results;0]==;
-    $addChoice[$cropText[$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];0;100;];$cropText[$if[$focusedOptionValue==;$getCache[cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];0;100;]]
+    $addChoice[$cropText[$if[$focusedOptionValue==;$getCache[initclientmusic;cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];0;100;];$cropText[$if[$focusedOptionValue==;$getCache[initclientmusic;cachesearchistory_user_autocomplete_$authorID];$focusedOptionValue];0;100;]]
     ;
     $if[$env[testing;results;0]!=;
     $let[tempres0;$env[testing;results;0]]

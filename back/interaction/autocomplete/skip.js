@@ -5,7 +5,7 @@ module.exports = {
     $onlyIf[$and[$applicationCommandName==skip;$focusedOptionName==position]]
     $onlyIf[$guildID!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearch];-1]]
     $onlyIf[$voiceID[$guildID;$authorID]!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchJoinVC];-1]]
-    $onlyIf[$getCache[radioplayer_data_$guildID_playerstatus]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];-1]]
+    $onlyIf[$getCache[initclientmusic;radioplayer_data_$guildID_playerstatus]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];-1]]
     
     $let[nodes;$if[$hasMusicNode;$isPlaying;false]]
     $onlyIf[$get[nodes];$autocomplete]

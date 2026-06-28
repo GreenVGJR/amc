@@ -62,6 +62,6 @@ module.exports = {
   $let[owner_banner;$try[$userBanner[$botOwnerID;2048]]]
   $let[av1;$userAvatar[$botOwnerID;2048]]
   $let[av2;$userAvatar[$clientID;2048]]
-  $callLocalFunction[abcd;$getCache[countmusicnode]]
+  $callLocalFunction[abcd;$getCache[initclientmusic;countmusicnode]]
   `
 }

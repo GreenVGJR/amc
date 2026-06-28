@@ -76,7 +76,7 @@ module.exports = {
     ]
     ;typela;passthr]
     $if[$option[country]!=;
-    $jsonLoad[result;$getCache[system_file-listRadio]]
+    $jsonLoad[result;$getCache[initclientmusic;system_file-listRadio]]
     $arrayMap[result;rest;$if[$checkContains[$toLowercase[$env[rest]];$toLowercase[$option[country]]];$return[$env[rest]]];result2]
     ]
     $let[checkfirstdb;$getRecord[global;;cachesearch_global-radio_$md5[$toLowercase[$option[query]]$advancedTextSplit[$env[result2;0;1];/;1]0]]]

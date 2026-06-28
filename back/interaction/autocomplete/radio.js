@@ -4,7 +4,7 @@ module.exports = {
     code: `
     $onlyIf[$and[$applicationCommandName==radio;$focusedOptionName==country]]
     $onlyIf[$guildID!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearch];__null__]]
-    $jsonLoad[result;$getCache[system_file-listRadio]]
+    $jsonLoad[result;$getCache[initclientmusic;system_file-listRadio]]
     $arrayMap[result;rest;$if[$checkContains[$toLowercase[$env[rest]];$toLowercase[$focusedOptionValue]];$return[$env[rest]]];result2]
     $arraySlice[result2;result2;0;24]
     $arrayForEach[result2;per;

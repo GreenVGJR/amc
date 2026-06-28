@@ -1,12 +1,12 @@
 module.exports = {
     type: "connectionDestroyed",
     code: `
-    $let[cid;$getCache[musicplayer_message_$guildID_channelid]]
-    $let[mid;$getCache[musicplayer_message_$guildID_messageid]]
-    $let[vid;$getCache[musicplayer_message_$guildID_voiceid]]
+    $let[cid;$getCache[initclientmusic;musicplayer_message_$guildID_channelid]]
+    $let[mid;$getCache[initclientmusic;musicplayer_message_$guildID_messageid]]
+    $let[vid;$getCache[initclientmusic;musicplayer_message_$guildID_voiceid]]
 
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
-    $if[$getCache[musicplayer_message_$guildID_is247music]==true;
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_is247music]==true;
     $if[$and[$channelExists[$get[vid]];$messageExists[$get[cid];$get[mid]]];
     $wait[1s]
     $let[checkvccount;$channelVoiceMemberCount[$get[vid]]]
@@ -31,7 +31,7 @@ module.exports = {
     $jsonLoad[comp;$try[$getComponents[$get[cid];$get[mid]];{}]]
 
     $try[
-    $if[$or[$env[comp;0;0]==;$and[$getCache[radioplayer_data_$guildID_playerstatus]==true;$getCache[radioplayer_data_$guildID_checkplayer]==true];$and[$env[comp;1;1;disabled]==true;$getCache[radioplayer_data_$guildID_playerstatus]==true;$getCache[radioplayer_data_$guildID_checkplayer]==false];$and[$env[comp;3;1;disabled]==true;$getCache[radioplayer_data_$guildID_playerstatus]==false;$getCache[radioplayer_data_$guildID_checkplayer]==false]];
+    $if[$or[$env[comp;0;0]==;$and[$getCache[initclientmusic;radioplayer_data_$guildID_playerstatus]==true;$getCache[initclientmusic;radioplayer_data_$guildID_checkplayer]==true];$and[$env[comp;1;1;disabled]==true;$getCache[initclientmusic;radioplayer_data_$guildID_playerstatus]==true;$getCache[initclientmusic;radioplayer_data_$guildID_checkplayer]==false];$and[$env[comp;3;1;disabled]==true;$getCache[initclientmusic;radioplayer_data_$guildID_playerstatus]==false;$getCache[initclientmusic;radioplayer_data_$guildID_checkplayer]==false]];
     $!editMessage[$get[cid];$get[mid];
     $description[$callFunction[useCustomMusicMessage;config_errorPlayTrackEvents]]
     $color[$callFunction[useIcon;error_color_embed]]
@@ -48,17 +48,17 @@ module.exports = {
     ]
     ]
 
-    $deleteCache[musicplayer_message_$guildID_waitloadmsg]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_waitloadmsg]
 
-    $if[$getCache[musicplayer_message_$guildID_is247music]!=true;
-    $deleteCache[musicplayer_message_$guildID_messageid]
-    $deleteCache[musicplayer_message_$guildID_channelid]
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_is247music]!=true;
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_messageid]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_channelid]
     ]
-    $deleteCache[musicplayer_message_$guildID_isdynamicmusic]
-    $deleteCache[musicplayer_message_$guildID_isshuffle]
-    $deleteCache[musicplayer_message_$guildID_attemptseek]
-    $deleteCache[musicplayer_message_$guildID_waitinterval]
-    $deleteCache[radioplayer_data_$guildID_playerstatus]
-    $deleteCache[radioplayer_data_$guildID_metadata]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_isdynamicmusic]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_isshuffle]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_attemptseek]
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_waitinterval]
+    $deleteCache[initclientmusic;radioplayer_data_$guildID_playerstatus]
+    $deleteCache[initclientmusic;radioplayer_data_$guildID_metadata]
     `
 }

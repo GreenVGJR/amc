@@ -4,8 +4,8 @@ module.exports = {
     code: `
     $onlyIf[$advancedTextSplit[$customID;_;0]==refreshsearchnoca]
     $onlyIf[$advancedTextSplit[$customID;_;1]==$authorID]
-    $let[query;$getCache[storecachesearchusersfetch-q_$djsEval[ctx.interaction.message.interaction.id]]]
-    $let[provider;$getCache[storecachesearchusersfetch-p_$djsEval[ctx.interaction.message.interaction.id]]]
+    $let[query;$getCache[initclientmusic;storecachesearchusersfetch-q_$djsEval[ctx.interaction.message.interaction.id]]]
+    $let[provider;$getCache[initclientmusic;storecachesearchusersfetch-p_$djsEval[ctx.interaction.message.interaction.id]]]
 
     $onlyIf[$or[$get[query]==;$get[provider]==]!=true;$!deferUpdate $!interactionDelete]
     $let[fsearch;false]
@@ -46,7 +46,7 @@ module.exports = {
     ]
     ;aa$randomBytes[2]]
     ]
-    $deleteCache[storecachesearchusersfetch-q_$djsEval[ctx.interaction.message.interaction.id]]
-    $deleteCache[storecachesearchusersfetch-p_$djsEval[ctx.interaction.message.interaction.id]]
+    $deleteCache[initclientmusic;storecachesearchusersfetch-q_$djsEval[ctx.interaction.message.interaction.id]]
+    $deleteCache[initclientmusic;storecachesearchusersfetch-p_$djsEval[ctx.interaction.message.interaction.id]]
     `
 }

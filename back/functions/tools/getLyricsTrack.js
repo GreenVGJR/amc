@@ -33,7 +33,7 @@ module.exports = {
     $jsonLoad[pullyt;$try[$getYoutubeMusic[$env[query]];{}]]
     $jsonLoad[pulltrack;$callFunction[filterMediaID;$env[pullyt;results;0;url]]]
     ]
-    $let[checkcachelyric;$getCache[cachelyricsdata-$env[line]-$md5[youtube_$env[pulltrack;id]]]]
+    $let[checkcachelyric;$getCache[initclientmusic;cachelyricsdata-$env[line]-$md5[youtube_$env[pulltrack;id]]]]
     $if[$get[checkcachelyric]!=;
     $let[ytmusic;$get[checkcachelyric]]
     ;
@@ -58,7 +58,7 @@ module.exports = {
     $let[crthumb-shazam;$env[r;thumbnail]]
     $let[cer_appleurlms;$env[r;id]]
     ]
-    $let[checkcachelyric;$getCache[cachelyricsdata-$env[line]-$md5[shazam_$env[r;id]]]]
+    $let[checkcachelyric;$getCache[initclientmusic;cachelyricsdata-$env[line]-$md5[shazam_$env[r;id]]]]
     $if[$get[checkcachelyric]!=;
     $let[finallyric;$get[checkcachelyric]]
     ;
@@ -114,11 +114,11 @@ module.exports = {
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept;application/json]
     $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[X-Tidal-Token;$getCache[authmusic_tidal]]
+    $httpAddHeader[X-Tidal-Token;$getCache[initclientmusic;authmusic_tidal]]
     $!httpRequest[https://api.tidal.com/v1/search/tracks?countryCode=US&locale=en_US&limit=1&offset=0&query=$env[query];GET;restt]
     $if[$env[restt;items;0;id]==;$let[custtslmgt;true]]
     $if[$get[custtslmgt]==false;
-    $let[checkcachelyric;$getCache[cachelyricsdata-$env[line]-$md5[tidal_$env[restt;items;0;id]]]]
+    $let[checkcachelyric;$getCache[initclientmusic;cachelyricsdata-$env[line]-$md5[tidal_$env[restt;items;0;id]]]]
     $if[$get[checkcachelyric]!=;
     $let[finallyric2;$get[checkcachelyric]]
     ;
@@ -128,7 +128,7 @@ module.exports = {
     $httpAddHeader[Accept-Encoding;]
     $httpAddHeader[Accept;application/vnd.api+json]
     $httpAddHeader[Origin;https://tidal.com]
-    $httpAddHeader[Authorization;Bearer $getCache[authmusic_tidal_token]]
+    $httpAddHeader[Authorization;Bearer $getCache[initclientmusic;authmusic_tidal_token]]
     $httpSetContentType[Text]
     $let[http_1;$httpRequest[https://openapi.tidal.com/v2/tracks/$env[restt;items;0;id]?include=lyrics;GET;ttklr]]
     $if[$or[$get[http_1]==401;$get[http_1]==400];$callLocalFunction[nttuf;true] $return]
@@ -168,7 +168,7 @@ module.exports = {
     $if[$env[refresh]==true;$generateAuthKeys[deezer;;false]]
     $if[$env[sumCount]==true;$letSum[drtcp_count;1]]
     $if[$env[drtcp;data;$get[drtcp_count];id]==;$jsonLoad[res;{}] $return]
-    $let[checkcachelyric;$getCache[cachelyricsdata-$env[line]-$md5[deezer_$env[drtcp;data;$get[drtcp_count];id]]]]
+    $let[checkcachelyric;$getCache[initclientmusic;cachelyricsdata-$env[line]-$md5[deezer_$env[drtcp;data;$get[drtcp_count];id]]]]
     $if[$get[checkcachelyric]!=;
     $jsonLoad[res;{}]
     $let[cachedeezerlyric;$get[checkcachelyric]]
@@ -177,7 +177,7 @@ module.exports = {
     $httpSetBody[{"operationName":"GetLyrics","variables":{"trackId":"$env[drtcp;data;$get[drtcp_count];id]"},"query":"$inflate[789c2b2c4d2daa54704f2df1a92cca4c2ed65029294a4ccef64cb152082e29cacc4b57d454a88ec953008b6ac0e560aa20923960ad1075a9152531790ac59579c91945f9799955a9293e9979a910c99ca2e490ccdcd4e292c4dc021037332f35264fa116816b01498b33f5;hex]"}]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
-    $httpAddHeader[Authorization;Bearer $getCache[authmusic_deezer]]
+    $httpAddHeader[Authorization;Bearer $getCache[initclientmusic;authmusic_deezer]]
     $httpAddHeader[Accept;application/json]
     $httpAddHeader[Content-Type;application/json]
     $httpSetContentType[Text]
@@ -234,7 +234,7 @@ module.exports = {
     $let[http_1;$httpRequest[https://genius.com/api/search/song?&per_page=1&q=$env[query];GET;ges]]
     $jsonLoad[ges;$env[ges]]
     $if[$env[ges;response;sections;0;hits;0]!=;
-    $let[checkcachelyric;$getCache[cachelyricsdata-$env[line]-$md5[$env[ges;response;sections;0;hits;0;result;api_path]]]]
+    $let[checkcachelyric;$getCache[initclientmusic;cachelyricsdata-$env[line]-$md5[$env[ges;response;sections;0;hits;0;result;api_path]]]]
     $if[$get[checkcachelyric]!=;
     $let[a2_filtering;$get[checkcachelyric]]
     ;
@@ -266,7 +266,7 @@ module.exports = {
     ]]]]]]
     $async[
     $if[$env[results;results;autocomplete]!=;
-    $setCache[cachelyricsdata-$env[line]-$md5[$env[results;id]];$env[results;results;lyric]]
+    $setCache[initclientmusic;cachelyricsdata-$env[line]-$md5[$env[results;id]];$env[results;results;lyric]]
     ]]
     $return[$env[results]]
     `

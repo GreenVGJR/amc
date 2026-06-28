@@ -67,7 +67,7 @@ module.exports = {
     $onlyIf[$get[fsearch]!=null;$interactionReply[$addTextDisplay[$callFunction[useCustomMusicMessage;config_errorNoResultLyrics]]]]
     $let[loadlyrics;$env[result;results;lyric]]
     $if[$and[$get[loadlyrics]!=;$option[translate]!=];
-    $jsonLoad[checklang;$getCache[system_file-listLyricsLanguage]]
+    $jsonLoad[checklang;$getCache[initclientmusic;system_file-listLyricsLanguage]]
     $jsonLoad[checklang;$jsonEntries[checklang]]
     $arrayMap[checklang;rest;$if[$checkContains[$toLowercase[$env[rest;1]];$toLowercase[$option[translate]]];$return[$env[rest]]];checklang]
     $let[temptrjson;$callFunction[translateText;$get[loadlyrics];;$env[checklang;0;0]]]

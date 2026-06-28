@@ -12,7 +12,7 @@ module.exports = {
     }],
     code: `
     $let[cco;$if[$or[$env[cco]==null;$env[cco]==];;$env[cco]]]
-    $let[discordAgent;$getCache[system_filetp-defaultDiscordAgent]]
+    $let[discordAgent;$getCache[initclientmusic;system_filetp-defaultDiscordAgent]]
     $try[
     $if[$get[cco]!=;
     $jsonLoad[fn;{}]

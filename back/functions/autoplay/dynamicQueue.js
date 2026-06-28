@@ -2,8 +2,8 @@ module.exports = {
     name: "dynamicQueue",
     code: `
     $if[$checkCondition[$try[$isPlaying;false]==true]==false;$return]
-    $setCache[musicplayer_message_$guildID_ongoingdynamicmusic;true]
-    $jsonLoad[mytlsbl;$getCache[musicplayer_message_$guildID_isdynamicmusic]]
+    $setCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic;true]
+    $jsonLoad[mytlsbl;$getCache[initclientmusic;musicplayer_message_$guildID_isdynamicmusic]]
     $jsonLoad[mytlsbr;$env[mytlsbl;tracks]]
     $jsonLoad[mytlsbq;$callFunction[filterMediaID;$try[$djsEval[require("discord-player").useQueue(ctx.client.guilds.cache.get("$guildID")).tracks.data?.[0\\]?.url];]]]
     $let[lookmytlsbq;$arrayFindIndex[mytlsbr;pvk;$checkCondition[$env[pvk]==$env[mytlsbq;id]]]]
@@ -13,7 +13,7 @@ module.exports = {
     ;
     $!jsonSet[mytlsbl;tracks;[\\]]
     ]
-    $setCache[musicplayer_message_$guildID_isdynamicmusic;$env[mytlsbl]]
+    $setCache[initclientmusic;musicplayer_message_$guildID_isdynamicmusic;$env[mytlsbl]]
     $let[countQueueMLength;$queueLength]
     $if[$get[countQueueMLength]<10;
     $let[trkkgl;$trackInfo[url]]
@@ -30,8 +30,8 @@ module.exports = {
         $let[attemptry;0]
         $let[donetry;5]
 
-        $while[$and[$get[attemptry]<=$get[donetry];$get[found]==false;$getCache[musicplayer_message_$guildID_ongoingdynamicmusic]==true];
-        $jsonLoad[llgntmpms;$getCache[musicplayer_message_$guildID_isdynamicmusic]]
+        $while[$and[$get[attemptry]<=$get[donetry];$get[found]==false;$getCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic]==true];
+        $jsonLoad[llgntmpms;$getCache[initclientmusic;musicplayer_message_$guildID_isdynamicmusic]]
         $if[$and[$queueLength<20;$default[$env[llgntmpms;status];false]==true];
         $try[
         $if[$env[lljntvdc;type]==youtube;
@@ -46,7 +46,7 @@ module.exports = {
         $jsonLoad[tnldnb;$callFunction[filterMediaID;$trimLines[$get[llgntvdc]]]]
         $arrayPush[tnvisk;$env[tnldnb;id]]
         $!jsonSet[llgntmpms;tracks;$jsonStringify[tnvisk]]
-        $setCache[musicplayer_message_$guildID_isdynamicmusic;$jsonStringify[llgntmpms]]
+        $setCache[initclientmusic;musicplayer_message_$guildID_isdynamicmusic;$jsonStringify[llgntmpms]]
         $let[found;true]
         ;
         $if[$env[lljntvdc;type]==youtube;
@@ -60,8 +60,8 @@ module.exports = {
         ]]
     ]
     ]
-    $deleteCache[musicplayer_message_$guildID_ongoingdynamicmusic]
-    $if[$getCache[musicplayer_message_$guildID_waitinterval]==true;
+    $deleteCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic]
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_waitinterval]==true;
     $callFunction[updateCurrentMusicPlayer;false]
     ]
     `

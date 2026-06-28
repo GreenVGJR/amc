@@ -32,7 +32,7 @@ module.exports = {
     $if[$env[typeplatform]==soundcloud;
     $jsonLoad[scTrack;$extractTrack[$env[urlplatform]]]
     $if[$env[scTrack;results;id]==;$return[{}]]
-    $!httpRequest[https://api-v2.soundcloud.com/tracks/$env[scTrack;results;id]/related?client_id=$getCache[authmusic_soundcloud]&limit=$get[limitplatform];GET;jjcm]
+    $!httpRequest[https://api-v2.soundcloud.com/tracks/$env[scTrack;results;id]/related?client_id=$getCache[initclientmusic;authmusic_soundcloud]&limit=$get[limitplatform];GET;jjcm]
     $jsonLoad[filterfinal;$default[$env[jjcm;collection];{}]]
     $arrayMap[filterfinal;cacfilterfinals;
     $jsonLoad[aac;{}]
@@ -59,8 +59,8 @@ module.exports = {
     "Accept": "application/json",
     "Accept-Language": "en",
     "App-Platform": "WebPlayer",
-    "Authorization": "Bearer $getCache[authmusic_spotify_fall]",
-    "Client-Token": "$getCache[authmusic_spotify_token]",
+    "Authorization": "Bearer $getCache[initclientmusic;authmusic_spotify_fall]",
+    "Client-Token": "$getCache[initclientmusic;authmusic_spotify_token]",
     "Content-Type": "application/json",
     "Origin": "https://open.spotify.com",
     "User-Agent": "$get[agent]"

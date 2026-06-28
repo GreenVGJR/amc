@@ -50,7 +50,7 @@ module.exports = {
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;]
-    $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[authmusic_soundcloud]&limit=1;GET;res]]
+    $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[initclientmusic;authmusic_soundcloud]&limit=1;GET;res]]
     $onlyIf[$get[http]!=401;
     $callFunction[generateAuthKeys;soundcloud;;false]
     $callLocalFunction[refreshing;true]]
@@ -69,7 +69,7 @@ module.exports = {
     "Accept": "application/json",
     "Accept-Language": "en",
     "App-Platform": "WebPlayer",
-    "Authorization": "Bearer $getCache[authmusic_spotify]",
+    "Authorization": "Bearer $getCache[initclientmusic;authmusic_spotify]",
     "User-Agent": "$get[agent]"
     }]
     $let[mdquery;https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1]
@@ -84,8 +84,8 @@ module.exports = {
     "Accept": "application/json",
     "Accept-Language": "en",
     "App-Platform": "WebPlayer",
-    "Authorization": "Bearer $getCache[authmusic_spotify]",
-    "Client-Token": "$getCache[authmusic_spotify_token]",
+    "Authorization": "Bearer $getCache[initclientmusic;authmusic_spotify]",
+    "Client-Token": "$getCache[initclientmusic;authmusic_spotify_token]",
     "Content-Type": "application/json",
     "User-Agent": "$get[agent]"
     }]

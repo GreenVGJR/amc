@@ -17,12 +17,12 @@ module.exports = {
   code: `
   $onlyIf[$guildID!=;]
   
-  $let[a;$getCache[listcommands-help]]
+  $let[a;$getCache[initclientmusic;listcommands-help]]
   $ephemeral
   $if[$get[a]==;
   $defer
   $updateApplicationCommands
-  $setCache[listcommands-help;$applicationCommands]
+  $setCache[initclientmusic;listcommands-help;$applicationCommands]
   ]
   
   $jsonLoad[test;$get[a]]
