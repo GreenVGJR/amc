@@ -239,7 +239,6 @@ module.exports = {
     $let[finalurl;$env[a;results;video_versions;0;url]]
     ;
     $jsonLoad[jysv;$default[$env[a;results;carousel_media];{}]]
-    $log[Test: $env[jysv]]
     $let[finalurl;$env[jysv;$arrayFindIndex[jysv;iuy;$checkCondition[$env[iuy;video_versions;0;url]]];video_versions;0;url]]
     ]]
     $if[$env[whattype;type]==instagramaudio;
