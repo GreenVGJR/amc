@@ -74,8 +74,13 @@ module.exports = {
     $let[title;$default[$env[a;results;text];$env[a;results;video_id]]]
     ]
     $if[$env[filtype;type]==instagram;
+    $if[$env[a;results;shortcode_media]!=;
+    $let[author;$default[$env[a;results;shortcode_media;owner;username];$env[a;results;shortcode_media;user;username]]]
+    $let[title;$default[$env[a;results;shortcode_media;edge_media_to_caption;edges;0;node;text];$env[a;results;shortcode_media;id]]]
+    ;
     $let[author;$default[$env[a;results;owner;username];$env[a;results;user;username]]]
     $let[title;$default[$env[a;results;edge_media_to_caption;edges;0;node;text];$default[$env[a;results;caption;text];$env[a;results;id]]]]
+    ]
     ]
     $if[$env[filtype;type]==instagramaudio;
     $if[$and[$env[a;results;metadata;original_sound_info]==null;$env[a;results;metadata;music_info]==null];
@@ -96,6 +101,10 @@ module.exports = {
     $if[$env[filtype;type]==twitter;
     $let[author;$env[a;results;user;screen_name]]
     $let[title;$default[$advancedTextSplit[$env[a;results;text];https://t.co;0];$env[a;results;id_str]]]
+    ]
+    $if[$env[filtype;type]==threads;
+    $let[author;$env[a;results;author]]
+    $let[title;$env[a;results;title]]
     ]
     $let[author;$trim[$if[$checkContains[$toLowercase[$toCamelCase[$get[title]]];$toLowercase[$toCamelCase[$get[author]]]]==false;$get[author]]]]
     $let[finaltitle;$get[author]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]

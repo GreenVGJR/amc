@@ -300,7 +300,7 @@ module.exports = [{
     ;
     $jsonLoad[la;$env[a;onResponseReceivedActions;0;appendContinuationItemsAction;continuationItems]]
     ]
-    $let[tokens;$default[$env[la;$arrayFindLastIndex[la;ks;$checkCondition[$env[ks;continuationItemViewModel]!=]];continuationItemViewModel;continuationCommand;innertubeCommand;continuationCommand;token];null]]
+    $let[tokens;$default[$env[la;$arrayFindIndex[la;ks;$checkCondition[$env[ks;continuationItemViewModel]!=]];continuationItemViewModel;continuationCommand;innertubeCommand;continuationCommand;token];null]]
     $arrayMap[la;ls;$if[$env[ls;lockupViewModel]!=;$return[$env[ls;lockupViewModel]]];la]
     $arrayForEach[la;ls;
     $if[$and[$env[ls;contentId]!=;$or[$env[ls;contentType]==LOCKUP_CONTENT_TYPE_VIDEO;$env[ls;contentType]==LOCKUP_CONTENT_TYPE_MUSIC]];

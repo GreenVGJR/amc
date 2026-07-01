@@ -174,7 +174,7 @@ generateVisitor().then(() => Promise.all([fetchWebConfigInfo(), fetchSignatureTi
 
 function createChunkedStream(url, totalSize, videoId, ext) {
     let start = 0;
-    const chunkSize = 1024 * 1024 * 5;
+    const chunkSize = 1024 * 1024 * 10;
     const concurrency = 5;
     let isEnded = false;
     let abortControllers = [];
@@ -235,7 +235,15 @@ function createChunkedStream(url, totalSize, videoId, ext) {
                     chunks.push(Buffer.from(value));
                 }
 
-                return { buffer: Buffer.concat(chunks), isLast: chunkIsLast, end };
+                const totalLength = chunks.reduce((n, b) => n + b.length, 0);
+                const merged = Buffer.allocUnsafe(totalLength);
+                let offset = 0;
+                for (const buf of chunks) {
+                    buf.copy(merged, offset);
+                    offset += buf.length;
+                }
+
+                return { buffer: merged, isLast: chunkIsLast, end };
             } catch (err) {
                 lastError = err;
                 if (err?.name === 'AbortError') throw err;
@@ -352,7 +360,7 @@ function getFormatUrl(format) {
 async function fallbackYTStream(lstracks) {
     refreshYtAuth();
     poToken = generateAnonPOT();
-    
+
     const videoId = lstracks.includes('watch?v=') ? lstracks.split('watch?v=')[1].split('&')[0] : lstracks;
     const cacheFilePathWebm = path.join(cacheDir, `${videoId}.webm`);
     const cacheFilePathM4a = path.join(cacheDir, `${videoId}.m4a`);
@@ -484,14 +492,17 @@ async function fallbackYTStream(lstracks) {
             if (fullPlayerResponse?.playabilityStatus?.status === 'OK') a = fullPlayerResponse;
         }
 
-        if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
+        if (!!(a?.videoDetails?.isLiveContent && a.videoDetails?.lengthSeconds == 0 && a?.streamingData?.hlsManifestUrl)) {
+            finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+        }
+        else if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
             finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
         }
         else if (targetClient === 'WEB_SAFARI' && a?.streamingData?.hlsManifestUrl) {
             finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
         }
         else if (['IOS'].includes(targetClient)) {
-            fr = a.streamingData?.adaptiveFormats?.find(c => [140, 139].includes(c.itag) && getFormatUrl(c));
+            fr = a.streamingData?.adaptiveFormats?.filter(c => [140, 139].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
             if (fr) {
                 const rawFormatUrl = getFormatUrl(fr);
                 const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
@@ -499,15 +510,13 @@ async function fallbackYTStream(lstracks) {
                 changeLength = true;
                 durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
                 streamingLength = String(fr.contentLength);
-            } else if (a?.videoDetails?.isLiveContent && a?.streamingData?.hlsManifestUrl) {
-                finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
             } else {
                 throw new Error(`No playable format for IOS`);
             }
         }
         else if (['ANDROID', 'ANDROID_VR', 'VISIONOS'].includes(targetClient)) {
-            fr = a.streamingData?.adaptiveFormats?.find(c => [251, 250, 249, 774].includes(c.itag) && getFormatUrl(c));
-            if (!fr) fr = a.streamingData?.adaptiveFormats?.find(c => [141, 140, 599].includes(c.itag) && getFormatUrl(c));
+            fr = a.streamingData?.adaptiveFormats?.filter(c => [774, 251, 250, 249, 600].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
+            if (!fr) fr = a.streamingData?.adaptiveFormats?.filter(c => [141, 140, 599].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
             if (fr) {
                 const rawFormatUrl = getFormatUrl(fr);
                 const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
@@ -521,8 +530,6 @@ async function fallbackYTStream(lstracks) {
                     const rawFormatUrl = getFormatUrl(fs);
                     const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
                     finalurl = decipheredUrl + "&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
-                } else if (a?.videoDetails?.isLiveContent && a?.streamingData?.hlsManifestUrl) {
-                    finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
                 } else {
                     throw new Error(`No playable format for ${targetClient}`);
                 }
@@ -534,8 +541,6 @@ async function fallbackYTStream(lstracks) {
                 const rawFormatUrl = getFormatUrl(fs);
                 const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
                 finalurl = decipheredUrl + "&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
-            } else if (a?.videoDetails?.isLiveContent && a?.streamingData?.hlsManifestUrl) {
-                finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
             } else {
                 throw new Error(`No playable format for ${targetClient}`);
             }
@@ -553,7 +558,7 @@ async function fallbackYTStream(lstracks) {
 
         const filterlocation = await fetch(finalurl, {
             method: "HEAD",
-            headers: { "Range": "bytes=0-","User-Agent": APIuserAgent }
+            headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
         });
 
         if (filterlocation.status === 403 && changeLength) {
@@ -576,14 +581,15 @@ async function fallbackYTStream(lstracks) {
         });
 
         if (changeLength && streamingLength && parseInt(streamingLength) > 0 && !actualfinalurl?.includes('googlevideo.com/api/manifest/')) {
-            const ext = [251, 774].includes(fr?.itag) ? "webm" : "m4a";
+            const ext = [774, 251, 250, 249, 600].includes(fr?.itag) ? "webm" : "m4a";
             return createChunkedStream(actualfinalurl, parseInt(streamingLength), videoId, ext);
         }
 
         return actualfinalurl;
     }
     catch (e) {
-        console.error(e.message);
+        console.log(e.message);
+        console.error(e);
         return e;
     }
 }

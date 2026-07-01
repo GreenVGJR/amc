@@ -28,6 +28,7 @@ module.exports = {
     $if[$endsWith[$get[host];music.apple.com];$let[type;applemusic]]
     $if[$endsWith[$get[host];deezer.com];$let[type;deezer]]
     $if[$and[$endsWith[$get[host];instagram.com];$startsWith[$get[paths];/reels/audio/]];$let[type;instagramaudio];$if[$endsWith[$get[host];instagram.com];$let[type;instagram]]]
+    $if[$endsWith[$get[host];threads.com];$let[type;threads]]
     $if[$endsWith[$get[host];facebook.com];$let[type;facebook]]
     $if[$endsWith[$get[host];bandcamp.com];$let[type;bandcamp]]
     $if[$or[$endsWith[$get[host];x.com];$endsWith[$get[host];twitter.com]];$let[type;twitter]]

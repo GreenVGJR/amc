@@ -235,12 +235,20 @@ module.exports = {
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $if[$env[a;results;error]!=;$return[$let[finalurl;bot|$env[a;results;error]]]]
     $if[$env[a;results]==null;$return[$let[finalurl;bot|This video may no longer exist, or you don't have permission to view it]]]
+    $if[$env[a;results;shortcode_media]!=;
+    $if[$env[a;results;shortcode_media;video_url]!=;
+    $let[finalurl;$env[a;results;shortcode_media;video_url]]
+    ;
+    $jsonLoad[jysv;$default[$env[a;results;shortcode_media;edge_sidecar_to_children;edges];{}]]
+    $let[finalurl;$env[jysv;$arrayFindIndex[jysv;iuy;$checkCondition[$env[iuy;node;video_url]!=]];node;video_url]]
+    ]
+    ;
     $if[$env[a;results;video_versions;0;url]!=;
     $let[finalurl;$env[a;results;video_versions;0;url]]
     ;
     $jsonLoad[jysv;$default[$env[a;results;carousel_media];{}]]
-    $let[finalurl;$env[jysv;$arrayFindIndex[jysv;iuy;$checkCondition[$env[iuy;video_versions;0;url]]];video_versions;0;url]]
-    ]]
+    $let[finalurl;$env[jysv;$arrayFindIndex[jysv;iuy;$checkCondition[$env[iuy;video_versions;0;url]!=]];video_versions;0;url]]
+    ]]]
     $if[$env[whattype;type]==instagramaudio;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $if[$env[a;results]==null;$return[$let[finalurl;null]]]
@@ -272,6 +280,13 @@ module.exports = {
     $jsonLoad[b;$env[a;results;quoted_tweet;video;variants]]
     ]]
     $let[finalurl;$default[$env[b;$sub[$arrayLength[b];1];src];$env[b;$sub[$arrayLength[b];1];url]]]
+    $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Video not available]]]
+    ]
+    $if[$env[whattype;type]==threads;
+    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[a;results]==null;$return[$let[finalurl;null]]]
+    $if[$env[a;results;error]!=;$return[$let[finalurl;bot|$env[a;results;error]]]]
+    $let[finalurl;$env[a;results;media]]
     $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Video not available]]]
     ]
     ;retry]
