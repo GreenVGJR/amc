@@ -17,7 +17,6 @@ module.exports = {
           { "name": "Spotify", "value": "spotify" },
           { "name": "Apple Music", "value": "applemusic" },
           { "name": "Shazam", "value": "shazam" },
-          { "name": "ITunes", "value": "itunes" },
           { "name": "Amazon Music", "value": "amazonmusic" },
           { "name": "Bandcamp", "value": "bandcamp" },
           { "name": "Deezer", "value": "deezer" },
@@ -74,7 +73,7 @@ module.exports = {
   $addTextDisplay[
   > ### $cropText[$replace[$env[result;title];#;\\\\#];0;197;...]
   > $env[result;url]
-  > -# $if[$and[$advancedTextSplit[$env[result;duration];:;1]==;$advancedTextSplit[$env[result;duration];:;2]==];$advancedTextSplit[$env[result;duration];:;0];$if[$advancedTextSplit[$env[result;duration];:;0]==00;$advancedTextSplit[$env[result;duration];:;1]:$advancedTextSplit[$env[result;duration];:;2];$env[result;duration]]]
+  > -# $if[$and[$advancedTextSplit[$env[result;duration];:;1]==;$advancedTextSplit[$env[result;duration];:;2]==];$advancedTextSplit[$env[result;duration];:;0];$if[$advancedTextSplit[$env[result;duration];:;0]==00;$advancedTextSplit[$env[result;duration];:;1]:$advancedTextSplit[$env[result;duration];:;2];$env[result;duration]]]$if[$env[result;isAi]==true; (AI-Generated)]
   ]
   $addThumbnail[$if[$isValidLink[$env[result;thumbnail]]==false;$userDefaultAvatar[$authorID];$env[result;thumbnail]]]
   ]

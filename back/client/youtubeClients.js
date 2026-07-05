@@ -56,7 +56,7 @@ const list_clients = {
         "osName": "iOS",
         "osVersion": "16.7.7"
     },
-    // legacy formats only
+    // required youtubei.js for solve n challenge
     // support cookies
     "WEB_PARENT": {
         "targetDomain": "www.youtube.com",

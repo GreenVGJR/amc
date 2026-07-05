@@ -64,7 +64,7 @@ module.exports = {
     ;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $httpSetContentType[Text]
     $let[rs_http;$httpRequest[https://www.shazam.com/song/$advancedTextSplit[$env[r;id];?i=;1]/$advancedTextSplit[$env[r;id];/;$sub[$charCount[$env[r;id];/];1]];GET;prgn]]
     ;
@@ -113,7 +113,7 @@ module.exports = {
     $let[custtslmgt;false]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept;application/json]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[X-Tidal-Token;$getCache[initclientmusic;authmusic_tidal]]
     $!httpRequest[https://api.tidal.com/v1/search/tracks?countryCode=US&locale=en_US&limit=1&offset=0&query=$env[query];GET;restt]
     $if[$env[restt;items;0;id]==;$let[custtslmgt;true]]
@@ -125,7 +125,7 @@ module.exports = {
     $localFunction[nttuf;
     $if[$env[refauth]==true;$generateAuthKeys[tidal_token;;false]]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Accept;application/vnd.api+json]
     $httpAddHeader[Origin;https://tidal.com]
     $httpAddHeader[Authorization;Bearer $getCache[initclientmusic;authmusic_tidal_token]]
@@ -157,7 +157,7 @@ module.exports = {
     ;
     $let[cusdezaborterls;false]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Accept;application/json]
     $!httpRequest[https://api.deezer.com/search?limit=5&q=$env[query];GET;drtcp]
     $if[$env[drtcp;data;0;id]==;$let[cusdezaborterls;true]]
@@ -176,7 +176,7 @@ module.exports = {
     $try[
     $httpSetBody[{"operationName":"GetLyrics","variables":{"trackId":"$env[drtcp;data;$get[drtcp_count];id]"},"query":"$inflate[789c2b2c4d2daa54704f2df1a92cca4c2ed65029294a4ccef64cb152082e29cacc4b57d454a88ec953008b6ac0e560aa20923960ad1075a9152531790ac59579c91945f9799955a9293e9979a910c99ca2e490ccdcd4e292c4dc021037332f35264fa116816b01498b33f5;hex]"}]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Authorization;Bearer $getCache[initclientmusic;authmusic_deezer]]
     $httpAddHeader[Accept;application/json]
     $httpAddHeader[Content-Type;application/json]
@@ -210,7 +210,7 @@ module.exports = {
     $!jsonSet[results;results;lyric;$default[$get[cachedeezerlyric];$if[$and[$env[line]==true;$env[res;data;track;lyrics;synchronizedLines]!=null];$get[finallyde];$env[res;data;track;lyrics;text]]]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $httpSetContentType[Text]
     $let[http_2;$httpRequest[https://lrclib.net/api/search?q=$env[query];GET;ges1]]
     $jsonLoad[ges1;$env[ges1]]
@@ -229,7 +229,7 @@ module.exports = {
     $!jsonSet[results;results;lyric;$if[$and[$env[line]==true;$env[ges1;0;syncedLyrics]!=];$env[ges1;0;syncedLyrics];$if[$env[ges1;0;instrumental];\\[Instrumental\\];$env[ges1;0;plainLyrics]]]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $httpSetContentType[Text]
     $let[http_1;$httpRequest[https://genius.com/api/search/song?&per_page=1&q=$env[query];GET;ges]]
     $jsonLoad[ges;$env[ges]]
@@ -239,7 +239,7 @@ module.exports = {
     $let[a2_filtering;$get[checkcachelyric]]
     ;
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $let[http2_1;$httpRequest[https://genius.com$env[ges;response;sections;0;hits;0;result;api_path]/embed.js;GET;ges2]]
     $let[a2;$advancedTextSplit[$advancedReplace[$env[ges2];\\\\n;
 ;\\\\;;<br>;];<p>;1;</p>;0]]

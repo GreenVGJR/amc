@@ -142,10 +142,10 @@ module.exports = {
     $color[$memberDisplayColor[$env[guildId];$env[jsonmusicdata;requestedBy;id]];0]
     ]
     $if[$getCache[initclientmusic;musicplayer_checkmessage_ytwarm_$env[guildId]]==true;
-    $footer[$callFunction[useCustomMusicMessage;config_generalRefreshYoutubeTrack];$callFunction[useIcon;loading]]
+    $footer[$callFunction[useCustomMusicMessage;config_generalRefreshYoutubeTrack];$callFunction[useIcon;loading];0]
     ;
     $if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true;
-    $footer[$callFunction[useCustomMusicMessage;config_generalDynamicQueue];$callFunction[useIcon;loading]]
+    $footer[$callFunction[useCustomMusicMessage;config_generalDynamicQueue];$callFunction[useIcon;loading];0]
     ;
     $footer[$userDisplayName[$env[jsonmusicdata;requestedBy;id]]$if[$get[countVcMembers]>=1;  •  +$get[countVcMembers] more];$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];0]
     ]

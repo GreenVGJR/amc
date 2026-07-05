@@ -1,6 +1,11 @@
+const { tarClient, tarClientYT } = require('../../functions/helpers/clientYoutube.js');
+
 module.exports = {
     type: "clientReady",
     code: `
+    $let[getpickclient;${tarClient()}]
+    $jsonLoad[listclient;$replace[${tarClientYT()};%SEMI%;\\;]]
+    $let[isWebClient;$checkCondition[$env[listclient;targetDomain]!=youtubei.googleapis.com]]
     $logger[Info;Ready on client $username[$clientID]]
     $if[$callFunction[configMusic;cacheAllContextNeed];
     $logger[Warn;Caching Discord context for better performance]
@@ -18,8 +23,8 @@ module.exports = {
         $setCache[initclientmusic;countmusicnode;"$get[countnode]"]
     ;30s]
     $logger[Info;Generating Auth]
-    $let[ytinitcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
-    $if[$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined;$callFunction[configMusic;useBearer]==true];
+    $let[ytinitcookiesalt;$djsEval[process.env.YOUTUBE_COOKIES]]
+    $if[$or[$get[ytinitcookiesalt]==;$get[ytinitcookiesalt]==undefined;$callFunction[configMusic;useBearer]==true];
     $callFunction[generateAuthKeys;youtube;;true]
     $if[$callFunction[configMusic;useBearer]==true;
     $if[$env[lrtuy]!=false;
@@ -31,7 +36,7 @@ module.exports = {
     $if[$getCache[initclientmusic;retrycookiesyt]==true;$deleteCache[initclientmusic;retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;false]]
     ;lfk;toggle]
     $callLocalFunction[checkcookies;true;false]
-    $if[$getCache[initclientmusic;disablecookiesyt]!=true;
+    $if[$and[$get[isWebClient]==true;$getCache[initclientmusic;disablecookiesyt]!=true];
     $setInterval[
     $callLocalFunction[checkcookies;false;false]
     ;10m]

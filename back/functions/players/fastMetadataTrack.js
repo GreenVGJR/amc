@@ -49,7 +49,7 @@ module.exports = {
     $try[
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[initclientmusic;authmusic_soundcloud]&limit=1;GET;res]]
     $onlyIf[$get[http]!=401;
     $callFunction[generateAuthKeys;soundcloud;;false]
@@ -120,7 +120,7 @@ module.exports = {
     $if[$env[provider]==applemusic;
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $httpSetContentType[Text]
     $!httpRequest[https://itunes.apple.com/search?media=music&entity=musicTrack&limit=1&country=US&lang=en-US&version=2&term=$env[query];GET;res]
     ]
@@ -135,7 +135,7 @@ module.exports = {
     $if[$env[provider]==deezer;
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
-    $httpAddHeader[Accept-Encoding;]
+    $httpAddHeader[Accept-Encoding;gzip, br]
     $let[status;$httpRequest[https://api.deezer.com/search?limit=1&q=$env[query];GET;res]]
     $onlyIf[$env[res]!=;$callLocalFunction[refreshing;true]]
     $jsonLoad[res;$env[res]]

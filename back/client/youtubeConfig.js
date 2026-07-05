@@ -33,7 +33,7 @@ if (!useClient) {
     throw new Error(`YouTube client "${targetClient}" does not exist. Available clients: ${available}`);
 }
 
-const isWebClient = targetClient === 'WEB_SAFARI';
+const isWebClient = (targetClient === 'WEB_SAFARI' || targetClient === 'WEB_PARENT');
 const apiEndpoint = isWebClient ? 'player' : 'get_watch';
 const apiFields = isWebClient
     ? 'responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds)'
@@ -71,19 +71,21 @@ actuallk.gl = "US";
 
 const generateVisitor = async () => {
     try {
+        const url = "https://www.youtube.com/sw.js_data";
+        const headers = { "User-Agent": default_userAgent_desktop };
         if (ytcookies) {
-            const embedText = await fetch("https://www.youtube.com/", { method: "GET", headers: { "User-Agent": default_userAgent_desktop, "Cookie": ytcookies } }).then(r => r.text());
-            vt = embedText.split('"visitorData":"')[1]?.split('"')[0] || "";
-            actuallk.visitorData = vt;
-            datasyncID = embedText.split('"DATASYNC_ID":"')[1]?.split('"')[0]?.split('||')[0] || "";
+            headers.Cookie = ytcookies;
         }
-
-        if (!vt) {
-            const data = await fetch(`https://${hostdomain}/youtubei/v1/player?prettyPrint=false&alt=json&fields=responseContext(visitorData)`, { method: "POST", body: JSON.stringify(lk), headers: { "Origin": `https://${hostdomain}`, "Content-Type": "application/json", "User-Agent": APIuserAgent } }).then(r => r.json());
-            vt = data.responseContext.visitorData || "";
-            actuallk.visitorData = vt;
-        }
-    } catch (e) { console.error(e) }
+        const raw = await fetch(url, { method: "GET", headers }).then(r => r.text());
+        const jsonPart = raw.split("\n")[2];
+        const data = jsonPart ? JSON.parse(jsonPart) : null;
+        vt = data?.[0]?.[2]?.[0]?.[0]?.[13] || "";
+        actuallk.visitorData = vt;
+        const rawSync = data?.[0]?.[3];
+        datasyncID = typeof rawSync === "string" ? rawSync.split('||')[0] : "";
+    } catch (e) {
+        console.error(e);
+    }
 };
 
 async function fetchWebConfigInfo() {
@@ -413,7 +415,7 @@ async function fallbackYTStream(lstracks) {
 
         const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp } } } : {};
 
-        const buildRoute = targetClient === 'WEB_SAFARI'
+        const buildRoute = isWebClient
             ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk } }, ...playbackContext, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: isWebClient } }
             : { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
 
@@ -498,7 +500,7 @@ async function fallbackYTStream(lstracks) {
         else if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
             finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
         }
-        else if (targetClient === 'WEB_SAFARI' && a?.streamingData?.hlsManifestUrl) {
+        else if (isWebClient && a?.streamingData?.hlsManifestUrl) {
             finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
         }
         else if (['IOS'].includes(targetClient)) {
@@ -514,7 +516,7 @@ async function fallbackYTStream(lstracks) {
                 throw new Error(`No playable format for IOS`);
             }
         }
-        else if (['ANDROID', 'ANDROID_VR', 'VISIONOS'].includes(targetClient)) {
+        else if (['ANDROID', 'ANDROID_VR', 'VISIONOS', 'WEB_PARENT'].includes(targetClient)) {
             fr = a.streamingData?.adaptiveFormats?.filter(c => [774, 251, 250, 249, 600].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
             if (!fr) fr = a.streamingData?.adaptiveFormats?.filter(c => [141, 140, 599].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
             if (fr) {
@@ -588,7 +590,6 @@ async function fallbackYTStream(lstracks) {
         return actualfinalurl;
     }
     catch (e) {
-        console.log(e.message);
         console.error(e);
         return e;
     }
