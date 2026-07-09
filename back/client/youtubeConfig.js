@@ -36,8 +36,8 @@ if (!useClient) {
 const isWebClient = (targetClient === 'WEB_SAFARI' || targetClient === 'WEB_PARENT');
 const apiEndpoint = isWebClient ? 'player' : 'get_watch';
 const apiFields = isWebClient
-    ? 'responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds)'
-    : 'playerResponse(responseContext(visitorData),playabilityStatus,streamingData(hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds))';
+    ? 'responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds)'
+    : 'playerResponse(responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds))';
 const buildQuery = apiEndpoint + '?prettyPrint=false&alt=json&fields=' + apiFields;
 
 const APIuserAgent = useClient?.userAgent || default_userAgent_desktop;
@@ -512,8 +512,6 @@ async function fallbackYTStream(lstracks) {
                 changeLength = true;
                 durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
                 streamingLength = String(fr.contentLength);
-            } else {
-                throw new Error(`No playable format for IOS`);
             }
         }
         else if (['ANDROID', 'ANDROID_VR', 'VISIONOS', 'WEB_PARENT'].includes(targetClient)) {
@@ -532,8 +530,6 @@ async function fallbackYTStream(lstracks) {
                     const rawFormatUrl = getFormatUrl(fs);
                     const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
                     finalurl = decipheredUrl + "&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
-                } else {
-                    throw new Error(`No playable format for ${targetClient}`);
                 }
             }
         }
@@ -543,9 +539,11 @@ async function fallbackYTStream(lstracks) {
                 const rawFormatUrl = getFormatUrl(fs);
                 const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
                 finalurl = decipheredUrl + "&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
-            } else {
-                throw new Error(`No playable format for ${targetClient}`);
             }
+        }
+
+        if(!finalurl && a?.streamingData?.serverAbrStreamingUrl) {
+            throw new Error(`This content unavailable due youtube enforce SABR-only`);
         }
 
         if (!finalurl) {

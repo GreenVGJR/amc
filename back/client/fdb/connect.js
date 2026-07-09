@@ -5,7 +5,8 @@ module.exports = [{
     $logger[Debug;Refreshing cache data]
     $async[
         $setCache[initclientmusic;system_file-config;$readFile[./back/config.json]]
-        $if[$or[$toLowerCase[$callFunction[configMusic;useClientYT]]==android_vr;$toLowerCase[$callFunction[configMusic;useClientYT]]==android];$logger[Warn;Youtube may enforcing SABR-only for this client ($callFunction[configMusic;useClientYT])]]
+        $let[lookwhatclientytuse;$toLowerCase[$callFunction[configMusic;useClientYT]]]
+        $if[$or[$get[lookwhatclientytuse]==web_safari;$get[lookwhatclientytuse]==web_parent;$get[lookwhatclientytuse]==android_vr;$get[lookwhatclientytuse]==android];$logger[Warn;Youtube may enforcing SABR-only for this client ($callFunction[configMusic;useClientYT])]]
     ]
     $async[$setCache[initclientmusic;system_file-filterMedia;$readFile[./back/listRegex.json]]]
     $async[$setCache[initclientmusic;system_file-useCustom;$readFile[./back/messageConfig.json]]]

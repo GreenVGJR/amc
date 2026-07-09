@@ -240,7 +240,7 @@ module.exports = {
     $httpAddHeader[Sec-Fetch-Site;none]
     $httpAddHeader[Sec-Fetch-Dest;document]
     $httpSetContentType[Text]
-    $let[uynsd;$httpRequest[https://www.instagram.com/$env[filterid;id];GET]]
+    $let[uynsd;$httpRequest[https://www.instagram.com/p/$advancedTextSplit[$env[filterid;id];/;$charCount[$env[filterid;id];/]];GET]]
     $if[$get[uynsd]!=200;
     $httpAddHeader[Accept;text/html, */*]
     $httpAddHeader[Accept-Language;en]

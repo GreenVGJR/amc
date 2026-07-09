@@ -56,15 +56,17 @@ const list_clients = {
         "osName": "iOS",
         "osVersion": "16.7.7"
     },
+    // enforced SABR-only for music video
     // required youtubei.js for solve n challenge
-    // support cookies
+    // required youtube cookies
     "WEB_PARENT": {
         "targetDomain": "www.youtube.com",
         "client_id": null,
         "client_secret": null,
         "clientName": 88,
-        "clientVersion": "1.20260206",
+        "clientVersion": "1.20260710",
     },
+    // enforced SABR-only for music video
     // merged formats
     // required youtubei.js for solve n challenge
     // support cookies
@@ -73,7 +75,7 @@ const list_clients = {
         "client_id": null,
         "client_secret": null,
         "clientName": 1,
-        "clientVersion": "2.20260206.01.00",
+        "clientVersion": "2.20260710.01.00",
         "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
     }
 };

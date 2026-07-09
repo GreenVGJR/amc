@@ -22,15 +22,16 @@
 ___
 
 1. Required [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v22.22.3 for node.js
-2. [Download](https://github.com/GreenVGJR/amc-discord-bot/archive/refs/heads/fs-dev-local.zip) this branch (.zip)
-3. Extract it, and rename `.env.example` file to `.env` inside folder you did extract
-4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
-5. Run this command with IDE/Terminal (still same folder)
-```js
-npm install
-npm update
-node .
+2. Clone the repository and install dependencies:
+
+```bash
+git clone -b fs-dev-local https://github.com/GreenVGJR/amc-discord-bot.git
+cd amc-discord-bot
+npm install --allow-git=root
 ```
+3. Go to that folder and rename `.env.example` file to `.env` inside folder you did extract
+4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
+5. Then run command `node .` inside that folder
 
 ___
 
