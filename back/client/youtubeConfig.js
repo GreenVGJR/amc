@@ -1,42 +1,43 @@
-// Test replace yt stream
-const { Readable } = require('stream');
-const { randomBytes } = require('crypto');
-const fs = require('fs');
-const path = require('path');
-const cacheDir = path.join(__dirname, 'ytCacheTracks');
-fs.mkdirSync(cacheDir, { recursive: true });
 const { default_userAgent_desktop, streamTypeYT, useClientYT, useBearer, cacheTrackYT } = require('../config.json');
 const ytClients = require('./youtubeClients.js');
 const targetClient = useClientYT?.toUpperCase();
-
-let vt;
-let datasyncID = "";
-let configInfoPromise = null;
-let signatureTimestamp = null;
-let signatureTimestampPromise = null;
-let webPlayer = null;
-let authRequiredUntil = 0;
-
-function generateAnonPOT() {
-    const b = Buffer.alloc(10);
-    b[0] = 0x22;
-    b[1] = 0x08;
-    for (let i = 0; i < 8; i++) b[2 + i] = Math.floor(Math.random() * 256);
-    return b.toString('base64url');
-}
-
-let poToken = generateAnonPOT();
-
 const useClient = ytClients?.[targetClient];
 if (!useClient) {
     const available = Object.keys(ytClients).join(", ");
     throw new Error(`YouTube client "${targetClient}" does not exist. Available clients: ${available}`);
 }
 
-const isWebClient = (targetClient === 'WEB_SAFARI' || targetClient === 'WEB_PARENT');
+if (['WEB_CREATOR', 'WEB_PARENT'].includes(targetClient) && !process.env.YOUTUBE_COOKIES) {
+    throw new Error(`Please put youtube cookies first before using this client. (${targetClient})`);
+}
+
+
+// Forgescript Logger
+const { Logger } = require("@tryforge/forgescript");
+
+const { Readable } = require('stream');
+const { randomBytes } = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const cacheDir = path.join(__dirname, 'ytCacheTracks');
+fs.mkdirSync(cacheDir, { recursive: true });
+const { initBotGuard, generateCbPot, generateAnonPOT } = require('./youtubeBG.js');
+
+let vt;
+let datasyncID = "";
+let configInfoPromise = null;
+let configInfoAttempted = false;
+let signatureTimestamp = null;
+let signatureTimestampPromise = null;
+let webPlayer = null;
+let authRequiredUntil = 0;
+
+let poToken = generateAnonPOT();
+
+const isWebClient = useClient.targetDomain !== 'youtubei.googleapis.com';
 const apiEndpoint = isWebClient ? 'player' : 'get_watch';
 const apiFields = isWebClient
-    ? 'responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds)'
+    ? 'responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url,signatureCipher),adaptiveFormats(itag,url,contentLength,signatureCipher)),videoDetails(isLiveContent,lengthSeconds)'
     : 'playerResponse(responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds))';
 const buildQuery = apiEndpoint + '?prettyPrint=false&alt=json&fields=' + apiFields;
 
@@ -46,6 +47,8 @@ let ytcookies;
 let tempytcookies;
 const hostdomain = useClient.targetDomain;
 const lk = { context: { client: { clientName: useClient.clientName, clientVersion: useClient.clientVersion } } };
+const sortTargetOpus = [774, 251, 250, 249];
+const sortTargetM4a = [141, 140, 139];
 var templist = [];
 
 function refreshYtAuth() {
@@ -83,13 +86,14 @@ const generateVisitor = async () => {
         actuallk.visitorData = vt;
         const rawSync = data?.[0]?.[3];
         datasyncID = typeof rawSync === "string" ? rawSync.split('||')[0] : "";
+        Logger.info(`/ [YoutubeConfig] Fetched Visitor Data`);
     } catch (e) {
         console.error(e);
     }
 };
 
 async function fetchWebConfigInfo() {
-    if (!isWebClient || actuallk.configInfo?.coldConfigData) return;
+    if (!isWebClient || actuallk.configInfo?.coldConfigData || configInfoAttempted) return;
     if (configInfoPromise) return configInfoPromise;
 
     configInfoPromise = fetch(`https://${hostdomain}/youtubei/v1/config?prettyPrint=false&alt=json`, {
@@ -105,7 +109,7 @@ async function fetchWebConfigInfo() {
             "User-Agent": APIuserAgent,
             ...(ytcookies ? { "Cookie": ytcookies } : {})
         },
-        body: JSON.stringify({ context: { client: { ...actuallk } } })
+        body: JSON.stringify({ context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken } })
     }).then(r => r.json()).then(res => {
         const gcg = res?.responseContext?.globalConfigGroup;
         const configInfo = {
@@ -115,9 +119,12 @@ async function fetchWebConfigInfo() {
         };
         if (configInfo.coldConfigData && configInfo.coldHashData && configInfo.hotHashData) {
             actuallk.configInfo = configInfo;
+        } else {
+            configInfoAttempted = true;
         }
     }).finally(() => {
         configInfoPromise = null;
+        Logger.info(`/ [YoutubeConfig] Fetched Client Config`);
     });
 
     return configInfoPromise;
@@ -139,6 +146,7 @@ async function fetchSignatureTimestamp(force = false) {
         signatureTimestamp = player?.signature_timestamp;
     }).finally(() => {
         signatureTimestampPromise = null;
+        Logger.info(`/ [YoutubeConfig] Fetched Youtubei Player`);
     });
 
     return signatureTimestampPromise;
@@ -153,7 +161,7 @@ async function decipherYoutubeUrl(url) {
         const rawN = nPathMatch[1];
         try {
             const dummyUrl = `https://www.youtube.com/watch?n=${encodeURIComponent(rawN)}`;
-            const decipheredDummyUrl = await webPlayer.decipher(dummyUrl);
+            const decipheredDummyUrl = await webPlayer.decipher(null, dummyUrl);
             const decipheredN = new URL(decipheredDummyUrl).searchParams.get('n');
             if (decipheredN) {
                 processedUrl = processedUrl.replace(`/n/${rawN}/`, `/n/${decipheredN}/`);
@@ -164,7 +172,9 @@ async function decipherYoutubeUrl(url) {
     }
 
     try {
-        processedUrl = await webPlayer.decipher(processedUrl);
+        // Passing the value as the 2nd arg (signature_cipher) makes youtubei.js
+        // also append the deciphered `sig`/signature, not just the `n` token.
+        processedUrl = await webPlayer.decipher(null, processedUrl);
     } catch (e) {
         console.error("Error deciphering query-based parameters:", e);
     }
@@ -172,7 +182,7 @@ async function decipherYoutubeUrl(url) {
     return processedUrl;
 }
 
-generateVisitor().then(() => Promise.all([fetchWebConfigInfo(), fetchSignatureTimestamp()])).catch(console.error);
+generateVisitor().then(() => Promise.all([fetchWebConfigInfo(), fetchSignatureTimestamp(), initBotGuard()])).catch(console.error);
 
 function createChunkedStream(url, totalSize, videoId, ext) {
     let start = 0;
@@ -356,14 +366,30 @@ function isHlsUrl(url) {
 }
 
 function getFormatUrl(format) {
-    return format?.url || format?.signatureCipher || format?.cipher || null;
+    return format?.url || format?.signatureCipher || null;
+}
+
+function withStreamParams(url, params) {
+    try {
+        const u = new URL(url);
+        for (const [k, v] of Object.entries(params)) {
+            if (v !== undefined && v !== null) u.searchParams.set(k, String(v));
+        }
+        return u.toString();
+    } catch {
+        return url;
+    }
+}
+
+function filterPlayerObject(YTPlayerResponse) {
+    return (Array.isArray(YTPlayerResponse) ? YTPlayerResponse[0] : YTPlayerResponse)?.playerResponse || YTPlayerResponse;
 }
 
 async function fallbackYTStream(lstracks) {
     refreshYtAuth();
-    poToken = generateAnonPOT();
 
     const videoId = lstracks.includes('watch?v=') ? lstracks.split('watch?v=')[1].split('&')[0] : lstracks;
+    poToken = generateAnonPOT();
     const cacheFilePathWebm = path.join(cacheDir, `${videoId}.webm`);
     const cacheFilePathM4a = path.join(cacheDir, `${videoId}.m4a`);
     if (cacheTrackYT) {
@@ -389,7 +415,7 @@ async function fallbackYTStream(lstracks) {
             if (isHlsUrl(checklist.url)) return checklist.url;
             const isAllowLength = checklist.allowLength;
             if (isAllowLength && checklist.contentLength) {
-                const ext = checklist.url.includes('mime=audio/webm') || checklist.url.includes('itag=251') || checklist.url.includes('itag=774') ? 'webm' : 'm4a';
+                const ext = checklist.url.includes('mime=audio/webm') ? 'webm' : 'm4a';
                 return createChunkedStream(checklist.url, parseInt(checklist.contentLength), videoId, ext);
             }
             return checklist.url;
@@ -408,10 +434,9 @@ async function fallbackYTStream(lstracks) {
 
         if (isWebClient && !actuallk.configInfo?.coldConfigData) {
             if (!vt) await generateVisitor();
-            await fetchWebConfigInfo();
+            await fetchWebConfigInfo(); // Just in case it fails before
         }
         if (isWebClient && !signatureTimestamp) await fetchSignatureTimestamp();
-        else if (!isWebClient && !webPlayer) await fetchSignatureTimestamp(true);
 
         const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp } } } : {};
 
@@ -462,8 +487,7 @@ async function fallbackYTStream(lstracks) {
         let streamingLength = null;
         let durationLength = null;
         let fr = null;
-        a = Array.isArray(a) ? a[0] : a;
-        a = a?.playerResponse || a;
+        a = filterPlayerObject(a);
 
         const new_vt = a?.responseContext?.visitorData;
         if (new_vt) actuallk.visitorData = new_vt;
@@ -473,9 +497,7 @@ async function fallbackYTStream(lstracks) {
             if (!usedAuth && hasAuth && playabilityError === 'LOGIN_REQUIRED') {
                 authRequiredUntil = Date.now() + 3600000;
                 usedAuth = true;
-                a = await fetchPlayerResponse(buildHeaders(true));
-                a = Array.isArray(a) ? a[0] : a;
-                a = a?.playerResponse || a;
+                a = filterPlayerObject(await fetchPlayerResponse(buildHeaders(true)));
                 const retry_vt = a?.responseContext?.visitorData;
                 if (retry_vt) actuallk.visitorData = retry_vt;
             }
@@ -486,90 +508,84 @@ async function fallbackYTStream(lstracks) {
             }
         }
 
-        const hasUsableFormatUrl = !!(a?.streamingData?.adaptiveFormats || []).find(getFormatUrl) || !!(a?.streamingData?.formats || []).find(getFormatUrl);
-        if (!isWebClient && !hasUsableFormatUrl) {
-            const fullResponse = await fetchPlayerResponse(buildHeaders(usedAuth), `${apiEndpoint}?prettyPrint=false&alt=json`);
-            let fullPlayerResponse = Array.isArray(fullResponse) ? fullResponse[0] : fullResponse;
-            fullPlayerResponse = fullPlayerResponse?.playerResponse || fullPlayerResponse;
-            if (fullPlayerResponse?.playabilityStatus?.status === 'OK') a = fullPlayerResponse;
-        }
+        let forceLegacy = false;
+        let actualfinalurl;
+        let fsFmt = {};
+        let frso = {};
 
-        if (!!(a?.videoDetails?.isLiveContent && a.videoDetails?.lengthSeconds == 0 && a?.streamingData?.hlsManifestUrl)) {
-            finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
-        }
-        else if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
-            finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
-        }
-        else if (isWebClient && a?.streamingData?.hlsManifestUrl) {
-            finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
-        }
-        else if (['IOS'].includes(targetClient)) {
-            fr = a.streamingData?.adaptiveFormats?.filter(c => [140, 139].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
-            if (fr) {
-                const rawFormatUrl = getFormatUrl(fr);
-                const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                finalurl = decipheredUrl + "&ratebypass=true&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
-                changeLength = true;
-                durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
-                streamingLength = String(fr.contentLength);
+        for (let attempt = 0; attempt < 2; attempt++) {
+            forceLegacy = attempt === 1;
+            finalurl = "";
+            changeLength = false;
+            streamingLength = null;
+            durationLength = null;
+            fr = null;
+
+            if (a?.videoDetails?.isLiveContent && a.videoDetails?.lengthSeconds == 0 && a?.streamingData?.hlsManifestUrl) {
+                finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
             }
-        }
-        else if (['ANDROID', 'ANDROID_VR', 'VISIONOS', 'WEB_PARENT'].includes(targetClient)) {
-            fr = a.streamingData?.adaptiveFormats?.filter(c => [774, 251, 250, 249, 600].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
-            if (!fr) fr = a.streamingData?.adaptiveFormats?.filter(c => [141, 140, 599].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
-            if (fr) {
-                const rawFormatUrl = getFormatUrl(fr);
-                const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                finalurl = decipheredUrl + "&ratebypass=true&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
-                changeLength = true;
-                durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
-                streamingLength = String(fr.contentLength);
-            } else {
-                const fs = a.streamingData?.formats?.find(getFormatUrl);
-                if (fs) {
-                    const rawFormatUrl = getFormatUrl(fs);
+            else if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
+                finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+            }
+            else {
+                fsFmt = a.streamingData?.formats?.find(getFormatUrl);
+                frso = a.streamingData?.adaptiveFormats?.filter(c => [...sortTargetOpus, ...sortTargetM4a].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
+                if (frso && !forceLegacy) {
+                    const rawFormatUrl = getFormatUrl(frso);
                     const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                    finalurl = decipheredUrl + "&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+                    finalurl = withStreamParams(decipheredUrl, { ratebypass: 'true', rn: '0', alr: 'no', fallback_count: '0', cver: useClient.clientVersion, cpn });
+                    changeLength = true;
+                    durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
+                    streamingLength = String(frso.contentLength);
+                }
+                else {
+                    const rawFormatUrl = getFormatUrl(fsFmt);
+                    const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
+                    finalurl = withStreamParams(decipheredUrl, { rn: '0', alr: 'no', fallback_count: '0', cver: useClient.clientVersion, cpn });
                 }
             }
-        }
-        else {
-            const fs = a.streamingData?.formats?.find(getFormatUrl);
-            if (fs) {
-                const rawFormatUrl = getFormatUrl(fs);
-                const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                finalurl = decipheredUrl + "&rn=0&alr=no&fallback_count=0&cver=" + useClient.clientVersion + "&cpn=" + cpn;
+
+            if (!finalurl && a?.streamingData?.hlsManifestUrl) {
+                finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
             }
-        }
 
-        if(!finalurl && a?.streamingData?.serverAbrStreamingUrl) {
-            throw new Error(`This content unavailable due youtube enforce SABR-only`);
-        }
+            if (!finalurl && a?.streamingData?.serverAbrStreamingUrl) {
+                throw new Error(`This content unavailable due youtube enforce SABR-only`);
+            }
 
-        if (!finalurl) {
-            throw new Error(`No playable YouTube format URL for ${targetClient}`);
-        }
+            if (!finalurl) {
+                throw new Error(`No playable YouTube format URL for ${targetClient}`);
+            }
 
-        if (isHlsUrl(finalurl)) {
-            return finalurl;
-        }
+            if (isHlsUrl(finalurl)) {
+                return finalurl;
+            }
 
-        let actualfinalurl;
+            const contentPoToken = await generateCbPot(videoId);
 
-        const filterlocation = await fetch(finalurl, {
-            method: "HEAD",
-            headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
-        });
+            const filterlocation = await fetch(finalurl + "&pot=" + contentPoToken, {
+                method: "HEAD",
+                headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
+            });
 
-        if (filterlocation.status === 403 && changeLength) {
-            const bytesPerSecond = parseInt(fr.contentLength) / durationLength;
-            const previewLength = String(Math.floor(bytesPerSecond * 60));
-            actualfinalurl = filterlocation.url;
-            streamingLength = previewLength;
-            changeLength = true;
-        }
-        else {
-            actualfinalurl = filterlocation.url;
+            const secfinalurl = filterlocation.url;
+            const finalWithPot = secfinalurl.includes("pot=") ? secfinalurl : secfinalurl + "&pot=" + contentPoToken;
+
+            if (filterlocation.status === 403 && changeLength) {
+                if (isWebClient && !forceLegacy) {
+                    continue;
+                }
+                const bytesPerSecond = parseInt(frso.contentLength) / durationLength;
+                const previewLength = String(Math.floor(bytesPerSecond * 60));
+                actualfinalurl = finalWithPot;
+                streamingLength = previewLength;
+                changeLength = true;
+            }
+            else {
+                actualfinalurl = finalWithPot;
+            }
+
+            break;
         }
 
         templist.push({
@@ -581,7 +597,7 @@ async function fallbackYTStream(lstracks) {
         });
 
         if (changeLength && streamingLength && parseInt(streamingLength) > 0 && !actualfinalurl?.includes('googlevideo.com/api/manifest/')) {
-            const ext = [774, 251, 250, 249, 600].includes(fr?.itag) ? "webm" : "m4a";
+            const ext = sortTargetOpus.includes((frso && !forceLegacy ? frso : fsFmt)?.itag) ? "webm" : "m4a";
             return createChunkedStream(actualfinalurl, parseInt(streamingLength), videoId, ext);
         }
 
@@ -600,6 +616,9 @@ module.exports = {
     ignoreSignInErrors: true,
     slicePlaylist: true,
     useYoutubeDL: false,
+    innertubeConfigRaw: {
+        generate_session_locally: true
+    },
     createStream: async (q) => {
         try { return await fallbackYTStream(q.url); }
         catch { return; }

@@ -14,6 +14,7 @@ module.exports = {
     $setCache[initclientmusic;system_file-useIcon;$readFile[./back/iconsURL.json]]
     $setCache[initclientmusic;system_file-listRadio;$readFile[./back/listRadioCountry.json]]
     $setCache[initclientmusic;system_file-listLyricsLanguage;$readFile[./back/listLanguages.json]]
+    $if[$callFunction[configMusic;cacheAllContextNeed];$callFunction[fetchDiscordContext]]
     ]
     $sendMessage[$channelID;$reply[$channelID;$messageID;true] OK]
     `

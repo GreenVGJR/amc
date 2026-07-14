@@ -92,9 +92,9 @@ module.exports = {
     $if[$get[trackytlength]>=$get[getcdnytlength];
     $break
     ]]
-    $let[finalurl;{"length":"$get[getcdnytlength]","container":$jsonStringify[las],"original":"$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no&pot=$getCache[initclientmusic;authmusic_youtube_pot]"}]
+    $let[finalurl;{"length":"$get[getcdnytlength]","container":$jsonStringify[las],"original":"$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no"}]
     ;
-    $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no&pot=$getCache[initclientmusic;authmusic_youtube_pot]]
+    $let[finalurl;$replace[$get[getcdnyt];&requiressl=yes;&requiressl=yes&ratebypass=true&range=0-$get[getcdnytlength];1]&cpn=$randomString[16]&alr=no]
     ]]
     $if[$env[types]==vs;
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
@@ -172,20 +172,24 @@ module.exports = {
     $if[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList;0]==;
     $jsonLoad[b;$env[test;results;video;PlayAddrStruct;UrlList]]
     ;
-    $jsonLoad[elindex;$env[test;results;video;bitrateInfo]]
+    $jsonLoad[elindex;$default[$env[test;results;video;bitrateInfo];{}]]
+    $jsonLoad[elmindex;$default[$env[test;results;video;bitrateAudioInfo];{}]]
     $let[ad0;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];original_]]]
     $let[findindex;$get[ad0]]
     $if[$get[ad0]==-1;
-    $let[ad1;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];adapt_lowest_]]]
+    $let[jfg1;$arrayFindIndex[elmindex;ef;$startsWith[$env[ef;AudioQualityString];adapt_lowest]]]
+    $let[ad1;$if[$get[jfg1]!=-1;-1;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];adapt_lowest_]]]]
     $let[findindex;$get[ad1]]
     $if[$get[ad1]==-1;
-    $let[ad2;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];adapt_lower_]]]
+    $let[jfg2;$arrayFindIndex[elmindex;ef;$startsWith[$env[ef;AudioQualityString];adapt_lower]]]
+    $let[ad2;$if[$get[jfg2]!=-1;-1;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];adapt_lower_]]]]
     $let[findindex;$get[ad2]]
     $if[$get[ad2]==-1;
     $let[ad3;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];normal_]]]
     $let[findindex;$get[ad3]]
     $if[$get[ad3]==-1;
-    $let[ad4;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];adapt_]]]
+    $let[jfg3;$arrayFindIndex[elmindex;ef;$startsWith[$env[ef;AudioQualityString];adapt]]]
+    $let[ad4;$if[$get[jfg3]!=-1;-1;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];adapt_]]]]
     $let[findindex;$get[ad4]]
     $if[$get[ad4]==-1;
     $let[ad5;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];lowest_]]]
@@ -194,7 +198,9 @@ module.exports = {
     $let[ad6;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];lower_]]]
     $let[findindex;$get[ad6]]
     $if[$get[ad6]==-1;
-    $let[ad7;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];comet_]]]
+    $let[jfg4;$arrayFindIndex[elmindex;ef;$startsWith[$env[ef;AudioQualityString];comet]]]
+    $let[jfg5;$arrayFindIndex[elmindex;ef;$startsWith[$env[ef;AudioQualityString];comet_adapt]]]
+    $let[ad7;$if[$or[$get[jfg4]!=-1;$get[jfg5]!=-1];-1;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];comet_]]]]
     $let[findindex;$get[ad7]]
     $if[$get[ad7]==-1;
     $let[ad8;$arrayFindIndex[elindex;ef;$startsWith[$env[ef;GearName];group_]]]

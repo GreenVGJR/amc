@@ -1,7 +1,7 @@
 module.exports = {
   data: {
     "name": "download",
-    "description": "Download a media (Only supports Video, Audio)",
+    "description": "Download a media (Video, Audio)",
     "options": [
       {
         "type": 3,
@@ -74,11 +74,8 @@ $if[$or[$and[$channelExists[$channelID]==false;$option[ephemeral]!=false];$and[$
 $localFunction[runcodessync;
 $interactionReply[
 $addContainer[
-$addSection[
-$addTextDisplay[### $env[msg1]]
+$addTextDisplay[- $bold[$env[msg1]]]
 $addTextDisplay[-# » $toTitleCase[$advancedReplace[$env[musictype;type];tiktokmusic;tiktok music;tiktokmob;tiktok mobile;instagramaudio;instagram audio;applemusic;apple music]]\n-# » $if[$get[clh]==;null;$round[$divide[$get[clh];1024;1024];2] MB - $round[$divide[$get[limitsize];1024;1024];2] MB]\n-# » $if[$get[converttype]==;null;.$get[contenttype]$if[$get[contenttype]!=$get[converttype]; => .$get[converttype]]]]
-$addThumbnail[$userAvatar[$authorID;2048]]
-]
 $addSeparator[Small;true]
 $addTextDisplay[$env[msg2]]
 $if[$env[togload]==true;
@@ -87,7 +84,7 @@ $if[$get[targetattachtype]==0;
 $addTextDisplay[$if[$and[$option[lyrics]==true;$get[checklyric]];$codeBlock[$default[$get[lyricnames];null]]]$codeBlock[$default[$get[names];null]]$if[$and[$has[checklyric];$get[checklyric]==false];\n-# WARNING: Lyrics not available]]
 $addMediaGallery[$addMediaItem[$get[getcdn];$get[getpuretitle]]]
 ]
-$addTextDisplay[-# Preview Mode$if[$get[targetattachtype]!=0; (Not Available)]]
+$addTextDisplay[-# Preview$if[$get[targetattachtype]!=0; (Not Available)]]
 ]
 ;$callFunction[useIcon;color_embed]]
 ]
