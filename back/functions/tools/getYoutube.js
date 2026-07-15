@@ -344,4 +344,37 @@ module.exports = [{
 
     $return[$default[$jsonStringify[oisdn];{}]]
     `
+},
+{
+    name: "getYoutubeChannel",
+    params: [{
+        name: "channelQuery", // string
+        description: "Query to search channels",
+        required: true
+    },
+    {
+        name: "userAgent", // string
+        description: "Spoof client",
+        required: false
+    }],
+    code: `
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
+    $let[ytinitcookietest1;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
+
+    $jsonLoad[inputhttpquery;{"params":"EgIQAg%3D%3D","context":{"client":{"clientName":2,"clientVersion":"2.20261231","visitorData":"$getCache[initclientmusic;authmusic_youtube_visitor]","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
+    $!jsonSet[inputhttpquery;query;$env[channelQuery]]
+    $httpSetBody[$jsonStringify[inputhttpquery]]
+    $httpSetContentType[Text]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip, br]
+    $httpAddHeader[Content-Type;application/json]
+    $httpAddHeader[Cookie;$get[ytinitcookietest1]]
+    $httpAddHeader[Accept-Language;en]
+    $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.sectionListRenderer.contents.itemSectionRenderer.contents.compactChannelRenderer;POST;oisdn]
+    $jsonLoad[oisdn;$env[oisdn]]
+    $jsonLoad[oisdn;$env[oisdn;contents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
+    $arrayMap[oisdn;ffuy;$if[$env[ffuy;compactChannelRenderer]!=;$return[$env[ffuy;compactChannelRenderer]]];oisdn]
+
+    $return[$default[$jsonStringify[oisdn];{}]]
+    `
 }]

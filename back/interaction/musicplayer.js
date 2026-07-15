@@ -103,7 +103,7 @@ module.exports = {
     $footer[Fetching;$callFunction[useIcon;loading];1]
     $color[$callFunction[useIcon;color_embed];1]
     ]
-    $let[a;$callFunction[discoverArtistLastFm;$trim[$advancedTextSplit[$trackInfo[author];- Topic;0]]]]
+    $let[a;$callFunction[lastFmArtist;$trim[$advancedTextSplit[$trackInfo[author];- Topic;0]]]]
     $onlyIf[$get[a]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
     $interactionReply[$get[a]]
     ]

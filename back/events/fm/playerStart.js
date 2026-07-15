@@ -78,7 +78,7 @@ module.exports = [{
         $let[lrkggl;$getCache[initclientmusic;musicplayer_cache-lastfm-$get[kkcmb]]]
         $if[$get[lrkggl]==;
         $setCache[initclientmusic;musicplayer_cache-lastfm-$get[kkcmb];undefined]
-        $let[knvmm;$callFunction[discoverArtistLastFm;$get[kkcmr];false]]
+        $let[knvmm;$callFunction[lastFmArtist;$get[kkcmr];false]]
         $if[$or[$get[knvmm]==null;$get[knvmm]==];
         $setCache[initclientmusic;musicplayer_cache-lastfm-$get[kkcmb];"null"]
         ]]

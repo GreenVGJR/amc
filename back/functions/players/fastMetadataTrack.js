@@ -52,7 +52,7 @@ module.exports = {
     $httpAddHeader[Accept-Encoding;gzip, br]
     $let[http;$httpRequest[https://api-v2.soundcloud.com/search/tracks?q=$env[query]&client_id=$getCache[initclientmusic;authmusic_soundcloud]&limit=1;GET;res]]
     $onlyIf[$get[http]!=401;
-    $callFunction[generateAuthKeys;soundcloud;;false]
+    $callFunction[generateAuth;soundcloud;;false]
     $callLocalFunction[refreshing;true]]
     $onlyIf[$get[http]!=429;$return]
     ]
@@ -75,8 +75,8 @@ module.exports = {
     $let[mdquery;https://api.spotify.com/v1/search?q=$env[query]&type=track&offset=0&limit=1]
     $let[jsonres;$djsEval[const { request, Agent } = require("undici")\\; request(ctx.getKeyword("mdquery"), { dispatcher: new Agent({ connect: { family: 4 } }), headers: JSON.parse(ctx.getKeyword("mdhedroute_spotify")), method: "GET" }).then(a => { ctx.setKeyword('httpspo', a.statusCode)\\; return a.body.text() }).catch()]]
     $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;
-    $callFunction[generateAuthKeys;spotify;;false]
-    $callFunction[generateAuthKeys;spotify_token;;false]
+    $callFunction[generateAuth;spotify;;false]
+    $callFunction[generateAuth;spotify_token;;false]
     $callLocalFunction[refreshing;true]
     ]
     $if[$or[$get[httpspo]==429;$get[httpspo]==403];
@@ -94,8 +94,8 @@ module.exports = {
     $let[mdquery2;https://api-partner.spotify.com/pathfinder/v2/query]
     $let[jsonres2;$djsEval[const { request, Agent } = require("undici")\\; request(ctx.getKeyword("mdquery2"), { dispatcher: new Agent({ connect: { family: 4 } }), body: JSON.stringify(ctx.getEnvironmentKey("mdbody_spotify")), headers: JSON.parse(ctx.getKeyword("mdhedroute_spotify2")), method: "POST" }).then(a => { ctx.setKeyword('httpspo', a.statusCode)\\; return a.body.text() }).catch()]]
     $onlyIf[$or[$get[httpspo]==401;$get[httpspo]==400]!=true;
-    $callFunction[generateAuthKeys;spotify;;false]
-    $callFunction[generateAuthKeys;spotify_token;;false]
+    $callFunction[generateAuth;spotify;;false]
+    $callFunction[generateAuth;spotify_token;;false]
     $callLocalFunction[refreshing;true]
     ]
     $onlyIf[$or[$get[httpspo]==429;$get[httpspo]==403]!=true;$return]

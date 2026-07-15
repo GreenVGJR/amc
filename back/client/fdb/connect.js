@@ -22,16 +22,17 @@ module.exports = [{
     $async[$setCache[initclientmusic;system_file-listRadio;$readFile[./back/listRadioCountry.json]]]
     $async[$setCache[initclientmusic;system_file-listLyricsLanguage;$readFile[./back/listLanguages.json]]]
     $async[$!prefetchDB[user;] $!prefetchDB[guild;] $!prefetchDB[global;]]
-    $async[$callFunction[generateAuthKeys;tidal;;true]]
+    $async[$callFunction[generateAuth;tidal;;true]]
+    $callFunction[generateAuth;youtube_anon;;true]
     $if[$or[$get[ytinitcookiesalt]==;$get[ytinitcookiesalt]==undefined;$callFunction[configMusic;useBearer]==true];
-    $callFunction[generateAuthKeys;youtube;;true]
+    $callFunction[generateAuth;youtube;;true]
     $if[$callFunction[configMusic;useBearer]==true;
     $if[$env[lrtuy]!=false;
     $setInterval[$let[yyugn;$callFunction[generateTokenYoutube;false]];30m]
     ]]
     ;
     $localFunction[checkcookies;
-    $let[checkcookie;$callFunction[generateAuthKeys;youtube;;$env[lfk];$env[toggle]]]
+    $let[checkcookie;$callFunction[generateAuth;youtube;;$env[lfk];$env[toggle]]]
     $if[$getCache[initclientmusic;retrycookiesyt]==true;$deleteCache[initclientmusic;retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;false]]
     ;lfk;toggle]
     $callLocalFunction[checkcookies;true;false]
@@ -42,16 +43,16 @@ module.exports = [{
     ]
     $deleteCache[initclientmusic;disablecookiesyt]
     ]
-    $async[$callFunction[generateAuthKeys;tiktok;;true]]
-    $async[$callFunction[generateAuthKeys;instagram;;true]]
-    $async[$callFunction[generateAuthKeys;soundcloud;;true]]
-    $async[$callFunction[generateAuthKeys;spotify;;true]]
-    $async[$callFunction[generateAuthKeys;spotify_player;;true]]
-    $async[$callFunction[generateAuthKeys;spotify_token;;true]]
-    $async[$callFunction[generateAuthKeys;amazonmusic;;true]]
-    $async[$callFunction[generateAuthKeys;applemusic;;true]]
-    $async[$callFunction[generateAuthKeys;tidal_token;;true]]
-    $async[$callFunction[generateAuthKeys;deezer;;true]]
+    $async[$callFunction[generateAuth;tiktok;;true]]
+    $async[$callFunction[generateAuth;instagram;;true]]
+    $async[$callFunction[generateAuth;soundcloud;;true]]
+    $async[$callFunction[generateAuth;spotify;;true]]
+    $async[$callFunction[generateAuth;spotify_player;;true]]
+    $async[$callFunction[generateAuth;spotify_token;;true]]
+    $async[$callFunction[generateAuth;amazonmusic;;true]]
+    $async[$callFunction[generateAuth;applemusic;;true]]
+    $async[$callFunction[generateAuth;tidal_token;;true]]
+    $async[$callFunction[generateAuth;deezer;;true]]
     `
 },
 {

@@ -1,5 +1,5 @@
 module.exports = {
-    name: "discoverArtistLastFm",
+    name: "lastFmArtist",
     params: [{
         name: "query", // string
         description: "query",
@@ -27,7 +27,7 @@ $let[lookCacheYT;$getCache[initclientmusic;musicplayer_cache-lastfmyt-$md5[$get[
 $localFunction[fetchlastfm;
 $let[lookCache;$getCache[initclientmusic;musicplayer_cache-lastfm-$md5[$get[cusque]]]]
 
-$if[$or[$get[lookCache]==null;$get[country]>=7];$return]
+$if[$or[$get[lookCache]==null;$get[country]>=9];$return]
 $if[$env[retry]==true;$letSum[country;1]]
 $if[$or[$get[lookCache]==undefined;$get[lookCache]==];
 $try[
@@ -39,7 +39,7 @@ $httpAddHeader[Sec-Fetch-Site;none]
 $httpSetContentType[Text]
 $let[checkhttp;$httpRequest[$get[authorurl]?_pjax=%23content&top_tracks_date_preset=ALL;GET]]
 $c[Last fm has weird anti-bot protect fr]
-$if[$or[$get[checkhttp]==502;$get[checkhttp]==416];$callLocalFunction[fetchlastfm;true] $return]
+$if[$or[$get[checkhttp]==502;$get[checkhttp]==416;$get[checkhttp]==429];$callLocalFunction[fetchlastfm;true] $return]
 $let[reslast;$httpResult]
 ]
 ;
@@ -57,23 +57,12 @@ $let[actualauthorurl;$advancedTextSplit[$get[reslast];meta property="og:url";1;c
 $if[$get[lookCacheYT]!=;
 $let[bannerchannelurl;$get[lookCacheYT]]
 ;
-$httpAddHeader[Accept-Language;en]
-$httpAddHeader[User-Agent;$get[agent]]
-$httpSetContentType[Text]
-$!httpRequest[https://www.youtube.com/results?search_query=$advancedTextSplit[$get[actualauthorurl];/;4]&sp=EgIQAkICCAE%253D;GET]
-$jsonLoad[a;$advancedTextSplit[$httpResult;ytInitialData =;1;\\;</script>;0]]
-$httpAddHeader[Accept-Language;en]
-$httpAddHeader[User-Agent;$get[agent]]
-$httpSetContentType[Text]
-$jsonLoad[findindexch;$env[a;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
-$let[mrinyt;$arrayFindIndex[findindexch;p;$checkCondition[$env[p;channelRenderer;ownerBadges;0;metadataBadgeRenderer;icon;iconType]==AUDIO_BADGE]]]
+$jsonLoad[findindexch;$callFunction[getYoutubeChannel;$advancedTextSplit[$get[actualauthorurl];/;4]]]
+$let[mrinyt;$arrayFindIndex[findindexch;p;$checkCondition[$env[p;ownerBadges;0;metadataBadgeRenderer;icon;iconType]==AUDIO_BADGE]]]
 $let[mrinyt;$if[$get[mrinyt]==-1;0;$get[mrinyt]]]
-$let[channelyturl;$env[a;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents;$get[mrinyt];channelRenderer;channelId]]
-$if[$get[channelyturl]!=;
-$httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
-$!httpRequest[https://www.youtube.com/channel/$get[channelyturl];GET]
-$jsonLoad[b;$advancedTextSplit[$httpResult;ytInitialData =;1;\\;</script>;0]]
-$let[bannerchannelurl;$replace[$env[b;header;pageHeaderRenderer;content;pageHeaderViewModel;banner;imageBannerViewModel;image;sources;0;url];w$env[b;header;pageHeaderRenderer;content;pageHeaderViewModel;banner;imageBannerViewModel;image;sources;0;width];s0]]
+$let[checkbannerexistyt;$env[findindexch;$get[mrinyt];tvBanner;thumbnails;0;url]]
+$if[$get[checkbannerexistyt]!=;
+$let[bannerchannelurl;$advancedTextSplit[$env[findindexch;$get[mrinyt];tvBanner;thumbnails;0;url];=;0]=s0]
 $if[$get[lookCacheYT]==;$setCache[initclientmusic;musicplayer_cache-lastfmyt-$md5[$get[cusque]];$get[bannerchannelurl]]]
 ]]
 $let[firstcovtop;$advancedTextSplit[$get[reslast];tbody;1;tbody;0;class="cover-art";1;src=";1;";0]]
@@ -122,7 +111,7 @@ $if[$get[desc]!=;$description[-# $get[desc]]]
 $addField[> \`🏷️\` | Tags;$if[$arrayLength[loadtag]==0;-# Not Available;$arrayJoin[loadtag;, ]];false;0]
 $addField[> \`🍀\` | Latest Release;$if[$trim[$get[latestre-t]]==;-# Not Available;$get[latestre]];true;0]
 $addField[> \`📈\` | Popular This Week;$if[$trim[$get[popweek-t]]==;-# Not Available;$get[popweek]];true;0]
-$addField[> \`👥\` | Similar Artists;$if[$trim[$get[simartist]]==;-# Not Available;$get[simartist]];false;0]
+$addField[> \`👥\` | Similar To;$if[$trim[$get[simartist]]==;-# Not Available;$get[simartist]];false;0]
 $thumbnail[$get[valthumbnail_author];0]
 $if[$get[bannerchannelurl]!=;
 $image[$get[bannerchannelurl];0]

@@ -5,7 +5,6 @@ require('dotenv').config({ quiet: true }); // Load Environment
 const toggles = require('./back/config.json');
 const youtube = require('./back/client/youtubeConfig');
 
-
 // Main
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
 const { ForgeMusic, GuildQueueEvent } = require('@tryforge/forge.music');

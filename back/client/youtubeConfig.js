@@ -533,7 +533,7 @@ async function fallbackYTStream(lstracks) {
                 if (frso && !forceLegacy) {
                     const rawFormatUrl = getFormatUrl(frso);
                     const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                    finalurl = withStreamParams(decipheredUrl, { ratebypass: 'true', rn: '0', alr: 'no', fallback_count: '0', cver: useClient.clientVersion, cpn });
+                    finalurl = withStreamParams(decipheredUrl, { ratebypass: 'true', rn: '0', alr: 'no', cver: useClient.clientVersion, cpn });
                     changeLength = true;
                     durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
                     streamingLength = String(frso.contentLength);
@@ -541,7 +541,7 @@ async function fallbackYTStream(lstracks) {
                 else {
                     const rawFormatUrl = getFormatUrl(fsFmt);
                     const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                    finalurl = withStreamParams(decipheredUrl, { rn: '0', alr: 'no', fallback_count: '0', cver: useClient.clientVersion, cpn });
+                    finalurl = withStreamParams(decipheredUrl, { rn: '0', alr: 'no', cver: useClient.clientVersion, cpn });
                 }
             }
 

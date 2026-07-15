@@ -72,7 +72,7 @@ module.exports = {
     $localFunction[refreshsc;
     $if[$env[refresh]==true;
     $if[$get[tryattempt]>=3;$return]
-    $callFunction[generateAuthKeys;soundcloud;;false]
+    $callFunction[generateAuth;soundcloud;;false]
     $letSum[tryattempt;1]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
@@ -98,8 +98,8 @@ module.exports = {
     $try[
     $if[$env[refresh]==true;
     $if[$get[tryattempt]>=3;$return]
-    $callFunction[generateAuthKeys;spotify;;false]
-    $callFunction[generateAuthKeys;spotify_token;;false]
+    $callFunction[generateAuth;spotify;;false]
+    $callFunction[generateAuth;spotify_token;;false]
     $letSum[tryattempt;1]
     ]
     $let[mdhedroute_spotify;{
@@ -164,9 +164,8 @@ module.exports = {
     $httpAddHeader[Cookie;geo=US]
     $let[httpal;$httpRequest[https://api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]]
     $if[$or[$get[httpal]==401;$get[httpal]==400];
-    $async[$callFunction[generateAuthKeys;applemusic;;false]]
+    $async[$callFunction[generateAuth;applemusic;;false]]
     $let[httpal;429]
-    ]
     $if[$get[httpal]==429;
     $let[tryattempt;0]
     $localFunction[runitunes;
@@ -253,7 +252,7 @@ module.exports = {
     $localFunction[refreshamz;
     $if[$env[refresh]==true;
     $if[$get[tryattempt]>=3;$return]
-    $callFunction[generateAuthKeys;amazonmusic;;false]
+    $callFunction[generateAuth;amazonmusic;;false]
     $letSum[tryattempt;1]
     ]
     $jsonLoad[a;$default[$getCache[initclientmusic;authmusic_amazonmusic];{}]]

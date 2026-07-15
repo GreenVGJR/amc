@@ -19,7 +19,7 @@ module.exports = {
     $async[$setCache[initclientmusic;listcommands-help;$applicationCommands]]
     $setInterval[
     $logger[Info;Re-generating keys - $getTimestamp]
-    $callFunction[generateAuthKeys;all;;false]
+    $callFunction[generateAuth;all;;false]
     $logger[Info;Done - $getTimestamp]
     ;6h]
     $logger[Info;Ready on client $username[$clientID]]

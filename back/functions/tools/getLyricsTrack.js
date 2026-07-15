@@ -123,7 +123,7 @@ module.exports = {
     $let[finallyric2;$get[checkcachelyric]]
     ;
     $localFunction[nttuf;
-    $if[$env[refauth]==true;$generateAuthKeys[tidal_token;;false]]
+    $if[$env[refauth]==true;$generateAuth[tidal_token;;false]]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Accept;application/vnd.api+json]
@@ -163,9 +163,9 @@ module.exports = {
     $if[$env[drtcp;data;0;id]==;$let[cusdezaborterls;true]]
     $if[$get[cusdezaborterls]==false;
     $let[drtcp_count;0]
-    $generateAuthKeys[deezer;;false]
+    $generateAuth[deezer;;false]
     $localFunction[lyrde;
-    $if[$env[refresh]==true;$generateAuthKeys[deezer;;false]]
+    $if[$env[refresh]==true;$generateAuth[deezer;;false]]
     $if[$env[sumCount]==true;$letSum[drtcp_count;1]]
     $if[$env[drtcp;data;$get[drtcp_count];id]==;$jsonLoad[res;{}] $return]
     $let[checkcachelyric;$getCache[initclientmusic;cachelyricsdata-$env[line]-$md5[deezer_$env[drtcp;data;$get[drtcp_count];id]]]]

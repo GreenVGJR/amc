@@ -1,7 +1,7 @@
 const { tarClient, tarClientYT } = require('../helpers/clientYoutube.js');
 
 module.exports = {
-    name: "generateAuthKeys",
+    name: "generateAuth",
     params: [{
         name: "type", // enum
         description: "Type",
@@ -26,11 +26,32 @@ module.exports = {
     $let[agent;$if[$or[$env[userAgent]==;$env[userAgent]==null];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
     $let[typedebug;$callFunction[configMusic;debug_auth]]
 
+    $if[$or[$env[type]==all;$env[type]==youtube_anon];
+    $if[$get[typedebug];$chalkLog[Generating Youtube (Anon)      | Cookies;cyan]]
+    $try[
+        $let[tempCookiesYTEnv;$djsEval[process.env.YOUTUBE_ANONCOOKIES]]
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+        $httpAddHeader[Sec-Fetch-Dest;document]
+        $httpAddHeader[Sec-Fetch-Site;none]
+        $httpSetContentType[Text]
+        $let[checkhttpuamyt;$httpRequest[https://www.youtube.com/sw.js_data;GET]]
+        $if[$get[checkhttpuamyt]==200;
+        $let[tempCookiesYT;$callFunction[filterCookies;2;$get[tempCookiesYTEnv];$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]]
+        $setCache[initclientmusic;authmusic_youtube_tempcookies;$get[tempCookiesYT]]
+        $writeFile[.env;$replace[$readFile[.env];YOUTUBE_ANONCOOKIES=$get[tempCookiesYTEnv];YOUTUBE_ANONCOOKIES=$get[tempCookiesYT]]]
+        $!djsEval[require('dotenv').config({ override: true, quiet: true })]
+        ]
+        $if[$env[successlog]==true;$logger[Info;$if[$get[tempCookiesYT]!=;$cropText[$get[tempCookiesYT];0;10;...];Failed to Retrieve] | Youtube (Anon) / Cookies]]
+    ;$logger[Info;Failed to Retrieve - Youtube (Anon)]]
+    $c[Failing won't attempt retry]
+    ]
+
     $if[$or[$env[type]==all;$env[type]==youtube];
     $let[getpickclient;${tarClient()}]
     $jsonLoad[listclient;$replace[${tarClientYT()};%SEMI%;\\;]]
     $let[isWebClient;$checkCondition[$env[listclient;targetDomain]!=youtubei.googleapis.com]]
-    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Youtube             | Visitor;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Youtube             | Visitor;cyan]]
     $if[$env[successlog]==true;
     $let[genpotytlk;$callFunction[generateColdPotYoutube]]
     $setCache[initclientmusic;authmusic_youtube_pot;$get[genpotytlk]]
@@ -120,16 +141,9 @@ module.exports = {
         ;
         $if[$env[successlog]==true;$logger[Error;InnerTube: Can't continue the process]]
         ]]
-        $let[tempCookiesYTEnv;$djsEval[process.env.YOUTUBE_ANONCOOKIES]]
-        $let[tempCookiesYT;$callFunction[filterCookies;2;$get[tempCookiesYTEnv];$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]]
         $let[a33;$advancedTextSplit[$env[g3;0;3];||;0]]
         $if[$get[a33]!=;$setCache[initclientmusic;authmusic_youtube_datasync_id;$get[a33]]]
         $jsonLoad[listconfig;$getCache[initclientmusic;system_file-config]]
-        $if[$and[$env[successlog]==true;$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]];
-        $setCache[initclientmusic;authmusic_youtube_tempcookies;$get[tempCookiesYT]]
-        $writeFile[.env;$replace[$readFile[.env];YOUTUBE_ANONCOOKIES=$get[tempCookiesYTEnv];YOUTUBE_ANONCOOKIES=$get[tempCookiesYT]]]
-        $!djsEval[require('dotenv').config({ override: true, quiet: true })]
-        ]
         $if[$and[$get[abortproscookies]!=true;$or[$get[ytinitcookies]==;$get[ytinitcookies]==undefined]==false];
         $localFunction[cookiessid;
         $let[tempgrinitcs;$default[$get[ytinitcookies_replacement];$get[ytinitcookies]]]
@@ -269,10 +283,10 @@ module.exports = {
         $if[$env[successlog]==true;$logger[Info;$if[$get[a33]!=;$cropText[$get[a33];0;10;...];Failed to Retrieve] | Youtube / DataSyncID]]
     ;$if[$hasCache[initclientmusic;retrycookiesyt]==false;$logger[Info;Failed to Retrieve - Youtube]]]
     ]
-    $if[$and[$get[a32]==;$get[abortproscookies]!=true];$logger[Warn;Re-trying - Youtube] $callFunction[generateAuthKeys;youtube;;true]]
+    $if[$and[$get[a32]==;$get[abortproscookies]!=true];$logger[Warn;Re-trying - Youtube] $callFunction[generateAuth;youtube;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==soundcloud];
-    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Soundcloud          | ClientID;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Soundcloud          | ClientID;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
@@ -306,10 +320,10 @@ module.exports = {
     $if[$env[successlog]==true;$logger[Info;$if[$env[storeclientid;0]!=;$cropText[$env[storeclientid;0];0;10;...];Failed to Retrieve] | Soundcloud / Player]]
     $if[$env[successlog]==true;$logger[Info;$if[$env[storeclientid;1]!=;$cropText[$env[storeclientid;1];0;10;...];Failed to Retrieve] | Soundcloud / Stream]]
     ;$logger[Info;Failed to Retrieve - Soundcloud]]
-    $if[$and[$env[storeclientid;0]==;$env[storeclientid;1]==;$get[abortscht]!=true];$logger[Warn;Re-trying - Soundcloud] $callFunction[generateAuthKeys;soundcloud;;true]]
+    $if[$and[$env[storeclientid;0]==;$env[storeclientid;1]==;$get[abortscht]!=true];$logger[Warn;Re-trying - Soundcloud] $callFunction[generateAuth;soundcloud;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==spotify];
-    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Key;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Spotify             | Key;cyan]]
     $try[
     $let[spinitcookies;$trimLines[$trim[$djsEval[process.env.SPOTIFY_COOKIES]]]]
     $if[$or[$get[spinitcookies]==;$get[spinitcookies]==undefined]==false;
@@ -355,10 +369,10 @@ module.exports = {
         $if[$get[token]!=;$setCache[initclientmusic;authmusic_spotify;$get[token]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[token]!=;$cropText[$get[token];0;10;...];Failed to Retrieve] | Spotify / Key$if[$get[cjdspo]; (with Cookies)]]]
     ;$logger[Info;Failed to Retrieve - Spotify]]
-    $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuthKeys;spotify;;true]]
+    $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuth;spotify;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==spotify_player];
-    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Key;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Spotify             | Key;cyan]]
     $try[
     $let[spinitcookies;$trimLines[$trim[$djsEval[process.env.SPOTIFY_COOKIES]]]]
     $httpAddHeader[Cookie;$get[spinitcookies]]
@@ -372,10 +386,10 @@ module.exports = {
     $if[$get[token]!=;$setCache[initclientmusic;authmusic_spotify_fall;$get[token]]]
     $if[$env[successlog]==true;$logger[Info;$if[$get[token]!=;$cropText[$get[token];0;10;...];Failed to Retrieve] | Spotify - Alt / Key$if[$env[parsejsspo;props;pageProps;state;settings;session;isAnonymous]==false; (with Cookies)]]]
     ;$logger[Info;Failed to Retrieve - Spotify]]
-    $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuthKeys;spotify_player;;true]]
+    $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuth;spotify_player;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==spotify_token];
-    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Spotify             | Token;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Spotify             | Token;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
@@ -387,10 +401,10 @@ module.exports = {
         $if[$get[token]!=;$setCache[initclientmusic;authmusic_spotify_token;$get[token]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[token]!=;$cropText[$get[token];0;10;...];Failed to Retrieve] | Spotify / Token]]
     ;$logger[Info;Failed to Retrieve - Spotify]]
-    $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuthKeys;spotify_token;;true]]
+    $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuth;spotify_token;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==amazonmusic];
-    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Amazon Music        | Config & Token;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Amazon Music        | Config & Token;cyan]]
     $try[
         $httpAddHeader[Origin;https://music.amazon.com/]
         $httpAddHeader[User-Agent;$get[agent]]
@@ -401,10 +415,10 @@ module.exports = {
         $if[$env[tokens;csrf;token]!=;$setCache[initclientmusic;authmusic_amazonmusic;$env[tokens]]]
         $if[$env[successlog]==true;$logger[Info;$if[$env[tokens;csrf;token]!=;$cropText[$env[tokens;csrf;token];0;10;...];Failed to Retrieve] | Amazon Music]]
     ;$logger[Info;Failed to Retrieve - Amazon Music]]
-    $if[$env[tokens;csrf;token]==;$logger[Warn;Re-trying - Amazon Music] $callFunction[generateAuthKeys;amazonmusic;;true]]
+    $if[$env[tokens;csrf;token]==;$logger[Warn;Re-trying - Amazon Music] $callFunction[generateAuth;amazonmusic;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==tidal];
-    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Tidal               | Token;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Tidal               | Token;cyan]]
     $if[a!=a;
     $try[
         $let[tidalids;$randomText[406956243;1550546;426987551;426987552;426987553]]
@@ -445,10 +459,10 @@ module.exports = {
     $let[finaltoken;txNoH4kkV41MfH25] $c[Static key]
     $setCache[initclientmusic;authmusic_tidal;$get[finaltoken]]
     $if[$env[successlog]==true;$logger[Info;$if[$get[finaltoken]!=;$cropText[$get[finaltoken];0;10;...];Failed to Retrieve] | Tidal / Token]]
-    $if[$get[finaltoken]==;$logger[Warn;Re-trying - Tidal] $callFunction[generateAuthKeys;tidal;;true]]
+    $if[$get[finaltoken]==;$logger[Warn;Re-trying - Tidal] $callFunction[generateAuth;tidal;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==tidal_token];
-    $if[$get[typedebug];$chalkLog[\\[PLAYER\\] Generating Tidal               | Auth;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Tidal               | Auth;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
@@ -460,10 +474,10 @@ module.exports = {
         $if[$get[finalauth]!=;$setCache[initclientmusic;authmusic_tidal_token;$get[finalauth]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[finalauth]!=;$cropText[$get[finalauth];0;10;...];Failed to Retrieve] | Tidal / Auth]]
     ;$logger[Info;Failed to Retrieve - Tidal]]
-    $if[$get[finalauth]==;$logger[Warn;Re-trying - Tidal] $callFunction[generateAuthKeys;tidal_token;;true]]
+    $if[$get[finalauth]==;$logger[Warn;Re-trying - Tidal] $callFunction[generateAuth;tidal_token;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==tiktok];
-    $if[$get[typedebug];$chalkLog[\\[SEARCH\\] Generating Tiktok              | Token & Cookies;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Tiktok              | Token & Cookies;cyan]]
     $try[
         $let[finaljs;false]
         $httpAddHeader[User-Agent;$get[agent]]
@@ -507,15 +521,15 @@ module.exports = {
         $jsonLoad[runtik;$httpResult]
         $let[a12;$env[runtik;body;webId]]
         ]
-        $if[$get[a13]!=;$setCache[initclientmusic;authmusic_tiktok;$deflate[$get[a13];base64]]]
+        $if[$get[a13]!=;$setCache[initclientmusic;authmusic_tiktok;$get[a13]]]
         $if[$get[a12]!=;$setCache[initclientmusic;authmusic_tiktok_did;"$get[a12]"]]
-        $if[$env[successlog]==true;$logger[Info;$if[$get[a13]!=;$cropText[$deflate[$get[a13];base64];0;10;...];Failed to Retrieve] | Tiktok / Cookie]]
+        $if[$env[successlog]==true;$logger[Info;$if[$get[a13]!=;$cropText[$get[a13];0;10;...];Failed to Retrieve] | Tiktok / Cookie]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[a12]!=;$cropText[$get[a12];0;10;...];Failed to Retrieve] | Tiktok / Device ID]]
     ;$logger[Info;Failed to Retrieve - Tiktok]]
-    $if[$and[$get[a12]==;$get[a13]==];$logger[Warn;Re-trying - Tiktok] $callFunction[generateAuthKeys;tiktok;;true]]
+    $if[$and[$get[a12]==;$get[a13]==];$logger[Warn;Re-trying - Tiktok] $callFunction[generateAuth;tiktok;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==applemusic];
-    $if[$get[typedebug];$chalkLog[\\[SEARCH\\] Generating Apple Music         | Token;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Apple Music         | Token;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
@@ -525,10 +539,10 @@ module.exports = {
         $if[$get[a14]!=;$setCache[initclientmusic;authmusic_applemusic;$get[a14]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[a14]!=;$cropText[$get[a14];0;10;...];Failed to Retrieve] | Apple Music]]
     ;$logger[Info;Failed to Retrieve - Apple Music]]
-    $if[$get[a14]==;$logger[Warn;Re-trying - Apple Music] $callFunction[generateAuthKeys;applemusic;;true]]
+    $if[$get[a14]==;$logger[Warn;Re-trying - Apple Music] $callFunction[generateAuth;applemusic;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==deezer];
-    $if[$get[typedebug];$chalkLog[\\[LYRIC\\] Generating Deezer               | Token;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Deezer              | Token;cyan]]
     $try[
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
@@ -539,10 +553,10 @@ module.exports = {
         $if[$get[hgk]!=;$setCache[initclientmusic;authmusic_deezer;$get[hgk]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[hgk]!=;$cropText[$get[hgk];0;10;...];Failed to Retrieve] | Deezer]]
     ;$logger[Info;Failed to Retrieve - Deezer]]
-    $if[$get[hgk]==;$logger[Warn;Re-trying - Deezer] $callFunction[generateAuthKeys;deezer;;true]]
+    $if[$get[hgk]==;$logger[Warn;Re-trying - Deezer] $callFunction[generateAuth;deezer;;true]]
     ]
     $if[$or[$env[type]==all;$env[type]==instagram];
-    $if[$get[typedebug];$chalkLog[\\[LYRIC\\] Generating Instagram               | Token & Cookies;cyan]]
+    $if[$get[typedebug];$chalkLog[Generating Instagram           | Token & Cookies;cyan]]
     $try[
         $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent_mobile]]
         $httpSetContentType[Text]
@@ -557,7 +571,7 @@ module.exports = {
         $if[$env[successlog]==true;$logger[Info;$if[$get[dsplccsrf]!=;$cropText[$get[dsplccsrf];0;10;...];Failed to Retrieve] | Instagram / Token]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[dsplcapp]!=;$cropText[$get[dsplcapp];0;10;...];Failed to Retrieve] | Instagram / AppID]]
     ;$logger[Info;Failed to Retrieve - Instagram]]
-    $if[$get[dsplclsd]==;$logger[Warn;Re-trying - Instagram] $callFunction[generateAuthKeys;instagram;;true]]
+    $if[$get[dsplclsd]==;$logger[Warn;Re-trying - Instagram] $callFunction[generateAuth;instagram;;true]]
     ]
     $return
     `

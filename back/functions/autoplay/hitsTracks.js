@@ -51,8 +51,8 @@ module.exports = {
     $try[
     $if[$env[refresh]==true;
     $if[$get[tryattempt]>=3;$return]
-    $callFunction[generateAuthKeys;spotify_player;;false]
-    $callFunction[generateAuthKeys;spotify_token;;false]
+    $callFunction[generateAuth;spotify_player;;false]
+    $callFunction[generateAuth;spotify_token;;false]
     $letSum[tryattempt;1]
     ]
     $let[mdhedroute_spotify2;{

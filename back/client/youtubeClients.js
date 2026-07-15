@@ -6,7 +6,7 @@ const list_clients = {
         "client_id": null,
         "client_secret": null,
         "clientName": 101,
-        "clientVersion": "0.1",
+        "clientVersion": "1.03",
         "deviceMake": "Apple",
         "deviceModel": "RealityDevice14,1",
         "osName": "visionOS",
@@ -49,19 +49,16 @@ const list_clients = {
         "client_id": null,
         "client_secret": null,
         "clientName": 88,
-        "clientVersion": "1.20260710",
+        "clientVersion": "1.20260711",
     },
-    // enforced SABR-only for music video
-    // merged formats
     // required youtubei.js for solve n challenge
     // support cookies
-    "WEB_SAFARI": {
-        "targetDomain": "www.youtube.com",
+    "WEB_MUSIC": {
+        "targetDomain": "music.youtube.com",
         "client_id": null,
         "client_secret": null,
-        "clientName": 1,
-        "clientVersion": "2.20260710.01.00",
-        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
+        "clientName": 67,
+        "clientVersion": "1.20260711"
     },
     // required youtubei.js for solve n challenge
     // required youtube cookies
@@ -70,7 +67,7 @@ const list_clients = {
         "client_id": null,
         "client_secret": null,
         "clientName": 62,
-        "clientVersion": "1.20260710.01.00"
+        "clientVersion": "1.20260711.01.00"
     },
     // required youtubei.js for solve n challenge
     // might not able to stream after 1 minute
