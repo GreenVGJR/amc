@@ -19,12 +19,18 @@ module.exports = {
     code: `
     $if[$env[mode]==0;
     $arrayLoad[filcookies; ;$env[po]]
-    $arrayMap[filcookies;b;$return[$advancedTextSplit[$trim[$env[b]];\\;;0]];filcookies]
+    $arrayMap[filcookies;b;
+        $let[ffhjkvcookie;$advancedTextSplit[$trim[$env[b]];\\;;0]]
+        $if[$get[ffhjkvcookie]!=;$return[$get[ffhjkvcookie]]]
+    ;filcookies]
     $arrayMap[filcookies;b;$if[$charCount[$env[b];=]>=1;$return[$trim[$env[b]]]];filcookies]]
     ]
     $if[$env[mode]==1;
     $arrayLoad[filcookies; ;$env[po]]
-    $arrayMap[filcookies;b;$return[$advancedTextSplit[$trim[$env[b]];\\;;0]];filcookies]
+    $arrayMap[filcookies;b;
+        $let[ffhjkvcookie;$advancedTextSplit[$trim[$env[b]];\\;;0]]
+        $if[$get[ffhjkvcookie]!=;$return[$get[ffhjkvcookie]]]
+    ;filcookies]
     $arrayMap[filcookies;b;$return[$default[$advancedTextSplit[$env[b];, ;1];$advancedTextSplit[$env[b]; ;0]]];filcookies]
     $arrayMap[filcookies;b;$if[$and[$charCount[$env[b]; ]==0;$charCount[$env[b]]!=0];$return[$env[b]]];filcookies]
     $arrayMap[filcookies;b;
@@ -35,9 +41,15 @@ module.exports = {
     $c[Both cookies must be filtered]
     $if[$env[mode]==2;
     $arrayLoad[filcookies; ;$env[po]]
-    $arrayMap[filcookies;b;$return[$advancedTextSplit[$trim[$env[b]];\\;;0]];filcookies]
+    $arrayMap[filcookies;b;
+        $let[ffhjkvcookie;$advancedTextSplit[$trim[$env[b]];\\;;0]]
+        $if[$get[ffhjkvcookie]!=;$return[$get[ffhjkvcookie]]]
+    ;filcookies]
     $arrayLoad[filcookies2; ;$env[po2]]
-    $arrayMap[filcookies2;b;$return[$advancedTextSplit[$trim[$env[b]];\\;;0]];filcookies2]
+    $arrayMap[filcookies2;b;
+        $let[ffhjkvcookie;$advancedTextSplit[$trim[$env[b]];\\;;0]]
+        $if[$get[ffhjkvcookie]!=;$return[$get[ffhjkvcookie]]]
+    ;filcookies2]
     $arrayForEach[filcookies2;llc;
         $let[tempcckvrlv;$advancedTextSplit[$trim[$env[llc]];=;0]]
         $let[tempcckvrll;$advancedTextSplit[$trim[$env[llc]];=;1;\\;;0]]
