@@ -1,11 +1,11 @@
 module.exports = {
   data: {
     "name": "volume",
-    "description": "Set the volume of the music player",
+    "description": "Change volume on music player",
     "options": [
       {
         "name": "value",
-        "description": "Set the volume of the music player",
+        "description": "Set the volume",
         "type": 4,
         "min_value": 0,
         "max_value": 150,
@@ -19,7 +19,7 @@ module.exports = {
       0
     ],
     "description_localizations": {
-      "id": "Ganti volume lagu"
+      "id": "Ganti volume dalam player musik"
     }
   },
   type: 0,

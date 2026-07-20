@@ -446,7 +446,7 @@ $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$replace[$callFunction[use
 ]
 
 $onlyIf[$or[$channelUserLimit[$voiceID]==0;$sum[$channelVoiceMemberCount[$voiceID];$if[$voiceID[$guildID;$clientID]==;1;0]]<=$channelUserLimit[$voiceID]];$ephemeral $callFunction[useCustomMusicMessage;config_errorIsLimitVC]]
-$onlyIf[$getCache[initclientmusic;radioplayer_data_$guildID_playerstatus]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
+$onlyIf[$callFunction[checkRadioPlayer;$guildID]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
 $let[cid;$getCache[initclientmusic;musicplayer_message_$guildID_channelid]]
 $let[mid;$getCache[initclientmusic;musicplayer_message_$guildID_messageid]]
 

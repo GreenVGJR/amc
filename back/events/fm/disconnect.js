@@ -8,20 +8,22 @@ module.exports = {
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $if[$getCache[initclientmusic;musicplayer_message_$guildID_is247music]==true;
     $if[$and[$channelExists[$get[vid]];$messageExists[$get[cid];$get[mid]]];
-    $wait[1s]
-    $let[checkvccount;$channelVoiceMemberCount[$get[vid]]]
+    $wait[500]
     $let[ml;$callFunction[joinVC;$get[vid]]]
     $if[$callFunction[configMusic;statusvc_message];
+    $let[checkvccount;$channelVoiceMemberCount[$get[vid]]]
     $if[$get[checkvccount]<1;
     $async[
-    $wait[100]
+    $wait[1s]
     $let[mm;$callFunction[channelStatus;$get[vid];💤 Idling...]]
     ]]]
-    $!editMessage[$get[cid];$get[mid];
+    $let[issamefootertext;$getEmbeds[$get[cid];$get[mid];0;footerText]]
+    $if[$get[issamefootertext]!=$callFunction[useCustomMusicMessage;config_generalIdleTrack];
+    $try[$!editMessage[$get[cid];$get[mid];
     $fetchComponents[$get[cid];$get[mid]]
     $disableComponents
     $callFunction[idlePlayerMessage]
-    ]
+    ]]]
     ]
     ;
     $async[
@@ -48,17 +50,6 @@ module.exports = {
     ]
     ]
 
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_waitloadmsg]
-
-    $if[$getCache[initclientmusic;musicplayer_message_$guildID_is247music]!=true;
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_messageid]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_channelid]
-    ]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_isdynamicmusic]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_isshuffle]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_attemptseek]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_waitinterval]
-    $deleteCache[initclientmusic;radioplayer_data_$guildID_playerstatus]
-    $deleteCache[initclientmusic;radioplayer_data_$guildID_metadata]
+    $callFunction[bulkMusicPlayer;$getCache[initclientmusic;musicplayer_message_$guildID_is247music]]
     `
 }

@@ -6,17 +6,8 @@ module.exports = {
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     
     $if[$try[$isPlaying;]!=;$async[$!leaveVoiceChannel]]
-    
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_messageid]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_channelid]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_isshuffle]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_attemptseek]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_waitinterval]
-    $deleteCache[initclientmusic;radioplayer_data_$guildID_playerstatus]
-    $deleteCache[initclientmusic;radioplayer_data_$guildID_metadata]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_waitloadmsg]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_ongoingdynamicmusic]
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_ongoingplaylistmusic]
+
+    $callFunction[bulkMusicPlayer;false]
 
     $try[
     $if[$messageExists[$get[cid];$get[mid]];

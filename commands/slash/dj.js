@@ -1,7 +1,7 @@
 module.exports = {
     data: {
     "name": "dj",
-    "description": "Tweak DJ features",
+    "description": "Configuration for DJ features",
     "integration_types": [
         0
     ],

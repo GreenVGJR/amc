@@ -13,6 +13,10 @@ module.exports = {
     code: `
     $let[cco;$if[$or[$env[cco]==null;$env[cco]==];;$env[cco]]]
     $let[discordAgent;$getCache[initclientmusic;system_filetp-defaultDiscordAgent]]
+    $let[cclkfj;0]
+    $localFunction[jsdbuduibs;
+    $if[$get[cclkfj]>=5;$return]
+    $if[$env[cclgjinretry]==true;$letSum[cclkfj;1]]
     $try[
     $if[$get[cco]!=;
     $jsonLoad[fn;{}]
@@ -23,7 +27,10 @@ module.exports = {
     ]
     $httpAddHeader[Authorization;Bot $clientToken]
     $let[kfkv;$httpRequest[https://discord.com/api/v10/channels/$env[ccl]/voice-status;PUT;sdbnja]]
+    $if[$get[kfkv]==429;$wait[500] $callLocalFunction[jsdbuduibs;true] $return]
     ]
+    ;cclgjinretry]
+    $callLocalFunction[jsdbuduibs;false]
     $return[$checkCondition[$get[kfkv]==204]]
     `
 }

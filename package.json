@@ -5,7 +5,7 @@
     "@snazzah/davey": "^0.1.12",
     "@tryforge/forge.music": "github:tryforge/ForgeMusic#main",
     "@tryforge/forgescript": "^2.6.0",
-    "bgutils-js": "^3.2.0",
+    "bgutils-js": "^4.0.0",
     "canvas": "^3.2.3",
     "discord-player": "^7.2.0",
     "discord-player-applemusic": "^1.0.3",

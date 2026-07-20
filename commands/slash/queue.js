@@ -2,7 +2,7 @@ module.exports = {
   data: {
     "type": 1,
     "name": "queue",
-    "description": "Show all tracks info",
+    "description": "Show all list tracks info",
     "integration_types": [
       0
     ],
@@ -17,7 +17,7 @@ module.exports = {
   code: `
 $onlyIf[$guildID!=;]
 
-$onlyIf[$getCache[initclientmusic;radioplayer_data_$guildID_playerstatus]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
+$onlyIf[$callFunction[checkRadioPlayer;$guildID]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
 
 $let[nodes;$if[$hasMusicNode;$isPlaying;false]]
 $ephemeral

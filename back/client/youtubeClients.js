@@ -49,7 +49,7 @@ const list_clients = {
         "client_id": null,
         "client_secret": null,
         "clientName": 88,
-        "clientVersion": "1.20260711",
+        "clientVersion": "1.20260720",
     },
     // required youtubei.js for solve n challenge
     // support cookies
@@ -58,7 +58,7 @@ const list_clients = {
         "client_id": null,
         "client_secret": null,
         "clientName": 67,
-        "clientVersion": "1.20260711"
+        "clientVersion": "1.20260720"
     },
     // required youtubei.js for solve n challenge
     // required youtube cookies
@@ -67,7 +67,7 @@ const list_clients = {
         "client_id": null,
         "client_secret": null,
         "clientName": 62,
-        "clientVersion": "1.20260711.01.00"
+        "clientVersion": "1.20260720"
     },
     // required youtubei.js for solve n challenge
     // might not able to stream after 1 minute
@@ -77,7 +77,7 @@ const list_clients = {
         "client_id": null,
         "client_secret": null,
         "clientName": 2,
-        "clientVersion": "2.20260711.08.00"
+        "clientVersion": "2.20260720"
     }
 };
 

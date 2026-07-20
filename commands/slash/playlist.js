@@ -1,7 +1,7 @@
 module.exports = {
     data: {
     "name": "playlist",
-    "description": "Show playlist you have",
+    "description": "Show playlist you've made",
     "options": [
     {
         "type": 3,
@@ -18,7 +18,7 @@ module.exports = {
         0
     ],
     "description_localizations": {
-        "id": "List playlist pengguna buat"
+        "id": "List playlist kamu yang buat"
     },
 },
 type: 0,

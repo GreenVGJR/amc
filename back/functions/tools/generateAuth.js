@@ -86,7 +86,7 @@ module.exports = {
     $!httpRequest[https://www.youtube.com/iframe_api;GET;ytivukas]
     $httpAddHeader[Accept-Encoding;gzip, deflate, br]
     $httpSetContentType[Text]
-    $!httpRequest[https://www.youtube.com/s/player/$advancedTextSplit[$env[ytivukas];';1;/;5;\\\\;0]/player_es6.vflset/en_US/base.js;GET;ytivuklac]
+    $!httpRequest[https://www.youtube.com/s/player/$advancedTextSplit[$env[ytivukas];';1;/;5;\\\\;0]/player_embed_es6.vflset/en_US/base.js;GET;ytivuklac]
     $let[signatureTimestampyt;$cropText[$advancedTextSplit[$env[ytivuklac];signatureTimestamp:;1;,;0];0;5;]]
     ]
     ]

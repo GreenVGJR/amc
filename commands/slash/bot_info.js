@@ -2,9 +2,9 @@ module.exports = {
   data: {
     "type": 1,
     "name": "info",
-    "description": "Show the bot info",
+    "description": "Return bot statistics",
     "description_localizations": {
-      "id": "Lihat informasi bot"
+      "id": "Lihat statistik bot"
     },
     "integration_types": [
       0

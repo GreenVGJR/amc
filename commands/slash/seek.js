@@ -35,7 +35,7 @@ module.exports = {
     ]
 
     $let[checkdurationms;$if[$hasMusicNode;$if[$isPlaying;$trackInfo[durationMS];0];0]]
-    $onlyIf[$getCache[initclientmusic;radioplayer_data_$guildID_playerstatus]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
+    $onlyIf[$callFunction[checkRadioPlayer;$guildID]!=true;$ephemeral $callFunction[useCustomMusicMessage;config_errorRadioPlayer]]
     $onlyIf[$get[checkdurationms]!=0;$callFunction[useCustomMusicMessage;config_errorLiveBeforeSeek]]
     $onlyIf[$isPaused!=true;$callFunction[useCustomMusicMessage;config_errorPauseBeforeSeek]]
     $onlyIf[$getCache[initclientmusic;musicplayer_message_$guildID_attemptseek]!=true;$callFunction[useCustomMusicMessage;config_errorProcessSeek]]

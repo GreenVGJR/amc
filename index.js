@@ -3,7 +3,7 @@ require("./back/client/youtubeiLogs.js");
 // Config
 require('dotenv').config({ quiet: true }); // Load Environment
 const toggles = require('./back/config.json');
-const youtube = require('./back/client/youtubeConfig');
+const youtube = require('./back/client/youtubeConfig.js');
 
 // Main
 const { ForgeClient, LogPriority } = require("@tryforge/forgescript");
@@ -52,7 +52,6 @@ const music = new ForgeMusic({
     ],
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
-        disableHistory: true,
         disableFallbackStream: true,
         disableBiquad: true,
         bufferingTimeout: 250,
@@ -89,7 +88,8 @@ const client = new ForgeClient({
         quorielDb,
         quorielEdge,
         music
-    ]
+    ],
+    waitGuildTimeout: 60000,
 });
 
 music.player.extractors.register(SoundcloudExtractor);
@@ -110,5 +110,3 @@ client.commands.load("back/events/fs");
 client.login();
 
 module.exports = { music }; // for $joinVC
-
-console.clear();

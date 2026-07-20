@@ -11,6 +11,7 @@ if (['WEB_CREATOR', 'WEB_PARENT'].includes(targetClient) && !process.env.YOUTUBE
     throw new Error(`Please put youtube cookies first before using this client. (${targetClient})`);
 }
 
+const isWebClient = useClient.targetDomain !== 'youtubei.googleapis.com';
 
 // Forgescript Logger
 const { Logger } = require("@tryforge/forgescript");
@@ -21,7 +22,9 @@ const fs = require('fs');
 const path = require('path');
 const cacheDir = path.join(__dirname, 'ytCacheTracks');
 fs.mkdirSync(cacheDir, { recursive: true });
-const { initBotGuard, generateCbPot, generateAnonPOT } = require('./youtubeBG.js');
+
+const { initBotGuard, generateCbPot, generateAnonPOT, setVisitorData } = require('./youtubeBG.js');
+const { convertProcessSignalToExitCode } = require('util');
 
 let vt;
 let datasyncID = "";
@@ -34,7 +37,6 @@ let authRequiredUntil = 0;
 
 let poToken = generateAnonPOT();
 
-const isWebClient = useClient.targetDomain !== 'youtubei.googleapis.com';
 const apiEndpoint = isWebClient ? 'player' : 'get_watch';
 const apiFields = isWebClient
     ? 'responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url,signatureCipher),adaptiveFormats(itag,url,contentLength,signatureCipher)),videoDetails(isLiveContent,lengthSeconds)'
@@ -51,6 +53,12 @@ const sortTargetOpus = [774, 251, 250, 249];
 const sortTargetM4a = [141, 140, 139];
 var templist = [];
 
+function normalizeCookies(cookies) {
+    if (!cookies) return "";
+    const list = Array.isArray(cookies) ? cookies : cookies.split(",");
+    return list.map(c => c.trim().split(";")[0]).filter(Boolean).join("; ");
+}
+
 function refreshYtAuth() {
     require('dotenv').config({ override: true, quiet: true });
     if (process.env.YOUTUBE_AUTH) {
@@ -66,6 +74,7 @@ function refreshYtAuth() {
 refreshYtAuth();
 
 let actuallk = { ...useClient };
+let ytcookiesapi;
 delete actuallk.targetDomain;
 delete actuallk.client_id;
 delete actuallk.client_secret;
@@ -79,11 +88,14 @@ const generateVisitor = async () => {
         if (ytcookies) {
             headers.Cookie = ytcookies;
         }
-        const raw = await fetch(url, { method: "GET", headers }).then(r => r.text());
+        const res = await fetch(url, { method: "GET", headers });
+        ytcookiesapi = ytcookies || normalizeCookies(res.headers.getSetCookie());
+        const raw = await res.text();
         const jsonPart = raw.split("\n")[2];
         const data = jsonPart ? JSON.parse(jsonPart) : null;
         vt = data?.[0]?.[2]?.[0]?.[0]?.[13] || "";
         actuallk.visitorData = vt;
+        setVisitorData(vt);
         const rawSync = data?.[0]?.[3];
         datasyncID = typeof rawSync === "string" ? rawSync.split('||')[0] : "";
         Logger.info(`/ [YoutubeConfig] Fetched Visitor Data`);
@@ -181,8 +193,6 @@ async function decipherYoutubeUrl(url) {
 
     return processedUrl;
 }
-
-generateVisitor().then(() => Promise.all([fetchWebConfigInfo(), fetchSignatureTimestamp(), initBotGuard()])).catch(console.error);
 
 function createChunkedStream(url, totalSize, videoId, ext) {
     let start = 0;
@@ -385,6 +395,8 @@ function filterPlayerObject(YTPlayerResponse) {
     return (Array.isArray(YTPlayerResponse) ? YTPlayerResponse[0] : YTPlayerResponse)?.playerResponse || YTPlayerResponse;
 }
 
+generateVisitor().then(() => Promise.all([fetchWebConfigInfo(), fetchSignatureTimestamp(), ...[isWebClient ? [initBotGuard()] : []]]));
+
 async function fallbackYTStream(lstracks) {
     refreshYtAuth();
 
@@ -459,7 +471,7 @@ async function fallbackYTStream(lstracks) {
             if (useAuth && isVRnAuth) {
                 return { ...base, "Authorization": "Bearer " + ytauth.token, "Cookie": tempytcookies };
             }
-            if (useAuth && ytcookies) {
+            if (useAuth && ytcookies && isWebClient) {
                 return { ...base, "Authorization": GTH(), "Cookie": ytcookies, "X-Youtube-Bootstrap-Logged-In": true, "Alt-Used": hostdomain, "X-Goog-AuthUser": 0 };
             }
             return { ...base, "Cookie": tempytcookies };
@@ -490,7 +502,7 @@ async function fallbackYTStream(lstracks) {
         a = filterPlayerObject(a);
 
         const new_vt = a?.responseContext?.visitorData;
-        if (new_vt) actuallk.visitorData = new_vt;
+        if (new_vt) { actuallk.visitorData = new_vt; setVisitorData(new_vt); }
 
         if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
             const playabilityError = a?.playabilityStatus?.status || '';
@@ -499,7 +511,7 @@ async function fallbackYTStream(lstracks) {
                 usedAuth = true;
                 a = filterPlayerObject(await fetchPlayerResponse(buildHeaders(true)));
                 const retry_vt = a?.responseContext?.visitorData;
-                if (retry_vt) actuallk.visitorData = retry_vt;
+                if (retry_vt) { actuallk.visitorData = retry_vt; setVisitorData(retry_vt); }
             }
             if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
                 vt = "";
@@ -561,15 +573,16 @@ async function fallbackYTStream(lstracks) {
                 return finalurl;
             }
 
-            const contentPoToken = await generateCbPot(videoId);
+            let contentPoToken;
+            if (isWebClient) contentPoToken = encodeURIComponent(await generateCbPot(videoId, actuallk.visitorData));
 
-            const filterlocation = await fetch(finalurl + "&pot=" + contentPoToken, {
+            const filterlocation = await fetch(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""), {
                 method: "HEAD",
                 headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
             });
 
             const secfinalurl = filterlocation.url;
-            const finalWithPot = secfinalurl.includes("pot=") ? secfinalurl : secfinalurl + "&pot=" + contentPoToken;
+            const finalWithPot = contentPoToken && secfinalurl.includes("pot=") ? (secfinalurl + "&pot=" + contentPoToken) : secfinalurl;
 
             if (filterlocation.status === 403 && changeLength) {
                 if (isWebClient && !forceLegacy) {
@@ -610,7 +623,7 @@ async function fallbackYTStream(lstracks) {
 }
 
 module.exports = {
-    ...(ytcookies && { cookie: ytcookies }),
+    get cookie() { return ytcookiesapi; },
     generateWithPoToken: false,
     disablePlayer: false,
     ignoreSignInErrors: true,

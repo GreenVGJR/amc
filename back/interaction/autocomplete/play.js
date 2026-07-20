@@ -5,7 +5,7 @@ module.exports = {
     $onlyIf[$and[$applicationCommandName==play;$focusedOptionName==query]]
     $onlyIf[$guildID!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearch];__null__]]
     $onlyIf[$voiceID[$guildID;$authorID]!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchJoinVC];__null1__]]
-    $onlyIf[$getCache[initclientmusic;radioplayer_data_$guildID_playerstatus]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];__null2__]]
+    $onlyIf[$callFunction[checkRadioPlayer;$guildID]!=true;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptRadioPlayer];__null2__]]
     $onlyIf[$or[$focusedOptionValue!=;$getCache[initclientmusic;cachesearchistory_user_autocomplete_$authorID]!=];$addChoice[$callFunction[useCustomMusicMessage;config_infoSearchFirst];__infointer-$authorID__]]
     $if[$isValidLink[$focusedOptionValue]==false;
     $jsonLoad[testing;$callFunction[fastSearchTrack;$if[$focusedOptionValue!=;$focusedOptionValue;$getCache[initclientmusic;cachesearchistory_user_autocomplete_$authorID]]]]

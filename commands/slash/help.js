@@ -30,8 +30,8 @@ module.exports = {
   $arrayMap[test;t1;$return[</$env[t1;name]:$env[t1;id]>];testguild]
   
   $author[List Commands;$userAvatar[$clientID;1024];;0]
-  $addField[Apps;-# - $arrayJoin[testuser;\n-# - ];true;0]
-  $addField[Guild;-# - $arrayJoin[testguild;\n-# - ];true;0]
+  $addField[Apps;-# $arrayJoin[testuser;, ];false;0]
+  $addField[Guild;-# $arrayJoin[testguild;, ];false;0]
   $color[$callFunction[useIcon;color_embed];0]
   $footer[$userDisplayName[$authorID];$userAvatar[$authorID;1024];0]
   `
