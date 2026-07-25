@@ -18,8 +18,6 @@ module.exports = {
     $let[mm;$callFunction[channelStatus;$voiceID[$guildID;$clientID];💤 Idling...]]
     ]]
     $try[$!editMessage[$get[cid];$get[mid];
-    $fetchComponents[$get[cid];$get[mid]]
-    $disableComponents
     $callFunction[idlePlayerMessage]
     ]]]
     `

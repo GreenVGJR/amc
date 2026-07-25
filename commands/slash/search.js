@@ -16,7 +16,6 @@ module.exports = {
           { "name": "Soundcloud", "value": "soundcloud" },
           { "name": "Spotify", "value": "spotify" },
           { "name": "Apple Music", "value": "applemusic" },
-          { "name": "Shazam", "value": "shazam" },
           { "name": "Amazon Music", "value": "amazonmusic" },
           { "name": "Bandcamp", "value": "bandcamp" },
           { "name": "Deezer", "value": "deezer" },

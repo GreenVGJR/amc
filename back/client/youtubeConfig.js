@@ -1,4 +1,4 @@
-const { default_userAgent_desktop, streamTypeYT, useClientYT, useBearer, cacheTrackYT } = require('../config.json');
+const { default_userAgent_desktop, streamTypeYT, useClientYT, useBearer, cacheTrackYT, skipOnCheckFormat } = require('../config.json');
 const ytClients = require('./youtubeClients.js');
 const targetClient = useClientYT?.toUpperCase();
 const useClient = ytClients?.[targetClient];
@@ -23,8 +23,7 @@ const path = require('path');
 const cacheDir = path.join(__dirname, 'ytCacheTracks');
 fs.mkdirSync(cacheDir, { recursive: true });
 
-const { initBotGuard, generateCbPot, generateAnonPOT, setVisitorData } = require('./youtubeBG.js');
-const { convertProcessSignalToExitCode } = require('util');
+const { initBotGuard, generateCbPot, generateSessionPoToken, generateAnonPOT, setVisitorData } = require('./youtubeBG.js');
 
 let vt;
 let datasyncID = "";
@@ -148,8 +147,7 @@ async function fetchSignatureTimestamp(force = false) {
     if (signatureTimestampPromise) return signatureTimestampPromise;
 
     signatureTimestampPromise = Promise.resolve().then(async () => {
-        const { Player, Log, Platform } = require('youtubei.js');
-        try { Log.setLevel(Log.Level.ERROR); } catch { }
+        const { Player, Platform } = require('youtubei.js');
         Platform.shim.eval = (data, env) => {
             return new Function(...Object.keys(env), data.output)(...Object.values(env));
         };
@@ -371,6 +369,99 @@ function createChunkedStream(url, totalSize, videoId, ext) {
     });
 }
 
+function createLiveChunkedStream(baseUrl) {
+    let rn = 0;
+    let isEnded = false;
+    let isReading = false;
+    let noContentRetries = 0;
+    const maxNoContentRetries = 10;
+    let abortControllers = [];
+
+    async function fetchLiveChunk() {
+        const chunkUrl = baseUrl.includes('&rn=')
+            ? baseUrl.replace(/&rn=\d+/, `&rn=${rn}`)
+            : `${baseUrl}&rn=${rn}`;
+
+        const ac = new AbortController();
+        abortControllers.push(ac);
+
+        const response = await fetch(chunkUrl, {
+            headers: { "User-Agent": APIuserAgent },
+            signal: ac.signal
+        });
+        return response;
+    }
+
+    return new Readable({
+        highWaterMark: 0,
+        async read() {
+            if (isEnded || isReading) return;
+            isReading = true;
+
+            try {
+                abortControllers = [];
+                const fetchStart = Date.now();
+                const response = await fetchLiveChunk();
+                const fetchElapsed = Date.now() - fetchStart;
+
+                if (response.status === 404 || response.status === 410) {
+                    isEnded = true;
+                    this.push(null);
+                    return;
+                }
+
+                if (response.status === 204) {
+                    noContentRetries++;
+                    if (noContentRetries >= maxNoContentRetries) {
+                        isEnded = true;
+                        this.push(null);
+                        return;
+                    }
+                    await new Promise(r => setTimeout(r, 1000));
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Live stream chunk fetch failed: HTTP ${response.status}`);
+                }
+
+                const arrayBuffer = await response.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+
+                if (buffer.length === 0) {
+                    noContentRetries++;
+                    if (noContentRetries >= maxNoContentRetries) {
+                        isEnded = true;
+                        this.push(null);
+                        return;
+                    }
+                    await new Promise(r => setTimeout(r, 1000));
+                    return;
+                }
+
+                noContentRetries = 0;
+                rn++;
+                await new Promise(r => setTimeout(r, 200));
+                this.push(buffer);
+            } catch (err) {
+                if (err?.name === 'AbortError') {
+                    this.destroy();
+                } else {
+                    console.error("Live chunk fetch error:", err);
+                    this.destroy(err);
+                }
+            } finally {
+                isReading = false;
+            }
+        },
+        destroy(err, callback) {
+            isEnded = true;
+            for (const ac of abortControllers) ac.abort();
+            if (callback) callback(err);
+        }
+    });
+}
+
 function isHlsUrl(url) {
     return typeof url === "string" && (url.includes('googlevideo.com/api/manifest/') || url.includes('.m3u8'));
 }
@@ -395,7 +486,11 @@ function filterPlayerObject(YTPlayerResponse) {
     return (Array.isArray(YTPlayerResponse) ? YTPlayerResponse[0] : YTPlayerResponse)?.playerResponse || YTPlayerResponse;
 }
 
-generateVisitor().then(() => Promise.all([fetchWebConfigInfo(), fetchSignatureTimestamp(), ...[isWebClient ? [initBotGuard()] : []]]));
+generateVisitor().then(() => Promise.all([
+    fetchWebConfigInfo(),
+    fetchSignatureTimestamp(),
+    ...(isWebClient ? [initBotGuard().then(() => generateSessionPoToken(actuallk.visitorData)).then(() => Logger.info(`/ [YoutubeConfig] Generated Session Token`))] : [])
+]));
 
 async function fallbackYTStream(lstracks) {
     refreshYtAuth();
@@ -450,10 +545,19 @@ async function fallbackYTStream(lstracks) {
         }
         if (isWebClient && !signatureTimestamp) await fetchSignatureTimestamp();
 
+        let sessionPoToken = poToken;
+        if (isWebClient) {
+            let sessionPoData = await generateSessionPoToken(actuallk.visitorData);
+            if (sessionPoData.exp <= Date.now()) {
+                sessionPoData = await generateSessionPoToken(actuallk.visitorData, true);
+            }
+            sessionPoToken = sessionPoData.poToken;
+        }
+
         const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp } } } : {};
 
         const buildRoute = isWebClient
-            ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk } }, ...playbackContext, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: isWebClient } }
+            ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk } }, ...playbackContext, serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
             : { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
 
         const buildHeaders = (useAuth) => {
@@ -524,6 +628,7 @@ async function fallbackYTStream(lstracks) {
         let actualfinalurl;
         let fsFmt = {};
         let frso = {};
+        const isLive = a?.videoDetails?.isLiveContent && a?.videoDetails?.lengthSeconds == 0;
 
         for (let attempt = 0; attempt < 2; attempt++) {
             forceLegacy = attempt === 1;
@@ -533,7 +638,7 @@ async function fallbackYTStream(lstracks) {
             durationLength = null;
             fr = null;
 
-            if (a?.videoDetails?.isLiveContent && a.videoDetails?.lengthSeconds == 0 && a?.streamingData?.hlsManifestUrl) {
+            if (isLive && a?.streamingData?.hlsManifestUrl) {
                 finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
             }
             else if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
@@ -576,13 +681,28 @@ async function fallbackYTStream(lstracks) {
             let contentPoToken;
             if (isWebClient) contentPoToken = encodeURIComponent(await generateCbPot(videoId, actuallk.visitorData));
 
-            const filterlocation = await fetch(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""), {
-                method: "HEAD",
-                headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
-            });
+            let filterlocation;
+            let secfinalurl;
+            let finalWithPot;
+            const maxHeadRetries = 4;
 
-            const secfinalurl = filterlocation.url;
-            const finalWithPot = contentPoToken && secfinalurl.includes("pot=") ? (secfinalurl + "&pot=" + contentPoToken) : secfinalurl;
+            for (let headAttempt = 0; headAttempt <= maxHeadRetries; headAttempt++) {
+                filterlocation = await fetch(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""), {
+                    method: "HEAD",
+                    headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
+                });
+
+                secfinalurl = filterlocation.url;
+                finalWithPot = contentPoToken && !secfinalurl.includes("pot=") ? (secfinalurl + "&pot=" + contentPoToken) : secfinalurl;
+
+                if (filterlocation.status !== 403 || !changeLength || skipOnCheckFormat) {
+                    break;
+                }
+
+                if (headAttempt < maxHeadRetries) {
+                    await new Promise(r => setTimeout(r, 1000 * (headAttempt + 1)));
+                }
+            }
 
             if (filterlocation.status === 403 && changeLength) {
                 if (isWebClient && !forceLegacy) {
@@ -601,6 +721,10 @@ async function fallbackYTStream(lstracks) {
             break;
         }
 
+        if (isLive) {
+            return createLiveChunkedStream(actualfinalurl);
+        }
+
         templist.push({
             id: lstracks,
             url: actualfinalurl,
@@ -609,7 +733,8 @@ async function fallbackYTStream(lstracks) {
             contentLength: streamingLength
         });
 
-        if (changeLength && streamingLength && parseInt(streamingLength) > 0 && !actualfinalurl?.includes('googlevideo.com/api/manifest/')) {
+
+        if (changeLength && streamingLength && parseInt(streamingLength) > 0 && !isHlsUrl(actualfinalurl)) {
             const ext = sortTargetOpus.includes((frso && !forceLegacy ? frso : fsFmt)?.itag) ? "webm" : "m4a";
             return createChunkedStream(actualfinalurl, parseInt(streamingLength), videoId, ext);
         }

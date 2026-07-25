@@ -1,7 +1,7 @@
 module.exports = {
   data: {
   "name": "radio",
-  "description": "Play a radio",
+  "description": "Play a radio (onlineradiobox's source)",
   "options": [
     {
       "type": 3,

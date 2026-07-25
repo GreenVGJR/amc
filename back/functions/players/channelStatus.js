@@ -19,8 +19,9 @@ module.exports = {
     $if[$env[cclgjinretry]==true;$letSum[cclkfj;1]]
     $try[
     $if[$get[cco]!=;
+    $let[cckvol;$cropText[$get[cco];0;500;]]
     $jsonLoad[fn;{}]
-    $!jsonSet[fn;status;"$cropText[$get[cco];0;500;]"]
+    $if[$typeof[$get[cckvol]]==string;$!jsonSet[fn;status;$get[cckvol]];$!jsonSet[fn;status;"$get[cckvol]"]]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[User-Agent;$get[discordAgent]]
     $httpSetBody[$env[fn]]

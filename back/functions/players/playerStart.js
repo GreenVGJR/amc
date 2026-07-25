@@ -181,8 +181,8 @@ module.exports = {
     $addButton[musicplayer_seekup_$env[messageId];+10s;Secondary;⏩;$or[$env[jsonmusicdata;durationMS]==0;$isPaused]]
     $addButton[musicplayer_actionplayer_$env[messageId];$if[$isPaused;Resume;Pause];Secondary;$if[$isPaused;▶️;⏸️];$checkCondition[$env[jsonmusicdata;durationMS]==0]]
     $addActionRow
-    $addButton[musicplayer_dynamic_$env[messageId];Dynamic Queue: $if[$get[checkautoplaystatus]!=true;Off;On];$if[$get[checkautoplaystatus]!=true;Secondary;Success];🎼;$checkCondition[$getCache[initclientmusic;musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true]]
-    $addButton[musicplayer_247music_$env[messageId];24/7: $if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]!=true;Off;On];Secondary;$if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]!=true;🌇;🌃];false]
+    $addButton[musicplayer_dynamic_$env[messageId];Autoplay: $if[$get[checkautoplaystatus]!=true;Off;On];$if[$get[checkautoplaystatus]!=true;Secondary;Success];🎼;$checkCondition[$getCache[initclientmusic;musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true]]
+    $callFunction[247Button;$env[messageId];$env[guildId];false]
     ]
     ;
     $jsonLoad[aradio;$default[$getCache[initclientmusic;radioplayer_data_$env[guildId]_metadata];{}]]
@@ -197,7 +197,7 @@ module.exports = {
     $addActionRow
     $addButton[musicplayer_volumemute_$env[messageId];$if[$getVolume==0;Unmute;Mute];Secondary;🔈;false]
     $addButton[null0;$getVolume%;Secondary;🔈;true]
-    $addButton[musicplayer_247music_$env[messageId];24/7: $if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]!=true;Off;On];Secondary;$if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]!=true;🌇;🌃];false]
+    $callFunction[247Button;$env[messageId];$env[guildId];false]
     $addActionRow
     $addButton[musicplayer_volumedown_$env[messageId];-10%;Secondary;🔉;$checkCondition[$getVolume==0]]
     $addButton[musicplayer_stopplayer_$env[messageId];Stop;Danger;⏹️;false]

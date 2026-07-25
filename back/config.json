@@ -18,12 +18,14 @@
     "preloadLastFmPlayer": false,
 
     "_comment|stream": [
-        "Having trouble while streaming youtube? Try switching the stream type.",
+        "Having trouble while/when streaming youtube? Try change client youtube",
+        "See: back/client/youtubeClients.js for list clients",
         "This setting would also apply to spotify and applemusic",
         "1 = DASH",
         "2 = HLS"
     ],
     "streamTypeYT": 1,
+    "skipOnCheckFormat": false,
     "useClientYT": "VISIONOS",
     "useBearer": false,
     "cacheTrackYT": false,

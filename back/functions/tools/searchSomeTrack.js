@@ -327,21 +327,6 @@ module.exports = {
     $arrayPush[results;$jsonStringify[kls]]
     ]
     ]
-    $if[$env[provider]==shazam;
-    $httpAddHeader[Accept-Encoding;gzip, br]
-    $httpAddHeader[User-Agent;$get[agent]]
-    $!httpRequest[https://www.shazam.com/services/amapi/v1/catalog/US/search?types=songs&limit=10&term=$env[query];GET]
-    $if[$httpResult[results;songs;data]==;$return]
-    $jsonLoad[res;$httpResult[results;songs;data]]
-    $arrayForEach[res;tp;
-    $jsonLoad[kls;{}]
-    $!jsonSet[kls;title;$env[tp;attributes;name]]
-    $!jsonSet[kls;duration;$parseDigital[$env[tp;attributes;durationInMillis]]]
-    $!jsonSet[kls;thumbnail;$replace[$env[tp;attributes;artwork;url];{w}x{h}bb;1x1ss]]
-    $!jsonSet[kls;url;https://www.shazam.com/song/$env[tp;id]/$advancedTextSplit[$env[tp;attributes;url];/;$sub[$charCount[$env[tp;attributes;url];/];1]]]
-    $arrayPush[results;$jsonStringify[kls]]
-    ]
-    ]
     $if[$env[provider]==jiosaavn;
     $httpSetContentType[Text]
     $httpAddHeader[Accept-Encoding;gzip, br]

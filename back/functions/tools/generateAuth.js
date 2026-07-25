@@ -51,6 +51,7 @@ module.exports = {
     $let[getpickclient;${tarClient()}]
     $jsonLoad[listclient;$replace[${tarClientYT()};%SEMI%;\\;]]
     $let[isWebClient;$checkCondition[$env[listclient;targetDomain]!=youtubei.googleapis.com]]
+    $let[defytdomain;$env[listclient;targetDomain]]
     $if[$get[typedebug];$chalkLog[Generating Youtube             | Visitor;cyan]]
     $if[$env[successlog]==true;
     $let[genpotytlk;$callFunction[generateColdPotYoutube]]
@@ -64,6 +65,7 @@ module.exports = {
     $logger[Warn;This client does not support OAuth2. Skipping]
     ]
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip, deflate, br]
     $httpAddHeader[Content-Type;application/json]
     $httpSetBody[{"context":{"client":{"clientName":1,"clientVersion":"2.20261231"}}}]
     $httpSetContentType[Text]
@@ -131,6 +133,7 @@ module.exports = {
         $if[$env[successlog]==true;$logger[Warn;InnerTube: Re-trying (Fallback)]]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Content-Type;application/json]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetBody[{"context":{"client":{"clientName":1,"clientVersion":"2.20261231"}}}]
         $httpSetContentType[Text]
         $!httpRequest[https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json&fields=responseContext(visitorData);POST]
@@ -155,14 +158,13 @@ module.exports = {
         $callLocalFunction[cookiessid;$httpGetHeader[Set-Cookie];false]
         $localFunction[attytrotate-1;
         $try[
-        $let[ytdomain;$env[listclient;targetDomain]]
         $httpSetContentType[Text]
         $httpAddHeader[Accept;*/*]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpAddHeader[Referer;https://www.youtube.com]
         $httpAddHeader[Cookie;$default[$get[ytinitcookies_replacement];$get[ytinitcookies]]]
         $httpAddHeader[User-Agent;$if[$or[$get[ytinitua]==;$get[ytinitua]==undefined]==false;$get[ytinitua];$get[agent]]]
-        $let[httpytrotate;$httpRequest[https://accounts.youtube.com/RotateCookiesPage?origin=https://$get[ytdomain]&yt_pid=1;GET;g3_1]]
+        $let[httpytrotate;$httpRequest[https://accounts.youtube.com/RotateCookiesPage?origin=https://$get[defytdomain]&yt_pid=1;GET;g3_1]]
         ]
         $if[$get[httpytrotate]==403;
         $logger[Warn;This client doesn't support cookies. You might using non-web client | Youtube Cookies]
@@ -210,7 +212,6 @@ module.exports = {
         $writeFile[.env;$replace[$readFile[.env];YOUTUBE_COOKIES=$get[ytinitcookies];YOUTUBE_COOKIES=$get[ytinitcookies_replacement]]]
         $!djsEval[require('dotenv').config({ override: true, quiet: true })]
         $if[$env[successlog]==true;
-        $let[defytdomain;$env[listclient;targetDomain]]
         $!jsonDelete[listclient;targetDomain]
         $!jsonDelete[listclient;client_id]
         $!jsonDelete[listclient;client_secret]
@@ -223,7 +224,7 @@ module.exports = {
         $let[testtempcookies;$djsEval[process.env.YOUTUBE_COOKIES]]
         $logger[Warn;Fetching Latest Config | Youtube Cookies]
 
-        $httpAddHeader[Accept-Encoding;gzip, br]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpAddHeader[Cookie;$get[testtempcookies]]
         $httpAddHeader[Origin;https://$get[defytdomain]]
         $httpAddHeader[X-Origin;https://$get[defytdomain]]
@@ -248,7 +249,7 @@ module.exports = {
         $let[tempauthytfhhv;$callFunction[generateBearerYt;$get[testtempcookies];$getCache[initclientmusic;authmusic_youtube_datasync_id];$get[defytdomain]]]
 
         $localFunction[iitryvmlas;
-        $httpAddHeader[Accept-Encoding;gzip, br]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpAddHeader[Authorization;$get[tempauthytfhhv]]
         $httpAddHeader[Cookie;$get[testtempcookies]]
         $httpAddHeader[Origin;https://$get[defytdomain]]
@@ -327,14 +328,10 @@ module.exports = {
     $try[
     $let[spinitcookies;$trimLines[$trim[$djsEval[process.env.SPOTIFY_COOKIES]]]]
     $if[$or[$get[spinitcookies]==;$get[spinitcookies]==undefined]==false;
-        $djsEval[const crypto = require('crypto')\\;
-
-        const verifier = crypto.randomBytes(64).toString('base64url').slice(0, 128)\\;
-        const challenge = crypto.createHash('sha256').update(verifier).digest('base64url')\\;
-
-        ctx.setKeyword("jasg", verifier)\\;
-        ctx.setKeyword("jasc", challenge)\\;
-        ]
+        $jsonLoad[spivukch;$callFunction[generateHMACSpotify]]
+        $let[spivclid;cfe923b2d660439caf2b557b21f31221]
+        $let[jasg;$env[spivukch;verifier]]
+        $let[jasc;$env[spivukch;challenge]]
         $httpAddHeader[Cookie;$get[spinitcookies]]
         $httpAddHeader[Referer;https://developer.spotify.com/]
         $httpAddHeader[Sec-Fetch-Dest;iframe]
@@ -342,7 +339,7 @@ module.exports = {
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
-        $!httpRequest[https://accounts.spotify.com/oauth2/v2/auth?response_type=code&client_id=cfe923b2d660439caf2b557b21f31221&scope=&redirect_uri=https%3A%2F%2Fdeveloper.spotify.com&code_challenge=$get[jasc]&code_challenge_method=S256&response_mode=web_message&prompt=none;GET]
+        $!httpRequest[https://accounts.spotify.com/oauth2/v2/auth?response_type=code&client_id=$get[spivclid]&scope=&redirect_uri=https%3A%2F%2Fdeveloper.spotify.com&code_challenge=$get[jasc]&code_challenge_method=S256&response_mode=web_message&prompt=none;GET]
         $let[pkcode;$advancedTextSplit[$httpResult;"code": ";1;";0]]
         $httpAddHeader[Origin;https://developer.spotify.com/]
         $httpAddHeader[Referer;https://developer.spotify.com/]
@@ -352,7 +349,7 @@ module.exports = {
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpAddHeader[Accept;application/json]
         $httpAddHeader[Content-Type;application/x-www-form-urlencoded]
-        $httpSetBody[grant_type=authorization_code&client_id=cfe923b2d660439caf2b557b21f31221&code=$get[pkcode]&redirect_uri=https%3A%2F%2Fdeveloper.spotify.com&code_verifier=$get[jasg]]
+        $httpSetBody[grant_type=authorization_code&client_id=$get[spivclid]&code=$get[pkcode]&redirect_uri=https%3A%2F%2Fdeveloper.spotify.com&code_verifier=$get[jasg]]
         $httpSetContentType[Json]
         $!httpRequest[https://accounts.spotify.com/api/token;POST]
         $let[cjdspo;true]
@@ -559,6 +556,7 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[Generating Instagram           | Token & Cookies;cyan]]
     $try[
         $httpAddHeader[User-Agent;$callFunction[configMusic;default_userAgent_mobile]]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpSetContentType[Text]
         $!httpRequest[https://www.instagram.com;GET;oinsd]
         $let[dsplclsd;$advancedTextSplit[$env[oinsd];"LSD";1;";3]]

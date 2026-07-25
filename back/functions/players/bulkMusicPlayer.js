@@ -11,7 +11,7 @@ module.exports = {
     code: `
     $let[targetGuildIdMusic;$if[$or[$env[targetGuildIdMusic]==;$env[targetGuildIdMusic]==null];$guildID;$env[targetGuildIdMusic]]]
     $if[$env[dothis247ornot]!=true;
-    $getCache[initclientmusic;musicplayer_message_$get[targetGuildIdMusic]_is247music]
+    $deleteCache[initclientmusic;musicplayer_message_$get[targetGuildIdMusic]_is247music]
     $deleteCache[initclientmusic;musicplayer_message_$get[targetGuildIdMusic]_messageid]
     $deleteCache[initclientmusic;musicplayer_message_$get[targetGuildIdMusic]_channelid]
     $deleteCache[initclientmusic;musicplayer_message_$get[targetGuildIdMusic]_voiceid]

@@ -20,8 +20,6 @@ module.exports = {
     $let[issamefootertext;$getEmbeds[$get[cid];$get[mid];0;footerText]]
     $if[$get[issamefootertext]!=$callFunction[useCustomMusicMessage;config_generalIdleTrack];
     $try[$!editMessage[$get[cid];$get[mid];
-    $fetchComponents[$get[cid];$get[mid]]
-    $disableComponents
     $callFunction[idlePlayerMessage]
     ]]]
     ]

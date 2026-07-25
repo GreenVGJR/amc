@@ -157,13 +157,15 @@ module.exports = [{
     $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
     ]
     $onlyIf[$or[$channelUserLimit[$voiceID]==0;$sum[$channelVoiceMemberCount[$voiceID];$if[$voiceID[$guildID;$clientID]==;1;0]]<=$channelUserLimit[$voiceID]];$ephemeral $callFunction[useCustomMusicMessage;config_errorIsLimitVC]]
+
+    $let[tempisstreamredirect;true]
     
     $localFunction[loadinteraction;
     $if[$env[typela]==1;
     $interactionUpdate[
     $fetchResponse[$channelID;$messageID]
     $!disableComponents
-    $footer[Fetching;$callFunction[useIcon;radioplayerload]]
+    $footer[Fetching$if[$get[tempisstreamredirect]==false; - Stream Redirected];$callFunction[useIcon;radioplayerload]]
     ]
     ]
     $if[$env[typela]==2;
@@ -184,6 +186,7 @@ module.exports = [{
     $let[tempembed;$getEmbeds[$channelID;$messageID]]
     $let[tempcomponent;$getComponents[$channelID;$messageID]]
 
+    $let[userAgent;$callFunction[configMusic;default_userAgent_desktop]]
     $let[stream;$getComponents[$channelID;$messageID;1;1;url]]
     $let[title;$getEmbeds[$channelID;$messageID;0;title]]
     $let[url;$getEmbeds[$channelID;$messageID;0;titleURL]]
@@ -191,6 +194,17 @@ module.exports = [{
     $callLocalFunction[loadinteraction;1]
 
     $try[
+    $!djsEval[fetch(ctx.getKeyword("stream"), { headers: { "User-Agent": ctx.getKeyword("userAgent") } })
+    .then(a => {
+        ctx.setKeyword("tempisstreamredirect", ctx.getKeyword("stream") === a.url)\\;
+        ctx.setKeyword("stream", a.url)\\;
+    })
+    .catch()
+    ]
+    $if[$get[tempisstreamredirect]==false;
+    $callLocalFunction[loadinteraction;1]
+    ]
+
     $jsonLoad[testmessage;{}]
     $!jsonSet[testmessage;title;$get[title]]
     $!jsonSet[testmessage;url;$get[url]]

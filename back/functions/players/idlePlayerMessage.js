@@ -1,8 +1,10 @@
 module.exports = {
     name: "idlePlayerMessage",
     code: `
-    $footer[$callFunction[useCustomMusicMessage;config_generalIdleTrack];$userAvatar[$clientID;2048]]
+    $author[🌙 Idle]
+    $footer[$callFunction[useCustomMusicMessage;config_generalIdleTrack]]
     $color[$callFunction[useIcon;color_embed]]
-    $timestamp
+    $addActionRow
+    $callFunction[247Button;$messageID;$guildID;true]
     `
 }

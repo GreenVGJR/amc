@@ -10,7 +10,6 @@ module.exports = {
     $fetchResponse
     $disableComponents
     ]]
-    $onlyIf[$try[$isPlaying;false]]
     $let[crdjcs_0f;$callFunction[checkDJRoleUser]]
     $if[$get[crdjcs_0f]==false;
     $onlyIf[$and[$voiceID[$guildID;$clientID]!=;$voiceID[$guildID;$authorID]!=$voiceID[$guildID;$clientID]]!=true;]
@@ -18,6 +17,17 @@ module.exports = {
     $let[crdjcr_0f;$advancedTextSplit[$get[crdjcs_0f];|;1]]
     $onlyIf[$hasRoles[$guildID;$authorID;$get[crdjcr_0f]];$ephemeral $replace[$callFunction[useCustomMusicMessage;config_errorIsSameDJVC];{role};<@&$get[crdjcr_0f]>]]
     ]
+    $if[$advancedTextSplit[$customID;_;1]==247musicidle;
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_is247music]==true;
+    $callFunction[bulkMusicPlayer;false]
+    $let[jjck;$callFunction[destroyPlayer]]
+    $interactionUpdate[
+    $callFunction[idlePlayerMessage]
+    $disableComponents
+    ]]
+    $stop
+    ]
+    $onlyIf[$try[$isPlaying;false]]
     $if[$advancedTextSplit[$customID;_;1]==nodequeue;
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
     $if[$selectMenuValues[0]==0;

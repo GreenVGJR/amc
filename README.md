@@ -27,7 +27,7 @@ ___
 ```bash
 git clone -b fs-dev-local https://github.com/GreenVGJR/amc-discord-bot.git
 cd amc-discord-bot
-npm install --allow-git=root
+npm install --allow-git=all
 ```
 3. Go to that folder and rename `.env.example` file to `.env` inside folder you did extract
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
@@ -133,8 +133,6 @@ ___
     > Soundcloud
     > Spotify
     > Apple Music
-    > Shazam
-    > ITunes
     > Amazon Music
     > Bandcamp
     > Deezer

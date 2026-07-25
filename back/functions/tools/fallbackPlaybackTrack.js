@@ -73,7 +73,6 @@ module.exports = {
     $if[$or[$env[types]==;$env[types]==v];
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==140]]
-    $if[$and[$get[getindex251]==-1;$env[reshttp;streamingData;formats;0]!=];$return[$let[finalurl;bot|Format is not available due youtube may enforce SABR-only for this client]]]
     $if[$get[getindex251]==-1;$return[$let[finalurl;bot|Format is not available]]]
     $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
     $if[$get[getcdnytlength]>=$env[size_limit];
@@ -99,7 +98,6 @@ module.exports = {
     $if[$env[types]==vs;
     $jsonLoad[afs;$env[reshttp;streamingData;adaptiveFormats]]
     $let[getindex251;$arrayFindIndex[afs;aaa;$env[aaa;itag]==251]]
-    $if[$and[$get[getindex251]==-1;$env[reshttp;streamingData;formats;0]!=];$return[$let[finalurl;bot|Format is not available due youtube may enforce SABR-only for this client]]]
     $if[$get[getindex251]==-1;$return[$let[finalurl;bot|Format is not available]]]
     $let[getcdnytlength;$env[afs;$get[getindex251];contentLength]]
     $if[$get[getcdnytlength]>=$env[size_limit];
@@ -211,7 +209,7 @@ module.exports = {
     ]
     $if[$env[b;0]==;$return[$let[finalurl;null]]]
     $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1180]]
-    $let[finalurl;$djsEval[fetch(ctx.getKeyword("finalurl"),{method:"GET",redirect:"manual"}).then(a => a.headers?.get("location") || ctx.getKeyword("finalurl")).catch(() => ctx.getKeyword("finalurl"))]]
+    $let[finalurl;$djsEval[fetch(ctx.getKeyword("finalurl"), { method: "GET" }).then(a => a.url).catch(() => ctx.getKeyword("finalurl"))]]
     ]
     $if[$env[whattype;type]==tiktokmusic;
     $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]

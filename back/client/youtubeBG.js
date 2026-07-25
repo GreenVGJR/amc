@@ -152,7 +152,7 @@ async function generateCbPotFall(videoId) {
     } catch (e) {
         // integrity token decode failed, fall back to cold start
         console.error('WebPoMinter failed, using cold start fallback:', e?.message || e);
-        token = createColdStartToken(videoId);
+        token = generateAnonPOT(videoId);
     }
     if (!token) throw new Error('poToken generation produced no token');
     return token;
@@ -174,31 +174,66 @@ async function generateCbPot(videoId, visitorData) {
         }
         // Re-snapshot with the current visitor binding (cached integrity reused).
         const webPoSignalOutput = await snapshotWithVisitor();
-        const { WebPoMinter, createColdStartToken } = await getBgModules();
+        const { WebPoMinter } = await getBgModules();
         let token;
         try {
             const webPoMinter = await WebPoMinter.create(bgIntegrityTokenData, webPoSignalOutput);
             token = await webPoMinter.mintAsWebsafeString(videoId);
         } catch (e) {
             console.error('WebPoMinter from cached integrity failed, using cold start:', e?.message || e);
-            token = createColdStartToken(videoId);
+            token = generateAnonPOT(videoId);
         }
         if (!token) throw new Error('poToken generation produced no token');
         poTokenCache.set(videoId, { token, exp: bgIntegrityExp });
         return token;
     } catch (e) {
         console.error('Content-bound poToken generation failed, using cold start:', e?.message || e);
-        const { createColdStartToken } = await getBgModules();
-        const fallbackToken = createColdStartToken(videoId);
+        const fallbackToken = generateAnonPOT(videoId);
         poTokenCache.set(videoId, { token: fallbackToken, exp: Date.now() + CAPTION_POT_TTL_FALLBACK });
         return fallbackToken;
     }
 }
 
-function generateAnonPOT() {
-    const id = Math.random().toString(36).substring(2, 13);
-    if (bgModules && bgModules.createColdStartToken) return bgModules.createColdStartToken(id);
-    return id;
+let sessionPoTokenCache = { poToken: null, exp: 0 };
+
+async function generateSessionPoToken(visitorData, forceRefresh = false) {
+    if (visitorData) setVisitorData(visitorData);
+    if (!forceRefresh && sessionPoTokenCache.poToken && sessionPoTokenCache.exp > Date.now()) {
+        return sessionPoTokenCache;
+    }
+    try {
+        if (forceRefresh || !bgProgram || !bgGlobalName || !bgIntegrityTokenData || bgIntegrityExp <= Date.now()) {
+            if (!bgProgram || !bgGlobalName) await initBotGuard();
+            else await refreshBotGuardIntegrity();
+        }
+        const webPoSignalOutput = await snapshotWithVisitor();
+        const { WebPoMinter, createColdStartToken } = await getBgModules();
+        let token;
+        try {
+            const webPoMinter = await WebPoMinter.create(bgIntegrityTokenData, webPoSignalOutput);
+            token = await webPoMinter.mintAsWebsafeString();
+        } catch (e) {
+            console.error('WebPoMinter session token failed, using cold start:', e?.message || e);
+            token = generateAnonPOT();
+        }
+        if (!token) throw new Error('Session poToken generation produced no token');
+        sessionPoTokenCache = { poToken: token, exp: bgIntegrityExp };
+        return sessionPoTokenCache;
+    } catch (e) {
+        console.error('Session poToken generation failed, using cold start fallback:', e?.message || e);
+        const fallbackToken = generateAnonPOT();
+        sessionPoTokenCache = { poToken: fallbackToken, exp: Date.now() + CAPTION_POT_TTL_FALLBACK };
+        return sessionPoTokenCache;
+    }
 }
 
-module.exports = { initBotGuard, generateCbPot, generateAnonPOT, setVisitorData };
+function generateAnonPOT(id) {
+    const identifier = id || Math.random().toString(36).substring(2, 13);
+    if (bgModules && bgModules.createColdStartToken) return bgModules.createColdStartToken(identifier);
+    return identifier;
+}
+
+module.exports = { initBotGuard, generateCbPot, generateSessionPoToken, generateAnonPOT, setVisitorData };
+
+
+
