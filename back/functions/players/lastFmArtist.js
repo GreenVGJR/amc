@@ -39,7 +39,7 @@ $httpAddHeader[Sec-Fetch-Site;none]
 $httpSetContentType[Text]
 $let[checkhttp;$httpRequest[$get[authorurl]?_pjax=%23content&top_tracks_date_preset=ALL;GET]]
 $c[Last fm has weird anti-bot protect fr]
-$if[$or[$get[checkhttp]==502;$get[checkhttp]==416;$get[checkhttp]==429];$callLocalFunction[fetchlastfm;true] $return]
+$if[$or[$get[checkhttp]==502;$get[checkhttp]==416;$get[checkhttp]==429;$get[checkhttp]==406];$callLocalFunction[fetchlastfm;true] $return]
 $let[reslast;$httpResult]
 ]
 ;
@@ -65,7 +65,14 @@ $if[$get[checkbannerexistyt]!=;
 $let[bannerchannelurl;$advancedTextSplit[$env[findindexch;$get[mrinyt];tvBanner;thumbnails;0;url];=;0]=s0]
 $if[$get[lookCacheYT]==;$setCache[initclientmusic;musicplayer_cache-lastfmyt-$md5[$get[cusque]];$get[bannerchannelurl]]]
 ]]
-$let[firstcovtop;$advancedTextSplit[$get[reslast];tbody;1;tbody;0;class="cover-art";1;src=";1;";0]]
+
+$let[stallfirstcovtop;$advancedTextSplit[$get[reslast];tbody;1;tbody;0;class="cover-art";1;src=";1;";0]]
+$let[domainCdnLastFM;$advancedTextSplit[$get[stallfirstcovtop];/;2]]
+$if[$get[domainCdnLastFM]!=;
+$let[hashFileImgLastFM;$advancedTextSplit[$get[stallfirstcovtop];/;$charCount[$get[stallfirstcovtop];/]]]
+$let[firstcovtop;https://$get[domainCdnLastFM]/i/u/$get[hashFileImgLastFM]]
+]
+
 $let[achexternal;$advancedTextSplit[$get[reslast];ul class="resource-external-links";1;</ul>;0]]
 $arrayLoad[achjexternal;href=";$get[achexternal]]
 $!arrayShift[achjexternal]
@@ -79,7 +86,14 @@ $let[conttracks;$arrayJoin[res;
 ]]
 $let[conttracks;$djsEval[require("entities").decodeHTML(ctx.getKeyword("conttracks"))]]
 $let[checkcolor;$if[$isValidHex[$advancedTextSplit[$get[reslast];"overlayColor";1;";1;";0]];$advancedTextSplit[$get[reslast];"overlayColor";1;";1;";0];$callFunction[useIcon;color_embed]]]
-$let[valthumbnail_author;$advancedTextSplit[$get[reslast];property="og:image";1;content=";1;";0]]
+
+$let[stallvalthumbnail;$advancedTextSplit[$get[reslast];property="og:image";1;content=";1;";0]]
+$let[domainCdnLastFM_a;$advancedTextSplit[$get[stallvalthumbnail];/;2]]
+$if[$get[domainCdnLastFM_a]!=;
+$let[hashFileImgLastFM_a;$advancedTextSplit[$get[stallvalthumbnail];/;$charCount[$get[stallvalthumbnail];/]]]
+$let[valthumbnail_author;https://$get[domainCdnLastFM_a]/i/u/$get[hashFileImgLastFM_a]]
+]
+
 $let[desc;$advancedTextSplit[$get[reslast];class="wiki-block-inner";1;wiki-truncate-4-lines;1;tabindex=";0;">
 ;1;
 ;1]]

@@ -34,7 +34,7 @@ module.exports = {
     $arrayMap[filcookies;b;$return[$default[$advancedTextSplit[$env[b];, ;1];$advancedTextSplit[$env[b]; ;0]]];filcookies]
     $arrayMap[filcookies;b;$if[$and[$charCount[$env[b]; ]==0;$charCount[$env[b]]!=0];$return[$env[b]]];filcookies]
     $arrayMap[filcookies;b;
-        $let[checkValidCookies;$or[$startsWith[$toLowerCase[$env[b]];domain];$startsWith[$toLowerCase[$env[b]];path];$startsWith[$toLowerCase[$env[b]];expires];$startsWith[$toLowerCase[$env[b]];max-age];$startsWith[$toLowerCase[$env[b]];secure];$startsWith[$toLowerCase[$env[b]];httponly];$startsWith[$toLowerCase[$env[b]];samesite];$startsWith[$toLowerCase[$env[b]];priority];$startsWith[$toLowerCase[$env[b]];partitioned]]]
+        $let[checkValidCookies;$or[$startsWith[$toLowerCase[$env[b]];domain];$startsWith[$toLowerCase[$env[b]];path];$startsWith[$toLowerCase[$env[b]];expires];$startsWith[$toLowerCase[$env[b]];max-age];$startsWith[$toLowerCase[$env[b]];secure];$startsWith[$toLowerCase[$env[b]];httponly];$startsWith[$toLowerCase[$env[b]];samesite];$startsWith[$toLowerCase[$env[b]];same-site];$startsWith[$toLowerCase[$env[b]];priority];$startsWith[$toLowerCase[$env[b]];partitioned]]]
         $if[$and[$get[checkValidCookies]==false;$charCount[$env[b];=]>=1];$return[$trim[$env[b]]]]
     ;filcookies]]
     ]
@@ -56,7 +56,7 @@ module.exports = {
         $let[tempcckvrlo;$replace[$env[llc];$get[tempcckvrlv]=;]]
         $let[templkcvr;$arrayFindIndex[filcookies;testlookcook;$startsWith[$env[testlookcook];$get[tempcckvrlv]]]]
         $if[$get[templkcvr]!=-1;
-        $if[$get[tempcckvrll]==;$!jsonDelete[filcookies;$get[templkcvr]];$!jsonSet[filcookies;$get[templkcvr];$env[llc]]]
+        $if[$or[$get[tempcckvrll]==;$toLowerCase[$get[tempcckvrll]]==delete];$!jsonDelete[filcookies;$get[templkcvr]];$!jsonSet[filcookies;$get[templkcvr];$env[llc]]]
         ;
         $if[$and[$env[llc]!=null;$env[llc]!=];$arrayPush[filcookies;$env[llc]]]
         ]

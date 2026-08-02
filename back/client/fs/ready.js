@@ -1,12 +1,14 @@
 module.exports = {
     type: "clientReady",
     code: `
+    $logger[Info;Ready on client $username[$clientID]]
     $if[$callFunction[configMusic;cacheAllContextNeed];
     $logger[Warn;Caching Discord context for better performance]
     $async[$callFunction[fetchDiscordContext]]
     ]
     $setCache[initclientmusic;countmusicnode;"0"]
     $setCache[initclientmusic;system_filetp-defaultDiscordAgent;$try[$djsEval[require("@discordjs/rest").DefaultUserAgent]]]
+    $async[$setCache[initclientmusic;listcommands-help;$applicationCommands]]
     $setInterval[
         $arrayLoad[guild;,;$guildIDs[,]]
         $let[countnode;0]
@@ -16,12 +18,10 @@ module.exports = {
         ]]
         $setCache[initclientmusic;countmusicnode;"$get[countnode]"]
     ;30s]
-    $async[$setCache[initclientmusic;listcommands-help;$applicationCommands]]
     $setInterval[
     $logger[Info;Re-generating keys - $getTimestamp]
     $callFunction[generateAuth;all;;false]
     $logger[Info;Done - $getTimestamp]
     ;6h]
-    $logger[Info;Ready on client $username[$clientID]]
     `
 }

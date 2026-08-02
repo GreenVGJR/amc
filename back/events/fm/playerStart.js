@@ -76,11 +76,13 @@ module.exports = [{
         $let[kkcmr;$trim[$advancedTextSplit[$trackInfo[author];- Topic;0]]]
         $let[kkcmb;$md5[$get[kkcmr]]]
         $let[lrkggl;$getCache[initclientmusic;musicplayer_cache-lastfm-$get[kkcmb]]]
+        $let[lrkggla;$getCache[initclientmusic;musicplayer_cache-lastfmapi-$get[kkcmb]]]
         $if[$get[lrkggl]==;
         $setCache[initclientmusic;musicplayer_cache-lastfm-$get[kkcmb];undefined]
         $let[knvmm;$callFunction[lastFmArtist;$get[kkcmr];false]]
-        $if[$or[$get[knvmm]==null;$get[knvmm]==];
-        $setCache[initclientmusic;musicplayer_cache-lastfm-$get[kkcmb];"null"]
+        $if[$and[$get[lrkggla]==;$or[$get[knvmm]==;$get[knvmm]==null]];
+        $setCache[initclientmusic;musicplayer_cache-lastfmapi-$get[kkcmb];undefined]
+        $let[knvmma;$callFunction[lastFmArtistAPI;$get[kkcmr];false]]
         ]]
     ]]
 

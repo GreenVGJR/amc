@@ -77,30 +77,41 @@ let ytcookiesapi;
 delete actuallk.targetDomain;
 delete actuallk.client_id;
 delete actuallk.client_secret;
+delete actuallk.embedded;
+delete actuallk.embedUrl;
 actuallk.hl = "en";
 actuallk.gl = "US";
+const isEmbeddedClient = useClient.embedded === true;
+const embedUrl = useClient.embedUrl;
 
+let visitorPromise = null;
 const generateVisitor = async () => {
-    try {
-        const url = "https://www.youtube.com/sw.js_data";
-        const headers = { "User-Agent": default_userAgent_desktop };
-        if (ytcookies) {
-            headers.Cookie = ytcookies;
+    if (visitorPromise) return visitorPromise;
+    visitorPromise = (async () => {
+        try {
+            const url = "https://www.youtube.com/sw.js_data";
+            const headers = { "User-Agent": default_userAgent_desktop };
+            if (ytcookies) {
+                headers.Cookie = ytcookies;
+            }
+            const res = await fetch(url, { method: "GET", headers });
+            ytcookiesapi = ytcookies || normalizeCookies(res.headers.getSetCookie());
+            const raw = await res.text();
+            const jsonPart = raw.split("\n")[2];
+            const data = jsonPart ? JSON.parse(jsonPart) : null;
+            vt = data?.[0]?.[2]?.[0]?.[0]?.[13] || "";
+            actuallk.visitorData = vt;
+            setVisitorData(vt);
+            const rawSync = data?.[0]?.[3];
+            datasyncID = typeof rawSync === "string" ? rawSync.split('||')[0] : "";
+            Logger.info(`/ [YoutubeConfig] Fetched Visitor Data`);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            visitorPromise = null;
         }
-        const res = await fetch(url, { method: "GET", headers });
-        ytcookiesapi = ytcookies || normalizeCookies(res.headers.getSetCookie());
-        const raw = await res.text();
-        const jsonPart = raw.split("\n")[2];
-        const data = jsonPart ? JSON.parse(jsonPart) : null;
-        vt = data?.[0]?.[2]?.[0]?.[0]?.[13] || "";
-        actuallk.visitorData = vt;
-        setVisitorData(vt);
-        const rawSync = data?.[0]?.[3];
-        datasyncID = typeof rawSync === "string" ? rawSync.split('||')[0] : "";
-        Logger.info(`/ [YoutubeConfig] Fetched Visitor Data`);
-    } catch (e) {
-        console.error(e);
-    }
+    })();
+    return visitorPromise;
 };
 
 async function fetchWebConfigInfo() {
@@ -139,6 +150,48 @@ async function fetchWebConfigInfo() {
     });
 
     return configInfoPromise;
+}
+
+function extractYtcfg(html) {
+    const m = html.match(/ytcfg\.set\(\{([\s\S]*?)\}\)\s*;/);
+    if (!m) return null;
+    try {
+        return JSON.parse('{' + m[1] + '}');
+    } catch {
+        return null;
+    }
+}
+
+let embeddedContextCache = null;
+let embeddedContextPromise = null;
+let embeddedRetried = false;
+
+async function fetchEmbeddedContext(videoId) {
+    if (!isEmbeddedClient) return null;
+    if (embeddedContextCache) return embeddedContextCache;
+    if (embeddedContextPromise) return embeddedContextPromise;
+
+    embeddedContextPromise = (async () => {
+        try {
+            const url = `https://${hostdomain}/embed/${videoId}?html5=1`;
+            const headers = { "User-Agent": APIuserAgent, "Referer": embedUrl };
+            if (ytcookies) headers.Cookie = ytcookies;
+            const res = await fetch(url, { method: "GET", headers });
+            const html = await res.text();
+            const ytcfg = extractYtcfg(html);
+            const thirdParty = ytcfg?.INNERTUBE_CONTEXT?.thirdParty || null;
+            const encryptedHostFlags = ytcfg?.WEB_PLAYER_CONTEXT_CONFIGS?.WEB_PLAYER_CONTEXT_CONFIG_ID_EMBEDDED_PLAYER?.encryptedHostFlags || null;
+            embeddedContextCache = { thirdParty, encryptedHostFlags };
+            Logger.info(`/ [YoutubeConfig] Fetched Web Embedded Config${encryptedHostFlags ? '' : ' (encryptedHostFlags absent)'}`);
+        } catch (e) {
+            console.error(e);
+            embeddedContextCache = null;
+        } finally {
+            embeddedContextPromise = null;
+        }
+    })();
+
+    return embeddedContextPromise;
 }
 
 async function fetchSignatureTimestamp(force = false) {
@@ -492,8 +545,24 @@ generateVisitor().then(() => Promise.all([
     ...(isWebClient ? [initBotGuard().then(() => generateSessionPoToken(actuallk.visitorData)).then(() => Logger.info(`/ [YoutubeConfig] Generated Session Token`))] : [])
 ]));
 
+const warmupEmbeddedClient = async () => {
+    if (!isEmbeddedClient) return;
+    try {
+        if (!vt) await generateVisitor();
+        await Promise.all([
+            fetchEmbeddedContext('dQw4w9WgXcQ'), // You know the rules
+            fetchSignatureTimestamp(),
+            initBotGuard().then(() => generateSessionPoToken(actuallk.visitorData))
+        ]);
+    } catch (e) {
+        console.error(`[YoutubeConfig] Embedded warmup failed:`, e?.message || e);
+    }
+};
+warmupEmbeddedClient();
+
 async function fallbackYTStream(lstracks) {
     refreshYtAuth();
+    embeddedRetried = false;
 
     const videoId = lstracks.includes('watch?v=') ? lstracks.split('watch?v=')[1].split('&')[0] : lstracks;
     poToken = generateAnonPOT();
@@ -539,11 +608,16 @@ async function fallbackYTStream(lstracks) {
         let a;
         const isVRnAuth = ytauth?.token && targetClient === "ANDROID_VR" && useBearer;
 
-        if (isWebClient && !actuallk.configInfo?.coldConfigData) {
+        if (isWebClient && !actuallk.configInfo?.coldConfigData && !isEmbeddedClient) {
             if (!vt) await generateVisitor();
             await fetchWebConfigInfo(); // Just in case it fails before
         }
         if (isWebClient && !signatureTimestamp) await fetchSignatureTimestamp();
+        let embeddedContext = null;
+        if (isEmbeddedClient) {
+            if (!vt) await generateVisitor();
+            embeddedContext = await fetchEmbeddedContext(videoId);
+        }
 
         let sessionPoToken = poToken;
         if (isWebClient) {
@@ -554,10 +628,14 @@ async function fallbackYTStream(lstracks) {
             sessionPoToken = sessionPoData.poToken;
         }
 
-        const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp } } } : {};
+        const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp, ...(embeddedContext?.encryptedHostFlags ? { encryptedHostFlags: embeddedContext.encryptedHostFlags } : {}) } } } : {};
+
+        const embeddedThirdParty = embeddedContext?.thirdParty
+            ? { ...embeddedContext.thirdParty, embedUrl }
+            : { embedUrl };
 
         const buildRoute = isWebClient
-            ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk } }, ...playbackContext, serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
+            ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, ...(isEmbeddedClient ? { originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` } : {}) }, ...(isEmbeddedClient ? { thirdParty: embeddedThirdParty } : {}) }, ...playbackContext, serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
             : { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
 
         const buildHeaders = (useAuth) => {
@@ -607,6 +685,25 @@ async function fallbackYTStream(lstracks) {
 
         const new_vt = a?.responseContext?.visitorData;
         if (new_vt) { actuallk.visitorData = new_vt; setVisitorData(new_vt); }
+
+        const embedderDenied = a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.reason?.runs?.some(r => /Error code: 152/.test(r.text)) || a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.errorCode === 'PLAYABILITY_ERROR_CODE_EMBEDDER_IDENTITY_DENIED';
+        if (isEmbeddedClient && embedderDenied && !embeddedRetried) {
+            embeddedRetried = true;
+            Logger.info(`/ [YoutubeConfig] EMBEDDER_IDENTITY_DENIED, refreshing embedded context`);
+            embeddedContextCache = null;
+            await generateVisitor();
+            sessionPoToken = (await generateSessionPoToken(actuallk.visitorData, true)).poToken;
+            embeddedContext = await fetchEmbeddedContext(videoId);
+            const retryThirdParty = embeddedContext?.thirdParty ? { ...embeddedContext.thirdParty, embedUrl } : { embedUrl };
+            const retryRoute = { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` }, thirdParty: retryThirdParty }, ...playbackContext, serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } };
+            a = filterPlayerObject(await fetch(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
+                method: "POST",
+                body: JSON.stringify(retryRoute),
+                headers: buildHeaders(usedAuth)
+            }).then(r => r.json()));
+            const retried_vt = a?.responseContext?.visitorData;
+            if (retried_vt) { actuallk.visitorData = retried_vt; setVisitorData(retried_vt); }
+        }
 
         if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
             const playabilityError = a?.playabilityStatus?.status || '';
@@ -732,7 +829,6 @@ async function fallbackYTStream(lstracks) {
             allowLength: changeLength,
             contentLength: streamingLength
         });
-
 
         if (changeLength && streamingLength && parseInt(streamingLength) > 0 && !isHlsUrl(actualfinalurl)) {
             const ext = sortTargetOpus.includes((frso && !forceLegacy ? frso : fsFmt)?.itag) ? "webm" : "m4a";

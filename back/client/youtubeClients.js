@@ -94,6 +94,20 @@ const list_clients = {
         "deviceModel": ""
     },
     // required youtubei.js for solve n challenge
+    // support cookies (recommended)
+    "WEB_EMBEDDED": {
+        "targetDomain": "www.youtube.com",
+        "client_id": null,
+        "client_secret": null,
+        "clientName": 56,
+        "clientVersion": "2.20260708.00.00",
+        "clientFormFactor": "UNKNOWN_FORM_FACTOR",
+        "embedded": true,
+        "embedUrl": "https://www.reddit.com/",
+        "deviceMake": "",
+        "deviceModel": ""
+    },
+    // required youtube.js for solve n challenge
     // support cookies (recommended, without it would stall for a moment)
     "TV": {
         "targetDomain": "www.youtube.com",

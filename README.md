@@ -1,11 +1,11 @@
 <div align="center">
   
 # 🌠 AMC
-[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/quoriel/db/main?label=@quoriel/db&color=2596be)](https://github.com/quoriel/db) [![QuorielEdge](https://img.shields.io/github/package-json/v/quoriel/edge/main?label=@quoriel/edge&color=2596be)](https://github.com/quoriel/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![License](https://img.shields.io/github/license/GreenVGJR/amc-discord-bot)](LICENSE)
+[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/quoriel/db/main?label=@quoriel/db&color=2596be)](https://github.com/quoriel/db) [![QuorielEdge](https://img.shields.io/github/package-json/v/quoriel/edge/main?label=@quoriel/edge&color=2596be)](https://github.com/quoriel/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![License](https://img.shields.io/github/license/GreenVGJR/amc)](LICENSE)
 
 </div>
 
-[Check another version](https://github.com/GreenVGJR/amc-discord-bot/blob/landing/README.md#choose-version)
+[Check another version](https://github.com/GreenVGJR/amc/blob/landing/README.md#choose-version)
 
 ## Installation
 
@@ -16,7 +16,7 @@
 > This branch is only for development. Expect errors.
 
 > [!NOTE]
-> These intents must enable to use all features.
+> These intents must be enable to use all features.
 > ![image](https://github.com/user-attachments/assets/4beb3e93-40f9-4253-99f4-c6ec8d5a7e67)
 
 ___
@@ -25,11 +25,11 @@ ___
 2. Clone the repository and install dependencies:
 
 ```bash
-git clone -b fs-dev-local https://github.com/GreenVGJR/amc-discord-bot.git
-cd amc-discord-bot
+git clone -b fs-dev-local https://github.com/GreenVGJR/amc.git
+cd amc
 npm install --allow-git=all
 ```
-3. Go to that folder and rename `.env.example` file to `.env` inside folder you did extract
+3. Navigate to that folder and rename `.env.example` file to `.env`
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
 5. Then run command `node .` inside that folder
 
@@ -43,7 +43,7 @@ ___
 
 </summary>
 
-| Streaming     | Extractor     | Dynamic Queue     |
+| Streaming     | Extractor     | Autoplay          |
 | ------------- | ------------- | ----------------- |
 | Youtube       | Youtube       | Youtube           |
 | Soundcloud    | Soundcloud    | Soundcloud        |
@@ -159,15 +159,14 @@ ___
     > Twitter / X
 
 - Auto-generate auth keys needed
+- Autoplay
 - Dynamic info message
-- Autocomplete song name suggestion
 - Music Controller
 - Lyrics Translation
+- DJ
 - Playlist
 - Radio
 - 24/7
-- Dynamic Queue
-- DJ
 ```
 
 </details>

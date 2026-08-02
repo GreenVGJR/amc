@@ -113,10 +113,15 @@ module.exports = {
     $footer[Fetching;$callFunction[useIcon;loading];1]
     $color[$callFunction[useIcon;color_embed];1]
     ]
-    $let[a;$callFunction[lastFmArtist;$trim[$advancedTextSplit[$trackInfo[author];- Topic;0]]]]
-    $onlyIf[$get[a]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
-    $interactionReply[$get[a]]
-    ]
+    $let[trackTitle;$trim[$advancedTextSplit[$trackInfo[author];- Topic;0]]]
+    $let[a;$callFunction[lastFmArtist;$get[trackTitle];false]]
+    $if[$get[a]==null;
+    $let[ak;$callFunction[lastFmArtistAPI;$get[trackTitle];false]]
+    $onlyIf[$get[ak]!=null;$callFunction[useCustomMusicMessage;config_errorNoResultSearch]]
+    $interactionReply[$callFunction[lastFmArtistAPI;$get[trackTitle]]]
+    ;
+    $interactionReply[$callFunction[lastFmArtist;$get[trackTitle]]]
+    ]]
     $if[$advancedTextSplit[$customID;_;1]==volumedown;
     $!setVolume[$if[$sub[$getVolume;10]>=0;$sub[$getVolume;10];0]]
     ]

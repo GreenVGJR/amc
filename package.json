@@ -14,7 +14,7 @@
     "discord-player-youtubei": "^2.0.0",
     "dotenv": "^17.4.2",
     "entities": "^8.0.0",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.1",
     "lmdb": "^3.5.6",
     "youtubei.js": "^17.2.0"
   },
