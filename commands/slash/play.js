@@ -276,12 +276,6 @@ module.exports = {
   $stop
   ]
 
-  $if[$and[$get[iscreatedfirst];$getCache[initclientmusic;musicplayer_message_$guildID_is247music]!=true];
-  $setCache[initclientmusic;musicplayer_message_$guildID_waitloadmsg;true]
-  $let[akm;$callFunction[musicVirtualDuration;$guildID;$getCache[initclientmusic;musicplayer_message_$guildID_channelid];0]]
-  $callFunction[updateCurrentMusicPlayer;false]
-  ]
-
   $if[$and[$get[currentqueuern]!=0;$get[iscreatedfirst]==false];
   $async[$if[$option[force_skip]==true;
   $let[statusloop;$getLoopMode]

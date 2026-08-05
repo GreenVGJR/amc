@@ -144,14 +144,10 @@ module.exports = {
     $if[$getCache[initclientmusic;musicplayer_checkmessage_ytwarm_$env[guildId]]==true;
     $footer[$callFunction[useCustomMusicMessage;config_generalRefreshYoutubeTrack];$callFunction[useIcon;loading];0]
     ;
-    $if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_waitloadmsg]==true;
-    $footer[$callFunction[useCustomMusicMessage;config_generalLoadTrack];$callFunction[useIcon;loading];0]
-    ;
     $if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true;
     $footer[$callFunction[useCustomMusicMessage;config_generalDynamicQueue];$callFunction[useIcon;loading];0]
     ;
     $footer[$userDisplayName[$env[jsonmusicdata;requestedBy;id]]$if[$get[countVcMembers]>=1;  •  +$get[countVcMembers] more];$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];0]
-    ]
     ]
     ]
     ]
@@ -212,12 +208,12 @@ module.exports = {
     $if[$env[bypassEdit]==true;
     $try[$interactionUpdate[
         $callLocalFunction[fetmusicmc]
-        $if[$or[$getCache[initclientmusic;musicplayer_message_$env[guildId]_waitloadmsg]==true;$getCache[initclientmusic;musicplayer_checkmessage_ytwarm_$env[guildId]]==true];$disableComponents]
+        $if[$getCache[initclientmusic;musicplayer_checkmessage_ytwarm_$env[guildId]]==true;$disableComponents]
     ]]
     ;
     $try[$!editMessage[$env[channelId];$env[messageId];
         $callLocalFunction[fetmusicmc]
-        $if[$or[$getCache[initclientmusic;musicplayer_message_$env[guildId]_waitloadmsg]==true;$getCache[initclientmusic;musicplayer_checkmessage_ytwarm_$env[guildId]]==true];$disableComponents]
+        $if[$getCache[initclientmusic;musicplayer_checkmessage_ytwarm_$env[guildId]]==true;$disableComponents]
     ]]
     ]
     $return

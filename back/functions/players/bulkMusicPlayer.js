@@ -22,7 +22,6 @@ module.exports = {
     $deleteCache[initclientmusic;musicplayer_message_$get[targetGuildIdMusic]_waitinterval]
     $deleteCache[initclientmusic;radioplayer_data_$get[targetGuildIdMusic]_playerstatus]
     $deleteCache[initclientmusic;radioplayer_data_$get[targetGuildIdMusic]_metadata]
-    $deleteCache[initclientmusic;musicplayer_message_$get[targetGuildIdMusic]_waitloadmsg]
     $deleteCache[initclientmusic;musicplayer_message_$get[targetGuildIdMusic]_ongoingdynamicmusic]
     $deleteCache[initclientmusic;musicplayer_message_$get[targetGuildIdMusic]_ongoingplaylistmusic]
     $return
