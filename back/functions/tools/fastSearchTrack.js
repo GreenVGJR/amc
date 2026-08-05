@@ -15,6 +15,7 @@ module.exports = {
     $arrayLoad[results]
     $try[
     $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Accept-Language;en]
     $httpSetContentType[Text]

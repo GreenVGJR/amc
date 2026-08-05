@@ -5,7 +5,7 @@
     "@snazzah/davey": "^0.1.12",
     "@tryforge/forge.music": "github:tryforge/ForgeMusic#main",
     "@tryforge/forgescript": "^2.6.0",
-    "bgutils-js": "^4.0.2",
+    "bgutils-js": "^4.0.3",
     "canvas": "^3.2.3",
     "discord-player": "^7.2.0",
     "discord-player-applemusic": "^1.0.3",
@@ -20,6 +20,6 @@
   },
   "devDependencies": {
     "patch-package": "^8.0.1",
-    "youtube-dl-exec": "^3.1.9"
+    "youtube-dl-exec": "^3.1.10"
   }
 }

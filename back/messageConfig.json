@@ -36,7 +36,7 @@
     "_inline|player": "---",
 
     "config_errorNoQueue": "There's no active player.",
-    "config_errorNoQueueList": "There's no track on this queue.",
+    "config_errorNoQueueList": "Nothing here yet.",
     "config_errorLiveBeforeSeek": "This track is LIVE.",
     "config_errorPauseBeforeSeek": "You can't seek while it's paused.",
     "config_errorProcessSeek": "It's still processing.",
@@ -54,6 +54,7 @@
     "config_generalVolumeTrack": "Volume changed to:",
     "config_generalIdleTrack": "Nothing is playing now.",
     "config_generalRefreshYoutubeTrack": "Refreshing Extractor",
+    "config_generalLoadTrack": "Fetching",
     "config_generalDynamicQueue": "Fetching Related Tracks",
 
     "_inline|downloader": "---",

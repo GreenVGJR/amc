@@ -120,6 +120,7 @@ async function fetchWebConfigInfo() {
 
     configInfoPromise = fetch(`https://${hostdomain}/youtubei/v1/config?prettyPrint=false&alt=json`, {
         method: "POST",
+        mode: "same-origin",
         headers: {
             "Accept-Language": "en",
             "Content-Type": "application/json",
@@ -640,7 +641,6 @@ async function fallbackYTStream(lstracks) {
 
         const buildHeaders = (useAuth) => {
             const base = {
-                "Accept-Encoding": "gzip",
                 "Accept-Language": "en",
                 "Content-Type": "application/json",
                 "X-Goog-Visitor-Id": vt,
@@ -661,6 +661,7 @@ async function fallbackYTStream(lstracks) {
 
         const fetchPlayerResponse = (headers, query = buildQuery) => fetch(`https://${hostdomain}/youtubei/v1/${query}`, {
             method: "POST",
+            mode: "same-origin",
             body: JSON.stringify(buildRoute),
             headers
         }).then(r => r.json());

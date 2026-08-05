@@ -135,7 +135,7 @@ module.exports = {
     $jsonLoad[test4;$env[loadres;media;transcodings]]
     $arrayMap[test4;test5;$if[$env[test5;format;protocol]==progressive;$return[$env[test5]]];test6]
     $if[$env[test6;0;url]==;$return[$let[finalurl;bot|DASH Audio is not available]]]
-    $!httpRequest[$env[test6;0;url]&track_authorization=$env[loadres;track_authorization];GET;rest]
+    $!httpRequest[$env[test6;0;url]?client_id=$getCache[initclientmusic;authmusic_soundcloud_fall]&track_authorization=$env[loadres;track_authorization];GET;rest]
     $let[finalurl;$env[rest;url]]
     $if[$get[finalurl]==;$return[$let[finalurl;null]]]
     ;
@@ -159,14 +159,17 @@ module.exports = {
     $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
     $if[$env[test;results;error]!=;$let[finalurl;bot|$env[test;results;error]] $return]
     $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $return]
-    $if[$env[test;results;profiles;0;play_addr;url_list;0]!=;
-    $let[finalurl;$env[test;results;profiles;0;play_addr;url_list;0]]
+    $c[Embed]
+    $if[$env[test;results;itemInfos;video;urls;0]!=;
+    $let[finalurl;$env[test;results;itemInfos;video;urls;0]]
     $return
     ]
+    $c[Webpage (Legacy format)]
     $if[$env[test;results;video_info;url_list;0]!=;
     $let[finalurl;$env[test;results;video_info;url_list;0]]
     $return
     ]
+    $c[Webpage (Adaptive formats)]
     $if[$env[test;results;video;bitrateInfo;0;PlayAddr;UrlList;0]==;
     $jsonLoad[b;$env[test;results;video;PlayAddrStruct;UrlList]]
     ;

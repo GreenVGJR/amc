@@ -11,7 +11,7 @@ module.exports = {
         required: false
     }],
     code: `
-    $let[cco;$if[$or[$env[cco]==null;$env[cco]==];;$env[cco]]]
+    $let[cco;$if[$or[$env[cco]==null;$env[cco]==];;$trim[$env[cco]]]]
     $let[discordAgent;$getCache[initclientmusic;system_filetp-defaultDiscordAgent]]
     $let[cclkfj;0]
     $localFunction[jsdbuduibs;

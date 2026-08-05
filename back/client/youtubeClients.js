@@ -107,7 +107,7 @@ const list_clients = {
         "deviceMake": "",
         "deviceModel": ""
     },
-    // required youtube.js for solve n challenge
+    // required youtubei.js for solve n challenge
     // support cookies (recommended, without it would stall for a moment)
     "TV": {
         "targetDomain": "www.youtube.com",
@@ -117,6 +117,19 @@ const list_clients = {
         "clientVersion": "5.20260720",
         "clientFormFactor": "UNKNOWN_FORM_FACTOR",
         "userAgent": "Mozilla/5.0 (ChromiumStylePlatform) Cobalt/Version",
+        "deviceMake": "",
+        "deviceModel": ""
+    },
+    // required youtubei.js for solve n challenge
+    // idk if this support cookies or oauth2
+    "TV_CAST": {
+        "targetDomain": "www.youtube.com",
+        "client_id": null,
+        "client_secret": null,
+        "clientName": 43,
+        "clientVersion": "7.20190924",
+        "clientFormFactor": "UNKNOWN_FORM_FACTOR",
+        "userAgent": "Mozilla/5.0 (Linux; Android) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 CrKey/1.54.248666",
         "deviceMake": "",
         "deviceModel": ""
     }

@@ -13,7 +13,7 @@ module.exports = {
     $jsonLoad[rest;$try[$djsEval[JSON.stringify(require("discord-player").useQueue(ctx.interaction.guild).tracks.data)];{}]]
     $if[$or[$focusedOptionValue==;$isNumber[$focusedOptionValue]];
     $let[value;$if[$sub[$focusedOptionValue;1]>=0;$sub[$focusedOptionValue;1];0]]
-    $arraySlice[rest;rest;$get[value];$sum[$get[value];25]]
+    $arraySlice[rest;rest;$get[value];$sum[$get[value];24]]
     $if[$arrayLength[rest]==0;
     $addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearchSkipTrack];-1]
     ;

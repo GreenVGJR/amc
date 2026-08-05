@@ -481,6 +481,7 @@ $let[errorplay;0]
 
 $if[$and[$get[cid]==;$get[mid]==];
 $let[mid2;$sendMessage[$channelID;
+$silent
 $author[$username[$authorID];$userAvatar[$authorID;1024];;0]
 $title[Playlist | $cropText[$env[trs;value;title];0;20;...]]
 $footer[Fetching;$callFunction[useIcon;loading]]

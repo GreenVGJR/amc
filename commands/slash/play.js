@@ -86,7 +86,7 @@ module.exports = {
   $if[$env[typesload]==1-1;
   $let[mid;$interactionReply[
   $author[» Searching\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
-  $footer[none;$callFunction[useIcon;loading]]
+  $footer[none]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
   $if[$or[$get[iscreatedfirst];$getCache[initclientmusic;musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
@@ -98,7 +98,7 @@ module.exports = {
   $let[mid;$interactionReply[
   $author[» Fetching\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
   $addField[Query;$codeBlock[$cropText[$get[filquery];0;1000]]]
-  $footer[none$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true]; - $callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$callFunction[useIcon;loading]]
+  $if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true];$footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$footer[none]]
   $color[$callFunction[useIcon;color_embed]]
   ;$get[iscreatedfirst]]]
   $if[$or[$get[iscreatedfirst];$getCache[initclientmusic;musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
@@ -112,7 +112,7 @@ module.exports = {
   $addField[$get[music_title];-# $if[$get[music_duration]==-1;MUSIC;$if[$get[music_duration]==0;LIVE;$if[$advancedTextSplit[$parseDigital[$get[music_duration]];:;0]==00;$cropText[$parseDigital[$get[music_duration]];3;];$parseDigital[$get[music_duration]]]]];true]
   $thumbnail[$get[music_thumbnail]]
   $color[$callFunction[useIcon;color_embed]]
-  $footer[$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]]$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true]; - $callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$callFunction[useIcon;loading]]
+  $footer[$toTitleCase[$advancedReplace[$get[use_provider];youtubemusic;youtube music;applemusic;apple music]]$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true]; - $callFunction[useCustomMusicMessage;config_generalForceSkipTrack]];$callFunction[useIcon;$get[use_provider]]]
   ;$get[iscreatedfirst]]]
   $if[$or[$get[iscreatedfirst];$getCache[initclientmusic;musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
   $setCache[initclientmusic;musicplayer_message_$guildID_channelid;"$channelID"]
@@ -131,7 +131,7 @@ module.exports = {
   $addField[Added Song;$sub[$get[currentqueuern];$get[queue_lengthtemp]];true;1]
   $addField[Total Song;$get[currentqueuern];true;1]
   $addField[Total Duration;$parseDigital[$queueEstimatedDuration];true;1]
-  $if[$option[force_skip]==true;$footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;loading];1]]
+  $if[$option[force_skip]==true;$footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;$get[use_provider]];1]]
   $color[$callFunction[useIcon;color_embed];0]
   $color[$callFunction[useIcon;color_embed];1]
   ;
@@ -139,7 +139,7 @@ module.exports = {
   $addField[Added Song;$sub[$get[currentqueuern];$get[queue_lengthtemp]];true;0]
   $addField[Total Song;$get[currentqueuern];true;0]
   $addField[Total Duration;$parseDigital[$queueEstimatedDuration];true;0]
-  $if[$option[force_skip]==true;$footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;loading];0]]
+  $if[$option[force_skip]==true;$footer[$callFunction[useCustomMusicMessage;config_generalForceSkipTrack];$callFunction[useIcon;$get[use_provider]];0]]
   $color[$callFunction[useIcon;color_embed];0]
   ]]
   ]
@@ -184,9 +184,15 @@ module.exports = {
   ]
   ]
   $if[$get[iscreatedfirst];
-  $let[ml;$try[$callFunction[joinVC]]]
-  ]
   $callLocalFunction[loadinteraction;1-1]
+  $if[$and[$voiceID[$guildID;$clientID]==;$getCache[initclientmusic;musicplayer_message_$guildID_is247music]==true];
+  $callFunction[bulkMusicPlayer;false]
+  $let[nhbmk;$callFunction[destroyPlayer]]
+  ]
+  $let[ml;$try[$callFunction[joinVC]]]
+  ;
+  $callLocalFunction[loadinteraction;1-1]
+  ]
   $loop[-1;
   $if[$get[fsearch]!=false;$break]
   $wait[5]

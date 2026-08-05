@@ -144,9 +144,10 @@ module.exports = [{
     $httpAddHeader[Accept-Language;en]
     $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,detailedMetadataSnippets,title(runs/text),richThumbnail(movingThumbnailRenderer/movingThumbnailDetails/thumbnails/url),lengthText(simpleText));POST;res]
     $jsonLoad[res;$env[res]]
-    $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
+    $jsonLoad[findindexres;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents]]
+    $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;$arrayFindIndex[findindexres;lookindexres;$checkCondition[$env[lookindexres;itemSectionRenderer]!=]];itemSectionRenderer;contents]]
     $arrayForEach[dofetch;getfetch;
-    $if[$and[$env[getfetch;videoRenderer;videoId]!=;$startsWith[$env[getfetch;videoRenderer;detailedMetadataSnippets;0;snippetText;runs;0;text];Provided to YouTube by]==false];
+    $if[$env[getfetch;videoRenderer;videoId]!=;
     $jsonLoad[tempres;{}]
     $!jsonSet[tempres;title;$env[getfetch;videoRenderer;title;runs;0;text]]
     $!jsonSet[tempres;duration;"$round[$divide[$unparseDigital[$env[getfetch;videoRenderer;lengthText;simpleText]];1000];0]"]

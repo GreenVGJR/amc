@@ -31,11 +31,9 @@ module.exports = [{
     $callFunction[dynamicQueue]
     ]]
 
-    $if[$getCache[initclientmusic;musicplayer_message_$guildID_waitloadmsg]!=true;
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_waitloadmsg]==true;$deleteCache[initclientmusic;musicplayer_message_$guildID_waitloadmsg]]
+
     $callFunction[updateCurrentMusicPlayer;false]
-    ;
-    $deleteCache[initclientmusic;musicplayer_message_$guildID_waitloadmsg]
-    ]
 
     $if[$callFunction[configMusic;interval_message];
     $!clearInterval[intervalmusicmessage_$guildID_$get[cid]]
