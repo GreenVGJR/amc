@@ -620,25 +620,6 @@ async function fallbackYTStream(lstracks) {
             embeddedContext = await fetchEmbeddedContext(videoId);
         }
 
-        let sessionPoToken = poToken;
-        if (isWebClient) {
-            let sessionPoData = await generateSessionPoToken(actuallk.visitorData);
-            if (sessionPoData.exp <= Date.now()) {
-                sessionPoData = await generateSessionPoToken(actuallk.visitorData, true);
-            }
-            sessionPoToken = sessionPoData.poToken;
-        }
-
-        const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp, ...(embeddedContext?.encryptedHostFlags ? { encryptedHostFlags: embeddedContext.encryptedHostFlags } : {}) } } } : {};
-
-        const embeddedThirdParty = embeddedContext?.thirdParty
-            ? { ...embeddedContext.thirdParty, embedUrl }
-            : { embedUrl };
-
-        const buildRoute = isWebClient
-            ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, ...(isEmbeddedClient ? { originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` } : {}) }, ...(isEmbeddedClient ? { thirdParty: embeddedThirdParty } : {}) }, ...playbackContext, serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
-            : { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
-
         const buildHeaders = (useAuth) => {
             const base = {
                 "Accept-Language": "en",
@@ -659,67 +640,99 @@ async function fallbackYTStream(lstracks) {
             return { ...base, "Cookie": tempytcookies };
         };
 
-        const fetchPlayerResponse = (headers, query = buildQuery) => fetch(`https://${hostdomain}/youtubei/v1/${query}`, {
+        const fetchPlayerResponse = (headers, query, route) => fetch(`https://${hostdomain}/youtubei/v1/${query}`, {
             method: "POST",
             mode: "same-origin",
-            body: JSON.stringify(buildRoute),
+            body: JSON.stringify(route),
             headers
         }).then(r => r.json());
 
-        let usedAuth = false;
         const hasAuth = isVRnAuth || !!ytcookies;
-        const shouldUseAuth = !hasAuth || Date.now() < authRequiredUntil;
+        const embeddedThirdParty = embeddedContext?.thirdParty
+            ? { ...embeddedContext.thirdParty, embedUrl }
+            : { embedUrl };
 
-        if (shouldUseAuth) {
-            usedAuth = true;
-            a = await fetchPlayerResponse(buildHeaders(true));
-        } else {
-            a = await fetchPlayerResponse(buildHeaders(false));
-        }
-
+        let usedAuth = false;
         let finalurl;
         let changeLength = false;
         let streamingLength = null;
         let durationLength = null;
         let fr = null;
-        a = filterPlayerObject(a);
 
-        const new_vt = a?.responseContext?.visitorData;
-        if (new_vt) { actuallk.visitorData = new_vt; setVisitorData(new_vt); }
+        for (let prAttempt = 0; prAttempt < 2; prAttempt++) {
+            const shouldUseAuth = !hasAuth || Date.now() < authRequiredUntil;
 
-        const embedderDenied = a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.reason?.runs?.some(r => /Error code: 152/.test(r.text)) || a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.errorCode === 'PLAYABILITY_ERROR_CODE_EMBEDDER_IDENTITY_DENIED';
-        if (isEmbeddedClient && embedderDenied && !embeddedRetried) {
-            embeddedRetried = true;
-            Logger.info(`/ [YoutubeConfig] EMBEDDER_IDENTITY_DENIED, refreshing embedded context`);
-            embeddedContextCache = null;
-            await generateVisitor();
-            sessionPoToken = (await generateSessionPoToken(actuallk.visitorData, true)).poToken;
-            embeddedContext = await fetchEmbeddedContext(videoId);
-            const retryThirdParty = embeddedContext?.thirdParty ? { ...embeddedContext.thirdParty, embedUrl } : { embedUrl };
-            const retryRoute = { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` }, thirdParty: retryThirdParty }, ...playbackContext, serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } };
-            a = filterPlayerObject(await fetch(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
-                method: "POST",
-                body: JSON.stringify(retryRoute),
-                headers: buildHeaders(usedAuth)
-            }).then(r => r.json()));
-            const retried_vt = a?.responseContext?.visitorData;
-            if (retried_vt) { actuallk.visitorData = retried_vt; setVisitorData(retried_vt); }
-        }
+            let sessionPoToken = poToken;
+            if (isWebClient) {
+                let sessionPoData = await generateSessionPoToken(actuallk.visitorData);
+                if (sessionPoData.exp <= Date.now()) {
+                    sessionPoData = await generateSessionPoToken(actuallk.visitorData, true);
+                }
+                sessionPoToken = sessionPoData.poToken;
+            }
 
-        if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
-            const playabilityError = a?.playabilityStatus?.status || '';
-            if (!usedAuth && hasAuth && playabilityError === 'LOGIN_REQUIRED') {
-                authRequiredUntil = Date.now() + 3600000;
+            const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp, ...(embeddedContext?.encryptedHostFlags ? { encryptedHostFlags: embeddedContext.encryptedHostFlags } : {}) } } } : {};
+
+            const buildRoute = isWebClient
+                ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, ...(isEmbeddedClient ? { originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` } : {}) }, ...(isEmbeddedClient ? { thirdParty: embeddedThirdParty } : {}) }, ...playbackContext, serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
+                : { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
+
+            if (shouldUseAuth) {
                 usedAuth = true;
-                a = filterPlayerObject(await fetchPlayerResponse(buildHeaders(true)));
-                const retry_vt = a?.responseContext?.visitorData;
-                if (retry_vt) { actuallk.visitorData = retry_vt; setVisitorData(retry_vt); }
+                a = await fetchPlayerResponse(buildHeaders(true), buildQuery, buildRoute);
+            } else {
+                a = await fetchPlayerResponse(buildHeaders(false), buildQuery, buildRoute);
             }
-            if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
-                vt = "";
+
+            a = filterPlayerObject(a);
+
+            const new_vt = a?.responseContext?.visitorData;
+            if (new_vt) { actuallk.visitorData = new_vt; setVisitorData(new_vt); }
+
+            const embedderDenied = a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.reason?.runs?.some(r => /Error code: 152/.test(r.text)) || a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.errorCode === 'PLAYABILITY_ERROR_CODE_EMBEDDER_IDENTITY_DENIED';
+            if (isEmbeddedClient && embedderDenied && !embeddedRetried) {
+                embeddedRetried = true;
+                Logger.info(`/ [YoutubeConfig] EMBEDDER_IDENTITY_DENIED, refreshing embedded context`);
+                embeddedContextCache = null;
                 await generateVisitor();
-                throw new Error(`InnerTube Error: ${JSON.stringify(a?.playabilityStatus) || null}`);
+                sessionPoToken = (await generateSessionPoToken(actuallk.visitorData, true)).poToken;
+                embeddedContext = await fetchEmbeddedContext(videoId);
+                const retryThirdParty = embeddedContext?.thirdParty ? { ...embeddedContext.thirdParty, embedUrl } : { embedUrl };
+                const retryRoute = { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` }, thirdParty: retryThirdParty }, ...playbackContext, serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } };
+                a = filterPlayerObject(await fetch(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
+                    method: "POST",
+                    body: JSON.stringify(retryRoute),
+                    headers: buildHeaders(usedAuth)
+                }).then(r => r.json()));
+                const retried_vt = a?.responseContext?.visitorData;
+                if (retried_vt) { actuallk.visitorData = retried_vt; setVisitorData(retried_vt); }
             }
+
+            if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
+                const playabilityError = a?.playabilityStatus?.status || '';
+                if (!usedAuth && hasAuth && playabilityError === 'LOGIN_REQUIRED') {
+                    authRequiredUntil = Date.now() + 3600000;
+                    usedAuth = true;
+                    a = filterPlayerObject(await fetchPlayerResponse(buildHeaders(true), buildQuery, buildRoute));
+                    const retry_vt = a?.responseContext?.visitorData;
+                    if (retry_vt) { actuallk.visitorData = retry_vt; setVisitorData(retry_vt); }
+                }
+                if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
+                    if (prAttempt === 0) {
+                        Logger.info(`/ [YoutubeConfig] Playability ${a?.playabilityStatus?.status || 'null'} - refreshing session and retrying`);
+                        if (isWebClient) {
+                            await initBotGuard();
+                            poToken = generateAnonPOT();
+                        }
+                        await generateVisitor();
+                        continue;
+                    }
+                    vt = "";
+                    await generateVisitor();
+                    throw new Error(`InnerTube Error: ${JSON.stringify(a?.playabilityStatus) || null}`);
+                }
+            }
+            break;
         }
 
         let forceLegacy = false;
