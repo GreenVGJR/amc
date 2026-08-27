@@ -1,4 +1,4 @@
-const { default_userAgent_desktop, streamTypeYT, useClientYT, useBearer, cacheTrackYT, skipOnCheckFormat } = require('../config.json');
+const { default_userAgent_desktop, streamTypeYT, useClientYT, cacheTrackYT, skipOnCheckFormat } = require('../config.json');
 const ytClients = require('./youtubeClients.js');
 const targetClient = useClientYT?.toUpperCase();
 const useClient = ytClients?.[targetClient];
@@ -23,7 +23,7 @@ const path = require('path');
 const cacheDir = path.join(__dirname, 'ytCacheTracks');
 fs.mkdirSync(cacheDir, { recursive: true });
 
-const { initBotGuard, generateCbPot, generateSessionPoToken, generateAnonPOT, setVisitorData } = require('./youtubeBG.js');
+const { initBotGuard, refreshBotGuardIntegrity, generateCbPot, generateSessionPoToken, generateAnonPOT, setVisitorData } = require('./youtubeBG.js');
 
 let vt;
 let datasyncID = "";
@@ -606,8 +606,7 @@ async function fallbackYTStream(lstracks) {
 
         const cpn = randomBytes(12).toString('base64url');
 
-        let a;
-        const isVRnAuth = ytauth?.token && targetClient === "ANDROID_VR" && useBearer;
+        const isVRnAuth = ytauth?.token && targetClient === "ANDROID_VR";
 
         if (isWebClient && !actuallk.configInfo?.coldConfigData && !isEmbeddedClient) {
             if (!vt) await generateVisitor();
@@ -648,208 +647,255 @@ async function fallbackYTStream(lstracks) {
         }).then(r => r.json());
 
         const hasAuth = isVRnAuth || !!ytcookies;
+        const forceAuthClients = ['WEB_PARENT', 'WEB_CREATOR', 'ANDROID_VR'];
+        const forceLegacyClients = ['MWEB'];
+        const mustUseAuth = forceAuthClients.includes(targetClient);
+
         const embeddedThirdParty = embeddedContext?.thirdParty
             ? { ...embeddedContext.thirdParty, embedUrl }
             : { embedUrl };
 
-        let usedAuth = false;
-        let finalurl;
-        let changeLength = false;
-        let streamingLength = null;
-        let durationLength = null;
-        let fr = null;
+        const clientSupportsAuth = mustUseAuth || isWebClient || isVRnAuth;
+        const authModes = mustUseAuth ? [true] : (!hasAuth || !clientSupportsAuth ? [false] : [false, true]);
 
-        for (let prAttempt = 0; prAttempt < 2; prAttempt++) {
-            const shouldUseAuth = !hasAuth || Date.now() < authRequiredUntil;
+        let result;
+        let lastError = null;
 
-            let sessionPoToken = poToken;
-            if (isWebClient) {
-                let sessionPoData = await generateSessionPoToken(actuallk.visitorData);
-                if (sessionPoData.exp <= Date.now()) {
-                    sessionPoData = await generateSessionPoToken(actuallk.visitorData, true);
-                }
-                sessionPoToken = sessionPoData.poToken;
-            }
+        const runPipeline = async (useAuthMode) => {
+            let a;
+            let usedAuth = false;
+            let finalurl;
+            let changeLength = false;
+            let streamingLength = null;
+            let durationLength = null;
+            let fr = null;
 
-            const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp, ...(embeddedContext?.encryptedHostFlags ? { encryptedHostFlags: embeddedContext.encryptedHostFlags } : {}) } } } : {};
+            for (let prAttempt = 0; prAttempt < 2; prAttempt++) {
+                const shouldUseAuth = useAuthMode || Date.now() < authRequiredUntil;
 
-            const buildRoute = isWebClient
-                ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, ...(isEmbeddedClient ? { originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` } : {}) }, ...(isEmbeddedClient ? { thirdParty: embeddedThirdParty } : {}) }, ...playbackContext, serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
-                : { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
-
-            if (shouldUseAuth) {
-                usedAuth = true;
-                a = await fetchPlayerResponse(buildHeaders(true), buildQuery, buildRoute);
-            } else {
-                a = await fetchPlayerResponse(buildHeaders(false), buildQuery, buildRoute);
-            }
-
-            a = filterPlayerObject(a);
-
-            const new_vt = a?.responseContext?.visitorData;
-            if (new_vt) { actuallk.visitorData = new_vt; setVisitorData(new_vt); }
-
-            const embedderDenied = a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.reason?.runs?.some(r => /Error code: 152/.test(r.text)) || a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.errorCode === 'PLAYABILITY_ERROR_CODE_EMBEDDER_IDENTITY_DENIED';
-            if (isEmbeddedClient && embedderDenied && !embeddedRetried) {
-                embeddedRetried = true;
-                Logger.info(`/ [YoutubeConfig] EMBEDDER_IDENTITY_DENIED, refreshing embedded context`);
-                embeddedContextCache = null;
-                await generateVisitor();
-                sessionPoToken = (await generateSessionPoToken(actuallk.visitorData, true)).poToken;
-                embeddedContext = await fetchEmbeddedContext(videoId);
-                const retryThirdParty = embeddedContext?.thirdParty ? { ...embeddedContext.thirdParty, embedUrl } : { embedUrl };
-                const retryRoute = { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` }, thirdParty: retryThirdParty }, ...playbackContext, serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } };
-                a = filterPlayerObject(await fetch(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
-                    method: "POST",
-                    body: JSON.stringify(retryRoute),
-                    headers: buildHeaders(usedAuth)
-                }).then(r => r.json()));
-                const retried_vt = a?.responseContext?.visitorData;
-                if (retried_vt) { actuallk.visitorData = retried_vt; setVisitorData(retried_vt); }
-            }
-
-            if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
-                const playabilityError = a?.playabilityStatus?.status || '';
-                if (!usedAuth && hasAuth && playabilityError === 'LOGIN_REQUIRED') {
-                    authRequiredUntil = Date.now() + 3600000;
-                    usedAuth = true;
-                    a = filterPlayerObject(await fetchPlayerResponse(buildHeaders(true), buildQuery, buildRoute));
-                    const retry_vt = a?.responseContext?.visitorData;
-                    if (retry_vt) { actuallk.visitorData = retry_vt; setVisitorData(retry_vt); }
-                }
-                if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
-                    if (prAttempt === 0) {
-                        Logger.info(`/ [YoutubeConfig] Playability ${a?.playabilityStatus?.status || 'null'} - refreshing session and retrying`);
-                        if (isWebClient) {
-                            await initBotGuard();
-                            poToken = generateAnonPOT();
-                        }
-                        await generateVisitor();
-                        continue;
+                let sessionPoToken = poToken;
+                let isRealSessionPo = false;
+                if (isWebClient) {
+                    let sessionPoData = await generateSessionPoToken(actuallk.visitorData);
+                    if (sessionPoData.exp <= Date.now()) {
+                        sessionPoData = await generateSessionPoToken(actuallk.visitorData, true);
                     }
-                    vt = "";
-                    await generateVisitor();
-                    throw new Error(`InnerTube Error: ${JSON.stringify(a?.playabilityStatus) || null}`);
+                    sessionPoToken = sessionPoData.poToken;
+                    isRealSessionPo = sessionPoData.isReal;
                 }
-            }
-            break;
-        }
 
-        let forceLegacy = false;
-        let actualfinalurl;
-        let fsFmt = {};
-        let frso = {};
-        const isLive = a?.videoDetails?.isLiveContent && a?.videoDetails?.lengthSeconds == 0;
+                const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp, ...(embeddedContext?.encryptedHostFlags ? { encryptedHostFlags: embeddedContext.encryptedHostFlags } : {}) } } } : {};
 
-        for (let attempt = 0; attempt < 2; attempt++) {
-            forceLegacy = attempt === 1;
-            finalurl = "";
-            changeLength = false;
-            streamingLength = null;
-            durationLength = null;
-            fr = null;
+                const webIntegrity = isWebClient && isRealSessionPo
+                    ? { serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
+                    : {};
 
-            if (isLive && a?.streamingData?.hlsManifestUrl) {
-                finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+                const buildRoute = isWebClient
+                    ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, ...(isEmbeddedClient ? { originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` } : {}) }, ...(isEmbeddedClient ? { thirdParty: embeddedThirdParty } : {}) }, ...playbackContext, ...webIntegrity }
+                    : { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
+
+                if (shouldUseAuth) {
+                    usedAuth = true;
+                    a = await fetchPlayerResponse(buildHeaders(true), buildQuery, buildRoute);
+                } else {
+                    a = await fetchPlayerResponse(buildHeaders(false), buildQuery, buildRoute);
+                }
+
+                a = filterPlayerObject(a);
+
+                const new_vt = a?.responseContext?.visitorData;
+                if (new_vt) { actuallk.visitorData = new_vt; setVisitorData(new_vt); }
+
+                const embedderDenied = a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.reason?.runs?.some(r => /Error code: 152/.test(r.text)) || a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.errorCode === 'PLAYABILITY_ERROR_CODE_EMBEDDER_IDENTITY_DENIED';
+                if (isEmbeddedClient && embedderDenied && !embeddedRetried) {
+                    embeddedRetried = true;
+                    Logger.info(`/ [YoutubeConfig] EMBEDDER_IDENTITY_DENIED, refreshing embedded context`);
+                    embeddedContextCache = null;
+                    await generateVisitor();
+                    const retryPoData = await generateSessionPoToken(actuallk.visitorData, true);
+                    sessionPoToken = retryPoData.poToken;
+                    embeddedContext = await fetchEmbeddedContext(videoId);
+                    const retryThirdParty = embeddedContext?.thirdParty ? { ...embeddedContext.thirdParty, embedUrl } : { embedUrl };
+                    const retryIntegrity = isWebClient && retryPoData.isReal
+                        ? { serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
+                        : {};
+                    const retryRoute = { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` }, thirdParty: retryThirdParty }, ...playbackContext, ...retryIntegrity };
+                    a = filterPlayerObject(await fetch(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
+                        method: "POST",
+                        body: JSON.stringify(retryRoute),
+                        headers: buildHeaders(usedAuth)
+                    }).then(r => r.json()));
+                    const retried_vt = a?.responseContext?.visitorData;
+                    if (retried_vt) { actuallk.visitorData = retried_vt; setVisitorData(retried_vt); }
+                }
+
+                if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
+                    const playabilityError = a?.playabilityStatus?.status || '';
+                    if (!usedAuth && hasAuth && playabilityError === 'LOGIN_REQUIRED') {
+                        authRequiredUntil = Date.now() + 3600000;
+                        usedAuth = true;
+                        a = filterPlayerObject(await fetchPlayerResponse(buildHeaders(true), buildQuery, buildRoute));
+                        const retry_vt = a?.responseContext?.visitorData;
+                        if (retry_vt) { actuallk.visitorData = retry_vt; setVisitorData(retry_vt); }
+                    }
+                    if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
+                        if (prAttempt === 0) {
+                            Logger.info(`/ [YoutubeConfig] Playability ${a?.playabilityStatus?.status || 'null'} - refreshing session and retrying`);
+                            if (isWebClient) {
+                                await refreshBotGuardIntegrity();
+                                await generateSessionPoToken(actuallk.visitorData, true);
+                            }
+                            await generateVisitor();
+                            continue;
+                        }
+                        vt = "";
+                        await generateVisitor();
+                        throw new Error(`InnerTube Error: ${JSON.stringify(a?.playabilityStatus) || null}`);
+                    }
+                }
+                break;
             }
-            else if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
-                finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
-            }
-            else {
-                fsFmt = a.streamingData?.formats?.find(getFormatUrl);
-                frso = a.streamingData?.adaptiveFormats?.filter(c => [...sortTargetOpus, ...sortTargetM4a].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
-                if (frso && !forceLegacy) {
-                    const rawFormatUrl = getFormatUrl(frso);
-                    const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                    finalurl = withStreamParams(decipheredUrl, { ratebypass: 'true', rn: '0', alr: 'no', cver: useClient.clientVersion, cpn });
-                    changeLength = true;
-                    durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
-                    streamingLength = String(frso.contentLength);
+
+            let forceLegacy = false;
+            let actualfinalurl;
+            let fsFmt = {};
+            let frso = {};
+            const isLive = a?.videoDetails?.isLiveContent && a?.videoDetails?.lengthSeconds == 0;
+
+            const startAttempt = forceLegacyClients.includes(targetClient) ? 1 : 0;
+
+            for (let attempt = startAttempt; attempt < 2; attempt++) {
+                forceLegacy = attempt === 1;
+                finalurl = "";
+                changeLength = false;
+                streamingLength = null;
+                durationLength = null;
+                fr = null;
+
+                if (isLive && a?.streamingData?.hlsManifestUrl) {
+                    finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+                }
+                else if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
+                    finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
                 }
                 else {
-                    const rawFormatUrl = getFormatUrl(fsFmt);
-                    const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-                    finalurl = withStreamParams(decipheredUrl, { rn: '0', alr: 'no', cver: useClient.clientVersion, cpn });
-                }
-            }
-
-            if (!finalurl && a?.streamingData?.hlsManifestUrl) {
-                finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
-            }
-
-            if (!finalurl && a?.streamingData?.serverAbrStreamingUrl) {
-                throw new Error(`This content unavailable due youtube enforce SABR-only`);
-            }
-
-            if (!finalurl) {
-                throw new Error(`No playable YouTube format URL for ${targetClient}`);
-            }
-
-            if (isHlsUrl(finalurl)) {
-                return finalurl;
-            }
-
-            let contentPoToken;
-            if (isWebClient) contentPoToken = encodeURIComponent(await generateCbPot(videoId, actuallk.visitorData));
-
-            let filterlocation;
-            let secfinalurl;
-            let finalWithPot;
-            const maxHeadRetries = 4;
-
-            for (let headAttempt = 0; headAttempt <= maxHeadRetries; headAttempt++) {
-                filterlocation = await fetch(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""), {
-                    method: "HEAD",
-                    headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
-                });
-
-                secfinalurl = filterlocation.url;
-                finalWithPot = contentPoToken && !secfinalurl.includes("pot=") ? (secfinalurl + "&pot=" + contentPoToken) : secfinalurl;
-
-                if (filterlocation.status !== 403 || !changeLength || skipOnCheckFormat) {
-                    break;
+                    fsFmt = a.streamingData?.formats?.find(getFormatUrl);
+                    frso = a.streamingData?.adaptiveFormats?.filter(c => [...sortTargetOpus, ...sortTargetM4a].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
+                    if (frso && !forceLegacy) {
+                        const rawFormatUrl = getFormatUrl(frso);
+                        const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
+                        finalurl = withStreamParams(decipheredUrl, { ratebypass: 'true', rn: '0', alr: 'no', cver: useClient.clientVersion, cpn });
+                        changeLength = true;
+                        durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
+                        streamingLength = String(frso.contentLength);
+                    }
+                    else {
+                        const rawFormatUrl = getFormatUrl(fsFmt);
+                        const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
+                        finalurl = withStreamParams(decipheredUrl, { rn: '0', alr: 'no', cver: useClient.clientVersion, cpn });
+                    }
                 }
 
-                if (headAttempt < maxHeadRetries) {
-                    await new Promise(r => setTimeout(r, 1000 * (headAttempt + 1)));
+                if (!finalurl && a?.streamingData?.hlsManifestUrl) {
+                    finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
                 }
+
+                if (!finalurl && a?.streamingData?.serverAbrStreamingUrl) {
+                    throw new Error(`This content unavailable due youtube enforce SABR-only`);
+                }
+
+                if (!finalurl) {
+                    throw new Error(`No playable YouTube format URL for ${targetClient}`);
+                }
+
+                if (isHlsUrl(finalurl)) {
+                    return finalurl;
+                }
+
+                let contentPoToken;
+                if (isWebClient) {
+                    const cbPot = await generateCbPot(videoId, actuallk.visitorData);
+                    contentPoToken = cbPot.isReal ? encodeURIComponent(cbPot.token) : null;
+                }
+
+                let filterlocation;
+                let secfinalurl;
+                let finalWithPot;
+                const maxHeadRetries = 4;
+
+                for (let headAttempt = 0; headAttempt <= maxHeadRetries; headAttempt++) {
+                    filterlocation = await fetch(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""), {
+                        method: "HEAD",
+                        headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
+                    });
+                    secfinalurl = filterlocation.url;
+                    finalWithPot = contentPoToken && !secfinalurl.includes("pot=") ? (secfinalurl + "&pot=" + contentPoToken) : secfinalurl;
+
+                    if (filterlocation.status !== 403 || !changeLength || skipOnCheckFormat) {
+                        break;
+                    }
+
+                    if (headAttempt < maxHeadRetries) {
+                        await new Promise(r => setTimeout(r, 1000 * (headAttempt + 1)));
+                    }
+                }
+
+                if (filterlocation.status === 403 && changeLength) {
+                    if (isWebClient && !forceLegacy) {
+                        continue;
+                    }
+                    const bytesPerSecond = parseInt(frso.contentLength) / durationLength;
+                    const previewLength = String(Math.floor(bytesPerSecond * 60));
+                    actualfinalurl = finalWithPot;
+                    streamingLength = previewLength;
+                    changeLength = true;
+                }
+                else {
+                    actualfinalurl = finalWithPot;
+                }
+
+                break;
             }
 
-            if (filterlocation.status === 403 && changeLength) {
-                if (isWebClient && !forceLegacy) {
-                    continue;
-                }
-                const bytesPerSecond = parseInt(frso.contentLength) / durationLength;
-                const previewLength = String(Math.floor(bytesPerSecond * 60));
-                actualfinalurl = finalWithPot;
-                streamingLength = previewLength;
-                changeLength = true;
-            }
-            else {
-                actualfinalurl = finalWithPot;
+            if (isLive) {
+                return createLiveChunkedStream(actualfinalurl);
             }
 
-            break;
+            templist.push({
+                id: lstracks,
+                url: actualfinalurl,
+                ref: Date.now() + 3600000,
+                allowLength: changeLength,
+                contentLength: streamingLength
+            });
+
+            if (changeLength && streamingLength && parseInt(streamingLength) > 0 && !isHlsUrl(actualfinalurl)) {
+                const ext = sortTargetOpus.includes((frso && !forceLegacy ? frso : fsFmt)?.itag) ? "webm" : "m4a";
+                return createChunkedStream(actualfinalurl, parseInt(streamingLength), videoId, ext);
+            }
+
+            return actualfinalurl;
+        };
+
+        for (let modeIdx = 0; modeIdx < authModes.length; modeIdx++) {
+            const useAuthMode = authModes[modeIdx];
+            try {
+                result = await runPipeline(useAuthMode);
+                lastError = null;
+                break;
+            } catch (modeErr) {
+                lastError = modeErr;
+                Logger.info(`/ [YoutubeConfig] attempt with auth=${useAuthMode} failed: ${modeErr?.message || modeErr}`);
+                if (isWebClient) {
+                    await initBotGuard();
+                    poToken = generateAnonPOT();
+                }
+                await generateVisitor();
+            }
         }
 
-        if (isLive) {
-            return createLiveChunkedStream(actualfinalurl);
-        }
-
-        templist.push({
-            id: lstracks,
-            url: actualfinalurl,
-            ref: Date.now() + 3600000,
-            allowLength: changeLength,
-            contentLength: streamingLength
-        });
-
-        if (changeLength && streamingLength && parseInt(streamingLength) > 0 && !isHlsUrl(actualfinalurl)) {
-            const ext = sortTargetOpus.includes((frso && !forceLegacy ? frso : fsFmt)?.itag) ? "webm" : "m4a";
-            return createChunkedStream(actualfinalurl, parseInt(streamingLength), videoId, ext);
-        }
-
-        return actualfinalurl;
+        if (lastError) throw lastError;
+        return result;
     }
     catch (e) {
         console.error(e);

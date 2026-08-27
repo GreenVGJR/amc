@@ -82,7 +82,7 @@ ___
 </summary>
 
 1. Navigate to this file `back/config.json`
-2. Changes for 'useClientYT' to `ANDROID_VR` and 'useBearer' to `true`
+2. Changes for 'useClientYT' to `ANDROID_VR`
 3. Restart the client and follow the instructions
 
 </details>

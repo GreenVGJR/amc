@@ -1,4 +1,4 @@
-const { androidVrClientYT } = require('../helpers/clientYoutube.js');
+const { tarClient, tarClientYT } = require('../helpers/clientYoutube.js');
 
 module.exports = {
     name: "fallbackPlaybackTrack",
@@ -34,28 +34,34 @@ module.exports = {
 
     $let[videoid;$env[whattype;id]]
     $let[ytinitauth;$djsEval[process.env.YOUTUBE_AUTH]]
-    $jsonLoad[listclient;${androidVrClientYT()}]
+    $let[targetClientYT;${tarClient()}]
+    $jsonLoad[listclient;${tarClientYT()}]
+
+    $try[
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
+    $try[$jsonLoad[youtubeAuth;$get[ytinitauth]]]
+    $if[$and[$env[youtubeAuth;token]!=;$get[targetClientYT]==ANDROID_VR];
+    $httpAddHeader[Authorization;Bearer $env[youtubeAuth;token]]
+    $httpAddHeader[X-Goog-AuthUser;0]
+
     $let[defytdomain;$env[listclient;targetDomain]]
-    $let[tempclientid;$env[listclient;client_id]]
-    $let[tempclientsecret;$env[listclient;client_secret]]
     $!jsonDelete[listclient;targetDomain]
     $!jsonDelete[listclient;client_id]
     $!jsonDelete[listclient;client_secret]
+    ;
+    $jsonLoad[listclient;{}]
+    $let[defytdomain;youtubei.googleapis.com]
+    $if[$env[types]!=va;
+    $!jsonSet[listclient;clientName;"101"]
+    $!jsonSet[listclient;clientVersion;"1.03"]
+    ;
+    $!jsonSet[listclient;clientName;"3"]
+    $!jsonSet[listclient;clientVersion;"21.26.360"]
+    ]]
+
     $!jsonSet[listclient;visitorData;$getCache[initclientmusic;authmusic_youtube_visitor]]
     $!jsonSet[listclient;hl;en]
     $!jsonSet[listclient;gl;US]
-
-    $try[
-    $if[$or[$get[ytinitauth]==;$get[ytinitauth]==undefined]==false;
-    $let[supportAuth;$or[$get[tempclientid]==null;$get[tempclientsecret]==null]]
-    $if[$and[$callFunction[configMusic;useBearer]==true;$get[supportAuth]==false];
-    $try[$jsonLoad[youtubeAuth;$get[ytinitauth]]]
-    $httpAddHeader[Authorization;Bearer $env[youtubeAuth;token]]
-    $httpAddHeader[X-Goog-AuthUser;0]
-    ]
-    ;
-    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
-    ]
 
     $httpAddHeader[X-Youtube-Client-Name;$env[listclient;clientName]]
     $httpAddHeader[X-Youtube-Client-Version;$env[listclient;clientVersion]]

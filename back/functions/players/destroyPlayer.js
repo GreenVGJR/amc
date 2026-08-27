@@ -9,9 +9,14 @@ module.exports = {
     $return[$try[$djsEval[
     const { useQueue } = require('discord-player')\\;
     const targetGuild = ctx.client.guilds.cache.get(ctx.getKeyword("guildCID"))\\;
+    try {
     const queue = useQueue(targetGuild)\\;
     queue.connection.destroy()\\;
     true\\;
+    }
+    catch {
+    false\\;
+    }
     ];false]]
     `
 }

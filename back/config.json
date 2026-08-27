@@ -27,11 +27,10 @@
     "streamTypeYT": 1,
     "skipOnCheckFormat": false,
     "useClientYT": "VISIONOS",
-    "useBearer": false,
     "cacheTrackYT": false,
 
     "disable_YT": false,
-    "default_userAgent_desktop": "Mozilla/5.0 (X11; Linux x86_64; rv:153.0) Gecko/20100101 Firefox/153.0",
+    "default_userAgent_desktop": "Mozilla/5.0 (X11; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
     "default_userAgent_mobile": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/151.0.0.0 Mobile/15E148 Safari/604.1",
     "default_userAgent_bot": "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)"
 }

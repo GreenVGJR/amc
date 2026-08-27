@@ -8,12 +8,15 @@ module.exports = [{
     $jsonLoad[listclient;$replace[${tarClientYT()};%SEMI%;\\;]]
     $let[isWebClient;$checkCondition[$env[listclient;targetDomain]!=youtubei.googleapis.com]]
     $let[ytinitcookiesalt;$djsEval[process.env.YOUTUBE_COOKIES]]
+    $let[lookauthalt;$trimLines[$trim[$djsEval[process.env.YOUTUBE_AUTH]]]]
+    $try[$jsonLoad[youtubeAuthalt;$get[lookauthalt]]]
     $logger[Debug;Refreshing cache data]
     $logger[Warn;Generating Auth while waiting client online]
     $async[
         $setCache[initclientmusic;system_file-config;$readFile[./back/config.json]]
         $let[lookwhatclientytuse;$toLowerCase[$callFunction[configMusic;useClientYT]]]
         $jsonLoad[checkytclient;["web_safari","web_parent","android_vr","android"\\]]
+        $if[$and[$env[youtubeAuthalt;token]==;android_vr==$get[lookwhatclientytuse]];$logger[Warn;This client required auth ($callFunction[configMusic;useClientYT])]]
         $if[$arrayIncludes[checkytclient;$get[lookwhatclientytuse]];$logger[Warn;Youtube may enforcing SABR-only for this client ($callFunction[configMusic;useClientYT])]]
     ]
     $async[$setCache[initclientmusic;system_file-filterMedia;$readFile[./back/listRegex.json]]]
@@ -24,13 +27,13 @@ module.exports = [{
     $async[$!prefetchDB[user;] $!prefetchDB[guild;] $!prefetchDB[global;]]
     $async[$callFunction[generateAuth;tidal;;true]]
     $callFunction[generateAuth;youtube_anon;;true]
-    $if[$or[$get[ytinitcookiesalt]==;$get[ytinitcookiesalt]==undefined;$callFunction[configMusic;useBearer]==true];
+    $if[$callFunction[configMusic;useClientYT]==ANDROID_VR;
     $callFunction[generateAuth;youtube;;true]
-    $if[$callFunction[configMusic;useBearer]==true;
     $if[$env[lrtuy]!=false;
     $setInterval[$let[yyugn;$callFunction[generateTokenYoutube;false]];30m]
-    ]]
+    ]
     ;
+    $if[$or[$get[ytinitcookiesalt]==;$get[ytinitcookiesalt]==undefined]==false;
     $localFunction[checkcookies;
     $let[checkcookie;$callFunction[generateAuth;youtube;;$env[lfk];$env[toggle]]]
     $if[$getCache[initclientmusic;retrycookiesyt]==true;$deleteCache[initclientmusic;retrycookiesyt] $wait[10s] $callLocalFunction[checkcookies;true;false]]
@@ -42,7 +45,7 @@ module.exports = [{
     ;10m]
     ]
     $deleteCache[initclientmusic;disablecookiesyt]
-    ]
+    ]]
     $async[$callFunction[generateAuth;tiktok;;true]]
     $async[$callFunction[generateAuth;instagram;;true]]
     $async[$callFunction[generateAuth;soundcloud;;true]]

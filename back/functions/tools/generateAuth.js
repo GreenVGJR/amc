@@ -58,7 +58,7 @@ module.exports = {
     $setCache[initclientmusic;authmusic_youtube_pot;$get[genpotytlk]]
     $logger[Info;$if[$get[genpotytlk]!=;$cropText[$get[genpotytlk];0;10;...];Failed to Retrieve] | Youtube / POT]
     ]
-    $if[$and[$callFunction[configMusic;useClientYT]==ANDROID_VR;$callFunction[configMusic;useBearer]==true];
+    $if[$callFunction[configMusic;useClientYT]==ANDROID_VR;
     $if[$env[successlog]==true;$logger[Info;Using Youtube Token. Looking auth]]
     $jsonLoad[lrtuy;$callFunction[generateTokenYoutube;true]]
     $if[$env[lrtuy]==false;

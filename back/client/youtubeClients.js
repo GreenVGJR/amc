@@ -27,17 +27,17 @@ const list_clients = {
     },
     // doesn't support stream kids contents
     // might enforce SABR-only
-    // support oauth2
+    // required oauth2
     "ANDROID_VR": {
         "targetDomain": "youtubei.googleapis.com",
         "client_id": "652469312169-4lvs9bnhr9lpns9v451j5oivd81vjvu1.apps.googleusercontent.com",
         "client_secret": "3fTWrBJI5Uojm1TK7_iJCW5Z",
         "clientName": 28,
-        "clientVersion": "1.00.0",
+        "clientVersion": "1.65.10",
         "deviceMake": "Oculus",
         "deviceModel": "Quest 3",
-        "androidSdkVersion": 32,
-        "userAgent": "com.google.android.apps.youtube.vr.oculus/1.00.0 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip",
+        "androidSdkVersion": 35,
+        "userAgent": "com.google.android.apps.youtube.vr.oculus/1.65.10 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip",
         "osName": "Android",
         "osVersion": "12L"
     },
@@ -108,15 +108,14 @@ const list_clients = {
         "deviceModel": ""
     },
     // required youtubei.js for solve n challenge
-    // support cookies (recommended, without it would stall for a moment)
+    // idk if this support cookies or oauth2
     "TV": {
         "targetDomain": "www.youtube.com",
         "client_id": null,
         "client_secret": null,
-        "clientName": 7,
-        "clientVersion": "5.20260720",
+        "clientName": 75,
+        "clientVersion": "1.0",
         "clientFormFactor": "UNKNOWN_FORM_FACTOR",
-        "userAgent": "Mozilla/5.0 (ChromiumStylePlatform) Cobalt/Version",
         "deviceMake": "",
         "deviceModel": ""
     },

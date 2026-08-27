@@ -16,10 +16,10 @@
     "entities": "^8.0.0",
     "jsdom": "^30.0.1",
     "lmdb": "^3.5.6",
-    "youtubei.js": "^17.2.0"
+    "youtubei.js": "^18.0.0"
   },
   "devDependencies": {
     "patch-package": "^8.0.1",
-    "youtube-dl-exec": "^3.1.12"
+    "youtube-dl-exec": "^3.1.13"
   }
 }

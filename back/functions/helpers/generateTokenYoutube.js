@@ -29,7 +29,7 @@ module.exports = {
     $httpSetBody[$jsonStringify[rr]]
     $!httpRequest[https://www.youtube.com/o/oauth2/device/code;POST;ppl]
     $if[$env[ppl;user_code]==;
-    $logger[Error;Google - Failed to fetch: $env[ppl;error_description]. Skipping]
+    $logger[Error;Google - Failed to fetch: $default[$env[ppl;error_description];null response]. Skipping]
     $return[null]
     ]
     $let[isRetrieved;false]
@@ -74,7 +74,7 @@ module.exports = {
     $httpSetBody[$env[rst]]
     $!httpRequest[https://www.youtube.com/o/oauth2/token;POST;ppm]
     $if[$env[ppm;access_token]==;
-    $logger[Error;Google - Failed to fetch: $env[ppm;error_description]. Skipping]
+    $logger[Error;Google - Failed to fetch: $default[$env[ppm;error_description];null response]. Skipping]
     $return[null]
     ]
     $!jsonSet[lr;token;$env[ppm;access_token]]

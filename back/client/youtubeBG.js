@@ -146,6 +146,7 @@ async function generateCbPotFall(videoId) {
     if (estimatedTtlSecs) bgIntegrityExp = estimatedTtlSecs * 1000;
     else bgIntegrityExp = CAPTION_POT_TTL_FALLBACK;
     let token;
+    let isReal = true;
     try {
         const minter = await WebPoMinter.create({ integrityToken: rawToken }, webPoSignalOutput);
         token = await minter.mintAsWebsafeString(videoId);
@@ -153,9 +154,10 @@ async function generateCbPotFall(videoId) {
         // integrity token decode failed, fall back to cold start
         console.error('WebPoMinter failed, using cold start fallback:', e?.message || e);
         token = generateAnonPOT(videoId);
+        isReal = false;
     }
     if (!token) throw new Error('poToken generation produced no token');
-    return token;
+    return { token, isReal };
 }
 
 async function generateCbPot(videoId, visitorData) {
@@ -176,25 +178,27 @@ async function generateCbPot(videoId, visitorData) {
         const webPoSignalOutput = await snapshotWithVisitor();
         const { WebPoMinter } = await getBgModules();
         let token;
+        let isReal = true;
         try {
             const webPoMinter = await WebPoMinter.create(bgIntegrityTokenData, webPoSignalOutput);
             token = await webPoMinter.mintAsWebsafeString(videoId);
         } catch (e) {
             console.error('WebPoMinter from cached integrity failed, using cold start:', e?.message || e);
             token = generateAnonPOT(videoId);
+            isReal = false;
         }
         if (!token) throw new Error('poToken generation produced no token');
-        poTokenCache.set(videoId, { token, exp: bgIntegrityExp });
-        return token;
+        poTokenCache.set(videoId, { token, exp: bgIntegrityExp, isReal });
+        return { token, isReal };
     } catch (e) {
         console.error('Content-bound poToken generation failed, using cold start:', e?.message || e);
         const fallbackToken = generateAnonPOT(videoId);
-        poTokenCache.set(videoId, { token: fallbackToken, exp: Date.now() + CAPTION_POT_TTL_FALLBACK });
-        return fallbackToken;
+        poTokenCache.set(videoId, { token: fallbackToken, exp: Date.now() + CAPTION_POT_TTL_FALLBACK, isReal: false });
+        return { token: fallbackToken, isReal: false };
     }
 }
 
-let sessionPoTokenCache = { poToken: null, exp: 0 };
+let sessionPoTokenCache = { poToken: null, exp: 0, isReal: false };
 
 async function generateSessionPoToken(visitorData, forceRefresh = false) {
     if (visitorData) setVisitorData(visitorData);
@@ -217,12 +221,12 @@ async function generateSessionPoToken(visitorData, forceRefresh = false) {
             token = generateAnonPOT();
         }
         if (!token) throw new Error('Session poToken generation produced no token');
-        sessionPoTokenCache = { poToken: token, exp: bgIntegrityExp };
+        sessionPoTokenCache = { poToken: token, exp: bgIntegrityExp, isReal: true };
         return sessionPoTokenCache;
     } catch (e) {
         console.error('Session poToken generation failed, using cold start fallback:', e?.message || e);
         const fallbackToken = generateAnonPOT();
-        sessionPoTokenCache = { poToken: fallbackToken, exp: Date.now() + CAPTION_POT_TTL_FALLBACK };
+        sessionPoTokenCache = { poToken: fallbackToken, exp: Date.now() + CAPTION_POT_TTL_FALLBACK, isReal: false };
         return sessionPoTokenCache;
     }
 }
@@ -233,7 +237,4 @@ function generateAnonPOT(id) {
     return identifier;
 }
 
-module.exports = { initBotGuard, generateCbPot, generateSessionPoToken, generateAnonPOT, setVisitorData };
-
-
-
+module.exports = { initBotGuard, refreshBotGuardIntegrity, generateCbPot, generateSessionPoToken, generateAnonPOT, setVisitorData };
