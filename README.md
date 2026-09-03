@@ -5,15 +5,10 @@
 
 </div>
 
-[Check another version](https://github.com/GreenVGJR/amc/blob/landing/README.md#choose-version)
-
 ## Installation
 
 > [!CAUTION]
 > Stream Youtube violates Discord ToS. Use it with caution.
-
-> [!WARNING]
-> This branch is only for development. Expect errors.
 
 > [!NOTE]
 > These intents must be enable to use all features.
@@ -68,7 +63,7 @@ ___
 2. If that done, navigate to `https://www.youtube.com/robots.txt` then open developers tools (`Ctrl + Shift + I`)
 3. Go to "Network" tab and find `robots.txt` request
 4. Copy the `Cookie` from Request Headers
-> Doesn't show? do `Ctrl + F5`
+> Not showing? do `Ctrl + F5`
 5. Put inside `.env` at `YOUTUBE_COOKIES=put_cookies_here`
 
 </details>
@@ -99,7 +94,7 @@ ___
 2. If that done, navigate to `https://accounts.spotify.com/robots.txt` then open developers tools (`Ctrl + Shift + I`)
 3. Go to "Network" tab and find `robots.txt` request
 4. Copy the `Cookie` from Request Headers
-> Doesn't show? do `Ctrl + F5`
+> Not showing? do `Ctrl + F5`
 5. Put inside `.env` at `SPOTIFY_COOKIES=put_cookies_here`
 
 </details>
