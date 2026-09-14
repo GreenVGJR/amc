@@ -7,6 +7,9 @@ if (!useClient) {
     throw new Error(`YouTube client "${targetClient}" does not exist. Available clients: ${available}`);
 }
 
+const forceAuthClients = ['WEB_PARENT', 'WEB_CREATOR', 'ANDROID_VR', 'ANDROID_VR_DOWN'];
+const forceLegacyClients = [];
+
 if (['WEB_CREATOR', 'WEB_PARENT'].includes(targetClient) && !process.env.YOUTUBE_COOKIES) {
     throw new Error(`Please put youtube cookies first before using this client. (${targetClient})`);
 }
@@ -38,8 +41,8 @@ let poToken = generateAnonPOT();
 
 const apiEndpoint = isWebClient ? 'player' : 'get_watch';
 const apiFields = isWebClient
-    ? 'responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url,signatureCipher),adaptiveFormats(itag,url,contentLength,signatureCipher)),videoDetails(isLiveContent,lengthSeconds)'
-    : 'playerResponse(responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength)),videoDetails(isLiveContent,lengthSeconds))';
+    ? 'responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url,signatureCipher),adaptiveFormats(itag,url,contentLength,signatureCipher,audioTrack(displayName,id,audioIsDefault))),videoDetails(isLiveContent,lengthSeconds),captions(playerCaptionsTracklistRenderer(audioTracks(audioTrackId),defaultAudioTrackIndex))'
+    : 'playerResponse(responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength,audioTrack(displayName,id,audioIsDefault))),videoDetails(isLiveContent,lengthSeconds),captions(playerCaptionsTracklistRenderer(audioTracks(audioTrackId),defaultAudioTrackIndex)))';
 const buildQuery = apiEndpoint + '?prettyPrint=false&alt=json&fields=' + apiFields;
 
 const APIuserAgent = useClient?.userAgent || default_userAgent_desktop;
@@ -647,8 +650,6 @@ async function fallbackYTStream(lstracks) {
         }).then(r => r.json());
 
         const hasAuth = isVRnAuth || !!ytcookies;
-        const forceAuthClients = ['WEB_PARENT', 'WEB_CREATOR', 'ANDROID_VR', 'ANDROID_VR_DOWN'];
-        const forceLegacyClients = [];
         const mustUseAuth = forceAuthClients.includes(targetClient);
 
         const embeddedThirdParty = embeddedContext?.thirdParty
@@ -780,7 +781,12 @@ async function fallbackYTStream(lstracks) {
                 }
                 else {
                     fsFmt = a.streamingData?.formats?.find(getFormatUrl);
-                    frso = a.streamingData?.adaptiveFormats?.filter(c => [...sortTargetOpus, ...sortTargetM4a].includes(c.itag) && getFormatUrl(c)).sort((a, b) => b.itag - a.itag)?.[0];
+                    const capRenderer = a?.captions?.playerCaptionsTracklistRenderer;
+                    const capAudioTracks = Array.isArray(capRenderer?.audioTracks) ? capRenderer.audioTracks : [];
+                    const capDefaultIdx = capRenderer?.defaultAudioTrackIndex;
+                    const originalAudioTrackId = (typeof capDefaultIdx === 'number' && capAudioTracks[capDefaultIdx]?.audioTrackId) || null;
+                    const audioCands = (a.streamingData?.adaptiveFormats || []).filter(c => [...sortTargetOpus, ...sortTargetM4a].includes(c.itag) && getFormatUrl(c)).sort((x, y) => y.itag - x.itag);
+                    frso = (originalAudioTrackId && audioCands.find(c => c?.audioTrack?.id === originalAudioTrackId)) || audioCands[0] || null;
                     if (frso && !forceLegacy) {
                         const rawFormatUrl = getFormatUrl(frso);
                         const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);

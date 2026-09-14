@@ -70,8 +70,8 @@ module.exports = {
     $let[title;$default[$env[a;results;matched_song;title];$env[a;results;title]]]
     ]
     $if[$env[filtype;type]==facebook;
-    $let[author;$env[a;results;owner]]
-    $let[title;$default[$env[a;results;text];$env[a;results;video_id]]]
+    $let[author;$default[$env[a;results;data;currMedia;creation_story;actors;0;name];$env[a;results;data;currMedia;owner;id]]]
+    $let[title;$default[$env[a;results;data;currMedia;creation_story;message;text];$default[$env[a;results;data;currMedia;seo_title];$env[a;results;data;currMedia;id]]]]
     ]
     $if[$env[filtype;type]==instagram;
     $if[$env[a;results;shortcode_media]!=;

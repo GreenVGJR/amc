@@ -193,14 +193,30 @@ module.exports = [{
     $let[thumbnail;$getEmbeds[$channelID;$messageID;0;thumbnail]]
     $callLocalFunction[loadinteraction;1]
 
-    $try[
-    $!djsEval[fetch(ctx.getKeyword("stream"), { headers: { "User-Agent": ctx.getKeyword("userAgent") } })
+    $!djsEval[fetch(ctx.getKeyword("stream"), { credentials: "include", headers: { "User-Agent": ctx.getKeyword("userAgent") } })
     .then(a => {
         ctx.setKeyword("tempisstreamredirect", ctx.getKeyword("stream") === a.url)\\;
         ctx.setKeyword("stream", a.url)\\;
     })
-    .catch()
+    .catch(b => ctx.setKeyword("streamError", "Stream failed: " + b.message))\\;
     ]
+    
+    $if[$get[streamError]!=;
+    $try[
+    $callLocalFunction[loadinteraction;3]
+    $let[mid2;$sendMessage[$channelID;
+    $reply[$channelID;$messageID;true]
+    $description[$callFunction[useCustomMusicMessage;config_errorPlayTrack]$codeBlock[$get[streamError]]]
+    $color[$callFunction[useIcon;error_color_embed]]
+    $footer[event]
+    $timestamp
+    ;true]]
+    $wait[3s]
+    $if[$messageExists[$channelID;$get[mid2]];$!deleteMessage[$channelID;$get[mid2]]]
+    ]
+    $stop
+    ]
+    $try[
     $if[$get[tempisstreamredirect]==false;
     $callLocalFunction[loadinteraction;1]
     ]
@@ -229,6 +245,7 @@ module.exports = [{
     $setCache[initclientmusic;radioplayer_data_$guildID_metadata;$jsonStringify[testmessage]]
     $setCache[initclientmusic;radioplayer_data_$guildID_playerstatus;true]
     ;
+    $try[
     $callLocalFunction[loadinteraction;3]
     $let[mid2;$sendMessage[$channelID;
     $reply[$channelID;$messageID;true]
@@ -239,6 +256,7 @@ module.exports = [{
     ;true]]
     $wait[3s]
     $if[$messageExists[$channelID;$get[mid2]];$!deleteMessage[$channelID;$get[mid2]]]
+    ]
     ;whaterrorlog]
     `
 }]

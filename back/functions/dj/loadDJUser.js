@@ -1,7 +1,8 @@
 module.exports = {
 name: "loadDJUser",
 code: `
-$jsonLoad[djks;$getRecord[guild;;musicplayer_data_djft_$guildID]]
+$getRecord[guild;djks;musicplayer_data_djft_$guildID]
+$jsonLoad[djks;$env[djks]]
 $let[hasrole;$env[djks;role]]
 $let[hasdj;$env[djks;mode]]
 $addContainer[

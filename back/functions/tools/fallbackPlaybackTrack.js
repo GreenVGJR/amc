@@ -9,7 +9,7 @@ module.exports = {
     },
     {
         name: "types", // enum
-        description: "Changes quality",
+        description: "Changes quality (v, vs, va) or image list (vi)",
         required: true
     },
     {
@@ -26,12 +26,27 @@ module.exports = {
     code: `
     $if[$isValidLink[$env[url]]==false;$return]
     $jsonLoad[whattype;$callFunction[filterMediaID;$env[url]]]
+    $let[agent;$callFunction[configMusic;default_userAgent_desktop]]
     $let[trycount;0]
+    $if[$env[whattype;type]!=youtube;
+    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $jsonLoad[a;$env[test]]
+    ]
     $localFunction[oncecode;
     $if[$get[trycount]>=3;$return]
     $if[$env[retry]==true;$letSum[trycount;1]]
     $if[$env[whattype;type]==youtube;
 
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+    $let[vimq;https://i.ytimg.com/vi/$env[whattype;id]/maxresdefault.jpg]
+    $let[vist;$httpRequest[$get[vimq];HEAD]]
+    $arrayPush[imgurls;$if[$get[vist]==200;$get[vimq];https://i.ytimg.com/vi/$env[whattype;id]/hqdefault.jpg]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
     $let[videoid;$env[whattype;id]]
     $let[ytinitauth;$djsEval[process.env.YOUTUBE_AUTH]]
     $let[targetClientYT;${tarClient()}]
@@ -134,8 +149,18 @@ module.exports = {
     $let[finalurl;$get[getcdnyt]&cpn=$randomString[16]&alr=no]
     ]
     ]
+    ]
     $if[$env[whattype;type]==soundcloud;
-    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+
+    $arrayPush[imgurls;$replace[$env[test;results;artwork_url];-large;-original]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
     $if[$env[test;results]==null;$return[$let[finalurl;bot|Track not available]]]
     $jsonLoad[loadres;$env[test;results]]
     $jsonLoad[test4;$env[loadres;media;transcodings]]
@@ -144,9 +169,33 @@ module.exports = {
     $!httpRequest[$env[test6;0;url]?client_id=$getCache[initclientmusic;authmusic_soundcloud_fall]&track_authorization=$env[loadres;track_authorization];GET;rest]
     $let[finalurl;$env[rest;url]]
     $if[$get[finalurl]==;$return[$let[finalurl;null]]]
+    ]
     ;
     $if[$env[whattype;type]==spotify;
-    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+
+    $if[$env[test;results;album;images;0;url]!=;
+    $let[vispid;$advancedTextSplit[$env[test;results;album;images;0;url];/;4]]
+    $let[visp82;https://i.scdn.co/image/$cropText[$get[vispid];0;12]82c1$cropText[$get[vispid];16]]
+    $let[vist;$httpRequest[$get[visp82];HEAD]]
+    $arrayPush[imgurls;$if[$get[vist]==200;$get[visp82];$env[test;results;album;images;0;url]]]
+    ;
+    $if[$env[test;results;props;pageProps;state;data;entity;image]!=;
+    $arrayPush[imgurls;$env[test;results;props;pageProps;state;data;entity;image]]
+    ;
+    $let[visppid;$advancedTextSplit[$env[test;results;props;pageProps;state;data;entity;visualIdentity;image;0;url];/;4]]
+    $let[visp82b;https://i.scdn.co/image/$cropText[$get[visppid];0;12]82c1$cropText[$get[visppid];16]]
+    $let[vistb;$httpRequest[$get[visp82b];HEAD]]
+    $arrayPush[imgurls;$if[$get[vistb]==200;$get[visp82b];$env[test;results;props;pageProps;state;data;entity;visualIdentity;image;0;url]]]
+    ]
+    ]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
     $if[$env[test;results;props]!=;
     $let[retpreview;$env[test;results;props;pageProps;state;data;entity;audioPreview;url]]
     ;
@@ -155,14 +204,37 @@ module.exports = {
     $if[$get[retpreview]==;$return[$let[finalurl;null]]]
     $let[finalurl;$get[retpreview]]
     ]
+    ]
     $if[$env[whattype;type]==tiktokmob;
-    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+    $let[viurl;$djsEval[fetch("https://vt.tiktok.com/$env[whattype;id]", { method: "HEAD" }).then(a => a.url).catch()]]
+    $jsonLoad[test;$extractTrack[$get[viurl]]]
+    $arrayPush[imgurls;$env[test;results;video;cover]]
+    $arrayPush[imgurls;$env[test;results;music;cover_large]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
     $if[$env[test;results;error]!=;$let[finalurl;bot|$env[test;results;error]] $return]
     $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $return]
     $jsonLoad[whattype;$callFunction[filterMediaID;$if[$or[$env[test;results;video;id]!=;$env[test;results;music_info]!=];https://www.tiktok.com/@/video/$env[test;results;video;id];https://www.tiktok.com/music/-$env[test;results;mid]]]]
     ]
+    ]
     $if[$env[whattype;type]==tiktok;
-    $jsonLoad[test;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+
+    $arrayPush[imgurls;$env[test;results;video;cover]]
+    $arrayPush[imgurls;$env[test;results;music;cover_large]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
     $if[$env[test;results;error]!=;$let[finalurl;bot|$env[test;results;error]] $return]
     $if[$env[test;results]==null;$callLocalFunction[oncecode;true] $return]
     $c[Embed]
@@ -220,8 +292,18 @@ module.exports = {
     $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1180]]
     $let[finalurl;$djsEval[fetch(ctx.getKeyword("finalurl"), { method: "GET" }).then(a => a.url).catch(() => ctx.getKeyword("finalurl"))]]
     ]
+    ]
     $if[$env[whattype;type]==tiktokmusic;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+
+    $arrayPush[imgurls;$default[$env[test;results;cover_large];$default[$env[test;results;cover_medium];$env[test;results;cover_thumb]]]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
     $if[$env[a;results]==null;$callLocalFunction[oncecode;true] $return]
     $if[$env[a;results;play_url;uri]==;
     $jsonLoad[b;$env[a;results;extra]]
@@ -231,21 +313,87 @@ module.exports = {
     ]
     $if[$get[finalurl]==;$return[$let[finalurl;null]]]
     ]
+    ]
     $if[$env[whattype;type]==applemusic;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+
+    $arrayPush[imgurls;$replace[$env[test;results;artworkUrl100];100x100bb;1x1ss]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
     $if[$env[a;results]==null;$callLocalFunction[oncecode;true] $return]
     $let[finalurl;$env[a;results;previewUrl]]
+    ]
     ]]
     $if[$env[whattype;type]==facebook;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $if[$or[$env[a;results]==;$env[a;results;is_live_stream]==true;$env[a;results;is_hls]==true];$return[$let[finalurl;bot|This video may no longer exist, or you don't have permission to view it]]]
-    $if[$env[a;results;hd_src]!=null;
-    $let[finalurl;$env[a;results;hd_src]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+    $jsonLoad[fbmedia;$default[$env[a;results;data;currMedia];{}]]
+    $if[$env[fbmedia;__typename]==Video;
+    $arrayPush[imgurls;$env[fbmedia;preferred_thumbnail;image;uri]]
     ;
-    $let[finalurl;$env[a;results;sd_src]]
+    $if[$env[fbmedia;__typename]==Photo;
+    $arrayPush[imgurls;$env[fbmedia;image;uri]]
+    ]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
+    $if[$or[$env[a;results;data]==;$env[a;results;data]==null];$return[$let[finalurl;bot|Facebook lookup failed, try again later]]]
+    $jsonLoad[fbmedia;$default[$env[a;results;data;currMedia];{}]]
+    $if[$or[$env[fbmedia]==;$env[fbmedia]==null;$env[fbmedia;is_live_streaming]==true];$return[$let[finalurl;bot|This video may no longer exist, or you don't have permission to view it]]]
+    $if[$env[fbmedia;__typename]==Video;
+    $if[$env[fbmedia;is_playable]==false;$return[$let[finalurl;bot|This video may no longer exist, or you don't have permission to view it]]]
+    $let[finalurl;$default[$env[fbmedia;videoDeliveryLegacyFields;browser_native_hd_url];$env[fbmedia;videoDeliveryLegacyFields;browser_native_sd_url]]]
+    ;
+    $return[$let[finalurl;bot|This post is a photo, use the Image option]]
+    ]
     ]]
     $if[$env[whattype;type]==instagram;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+
+    $jsonLoad[vicm;$default[$env[test;results;carousel_media];{}]]
+    $if[$env[vicm;0]==;
+    $if[$env[test;results;edge_sidecar_to_children;edges;0]==;
+    $if[$env[test;results;display_url]!=;
+    $arrayPush[imgurls;$env[test;results;display_url]]
+    ;
+    $if[$env[test;results;thumbnail_src]!=;
+    $arrayPush[imgurls;$env[test;results;thumbnail_src]]
+    ;
+    $if[$env[test;results;image_versions2;candidates;0;url]!=;
+    $arrayPush[imgurls;$env[test;results;image_versions2;candidates;0;url]]
+    ;
+    $if[$env[test;results;display_uri]!=;
+    $arrayPush[imgurls;$env[test;results;display_uri]]
+    ;
+    $if[$env[test;results;shortcode_media;display_url]!=;
+    $arrayPush[imgurls;$env[test;results;shortcode_media;display_url]]
+    ;
+    $arrayPush[imgurls;$env[test;results;shortcode_media;image_versions2;candidates;0;url]]
+    ]]]]]
+    ;
+    $jsonLoad[viedges;$env[test;results;edge_sidecar_to_children;edges]]
+    $arrayForEach[viedges;vied;$arrayPush[imgurls;$default[$env[vied;node;display_url];$env[vied;node;image_versions2;candidates;0;url]]]]
+    $jsonLoad[viedges2;$default[$env[test;results;shortcode_media;edge_sidecar_to_children;edges];{}]]
+    $arrayForEach[viedges2;vied;$arrayPush[imgurls;$default[$env[vied;node;display_url];$env[vied;node;image_versions2;candidates;0;url]]]]
+    ]
+    ;
+    $arrayForEach[vicm;vic;$arrayPush[imgurls;$default[$env[vic;image_versions2;candidates;0;url];$env[vic;display_uri]]]]
+    ]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
     $if[$env[a;results;error]!=;$return[$let[finalurl;bot|$env[a;results;error]]]]
     $if[$env[a;results]==null;$return[$let[finalurl;bot|This video may no longer exist, or you don't have permission to view it]]]
     $if[$env[a;results;shortcode_media]!=;
@@ -261,9 +409,20 @@ module.exports = {
     ;
     $jsonLoad[jysv;$default[$env[a;results;carousel_media];{}]]
     $let[finalurl;$env[jysv;$arrayFindIndex[jysv;iuy;$checkCondition[$env[iuy;video_versions;0;url]!=]];video_versions;0;url]]
+    ]
     ]]]
     $if[$env[whattype;type]==instagramaudio;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+
+    $arrayPush[imgurls;$env[test;results;items;0;media;image_versions2;candidates;0;url]]
+    $arrayPush[imgurls;$env[test;results;music_info;music_asset_info;cover_artwork_uri]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
     $if[$env[a;results]==null;$return[$let[finalurl;null]]]
     $if[$and[$env[a;results;metadata;original_sound_info]==null;$env[a;results;metadata;music_info]==null];
     $let[finalurl;$djsEval[require("entities").decodeHTML("$advancedTextSplit[$env[a;results;items;0;media;video_dash_manifest];mimeType="audio/mp4";1;<BaseURL>;1;</BaseURL>;0]")]]
@@ -272,14 +431,64 @@ module.exports = {
     $let[finalurl;$env[a;results;metadata;music_info;music_asset_info;progressive_download_url]]
     ;
     $let[finalurl;$env[a;results;metadata;original_sound_info;progressive_download_url]]
+    ]
     ]]]
     $if[$env[whattype;type]==bandcamp;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+
+    $if[$env[test;results;art_id]!=;
+    $arrayPush[imgurls;https://f4.bcbits.com/img/a$env[test;results;art_id]_16.jpg]
+    ;
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip, br]
+    $httpAddHeader[Accept-Language;en]
+    $httpSetContentType[Text]
+    $!httpRequest[$env[whattype;id];GET]
+    $arrayPush[imgurls;$advancedTextSplit[$httpResult;og:image" content=";1;";0]]
+    ]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
     $if[$env[a;results]==null;$return[$let[finalurl;null]]]
     $let[finalurl;$env[a;results;file;mp3-128]]
     ]
+    ]
     $if[$env[whattype;type]==twitter;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+
+    $jsonLoad[twm;$default[$env[test;results;mediaDetails];{}]]
+    $if[$env[twm;0;media_url_https]!=;
+    $arrayForEach[twm;twmi;$arrayPush[imgurls;$if[$env[twmi;type]==photo;$env[twmi;media_url_https]?format=$advancedTextSplit[$env[twmi;media_url_https];.;$charCount[$env[twmi;media_url_https];.]]&name=orig;$env[twmi;media_url_https]]]]
+    ;
+    $jsonLoad[twp;$default[$env[test;results;photos];{}]]
+    $if[$env[twp;0;url]!=;
+    $arrayForEach[twp;twpi;$arrayPush[imgurls;$env[twpi;url]?format=$advancedTextSplit[$env[twpi;url];.;$charCount[$env[twpi;url];.]]&name=orig]]
+    ;
+    $arrayPush[imgurls;$env[test;results;video;poster]]
+    ]
+    ]
+    $jsonLoad[twqm;$default[$env[test;results;quoted_tweet;mediaDetails];{}]]
+    $if[$env[twqm;0;media_url_https]!=;
+    $arrayForEach[twqm;twqmi;$arrayPush[imgurls;$if[$env[twqmi;type]==photo;$env[twqmi;media_url_https]?format=$advancedTextSplit[$env[twqmi;media_url_https];.;$charCount[$env[twqmi;media_url_https];.]]&name=orig;$env[twqmi;media_url_https]]]]
+    ;
+    $jsonLoad[twqp;$default[$env[test;results;quoted_tweet;photos];{}]]
+    $if[$env[twqp;0;url]!=;
+    $arrayForEach[twqp;twqpi;$arrayPush[imgurls;$env[twqpi;url]?format=$advancedTextSplit[$env[twqpi;url];.;$charCount[$env[twqpi;url];.]]&name=orig]]
+    ;
+    $arrayPush[imgurls;$env[test;results;quoted_tweet;video;poster]]
+    ]
+    ]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+
     $if[$env[a;results]==null;$return[$let[finalurl;null]]]
     $if[$env[a;results;video]!=;
     $jsonLoad[b;$env[a;results;video;variants]]
@@ -293,14 +502,25 @@ module.exports = {
     $jsonLoad[b;$env[a;results;quoted_tweet;video;variants]]
     ]]
     $let[finalurl;$default[$env[b;$sub[$arrayLength[b];1];src];$env[b;$sub[$arrayLength[b];1];url]]]
-    $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Video not available]]]
+    $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Content is not available]]]
+    ]
     ]
     $if[$env[whattype;type]==threads;
-    $jsonLoad[a;$if[$or[$env[tempobject]==;$env[tempobject]==null];$extractTrack[$env[url]];$env[tempobject]]]
-    $if[$env[a;results]==null;$return[$let[finalurl;null]]]
-    $if[$env[a;results;error]!=;$return[$let[finalurl;bot|$env[a;results;error]]]]
-    $let[finalurl;$env[a;results;media]]
-    $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Video not available]]]
+
+    $if[$env[types]==vi;
+    $arrayLoad[imgurls]
+    $jsonLoad[thimgs;$default[$env[test;results;images];{}]]
+    $arrayForEach[thimgs;thim;$arrayPush[imgurls;$env[thim]]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+    $if[$env[test;results]==null;$return[$let[finalurl;null]]]
+    $if[$env[test;results;error]!=;$return[$let[finalurl;bot|$env[test;results;error]]]]
+    $let[finalurl;$env[test;results;media]]
+    $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Content is not available]]]
+    ]
     ]
     ;retry]
     $callLocalFunction[oncecode;false]

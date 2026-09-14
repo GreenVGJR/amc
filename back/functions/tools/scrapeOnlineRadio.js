@@ -60,10 +60,9 @@ module.exports = {
     $let[results;$env[tempstore]]
     $jsonLoad[lf;{}]
     $!jsonSet[lf;list_radio;$get[results]]
-    $if[$env[tempstore;0]!=;$!putRecord[global;$jsonStringify[lf];cachesearch_global-radio_$md5[$env[query]$env[countrycode]$env[page]]]]
+    $if[$env[tempstore;0]!=;$!putRecord[global;lf;cachesearch_global-radio_$md5[$env[query]$env[countrycode]$env[page]]]]
     ;
-    $let[results;$getRecord[global;;cachesearch_global-radio_$md5[$env[query]$env[countrycode]$env[page]]]]
-    $jsonLoad[listradio;$get[results]]
+    $getRecord[global;listradio;cachesearch_global-radio_$md5[$env[query]$env[countrycode]$env[page]]]
     $let[results;$env[listradio;list_radio]]
     ]
     $return[$if[$env[disableRes]==false;$get[results]]]

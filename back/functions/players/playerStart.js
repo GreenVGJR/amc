@@ -101,6 +101,7 @@ module.exports = {
     $let[looknextsong;$and[$env[toggleInterval]==true;$env[showNext]==true;$queueLength!=0;$getLoopMode!=TRACK;$get[checkdurationms]!=0]]
     $if[$get[looknextsong];
     $jsonLoad[restnext;$try[$djsEval[JSON.stringify(require("discord-player").useQueue(ctx.client.guilds.cache.get("$env[guildId]")).tracks.data[0\\])];{}]]
+    $let[kkvlldmytkv3va;$callFunction[bannerYoutube;$env[restnext;author];$env[restnext;url];true]]
     $let[requestedBy;$env[restnext;requestedBy]]
     $if[$or[$get[requestedBy]==;$get[requestedBy]==null];
     $let[requestedBy;$clientID]
@@ -110,6 +111,11 @@ module.exports = {
     $let[thumbnail;$env[restnext;thumbnail]]
     $let[owner;$env[restnext;author]]
     $jsonLoad[jsonmedia;$callFunction[filterMediaID;$get[url]]]
+    ;
+    $let[kkvlldmytkv3va;$callFunction[bannerYoutube;$env[jsonmusicdata;author];$env[jsonmusicdata;url];true]]
+    ]
+    $if[$get[kkvlldmytkv3va]==;
+    $let[kkvlldmytkv3va;$userBanner[$clientID;2048]]
     ]
     $let[provider;$env[jsonmedia;type]]
     $localFunction[fetmusicmc;
@@ -125,10 +131,11 @@ module.exports = {
     ]
     $thumbnail[$if[$isValidLink[$get[thumbnail]]==false;$userAvatar[$get[requestedBy];1024];$if[$endsWith[$get[owner]; - Topic];https://i.ytimg.com/vi/$advancedTextSplit[$get[thumbnail];/;4]/frame0.jpg;$if[$get[provider]==applemusic;$replace[$get[thumbnail];1200x630wp-60;1x1ss];$get[thumbnail]]]];0]
     $if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_ongoingdynamicmusic]==true;
-    $footer[$callFunction[useCustomMusicMessage;config_generalDynamicQueue];$callFunction[useIcon;loading]]
+    $footer[$callFunction[useCustomMusicMessage;config_generalDynamicQueue];$callFunction[useIcon;loading];0]
     ;
     $footer[$userDisplayName[$get[requestedBy]]$if[$get[countVcMembers]>=1;  •  +$get[countVcMembers] more];$userAvatar[$get[requestedBy];1024];0]
     ]
+    $if[$get[kkvlldmytkv3va]!=;$image[$get[kkvlldmytkv3va];0]]
     ;
     $author[» Now Playing$if[$getCache[initclientmusic;musicplayer_message_$env[guildId]_is247music]==true; - 24/7 Mode]\n$env[jsonmusicdata;author];$callFunction[useIcon;$get[provider]];;0]
     $title[$cropText[$env[jsonmusicdata;title];0;253;...];$env[jsonmusicdata;url];0]
@@ -149,6 +156,7 @@ module.exports = {
     ;
     $footer[$userDisplayName[$env[jsonmusicdata;requestedBy;id]]$if[$get[countVcMembers]>=1;  •  +$get[countVcMembers] more];$userAvatar[$env[jsonmusicdata;requestedBy;id];1024];0]
     ]
+    $if[$get[kkvlldmytkv3va]!=;$image[$get[kkvlldmytkv3va];0]]
     ]
     ]
     $addActionRow

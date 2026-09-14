@@ -113,7 +113,7 @@ ___
 - Find Lyrics from current/specific song
   Providers:
   = > Youtube Music
-    > Shazam
+    > Spotify
     > Tidal
     > Deezer
     > Lrclib

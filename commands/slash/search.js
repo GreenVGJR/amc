@@ -58,14 +58,14 @@ module.exports = {
   $onlyIf[$guildID!=;]
   $if[$or[$option[ephemeral]==;$option[ephemeral]==true;$option[provider]==bilibili];$ephemeral]
   $let[colors;aa$randomBytes[2]]
-  $let[check;$getRecord[global;;cachesearch_global-query_$deflate[$option[provider]$toLowercase[$option[query]];hex]]]
+  $getRecord[global;check;cachesearch_global-query_$deflate[$option[provider]$toLowercase[$option[query]];hex]]
   $localFunction[loadinteraction;
   $if[$env[typela]==1;
   $defer
   ]
   $if[$env[typela]==2;
   $interactionReply[
-  $addContainer[$addTextDisplay[-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms$if[$get[check]!={}; - Cached]\`]
+  $addContainer[$addTextDisplay[-# Provider:\n\`$option[provider]\`\n-# Ping:\n\`$get[currentping]ms$if[$env[check]!={}; - Cached]\`]
   $addSeparator[Large;true]
   $arrayForEach[loadser;result;
   $addSection[
@@ -77,7 +77,7 @@ module.exports = {
   $addThumbnail[$if[$isValidLink[$env[result;thumbnail]]==false;$userDefaultAvatar[$authorID];$env[result;thumbnail]]]
   ]
   ]
-  $if[$get[check]!={};
+  $if[$env[check]!={};
   $addSeparator[Large;true]
   $addActionRow
   $addButton[refreshsearchnoca_$authorID;Force Refresh;Secondary;🔄]
@@ -90,7 +90,7 @@ module.exports = {
   ;typela]
   $onlyIf[$isValidLink[$option[query]]!=true;$callLocalFunction[loadinteraction;3]]
   $let[fsearch;false]
-  $if[$get[check]=={};
+  $if[$env[check]=={};
   $async[
   $let[a;$callFunction[searchSomeTrack;$option[query];$option[provider]]]
   $let[currentping;$round[$executionTime;0]]
@@ -108,13 +108,13 @@ module.exports = {
   ]
   ;
   $let[currentping;$round[$executionTime;0]]
-  $jsonLoad[loadser;$get[check]]
+  $jsonLoad[loadser;$env[check]]
   $jsonLoad[loadser;$env[loadser;playlist]]
   ]
   $arraySlice[loadser;loadser;0;10]
   $arrayReverse[loadser;loadser]
   $callLocalFunction[loadinteraction;2]
-  $if[$get[check]!={};
+  $if[$env[check]!={};
   $setCache[initclientmusic;storecachesearchusersfetch-q_$djsEval[ctx.interaction.id];$option[query]]
   $setCache[initclientmusic;storecachesearchusersfetch-p_$djsEval[ctx.interaction.id];$option[provider]]
   ]

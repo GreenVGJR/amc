@@ -24,7 +24,7 @@ module.exports = {
     $if[$and[$endsWith[$get[host];youtube.com];$startsWith[$get[paths];/playlist]];$let[type;youtubeplaylist];$if[$or[$endsWith[$get[host];youtube.com];$endsWith[$get[host];youtu.be]];$let[type;youtube]]]
     $if[$endsWith[$get[host];soundcloud.com];$let[type;soundcloud]]
     $if[$endsWith[$get[host];open.spotify.com];$let[type;spotify]]
-    $if[$endsWith[$get[host];vt.tiktok.com;vm.tiktok.com];$let[type;tiktokmob];$if[$and[$endsWith[$get[host];tiktok.com];$startsWith[$get[paths];/music/]];$let[type;tiktokmusic];$if[$endsWith[$get[host];tiktok.com];$let[type;tiktok]]]]
+    $if[$or[$endsWith[$get[host];vt.tiktok.com;vm.tiktok.com];$and[$endsWith[$get[host];tiktok.com];$startsWith[$get[paths];/t/]]];$let[type;tiktokmob];$if[$and[$endsWith[$get[host];tiktok.com];$startsWith[$get[paths];/music/]];$let[type;tiktokmusic];$if[$endsWith[$get[host];tiktok.com];$let[type;tiktok]]]]
     $if[$endsWith[$get[host];music.apple.com];$let[type;applemusic]]
     $if[$endsWith[$get[host];deezer.com];$let[type;deezer]]
     $if[$and[$endsWith[$get[host];instagram.com];$startsWith[$get[paths];/reels/audio/]];$let[type;instagramaudio];$if[$endsWith[$get[host];instagram.com];$let[type;instagram]]]

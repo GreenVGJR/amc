@@ -157,15 +157,28 @@ module.exports = {
     $callLocalFunction[refreshspotify;false]
     ]
     $if[$env[provider]==applemusic;
+    $let[tryattemptlv;0]
+    $let[httpal;]
+    $localFunction[runapplemusic;
+    $try[
+    $if[$env[refreshkgl]==true;
+    $if[$get[tryattemptlv]>=3;$return]
+    $letSum[tryattemptlv;1]
+    ]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Authorization;Bearer $getCache[initclientmusic;authmusic_applemusic]]
     $httpAddHeader[Origin;https://music.apple.com]
     $httpAddHeader[Cookie;geo=US]
     $let[httpal;$httpRequest[https://api.music.apple.com/v1/catalog/us/search?types=songs&limit=10&offset=0&term=$env[query];GET;res]]
+    ]
     $if[$or[$get[httpal]==401;$get[httpal]==400];
-    $async[$callFunction[generateAuth;applemusic;;false]]
-    $let[httpal;429]
+    $callFunction[generateAuth;applemusic;;false]
+    $callLocalFunction[runapplemusic;true]
+    $return
+    ]
+    ;refreshkgl]
+    $callLocalFunction[runapplemusic;false]
     $if[$get[httpal]==429;
     $let[tryattempt;0]
     $localFunction[runitunes;
@@ -180,6 +193,7 @@ module.exports = {
     $!httpRequest[https://itunes.apple.com/search?media=music&entity=musicTrack&limit=10&country=US&lang=en-US&version=2&term=$env[query];GET;res]
     ]
     $onlyIf[$env[res]!=;$callLocalFunction[runitunes;true]]
+    $return
     ;refresh]
     $callLocalFunction[runitunes;false]
     $jsonLoad[res;$env[res]]
@@ -192,7 +206,6 @@ module.exports = {
     $!jsonSet[kls;url;https://music.apple.com/us/song/$advancedTextSplit[$env[res3;trackViewUrl];/;$sub[$charCount[$env[res3;trackViewUrl];/];1]]/$env[res3;trackId]]
     $arrayPush[results;$jsonStringify[kls]]
     ]
-    ]
     ;
     $jsonLoad[res2;$env[res;results;songs;data]]
     $arrayForEach[res2;res5;
@@ -203,7 +216,7 @@ module.exports = {
     $!jsonSet[kls;url;https://music.apple.com/us/song/$advancedTextSplit[$env[res5;attributes;url];/;$sub[$charCount[$env[res5;attributes;url];/];1]]/$env[res5;id]]
     $arrayPush[results;$jsonStringify[kls]]
     ]
-    ]]
+    ]
     $if[$env[provider]==tidal;
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept;application/json]
@@ -454,10 +467,11 @@ module.exports = {
     $async[
     $wait[1]
     $if[$env[results;0]!=;
-    $jsonLoad[lf;{}]
-    $!jsonSet[lf;playlist;$get[results]]
-    $!putRecord[global;$jsonStringify[lf];cachesearch_global-query_$deflate[$env[provider]$toLowercase[$env[query]];hex]]]
-    ]]
+     $jsonLoad[lf;{}]
+     $!jsonSet[lf;playlist;$get[results]]
+     $!putRecord[global;lf;cachesearch_global-query_$deflate[$env[provider]$toLowercase[$env[query]];hex]]
+    ]
+    ]
     ]
     $return[$get[results]]
     `

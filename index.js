@@ -48,7 +48,8 @@ const music = new ForgeMusic({
         GuildQueueEvent.PlayerResume,
         GuildQueueEvent.PlayerTrigger,
         GuildQueueEvent.PlayerFinish,
-        GuildQueueEvent.EmptyQueue
+        GuildQueueEvent.EmptyQueue,
+        GuildQueueEvent.AudioTrackAdd
     ],
     blockStreamFrom: toggles.disable_YT ? [YoutubeiExtractor.identifier] : [],
     connectOptions: {
