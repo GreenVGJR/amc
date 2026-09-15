@@ -5,10 +5,10 @@ module.exports = {
     $onlyIf[$or[$customID==toggledjrolepick_clear;$customID==toggledjrolepick;$customID==toggledjrolemode]]
     $onlyIf[$hasPerms[$guildID;$authorID;ManageChannels;ManageRoles]]
     $getRecord[guild;test;musicplayer_data_djft_$guildID]
-    $jsonLoad[test;$env[test]]
     $if[$customID==toggledjrolepick_clear;
     $!jsonSet[test;role;]
     $!jsonSet[test;mode;0]
+    $interactionUpdate[$addTextDisplay[$callFunction[useCustomMusicMessage;config_infoDJUpdate]]]
     ]
     $if[$customID==toggledjrolepick;
     $!jsonSet[test;role;"$selectMenuValues[0]"]

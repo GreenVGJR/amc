@@ -13,6 +13,7 @@
     "config_errorIsSameVC": "You must same with {client} in",
     "config_errorIsLimitVC": "Can't join this voice channel.",
     "config_errorIsSameDJVC": "You must have {role} role to access this command.",
+    "config_infoDJUpdate": "Updating contents...",
 
     "_inline|autocomplete": "---",
 

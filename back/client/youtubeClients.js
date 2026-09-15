@@ -96,19 +96,6 @@ const list_clients = {
         "deviceModel": ""
     },
     // required youtubei.js for solve n challenge
-    // might not able to stream after 1 minute
-    // support cookies
-    "MWEB": {
-        "targetDomain": "www.youtube.com",
-        "client_id": null,
-        "client_secret": null,
-        "clientName": 2,
-        "clientVersion": "2.20260904.01.00",
-        "clientFormFactor": "UNKNOWN_FORM_FACTOR",
-        "deviceMake": "",
-        "deviceModel": ""
-    },
-    // required youtubei.js for solve n challenge
     // support cookies (recommended)
     "WEB_EMBEDDED": {
         "targetDomain": "www.youtube.com",

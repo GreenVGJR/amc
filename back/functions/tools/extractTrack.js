@@ -329,7 +329,9 @@ module.exports = {
     $httpAddHeader[Sec-Fetch-Site;none]
     $httpAddHeader[User-Agent;$get[agent]]
     $!httpRequest[https://cdn.syndication.twimg.com/tweet-result?id=$env[filterid;id]&lang=en&token=abc;GET]
+    $if[$typeof[$httpResult]==string;$return[{"status":null,"results":{"error":"Item not found"}}]]
     $jsonLoad[thers;$httpResult]
+    $if[$env[thers;tombstone;text;text]!=;$return[{"status":null,"results":{"error":"$env[thers;tombstone;text;text]"}}]]
     $let[results;{"status":null,"results":$if[$env[thers]==;null;$jsonStringify[thers]]}]
     ]
     $if[$env[filterid;type]==threads;

@@ -2,7 +2,6 @@ module.exports = {
 name: "loadDJUser",
 code: `
 $getRecord[guild;djks;musicplayer_data_djft_$guildID]
-$jsonLoad[djks;$env[djks]]
 $let[hasrole;$env[djks;role]]
 $let[hasdj;$env[djks;mode]]
 $addContainer[
@@ -17,11 +16,7 @@ $addSeparator[Large;true]
 $addActionRow
 $addButton[toggledjrolepick_clear;Clear Role;Secondary;;$checkCondition[$get[hasrole]==]]
 $addActionRow
-$if[$get[hasrole]!=;
-$addRoleSelectMenu[toggledjrolepick;Role to use;1;1;false;$get[hasrole]]
-;
-$addRoleSelectMenu[toggledjrolepick;Role to use;1;1;false]
-]
+$addRoleSelectMenu[toggledjrolepick;Role to use;1;1;false;false]
 $addSeparator[Small;false]
 $addActionRow
 $addStringSelectMenu[toggledjrolemode;DJ Mode;$checkCondition[$get[hasrole]==];1;1]

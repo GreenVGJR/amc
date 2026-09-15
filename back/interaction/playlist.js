@@ -102,7 +102,6 @@ $addOption[$cropText[$default[$env[lotr;title];$env[lotr;url]];0;100];$cropText[
 $letSum[countpr;1]
 ]]
 $getRecord[user;confplaylistdb;configplaylistuser_vgjra9f_$authorID]
-$jsonLoad[confplaylistdb;$env[confplaylistdb]]
 $addActionRow
 $addButton[listplaylistuserall;Back;Secondary;↩️]
 $addButton[editplaylistuser_$get[hash];Edit Playlist;Secondary;📂]
@@ -161,7 +160,6 @@ $if[$advancedTextSplit[$customID;_;0]==editplaylistuserh;
 $let[checkdb;$callFunction[findPlaylistUser;$advancedTextSplit[$customID;_;1];$authorID]]
 $onlyIf[$get[checkdb]!=;$ephemeral $callFunction[useCustomMusicMessage;config_generalPlaylistNotExistUser]]
 $getRecord[user;confplaylistdb;configplaylistuser_vgjra9f_$authorID]
-$jsonLoad[confplaylistdb;$env[confplaylistdb]]
 $jsonLoad[ketdata;$get[checkdb]]
 $jsonLoad[listracks;$env[ketdata;value;tracks]]
 $let[totaltrack;$arrayLength[listracks]]
@@ -212,7 +210,6 @@ $addButton[editplaylistuserh_$advancedTextSplit[$customID;_;1]_$get[nextpage]_tr
 ]
 $if[$advancedTextSplit[$customID;_;0]==toggleplaylistuser;
 $getRecord[user;confplaylistdb;configplaylistuser_vgjra9f_$authorID]
-$jsonLoad[confplaylistdb;$env[confplaylistdb]]
 $if[$advancedTextSplit[$customID;_;1]==fm;$!jsonSet[confplaylistdb;title;$if[$default[$env[confplaylistdb;title];false]==false;true;false]]]
 $if[$advancedTextSplit[$customID;_;1]==fp;$!jsonSet[confplaylistdb;slice;$if[$default[$env[confplaylistdb;slice];false]==false;true;false]]]
 $if[$advancedTextSplit[$customID;_;1]==sc;$!jsonSet[confplaylistdb;confirm;$if[$default[$env[confplaylistdb;confirm];true]==false;true;false]]]
@@ -338,7 +335,6 @@ $callLocalFunction[loadinteraction;1]
 $arrayLoad[listlink;
 ;$trim[$trimLines[$input[crplaylistusertrdo]]]]
 $getRecord[user;confplaylistdb;configplaylistuser_vgjra9f_$authorID]
-$jsonLoad[confplaylistdb;$env[confplaylistdb]]
 $let[isfetch;$default[$env[confplaylistdb;title];false]]
 $let[isslice;$default[$env[confplaylistdb;slice];false]]
 $arrayUnique[listlink;listlink]

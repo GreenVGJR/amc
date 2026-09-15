@@ -362,7 +362,7 @@ $if[$arrayLength[imglist]!=0;
 $let[viok;0]
 $let[clh;0]
 $if[$get[as_attachment]==true;
-$interactionReply[$arrayForEach[imglist;im;
+$#interactionReply[$arrayForEach[imglist;im;
 $let[viraw;$djsEval[fetch(ctx.getEnvironmentKey("im"),{method:"GET",headers:JSON.parse(ctx.getKeyword("checkcdn_headers")||"{}")}).then(async r=>{const t=await r.arrayBuffer()\\;return r.status+"|||"+(r.headers?.get("content-type")??"")+"|||"+(t?.byteLength??0)+"|||"+Buffer.from(t).toString("base64")}).catch(()=>"")]]
 $let[vistat;$advancedTextSplit[$get[viraw];|||;0]]
 $let[vitype;$toLowercase[$advancedTextSplit[$get[viraw];|||;1]]]
