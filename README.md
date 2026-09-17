@@ -11,7 +11,7 @@
 > Stream Youtube violates Discord ToS. Use it with caution.
 
 > [!NOTE]
-> These intents must be enable to use all features.
+> These intents must be enabled to use all features: Guilds, GuildMembers, GuildMessages, GuildVoiceStates, and MessageContent.
 > ![image](https://github.com/user-attachments/assets/4beb3e93-40f9-4253-99f4-c6ec8d5a7e67)
 
 ___
