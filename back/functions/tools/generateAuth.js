@@ -419,11 +419,12 @@ module.exports = {
     $if[$or[$env[type]==all;$env[type]==amazonmusic];
     $if[$get[typedebug];$chalkLog[Generating Amazon Music        | Config & Token;cyan]]
     $try[
-        $httpAddHeader[Origin;https://music.amazon.com/]
+        $httpAddHeader[Origin;https://music.amazon.com/]    
+        $httpAddHeader[Referer;https://music.amazon.com/]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpSetContentType[Text]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
-        $!httpRequest[https://music.amazon.com/config.json;GET]
+        $!httpRequest[https://music.amazon.com/config.json?skipToken=false&clientApplication=skyfire;POST]
         $jsonLoad[tokens;$httpResult]
         $if[$env[tokens;csrf;token]!=;$setCache[initclientmusic;authmusic_amazonmusic;$env[tokens]]]
         $if[$env[successlog]==true;$logger[Info;$if[$env[tokens;csrf;token]!=;$cropText[$env[tokens;csrf;token];0;10;...];Failed to Retrieve] | Amazon Music]]
