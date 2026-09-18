@@ -160,7 +160,7 @@ module.exports = {
     $!deferUpdate
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekdown;
-    $if[$getCache[initclientmusic;musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[$callFunction[useCustomMusicMessage;config_errorProcessSeek]] $stop]
     $ephemeral
     $defer
     $if[$callFunction[configMusic;interval_message]==true;
@@ -178,7 +178,7 @@ module.exports = {
     $!interactionDelete
     ]
     $if[$advancedTextSplit[$customID;_;1]==seekup;
-    $if[$getCache[initclientmusic;musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[It's still processing.] $stop]
+    $if[$getCache[initclientmusic;musicplayer_message_$guildID_attemptseek]==true;$ephemeral $interactionReply[$callFunction[useCustomMusicMessage;config_errorProcessSeek]] $stop]
     $ephemeral
     $defer
     $if[$callFunction[configMusic;interval_message]==true;

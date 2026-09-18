@@ -284,7 +284,19 @@ module.exports = {
         $if[$env[successlog]==true;$logger[Info;$if[$get[a33]!=;$cropText[$get[a33];0;10;...];Failed to Retrieve] | Youtube / DataSyncID]]
     ;$if[$hasCache[initclientmusic;retrycookiesyt]==false;$logger[Info;Failed to Retrieve - Youtube]]]
     ]
-    $if[$and[$get[a32]==;$get[abortproscookies]!=true];$logger[Warn;Re-trying - Youtube] $callFunction[generateAuth;youtube;;true]]
+    $if[$and[$get[a32]==;$get[abortproscookies]!=true];
+    $setCache[pornamecachingretry;authretry_youtube;$sum[$default[$getCache[pornamecachingretry;authretry_youtube];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_youtube]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_youtube]/3) - Youtube]
+    $callFunction[generateAuth;youtube;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_youtube]
+    $logger[Error;Giving up after 3 attempts - Youtube]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_youtube]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==soundcloud];
     $if[$get[typedebug];$chalkLog[Generating Soundcloud          | ClientID;cyan]]
@@ -321,7 +333,19 @@ module.exports = {
     $if[$env[successlog]==true;$logger[Info;$if[$env[storeclientid;0]!=;$cropText[$env[storeclientid;0];0;10;...];Failed to Retrieve] | Soundcloud / Player]]
     $if[$env[successlog]==true;$logger[Info;$if[$env[storeclientid;1]!=;$cropText[$env[storeclientid;1];0;10;...];Failed to Retrieve] | Soundcloud / Stream]]
     ;$logger[Info;Failed to Retrieve - Soundcloud]]
-    $if[$and[$env[storeclientid;0]==;$env[storeclientid;1]==;$get[abortscht]!=true];$logger[Warn;Re-trying - Soundcloud] $callFunction[generateAuth;soundcloud;;true]]
+    $if[$and[$env[storeclientid;0]==;$env[storeclientid;1]==;$get[abortscht]!=true];
+    $setCache[pornamecachingretry;authretry_soundcloud;$sum[$default[$getCache[pornamecachingretry;authretry_soundcloud];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_soundcloud]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_soundcloud]/3) - Soundcloud]
+    $callFunction[generateAuth;soundcloud;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_soundcloud]
+    $logger[Error;Giving up after 3 attempts - Soundcloud]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_soundcloud]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==spotify];
     $if[$get[typedebug];$chalkLog[Generating Spotify             | Key;cyan]]
@@ -368,7 +392,19 @@ module.exports = {
         $if[$get[token]!=;$setCache[initclientmusic;authmusic_spotify;$get[token]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[token]!=;$cropText[$get[token];0;10;...];Failed to Retrieve] | Spotify / Key$if[$get[cjdspo]; (with Cookies)]]]
     ;$logger[Info;Failed to Retrieve - Spotify]]
-    $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuth;spotify;;true]]
+    $if[$get[token]==;
+    $setCache[pornamecachingretry;authretry_spotify;$sum[$default[$getCache[pornamecachingretry;authretry_spotify];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_spotify]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_spotify]/3) - Spotify]
+    $callFunction[generateAuth;spotify;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_spotify]
+    $logger[Error;Giving up after 3 attempts - Spotify]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_spotify]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==spotify_player];
     $if[$get[typedebug];$chalkLog[Generating Spotify             | Key;cyan]]
@@ -399,7 +435,19 @@ module.exports = {
     $if[$env[successlog]==true;$logger[Info;$if[$get[token]!=;$cropText[$get[token];0;10;...];Failed to Retrieve] | Spotify - Alt / Key$if[$env[parsejsspo;props;pageProps;state;settings;session;isAnonymous]==false; (with Cookies)]]]
     $if[$and[$or[$get[spinitcookies]==;$get[spinitcookies]==undefined]==false;$env[successlog]==true];$logger[Info;$if[$get[token2]!=;$cropText[$get[token2];0;10;...];Failed to Retrieve] | Spotify - Lyrics / Key]]
     ;$logger[Info;Failed to Retrieve - Spotify]]
-    $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuth;spotify_player;;true]]
+    $if[$get[token]==;
+    $setCache[pornamecachingretry;authretry_spotify_player;$sum[$default[$getCache[pornamecachingretry;authretry_spotify_player];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_spotify_player]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_spotify_player]/3) - Spotify]
+    $callFunction[generateAuth;spotify_player;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_spotify_player]
+    $logger[Error;Giving up after 3 attempts - Spotify]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_spotify_player]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==spotify_token];
     $if[$get[typedebug];$chalkLog[Generating Spotify             | Token;cyan]]
@@ -414,7 +462,19 @@ module.exports = {
         $if[$get[token]!=;$setCache[initclientmusic;authmusic_spotify_token;$get[token]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[token]!=;$cropText[$get[token];0;10;...];Failed to Retrieve] | Spotify / Token]]
     ;$logger[Info;Failed to Retrieve - Spotify]]
-    $if[$get[token]==;$logger[Warn;Re-trying - Spotify] $callFunction[generateAuth;spotify_token;;true]]
+    $if[$get[token]==;
+    $setCache[pornamecachingretry;authretry_spotify_token;$sum[$default[$getCache[pornamecachingretry;authretry_spotify_token];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_spotify_token]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_spotify_token]/3) - Spotify]
+    $callFunction[generateAuth;spotify_token;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_spotify_token]
+    $logger[Error;Giving up after 3 attempts - Spotify]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_spotify_token]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==amazonmusic];
     $if[$get[typedebug];$chalkLog[Generating Amazon Music        | Config & Token;cyan]]
@@ -429,7 +489,19 @@ module.exports = {
         $if[$env[tokens;csrf;token]!=;$setCache[initclientmusic;authmusic_amazonmusic;$env[tokens]]]
         $if[$env[successlog]==true;$logger[Info;$if[$env[tokens;csrf;token]!=;$cropText[$env[tokens;csrf;token];0;10;...];Failed to Retrieve] | Amazon Music]]
     ;$logger[Info;Failed to Retrieve - Amazon Music]]
-    $if[$env[tokens;csrf;token]==;$logger[Warn;Re-trying - Amazon Music] $callFunction[generateAuth;amazonmusic;;true]]
+    $if[$env[tokens;csrf;token]==;
+    $setCache[pornamecachingretry;authretry_amazonmusic;$sum[$default[$getCache[pornamecachingretry;authretry_amazonmusic];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_amazonmusic]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_amazonmusic]/3) - Amazon Music]
+    $callFunction[generateAuth;amazonmusic;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_amazonmusic]
+    $logger[Error;Giving up after 3 attempts - Amazon Music]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_amazonmusic]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==tidal];
     $if[$get[typedebug];$chalkLog[Generating Tidal               | Token;cyan]]
@@ -473,7 +545,19 @@ module.exports = {
     $let[finaltoken;txNoH4kkV41MfH25] $c[Static key]
     $setCache[initclientmusic;authmusic_tidal;$get[finaltoken]]
     $if[$env[successlog]==true;$logger[Info;$if[$get[finaltoken]!=;$cropText[$get[finaltoken];0;10;...];Failed to Retrieve] | Tidal / Token]]
-    $if[$get[finaltoken]==;$logger[Warn;Re-trying - Tidal] $callFunction[generateAuth;tidal;;true]]
+    $if[$get[finaltoken]==;
+    $setCache[pornamecachingretry;authretry_tidal;$sum[$default[$getCache[pornamecachingretry;authretry_tidal];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_tidal]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_tidal]/3) - Tidal]
+    $callFunction[generateAuth;tidal;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_tidal]
+    $logger[Error;Giving up after 3 attempts - Tidal]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_tidal]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==tidal_token];
     $if[$get[typedebug];$chalkLog[Generating Tidal               | Auth;cyan]]
@@ -488,7 +572,19 @@ module.exports = {
         $if[$get[finalauth]!=;$setCache[initclientmusic;authmusic_tidal_token;$get[finalauth]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[finalauth]!=;$cropText[$get[finalauth];0;10;...];Failed to Retrieve] | Tidal / Auth]]
     ;$logger[Info;Failed to Retrieve - Tidal]]
-    $if[$get[finalauth]==;$logger[Warn;Re-trying - Tidal] $callFunction[generateAuth;tidal_token;;true]]
+    $if[$get[finalauth]==;
+    $setCache[pornamecachingretry;authretry_tidal_token;$sum[$default[$getCache[pornamecachingretry;authretry_tidal_token];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_tidal_token]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_tidal_token]/3) - Tidal]
+    $callFunction[generateAuth;tidal_token;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_tidal_token]
+    $logger[Error;Giving up after 3 attempts - Tidal]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_tidal_token]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==tiktok];
     $if[$get[typedebug];$chalkLog[Generating Tiktok              | Token & Cookies;cyan]]
@@ -544,7 +640,19 @@ module.exports = {
         $if[$env[successlog]==true;$logger[Info;$if[$get[a12]!=;$cropText[$get[a12];0;10;...];Failed to Retrieve] | Tiktok / Device ID]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[a14]!=;$cropText[$get[a14];0;10;...];Failed to Retrieve] | Tiktok / Odin ID]]
     ;$logger[Info;Failed to Retrieve - Tiktok]]
-    $if[$and[$get[a12]==;$get[a13]==;$get[a14]==];$logger[Warn;Re-trying - Tiktok] $callFunction[generateAuth;tiktok;;true]]
+    $if[$and[$get[a12]==;$get[a13]==;$get[a14]==];
+    $setCache[pornamecachingretry;authretry_tiktok;$sum[$default[$getCache[pornamecachingretry;authretry_tiktok];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_tiktok]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_tiktok]/3) - Tiktok]
+    $callFunction[generateAuth;tiktok;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_tiktok]
+    $logger[Error;Giving up after 3 attempts - Tiktok]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_tiktok]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==applemusic];
     $if[$get[typedebug];$chalkLog[Generating Apple Music         | Token;cyan]]
@@ -568,7 +676,19 @@ module.exports = {
         $if[$get[a14]!=;$setCache[initclientmusic;authmusic_applemusic;$get[a14]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[a14]!=;$cropText[$get[a14];0;10;...];Failed to Retrieve] | Apple Music]]
     ;$logger[Info;Failed to Retrieve - Apple Music]]
-    $if[$get[a14]==;$logger[Warn;Re-trying - Apple Music] $callFunction[generateAuth;applemusic;;true]]
+    $if[$get[a14]==;
+    $setCache[pornamecachingretry;authretry_applemusic;$sum[$default[$getCache[pornamecachingretry;authretry_applemusic];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_applemusic]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_applemusic]/3) - Apple Music]
+    $callFunction[generateAuth;applemusic;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_applemusic]
+    $logger[Error;Giving up after 3 attempts - Apple Music]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_applemusic]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==deezer];
     $if[$get[typedebug];$chalkLog[Generating Deezer              | Token;cyan]]
@@ -582,7 +702,19 @@ module.exports = {
         $if[$get[hgk]!=;$setCache[initclientmusic;authmusic_deezer;$get[hgk]]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[hgk]!=;$cropText[$get[hgk];0;10;...];Failed to Retrieve] | Deezer]]
     ;$logger[Info;Failed to Retrieve - Deezer]]
-    $if[$get[hgk]==;$logger[Warn;Re-trying - Deezer] $callFunction[generateAuth;deezer;;true]]
+    $if[$get[hgk]==;
+    $setCache[pornamecachingretry;authretry_deezer;$sum[$default[$getCache[pornamecachingretry;authretry_deezer];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_deezer]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_deezer]/3) - Deezer]
+    $callFunction[generateAuth;deezer;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_deezer]
+    $logger[Error;Giving up after 3 attempts - Deezer]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_deezer]
+    ]
     ]
     $if[$or[$env[type]==all;$env[type]==instagram];
     $if[$get[typedebug];$chalkLog[Generating Instagram           | Token & Cookies;cyan]]
@@ -601,7 +733,19 @@ module.exports = {
         $if[$env[successlog]==true;$logger[Info;$if[$get[dsplccsrf]!=;$cropText[$get[dsplccsrf];0;10;...];Failed to Retrieve] | Instagram / Token]]
         $if[$env[successlog]==true;$logger[Info;$if[$get[dsplcapp]!=;$cropText[$get[dsplcapp];0;10;...];Failed to Retrieve] | Instagram / AppID]]
     ;$logger[Info;Failed to Retrieve - Instagram]]
-    $if[$get[dsplclsd]==;$logger[Warn;Re-trying - Instagram] $callFunction[generateAuth;instagram;;true]]
+    $if[$get[dsplclsd]==;
+    $setCache[pornamecachingretry;authretry_instagram;$sum[$default[$getCache[pornamecachingretry;authretry_instagram];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_instagram]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_instagram]/3) - Instagram]
+    $callFunction[generateAuth;instagram;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_instagram]
+    $logger[Error;Giving up after 3 attempts - Instagram]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_instagram]
+    ]
     ]
     $return
     `

@@ -12,12 +12,8 @@ const { QuorielDB } = require("@quoriel/db");
 const { QuorielEdge } = require("@quoriel/edge");
 // const { ForgeDB } = require("@tryforge/forge.db");
 
-// Extractor
-const { YoutubeExtractor } = require("discord-player-youtubei");
-const { SoundcloudExtractor } = require("discord-player-soundcloud");
-const { SpotifyExtractor } = require("discord-player-spotify");
-const { AppleMusicExtractor } = require("discord-player-applemusic");
-const { AttachmentExtractor } = require("@discord-player/extractor");
+// Extractor warmup (background, retried, logged - see back/client/extractorWarmup.js)
+const { warmupExtractors } = require("./back/client/extractorWarmup.js");
 
 // Disable DSP compressor by default for discord-player
 const { FiltersChain } = require("@discord-player/equalizer");
@@ -36,7 +32,7 @@ const quorielDb = new QuorielDB({
 });
 
 const quorielEdge = new QuorielEdge({
-    caches: ["initclientmusic"]
+    caches: ["initclientmusic", "pornamecachingretry"]
 });
 
 const music = new ForgeMusic({
@@ -79,7 +75,8 @@ const client = new ForgeClient({
         "clientReady",
         "voiceStateUpdate",
         "interactionCreate",
-        "messageCreate"
+        "messageCreate",
+        "guildDelete"
     ],
     prefixes: [
         "?"
@@ -93,11 +90,7 @@ const client = new ForgeClient({
     waitGuildTimeout: 60000,
 });
 
-music.player.extractors.register(SoundcloudExtractor);
-music.player.extractors.register(SpotifyExtractor);
-music.player.extractors.register(AppleMusicExtractor);
-music.player.extractors.register(AttachmentExtractor);
-music.player.extractors.register(YoutubeExtractor, youtube);
+warmupExtractors(music.player, { youtube });
 
 client.functions.load("back/functions");
 quorielDb.commands.load("back/client/fdb");

@@ -50,7 +50,6 @@ let ytauth;
 let ytcookies;
 let tempytcookies;
 const hostdomain = useClient.targetDomain;
-const lk = { context: { client: { clientName: useClient.clientName, clientVersion: useClient.clientVersion } } };
 const sortTargetOpus = [774, 251, 250, 249];
 const sortTargetM4a = [141, 140, 139];
 var templist = [];
@@ -828,12 +827,13 @@ async function fallbackYTStream(lstracks) {
                 let secfinalurl;
                 let finalWithPot;
                 const maxHeadRetries = 4;
+                const headCheck = (url) => fetch(url, {
+                    method: "HEAD",
+                    headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
+                });
 
                 for (let headAttempt = 0; headAttempt <= maxHeadRetries; headAttempt++) {
-                    filterlocation = await fetch(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""), {
-                        method: "HEAD",
-                        headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
-                    });
+                    filterlocation = await headCheck(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""));
                     secfinalurl = filterlocation.url;
                     finalWithPot = contentPoToken && !secfinalurl.includes("pot=") ? (secfinalurl + "&pot=" + contentPoToken) : secfinalurl;
 
@@ -845,37 +845,7 @@ async function fallbackYTStream(lstracks) {
                         await new Promise(r => setTimeout(r, 1000 * (headAttempt + 1)));
                     }
                 }
-
-                // Cap-boundary probe: media servers serve ~768KB even with a bad
-                // pot, then 403. A tiny ranged GET at the boundary proves the pot
-                // up front; on 403, re-attest once with a fresh challenge.
-                if (isWebClient && contentPoToken && !skipOnCheckFormat) {
-                    const totalLen = parseInt(((frso && !forceLegacy ? frso : fsFmt)?.contentLength) || 0);
-                    if (Number.isFinite(totalLen) && totalLen > 786432 + 512) {
-                        const probeAt = 786432;
-                        const probePot = (url) => fetch(`${url}&range=${probeAt}-${probeAt + 255}`, {
-                            headers: { "User-Agent": APIuserAgent }
-                        }).then(r => r.status).catch(() => 0);
-                        if ((await probePot(finalWithPot)) === 403) {
-                            Logger.info(`/ [YoutubeConfig] poToken rejected at cap boundary, re-attesting`);
-                            invalidateBotGuard();
-                            try {
-                                const retryPot = await generateCbPot(videoId, actuallk.visitorData);
-                                if (retryPot.isReal) {
-                                    const retryEncoded = encodeURIComponent(retryPot.token);
-                                    const rebuilt = secfinalurl.includes("pot=")
-                                        ? secfinalurl.replace(/([?&])pot=[^&]*/, `$1pot=${retryEncoded}`)
-                                        : (secfinalurl + "&pot=" + retryEncoded);
-                                    if ((await probePot(rebuilt)) !== 403) {
-                                        contentPoToken = retryEncoded;
-                                        finalWithPot = rebuilt;
-                                    }
-                                }
-                            } catch { /* keep original URL; existing 403 handling applies */ }
-                        }
-                    }
-                }
-
+                
                 if (filterlocation.status === 403 && changeLength) {
                     if (isWebClient && !forceLegacy) {
                         continue;
