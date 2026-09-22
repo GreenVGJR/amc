@@ -30,6 +30,9 @@ module.exports = {
     $if[$get[typedebug];$chalkLog[Generating Youtube (Anon)      | Cookies;cyan]]
     $try[
         $let[tempCookiesYTEnv;$djsEval[process.env.YOUTUBE_ANONCOOKIES]]
+        $if[$or[$get[tempCookiesYTEnv]==;$get[tempCookiesYTEnv]==undefined]==false;
+        $httpAddHeader[Cookie;$get[tempCookiesYTEnv]]
+        ]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
         $httpAddHeader[Sec-Fetch-Dest;document]

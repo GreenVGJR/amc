@@ -93,8 +93,8 @@ const generateVisitor = async () => {
         try {
             const url = "https://www.youtube.com/sw.js_data";
             const headers = { "User-Agent": default_userAgent_desktop };
-            if (ytcookies) {
-                headers.Cookie = ytcookies;
+            if (ytcookies || tempytcookies) {
+                headers.Cookie = ytcookies || tempytcookies;
             }
             const res = await fetch(url, { method: "GET", headers });
             ytcookiesapi = ytcookies || normalizeCookies(res.headers.getSetCookie());
@@ -132,7 +132,7 @@ async function fetchWebConfigInfo() {
             "X-Youtube-Client-Name": useClient.clientName,
             "X-Youtube-Client-Version": useClient.clientVersion,
             "User-Agent": APIuserAgent,
-            ...(ytcookies ? { "Cookie": ytcookies } : {})
+            ...(ytcookies || tempytcookies ? { "Cookie": ytcookies || tempytcookies } : {})
         },
         body: JSON.stringify({ context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken } })
     }).then(r => r.json()).then(res => {
@@ -178,7 +178,7 @@ async function fetchEmbeddedContext(videoId) {
         try {
             const url = `https://${hostdomain}/embed/${videoId}?html5=1`;
             const headers = { "User-Agent": APIuserAgent, "Referer": embedUrl };
-            if (ytcookies) headers.Cookie = ytcookies;
+            if (ytcookies || tempytcookies) headers.Cookie = ytcookies || tempytcookies;
             const res = await fetch(url, { method: "GET", headers });
             const html = await res.text();
             const ytcfg = extractYtcfg(html);
