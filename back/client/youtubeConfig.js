@@ -958,6 +958,10 @@ module.exports = {
     get cookie() { return ytcookiesapi; },
     disablePlayer: true,
     createStream: useNativeStream ? {} : async (q) => {
-        return await fallbackYTStream(q.url);
+        try {
+            return await fallbackYTStream(q.url);
+        } catch {
+            return undefined;
+        }
     }
 }
