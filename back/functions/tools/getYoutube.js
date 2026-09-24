@@ -240,7 +240,7 @@ module.exports = [{
     $!httpRequest[https://music.youtube.com/youtubei/v1/next?prettyPrint=false&fields=contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer(tabs.tabRenderer.endpoint.browseEndpoint.browseId);POST;res]
     $let[browseid;$advancedTextSplit[$env[res];"browseId":";1;";0]]
     $if[$env[line]==true;
-    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":21,"clientVersion":"9.25.50","visitorData":"$getCache[initclientmusic;authmusic_youtube_visitor]","hl":"en"}},"attestationRequest":{"omitBotguardData":false}}]
+    $httpSetBody[{"browseId":"$get[browseid]","context":{"client":{"clientName":21,"clientVersion":"9.38.51","visitorData":"$getCache[initclientmusic;authmusic_youtube_visitor]","hl":"en"}},"attestationRequest":{"omitBotguardData":false}}]
     $httpSetContentType[Text]
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip, br]
@@ -344,6 +344,39 @@ module.exports = [{
     $arrayMap[oisdn;pulllockview;$if[$and[$env[pulllockview;lockupViewModel]!=;$endsWith[$env[pulllockview;lockupViewModel;contentType];_VIDEO]];$return[$env[pulllockview;lockupViewModel]]];oisdn]
 
     $return[$default[$jsonStringify[oisdn];{}]]
+    `
+},
+{
+    name: "getYoutubeMusicFeed",
+    params: [{
+        name: "videoId", // string
+        description: "VideoID",
+        required: true
+    },
+    {
+        name: "userAgent", // string
+        description: "Spoof client",
+        required: false
+    }],
+    code: `
+    $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
+    $let[ytinitcookietest1;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
+
+    $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[initclientmusic;authmusic_youtube_visitor]","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
+    $!jsonSet[inputhttpquery;playlistId;RDAMVM$env[videoId]]
+    $httpSetBody[$jsonStringify[inputhttpquery]]
+    $httpSetContentType[Text]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept-Encoding;gzip, br]
+    $httpAddHeader[Content-Type;application/json]
+    $httpAddHeader[Cookie;$get[ytinitcookietest1]]
+    $httpAddHeader[Accept-Language;en]
+    $!httpRequest[https://music.youtube.com/youtubei/v1/next?prettyPrint=false&fields=contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.tabRenderer.content.musicQueueRenderer.content.playlistPanelRenderer.contents(playlistPanelVideoRenderer(videoId,title(runs(text)),thumbnail(thumbnails(url)),lengthText(runs(text)),shortBylineText(runs(text))));POST;oysn]
+    $jsonLoad[oysn;$env[oysn]]
+    $jsonLoad[oysn;$default[$env[oysn;contents;singleColumnMusicWatchNextResultsRenderer;tabbedRenderer;watchNextTabbedResultsRenderer;tabs;0;tabRenderer;content;musicQueueRenderer;content;playlistPanelRenderer;contents];{}]]
+    $arrayMap[oysn;pullmusicvideo;$if[$env[pullmusicvideo;playlistPanelVideoRenderer]!=;$return[$env[pullmusicvideo;playlistPanelVideoRenderer]]];oysn]
+
+    $return[$default[$jsonStringify[oysn];{}]]
     `
 },
 {

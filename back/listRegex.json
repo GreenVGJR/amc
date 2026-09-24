@@ -8,7 +8,7 @@
         "https://github.com/Cyberghxst/Sora/blob/main/constants.json"
     ],
     "youtube": [
-        "(?:[?&]v(?:i)?=|(?:^|/)(?:youtu\\.be|v|vi|u/\\w|embed|shorts|watch|live|source)/)([A-Za-z0-9_-]{11})(?=$|[?#&/])",
+        "^(?:https?:\\/\\/)(?:(?:[a-z0-9-]+\\.)*youtube\\.com\\/(?:watch\\/|(?:w|v|vi|e|embed|shorts|live)\\/|source\\/(?=[A-Za-z0-9_-]{11}\\/shorts(?:[?#]|$)))|music\\.youtube\\.com\\/samples\\/|youtu\\.be\\/|(?:www\\.)?youtube-nocookie\\.com\\/embed\\/|(?:[a-z0-9-]+\\.)*youtube\\.com\\/(?:(?:watch|movie|watch_popup)\\/?)?\\?(?:[^&#?\\s]*&)*v(?:i)?=)([A-Za-z0-9_-]{11})(?:[?&#\\/].*)?$",
         1
     ],
     "youtubeplaylist": [

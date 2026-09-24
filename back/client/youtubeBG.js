@@ -152,6 +152,10 @@ async function attestMintPair() {
         },
         body: JSON.stringify([POTOKEN_REQUEST_KEY, botguardResponse])
     });
+    if (!integrityTokenResponse.ok) {
+        const snippet = await integrityTokenResponse.text().catch(() => '');
+        throw new Error(`GenerateIT failed: HTTP ${integrityTokenResponse.status} ${(snippet || '').slice(0, 160)}`);
+    }
     const integrityTokenJson = await integrityTokenResponse.json();
     const [rawToken, estimatedTtlSecs] = integrityTokenJson;
     if (typeof rawToken !== 'string' || !rawToken) throw new Error('BotGuard integrity token unavailable');

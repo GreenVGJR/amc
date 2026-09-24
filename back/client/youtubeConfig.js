@@ -60,6 +60,27 @@ function normalizeCookies(cookies) {
     return list.map(c => c.trim().split(";")[0]).filter(Boolean).join("; ");
 }
 
+// Guarded JSON parsing for InnerTube-style endpoints
+async function readBodyText(res) {
+    try {
+        return await res.text();
+    } catch { return ''; }
+}
+
+async function parseJsonGuarded(res, label) {
+    const text = await readBodyText(res);
+    try {
+        return JSON.parse(text);
+    } catch {
+        const snippet = (text || '').slice(0, 160).replace(/\s+/g, ' ');
+        throw new Error(`InnerTube ${label} failed: HTTP ${res.status}${res.statusText ? ' ' + res.statusText : ''}: ${snippet || '<empty body>'}`);
+    }
+}
+
+async function fetchJsonGuarded(url, options, label) {
+    return parseJsonGuarded(await fetch(url, options), label);
+}
+
 function refreshYtAuth() {
     require('dotenv').config({ override: true, quiet: true });
     if (process.env.YOUTUBE_AUTH) {
@@ -135,7 +156,7 @@ async function fetchWebConfigInfo() {
             ...(ytcookies || tempytcookies ? { "Cookie": ytcookies || tempytcookies } : {})
         },
         body: JSON.stringify({ context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken } })
-    }).then(r => r.json()).then(res => {
+    }).then(r => parseJsonGuarded(r, 'config')).then(res => {
         const gcg = res?.responseContext?.globalConfigGroup;
         const configInfo = {
             coldConfigData: gcg?.rawColdConfigGroup?.configData,
@@ -147,6 +168,10 @@ async function fetchWebConfigInfo() {
         } else {
             configInfoAttempted = true;
         }
+    }).catch((e) => {
+        // Config is optional enhancement data; never fail the stream over it.
+        Logger.info(`/ [YoutubeConfig] Client config unavailable (${e?.message || e}), continuing without it`);
+        configInfoAttempted = true;
     }).finally(() => {
         configInfoPromise = null;
         Logger.info(`/ [YoutubeConfig] Fetched Client Config`);
@@ -641,12 +666,12 @@ async function fallbackYTStream(lstracks) {
             return { ...base, "Cookie": tempytcookies };
         };
 
-        const fetchPlayerResponse = (headers, query, route) => fetch(`https://${hostdomain}/youtubei/v1/${query}`, {
+        const fetchPlayerResponse = (headers, query, route) => fetchJsonGuarded(`https://${hostdomain}/youtubei/v1/${query}`, {
             method: "POST",
             mode: "same-origin",
             body: JSON.stringify(route),
             headers
-        }).then(r => r.json());
+        }, 'player');
 
         const hasAuth = isVRnAuth || !!ytcookies;
         const mustUseAuth = forceAuthClients.includes(targetClient);
@@ -694,11 +719,25 @@ async function fallbackYTStream(lstracks) {
                     ? { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, ...(isEmbeddedClient ? { originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` } : {}) }, ...(isEmbeddedClient ? { thirdParty: embeddedThirdParty } : {}) }, ...playbackContext, ...webIntegrity }
                     : { playerRequest: { videoId: videoId, contentCheckOk: true, racyCheckOk: true }, disablePlayerResponse: false, cpn: cpn, context: { client: { ...actuallk } }, serviceIntegrityDimensions: { poToken }, attestationRequest: { omitBotguardData: false } };
 
-                if (shouldUseAuth) {
-                    usedAuth = true;
-                    a = await fetchPlayerResponse(buildHeaders(true), buildQuery, buildRoute);
-                } else {
-                    a = await fetchPlayerResponse(buildHeaders(false), buildQuery, buildRoute);
+                try {
+                    if (shouldUseAuth) {
+                        usedAuth = true;
+                        a = await fetchPlayerResponse(buildHeaders(true), buildQuery, buildRoute);
+                    } else {
+                        a = await fetchPlayerResponse(buildHeaders(false), buildQuery, buildRoute);
+                    }
+                } catch (fetchErr) {
+                    // HTML/block pages and transient HTTP errors land here as
+                    // meaningful errors (see parseJsonGuarded). Refresh the
+                    // session once and retry before falling through to modes.
+                    Logger.info(`/ [YoutubeConfig] Player request failed (${fetchErr?.message || fetchErr}), refreshing session and retrying`);
+                    if (isWebClient) {
+                        await refreshBotGuardIntegrity();
+                        await generateSessionPoToken(actuallk.visitorData, true);
+                    }
+                    await generateVisitor();
+                    if (prAttempt === 0) continue;
+                    throw fetchErr;
                 }
 
                 a = filterPlayerObject(a);
@@ -720,11 +759,11 @@ async function fallbackYTStream(lstracks) {
                         ? { serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
                         : {};
                     const retryRoute = { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` }, thirdParty: retryThirdParty }, ...playbackContext, ...retryIntegrity };
-                    a = filterPlayerObject(await fetch(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
+                    a = filterPlayerObject(await fetchJsonGuarded(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
                         method: "POST",
                         body: JSON.stringify(retryRoute),
                         headers: buildHeaders(usedAuth)
-                    }).then(r => r.json()));
+                    }, 'player-embed-retry'));
                     const retried_vt = a?.responseContext?.visitorData;
                     if (retried_vt) { actuallk.visitorData = retried_vt; setVisitorData(retried_vt); }
                 }
@@ -832,18 +871,24 @@ async function fallbackYTStream(lstracks) {
                     headers: { "Range": "bytes=0-", "User-Agent": APIuserAgent }
                 });
 
-                for (let headAttempt = 0; headAttempt <= maxHeadRetries; headAttempt++) {
-                    filterlocation = await headCheck(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""));
-                    secfinalurl = filterlocation.url;
-                    finalWithPot = contentPoToken && !secfinalurl.includes("pot=") ? (secfinalurl + "&pot=" + contentPoToken) : secfinalurl;
+                if (!skipOnCheckFormat) {
+                    for (let headAttempt = 0; headAttempt <= maxHeadRetries; headAttempt++) {
+                        filterlocation = await headCheck(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""));
+                        secfinalurl = filterlocation.url;
+                        finalWithPot = contentPoToken && !secfinalurl.includes("pot=") ? (secfinalurl + "&pot=" + contentPoToken) : secfinalurl;
 
-                    if (filterlocation.status !== 403 || !changeLength || skipOnCheckFormat) {
-                        break;
-                    }
+                        if (filterlocation.status !== 403 || !changeLength || skipOnCheckFormat) {
+                            break;
+                        }
 
-                    if (headAttempt < maxHeadRetries) {
-                        await new Promise(r => setTimeout(r, 1000 * (headAttempt + 1)));
+                        if (headAttempt < maxHeadRetries) {
+                            await new Promise(r => setTimeout(r, 1000 * (headAttempt + 1)));
+                        }
                     }
+                } else {
+                    filterlocation = { status: 200, url: finalurl };
+                    secfinalurl = finalurl;
+                    finalWithPot = finalurl + (contentPoToken ? "&pot=" + contentPoToken : "");
                 }
                 
                 if (filterlocation.status === 403 && changeLength) {
@@ -905,14 +950,14 @@ async function fallbackYTStream(lstracks) {
     }
     catch (e) {
         console.error(e);
-        return e;
+        throw e;
     }
 }
 
 module.exports = {
     get cookie() { return ytcookiesapi; },
+    disablePlayer: true,
     createStream: useNativeStream ? {} : async (q) => {
-        try { return await fallbackYTStream(q.url); }
-        catch { return undefined; }
+        return await fallbackYTStream(q.url);
     }
 }

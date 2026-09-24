@@ -70,7 +70,7 @@ module.exports = {
     $!jsonSet[listclient;clientVersion;"1.03"]
     ;
     $!jsonSet[listclient;clientName;"3"]
-    $!jsonSet[listclient;clientVersion;"21.26.360"]
+    $!jsonSet[listclient;clientVersion;"21.38.123"]
     ]]
 
     $!jsonSet[listclient;visitorData;$getCache[initclientmusic;authmusic_youtube_visitor]]

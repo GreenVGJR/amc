@@ -17,6 +17,20 @@ module.exports = {
     $let[limitplatform;$if[$or[$env[limitplatform]==;$env[limitplatform]==null];20;$env[limitplatform]]]
     $jsonLoad[whattype;$callFunction[filterMediaID;$env[urlplatform]]]
     $if[$env[typeplatform]==youtube;
+    $jsonLoad[filterfinal;$callFunction[getYoutubeMusicFeed;$env[whattype;id]]]
+    $if[$env[filterfinal;0;videoId]!=;
+    $arrayMap[filterfinal;cacfilterfinals;
+    $jsonLoad[aac;{}]
+    $!jsonSet[aac;id;$env[cacfilterfinals;videoId]]
+    $!jsonSet[aac;url;https://www.youtube.com/watch?v=$env[cacfilterfinals;videoId]]
+    $!jsonSet[aac;title;$env[cacfilterfinals;title;runs;0;text]]
+    $!jsonSet[aac;author;$env[cacfilterfinals;shortBylineText;runs;0;text]]
+    $!jsonSet[aac;duration;"$unparseDigital[$env[cacfilterfinals;lengthText;runs;0;text]]"]
+    $!jsonSet[aac;thumbnail;$advancedTextSplit[$env[cacfilterfinals;thumbnail;thumbnails;0;url];=;0]=s0]
+    $return[$env[aac]]
+    ;filterfinal]
+    ;
+    $c[Fallback when its not ATV or Not available]
     $jsonLoad[filterfinal;$callFunction[getYoutubeFeed;$env[whattype;id]]]
     $arrayMap[filterfinal;cacfilterfinals;
     $jsonLoad[aac;{}]
@@ -28,6 +42,7 @@ module.exports = {
     $!jsonSet[aac;thumbnail;https://i.ytimg.com/vi/$env[cacfilterfinals;contentId]/hq720.jpg]
     $return[$env[aac]]
     ;filterfinal]
+    ]
     ]
     $if[$env[typeplatform]==soundcloud;
     $jsonLoad[scTrack;$extractTrack[$env[urlplatform]]]

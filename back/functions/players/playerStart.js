@@ -167,9 +167,10 @@ module.exports = {
     $if[$queueLength!=0;
     $arrayForEach[rest;yesnt;
     $let[ttrknt;$cropText[$env[yesnt];0;97;...]]
+    $if[$or[$get[ttrknt]==;$get[ttrknt]==null;$get[ttrknt]==undefined]==false;
     $addOption[$djsEval[require("entities").decodeHTML(ctx.getKeyword("ttrknt"))];;$get[countqueue]]
     $letSum[countqueue;1]
-    ]
+    ]]
     ;
     $addOption[null;null;null]
     ]

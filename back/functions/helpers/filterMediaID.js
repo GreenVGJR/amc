@@ -21,7 +21,8 @@ module.exports = {
         catch { '' }
     ]
     
-    $if[$and[$endsWith[$get[host];youtube.com];$startsWith[$get[paths];/playlist]];$let[type;youtubeplaylist];$if[$or[$endsWith[$get[host];youtube.com];$endsWith[$get[host];youtu.be]];$let[type;youtube]]]
+    $let[youtubehost;$or[$get[host]==youtube.com;$endsWith[$get[host];.youtube.com];$get[host]==youtu.be;$get[host]==youtube-nocookie.com;$get[host]==www.youtube-nocookie.com]]
+    $if[$and[$get[youtubehost]==true;$startsWith[$get[paths];/playlist]];$let[type;youtubeplaylist];$if[$get[youtubehost]==true;$let[type;youtube]]]
     $if[$endsWith[$get[host];soundcloud.com];$let[type;soundcloud]]
     $if[$endsWith[$get[host];open.spotify.com];$let[type;spotify]]
     $if[$or[$endsWith[$get[host];vt.tiktok.com;vm.tiktok.com];$and[$endsWith[$get[host];tiktok.com];$startsWith[$get[paths];/t/]]];$let[type;tiktokmob];$if[$and[$endsWith[$get[host];tiktok.com];$startsWith[$get[paths];/music/]];$let[type;tiktokmusic];$if[$endsWith[$get[host];tiktok.com];$let[type;tiktok]]]]
