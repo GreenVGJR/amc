@@ -35,7 +35,7 @@ ___
 ```js
 npm install
 npm update
-node .
+npm start
 ```
 > How about for Pterodactyl user?
 

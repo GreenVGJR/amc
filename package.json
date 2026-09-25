@@ -1,11 +1,20 @@
 {
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node ."
+  },
   "dependencies": {
-    "@nationdex/qdb": "github:nationdex/qdb",
     "@nationdex/edge": "github:nationdex/edge",
+    "@nationdex/qdb": "github:nationdex/qdb",
     "@tryforge/forgescript": "^2.6.0",
     "dotenv": "^17.4.2",
     "entities": "^8.0.0",
     "ForgeLinked": "github:tryforge/ForgeLinked#dev",
     "lmdb": "^3.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "typescript": "^5.9.3"
   }
 }
