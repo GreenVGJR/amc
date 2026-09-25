@@ -1,7 +1,7 @@
 <div align="center">
   
 # 🌠 AMC
-[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/nationdex/qdb/main?label=@nationdex/qdb&color=2596be)](https://github.com/quoriel/db) [![QuorielEdge](https://img.shields.io/github/package-json/v/nationdex/edge/main?label=@nationdex/edge&color=2596be)](https://github.com/quoriel/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![License](https://img.shields.io/github/license/GreenVGJR/amc)](LICENSE)
+[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![NationdexQDB](https://img.shields.io/github/package-json/v/nationdex/qdb/main?label=@nationdex/qdb&color=2596be)](https://github.com/nationdex/qdb) [![NationdexEdge](https://img.shields.io/github/package-json/v/nationdex/edge/main?label=@nationdex/edge&color=2596be)](https://github.com/nationdex/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![License](https://img.shields.io/github/license/GreenVGJR/amc)](LICENSE)
 
 </div>
 
