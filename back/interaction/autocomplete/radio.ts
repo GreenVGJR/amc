@@ -1,0 +1,16 @@
+import type { IBaseCommand, CommandType } from "@tryforge/forgescript";
+export default {
+    type: "interactionCreate",
+    allowedInteractionTypes: ["autocomplete"],
+    code: `
+    $onlyIf[$and[$applicationCommandName==radio;$focusedOptionName==country]]
+    $onlyIf[$guildID!=;$addChoice[$callFunction[useCustomMusicMessage;config_errorAttemptSearch];__null__]]
+    $jsonLoad[result;$getCache[initclientmusic;system_file-listRadio]]
+    $arrayMap[result;rest;$if[$checkContains[$toLowercase[$env[rest]];$toLowercase[$focusedOptionValue]];$return[$env[rest]]];result2]
+    $arraySlice[result2;result2;0;24]
+    $arrayForEach[result2;per;
+    $addChoice[$env[per;0];$env[per;0]]]
+    ]
+    $if[$env[result2;0]==;$autocomplete]
+`
+} satisfies IBaseCommand<CommandType>;

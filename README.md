@@ -1,7 +1,7 @@
 <div align="center">
   
 # 🌠 AMC
-[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/quoriel/db/main?label=@quoriel/db&color=2596be)](https://github.com/quoriel/db) [![QuorielEdge](https://img.shields.io/github/package-json/v/quoriel/edge/main?label=@quoriel/edge&color=2596be)](https://github.com/quoriel/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![License](https://img.shields.io/github/license/GreenVGJR/amc)](LICENSE)
+[![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![QuorielDB](https://img.shields.io/github/package-json/v/nationdex/qdb/main?label=@nationdex/qdb&color=2596be)](https://github.com/quoriel/db) [![QuorielEdge](https://img.shields.io/github/package-json/v/nationdex/edge/main?label=@nationdex/edge&color=2596be)](https://github.com/quoriel/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![License](https://img.shields.io/github/license/GreenVGJR/amc)](LICENSE)
 
 </div>
 
@@ -23,10 +23,11 @@ ___
 git clone -b fs-dev-local https://github.com/GreenVGJR/amc.git
 cd amc
 npm install
+npm run build
 ```
 3. Navigate to that folder and rename `.env.example` file to `.env`
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
-5. Then run command `node .` inside that folder
+5. Then run command `npm start` inside that folder (compiles the TypeScript sources and starts the bot)
 
 ___
 

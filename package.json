@@ -1,7 +1,13 @@
 {
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "start": "node ."
+  },
   "dependencies": {
-    "@quoriel/db": "github:quoriel/db",
-    "@quoriel/edge": "github:quoriel/edge",
+    "@nationdex/edge": "github:nationdex/edge",
+    "@nationdex/qdb": "github:nationdex/qdb",
     "@snazzah/davey": "^0.1.12",
     "@tryforge/forge.music": "github:tryforge/ForgeMusic#main",
     "@tryforge/forgescript": "^2.7.1",
@@ -21,7 +27,10 @@
     "youtubei.js": "^18.1.0"
   },
   "devDependencies": {
-    "patch-package": "^8.0.1"
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.2",
+    "patch-package": "^8.0.1",
+    "typescript": "^7.0.2"
   },
   "allowScripts": {
     "canvas@3.2.3": true
