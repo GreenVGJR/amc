@@ -1,7 +1,12 @@
 {
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node ."
+  },
   "dependencies": {
-    "@nationdex/qdb": "github:nationdex/qdb",
     "@nationdex/edge": "github:nationdex/edge",
+    "@nationdex/qdb": "github:nationdex/qdb",
     "@snazzah/davey": "^0.1.12",
     "@tryforge/forge.music": "github:tryforge/ForgeMusic#main",
     "@tryforge/forgescript": "^2.7.1",
@@ -21,7 +26,10 @@
     "youtubei.js": "^18.1.0"
   },
   "devDependencies": {
-    "patch-package": "^8.0.1"
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^22.20.4",
+    "patch-package": "^8.0.1",
+    "typescript": "^5.9.3"
   },
   "allowScripts": {
     "canvas@3.2.3": true

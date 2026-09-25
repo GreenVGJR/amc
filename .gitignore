@@ -11,3 +11,12 @@ forgeconfig.json
 bun.lock
 .forgevsc.json
 back/client/ytCacheTracks
+
+# TypeScript build output (compiled in-place next to their .ts sources)
+/index.js
+/index.js.map
+/back/**/*.js
+/back/**/*.js.map
+/commands/**/*.js
+/commands/**/*.js.map
+*.tsbuildinfo

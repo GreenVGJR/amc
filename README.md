@@ -26,7 +26,7 @@ npm install
 ```
 3. Navigate to that folder and rename `.env.example` file to `.env`
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
-5. Then run command `node .` inside that folder
+5. Then run command `npm start` inside that folder (compiles the TypeScript sources and starts the bot)
 
 ___
 
