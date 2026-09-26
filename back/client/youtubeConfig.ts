@@ -1,6 +1,6 @@
 import config from "../config.json" with { type: "json" };
 import dotenv from "dotenv";
-const { default_userAgent_desktop, streamTypeYT, useClientYT, cacheTrackYT, skipOnCheckFormat, useNativeStream } = config;
+const { default_userAgent_desktop, streamTypeYT, useClientYT, cacheTrackYT, skipOnCheckFormat, useNativeStream, webClientYT } = config;
 import ytClients from "./youtubeClients.ts";
 const targetClient = useClientYT?.toUpperCase();
 const useClient = ytClients?.[targetClient];
@@ -17,6 +17,7 @@ if (['WEB_CREATOR', 'WEB_PARENT'].includes(targetClient) && !process.env.YOUTUBE
 }
 
 const isWebClient = useClient.targetDomain !== 'youtubei.googleapis.com';
+const usePoToken = isWebClient && webClientYT?.poToken === true;
 
 // Forgescript Logger
 import { Logger } from "@tryforge/forgescript";
@@ -30,7 +31,8 @@ const require = createRequire(import.meta.url);
 const cacheDir = path.join(import.meta.dirname, 'ytCacheTracks');
 fs.mkdirSync(cacheDir, { recursive: true });
 
-import { initBotGuard, refreshBotGuardIntegrity, generateCbPot, generateSessionPoToken, generateAnonPOT, setVisitorData, invalidateBotGuard } from "./youtubeBG.ts";
+import { initBotGuard, refreshBotGuardIntegrity, generateCbPot, generateSessionPoToken, generateAnonPOT, setVisitorData } from "./youtubeBG.ts";
+import { searchSoundcloudFallback } from "./soundcloudConfig.ts";
 
 let vt;
 let datasyncID = "";
@@ -64,7 +66,6 @@ function normalizeCookies(cookies) {
     return list.map(c => c.trim().split(";")[0]).filter(Boolean).join("; ");
 }
 
-// Guarded JSON parsing for InnerTube-style endpoints
 async function readBodyText(res) {
     try {
         return await res.text();
@@ -173,7 +174,6 @@ async function fetchWebConfigInfo() {
             configInfoAttempted = true;
         }
     }).catch((e) => {
-        // Config is optional enhancement data; never fail the stream over it.
         Logger.info(`/ [YoutubeConfig] Client config unavailable (${e?.message || e}), continuing without it`);
         configInfoAttempted = true;
     }).finally(() => {
@@ -572,9 +572,10 @@ function filterPlayerObject(YTPlayerResponse) {
 }
 
 generateVisitor().then(() => Promise.all([
+    Logger.info(`/ [YoutubeConfig] Client ${targetClient} | Web=${isWebClient} | poToken Solving=${usePoToken}`),
     fetchWebConfigInfo(),
     fetchSignatureTimestamp(),
-    ...(isWebClient ? [initBotGuard().then(() => generateSessionPoToken(actuallk.visitorData)).then(() => Logger.info(`/ [YoutubeConfig] Generated Session Token`))] : [])
+    ...(usePoToken ? [initBotGuard().then(() => generateSessionPoToken(actuallk.visitorData)).then(() => Logger.info(`/ [YoutubeConfig] Generated Session Token`))] : [])
 ]));
 
 const warmupEmbeddedClient = async () => {
@@ -584,7 +585,7 @@ const warmupEmbeddedClient = async () => {
         await Promise.all([
             fetchEmbeddedContext('dQw4w9WgXcQ'), // You know the rules
             fetchSignatureTimestamp(),
-            initBotGuard().then(() => generateSessionPoToken(actuallk.visitorData))
+            ...(usePoToken ? [initBotGuard().then(() => generateSessionPoToken(actuallk.visitorData))] : [])
         ]);
     } catch (e) {
         console.error(`[YoutubeConfig] Embedded warmup failed:`, e?.message || e);
@@ -592,7 +593,7 @@ const warmupEmbeddedClient = async () => {
 };
 warmupEmbeddedClient();
 
-async function fallbackYTStream(lstracks) {
+async function fallbackYTStream(lstracks, trackInfo?: any) {
     refreshYtAuth();
     embeddedRetried = false;
 
@@ -704,7 +705,7 @@ async function fallbackYTStream(lstracks) {
 
                 let sessionPoToken = poToken;
                 let isRealSessionPo = false;
-                if (isWebClient) {
+                if (usePoToken) {
                     let sessionPoData = await generateSessionPoToken(actuallk.visitorData);
                     if (sessionPoData.exp <= Date.now()) {
                         sessionPoData = await generateSessionPoToken(actuallk.visitorData, true);
@@ -715,8 +716,10 @@ async function fallbackYTStream(lstracks) {
 
                 const playbackContext = signatureTimestamp ? { playbackContext: { contentPlaybackContext: { vis: 0, splay: false, lactMilliseconds: '-1', signatureTimestamp, ...(embeddedContext?.encryptedHostFlags ? { encryptedHostFlags: embeddedContext.encryptedHostFlags } : {}) } } } : {};
 
-                const webIntegrity = isWebClient && isRealSessionPo
-                    ? { serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
+                const webIntegrity = isWebClient
+                    ? (usePoToken && isRealSessionPo
+                        ? { serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
+                        : {})
                     : {};
 
                 const buildRoute = isWebClient
@@ -731,11 +734,8 @@ async function fallbackYTStream(lstracks) {
                         a = await fetchPlayerResponse(buildHeaders(false), buildQuery, buildRoute);
                     }
                 } catch (fetchErr) {
-                    // HTML/block pages and transient HTTP errors land here as
-                    // meaningful errors (see parseJsonGuarded). Refresh the
-                    // session once and retry before falling through to modes.
                     Logger.info(`/ [YoutubeConfig] Player request failed (${fetchErr?.message || fetchErr}), refreshing session and retrying`);
-                    if (isWebClient) {
+                    if (usePoToken) {
                         await refreshBotGuardIntegrity();
                         await generateSessionPoToken(actuallk.visitorData, true);
                     }
@@ -755,12 +755,18 @@ async function fallbackYTStream(lstracks) {
                     Logger.info(`/ [YoutubeConfig] EMBEDDER_IDENTITY_DENIED, refreshing embedded context`);
                     embeddedContextCache = null;
                     await generateVisitor();
-                    const retryPoData = await generateSessionPoToken(actuallk.visitorData, true);
-                    sessionPoToken = retryPoData.poToken;
+                    let retryIsRealPo = false;
+                    if (usePoToken) {
+                        const retryPoData = await generateSessionPoToken(actuallk.visitorData, true);
+                        sessionPoToken = retryPoData.poToken;
+                        retryIsRealPo = retryPoData.isReal;
+                    }
                     embeddedContext = await fetchEmbeddedContext(videoId);
                     const retryThirdParty = embeddedContext?.thirdParty ? { ...embeddedContext.thirdParty, embedUrl } : { embedUrl };
-                    const retryIntegrity = isWebClient && retryPoData.isReal
-                        ? { serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
+                    const retryIntegrity = isWebClient
+                        ? (usePoToken && retryIsRealPo
+                            ? { serviceIntegrityDimensions: { poToken: sessionPoToken }, attestationRequest: { omitBotguardData: false } }
+                            : {})
                         : {};
                     const retryRoute = { videoId: videoId, contentCheckOk: true, racyCheckOk: true, cpn: cpn, context: { client: { ...actuallk, originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1` }, thirdParty: retryThirdParty }, ...playbackContext, ...retryIntegrity };
                     a = filterPlayerObject(await fetchJsonGuarded(`https://${hostdomain}/youtubei/v1/${buildQuery}`, {
@@ -784,7 +790,7 @@ async function fallbackYTStream(lstracks) {
                     if (!a?.playabilityStatus || a.playabilityStatus.status !== 'OK') {
                         if (prAttempt === 0) {
                             Logger.info(`/ [YoutubeConfig] Playability ${a?.playabilityStatus?.status || 'null'} - refreshing session and retrying`);
-                            if (isWebClient) {
+                            if (usePoToken) {
                                 await refreshBotGuardIntegrity();
                                 await generateSessionPoToken(actuallk.visitorData, true);
                             }
@@ -848,12 +854,16 @@ async function fallbackYTStream(lstracks) {
                     finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
                 }
 
+                if (!finalurl) {
+                    finalurl = await searchSoundcloudFallback(trackInfo?.title, trackInfo?.author) || "";
+                }
+
                 if (!finalurl && a?.streamingData?.serverAbrStreamingUrl) {
                     throw new Error(`This content unavailable due youtube enforce SABR-only`);
                 }
 
                 if (!finalurl) {
-                    throw new Error(`No playable YouTube format URL for ${targetClient}`);
+                    throw new Error(`No playable YouTube and Soundcloud format URL for ${targetClient}`);
                 }
 
                 if (isHlsUrl(finalurl)) {
@@ -861,7 +871,7 @@ async function fallbackYTStream(lstracks) {
                 }
 
                 let contentPoToken;
-                if (isWebClient) {
+                if (usePoToken) {
                     const cbPot = await generateCbPot(videoId, actuallk.visitorData);
                     contentPoToken = cbPot.isReal ? encodeURIComponent(cbPot.token) : null;
                 }
@@ -942,7 +952,7 @@ async function fallbackYTStream(lstracks) {
                 lastError = modeErr;
                 Logger.info(`/ [YoutubeConfig] attempt with auth=${useAuthMode} failed: ${modeErr?.message || modeErr}`);
                 if (isWebClient) {
-                    await initBotGuard();
+                    if (usePoToken) await initBotGuard();
                     poToken = generateAnonPOT();
                 }
                 await generateVisitor();
@@ -963,7 +973,7 @@ export default {
     disablePlayer: true,
     createStream: useNativeStream ? {} : async (q) => {
         try {
-            return await fallbackYTStream(q.url);
+            return await fallbackYTStream(q.url, q);
         } catch {
             return undefined;
         }

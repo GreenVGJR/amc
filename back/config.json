@@ -28,6 +28,9 @@
     "streamTypeYT": 1,
     "skipOnCheckFormat": false,
     "useClientYT": "VISIONOS",
+    "webClientYT": {
+        "poToken": false
+    },
     "cacheTrackYT": false,
 
     "disable_YT": false,

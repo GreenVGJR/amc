@@ -1,14 +1,12 @@
 <div align="center">
-  
-# 🌠 AMC
+
+# <img width="4096" height="1638" alt="Banner - 451ECC4" src="https://github.com/user-attachments/assets/e1f7bc7c-a61a-43e2-ab6e-1f7d8967495a" />
+
 [![Forgescript](https://img.shields.io/github/package-json/v/tryforge/ForgeScript/main?label=@tryforge/forgescript&color=5c16d4)](https://github.com/tryforge/ForgeScript) [![NationdexQDB](https://img.shields.io/github/package-json/v/nationdex/qdb/main?label=@nationdex/qdb&color=2596be)](https://github.com/nationdex/qdb) [![NationdexEdge](https://img.shields.io/github/package-json/v/nationdex/edge/main?label=@nationdex/edge&color=2596be)](https://github.com/nationdex/edge) [![ForgeMusic](https://img.shields.io/github/package-json/v/tryforge/ForgeMusic/main?label=@tryforge/forge.music&color=5c16d4)](https://github.com/tryforge/ForgeMusic) [![License](https://img.shields.io/github/license/GreenVGJR/amc)](LICENSE)
 
 </div>
 
 ## Installation
-
-> [!CAUTION]
-> Stream Youtube violates Discord ToS. Use it with caution.
 
 > [!NOTE]
 > These intents must be enable to use all features.
@@ -16,7 +14,7 @@
 
 ___
 
-1. Required [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v22.22.3 for node.js
+1. Required [node.js](https://nodejs.org/) and [git](https://git-scm.com/) installed, and greater than version v22 for node.js
 2. Clone the repository and install dependencies:
 
 ```bash
@@ -28,6 +26,10 @@ npm run build
 3. Navigate to that folder and rename `.env.example` file to `.env`
 4. Add your [Discord token bot](https://discord.com/developers/applications) inside `.env` at `DISCORD_TOKEN=yourtokenhere`
 5. Then run command `npm start` inside that folder (compiles the TypeScript sources and starts the bot)
+6. To keep up-to-date, run `git pull` then restart the bot
+
+> [!CAUTION]
+> Streaming Youtube violates Discord ToS. Use it with caution.
 
 ___
 
