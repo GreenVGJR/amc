@@ -610,7 +610,8 @@ async function fallbackYTStream(lstracks, trackInfo?: any) {
         }
     }
 
-    const checklist = templist.find(l => l.id === lstracks);
+    const checkindex = templist.findIndex(l => l.id === lstracks);
+    const checklist = checkindex === -1 ? undefined : templist[checkindex];
     if (checklist) {
         if (Date.now() <= checklist.ref) {
             if (cacheTrackYT) {
@@ -629,6 +630,7 @@ async function fallbackYTStream(lstracks, trackInfo?: any) {
             }
             return checklist.url;
         }
+        else templist.splice(checkindex, 1);
     }
     try {
         let GTH;
@@ -926,10 +928,15 @@ async function fallbackYTStream(lstracks, trackInfo?: any) {
                 return createLiveChunkedStream(actualfinalurl);
             }
 
+            const nowRef = Date.now();
+            for (let ti = templist.length - 1; ti >= 0; ti--) {
+                if (templist[ti].id === lstracks || templist[ti].ref <= nowRef) templist.splice(ti, 1);
+            }
+            if (templist.length >= 500) templist.splice(0, templist.length - 499);
             templist.push({
                 id: lstracks,
                 url: actualfinalurl,
-                ref: Date.now() + 3600000,
+                ref: nowRef + 3600000,
                 allowLength: changeLength,
                 contentLength: streamingLength
             });

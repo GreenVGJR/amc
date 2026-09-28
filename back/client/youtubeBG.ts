@@ -225,7 +225,16 @@ async function generateCbPot(videoId: any, visitorData?: any): Promise<{ token: 
     if (visitorData) setVisitorData(visitorData);
     const cacheKey = potCacheKey(videoId);
     const cached = poTokenCache.get(cacheKey);
-    if (cached && cached.exp > Date.now()) return { token: cached.token, isReal: cached.isReal };
+    if (cached) {
+        if (cached.exp > Date.now()) return { token: cached.token, isReal: cached.isReal };
+        poTokenCache.delete(cacheKey);
+    }
+    if (poTokenCache.size >= 1000) {
+        const nowPot = Date.now();
+        for (const [k, v] of poTokenCache) {
+            if (!v || v.exp <= nowPot) poTokenCache.delete(k);
+        }
+    }
     try {
         let token;
         let isReal = true;
