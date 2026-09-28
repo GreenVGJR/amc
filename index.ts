@@ -15,6 +15,28 @@ import { QuorielEdge } from "@nationdex/edge";
 
 // Extractor warmup (background, retried, logged - see back/client/extractorWarmup.ts)
 import { warmupExtractors } from "./back/client/extractorWarmup.ts";
+
+import { Collection, LimitedCollection } from "discord.js";
+const djsCacheLimits: Record<string, number> = {
+    MessageManager: 50,
+    ThreadManager: 25,
+    ReactionManager: 25,
+    ReactionUserManager: 25,
+    ThreadMemberManager: 25,
+    UserManager: 500,
+    GuildInviteManager: 0,
+    GuildBanManager: 0,
+    AutoModerationRuleManager: 0,
+    GuildScheduledEventManager: 0,
+    StageInstanceManager: 0,
+    PresenceManager: 0
+};
+const customCaching = (manager: any) => {
+    const maxSize = djsCacheLimits[manager?.constructor?.name];
+    if (maxSize === undefined) return new Collection();
+    return new LimitedCollection({ maxSize });
+};
+
 import { installTypeScriptModuleLoaders } from "./back/client/typescriptLoaders.ts";
 import { YoutubeExtractor } from "discord-player-youtubei";
 
@@ -67,6 +89,11 @@ const music = new ForgeMusic({
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
     logLevel: LogPriority.Medium,
+    makeCache: customCaching,
+    sweepers: {
+        messages: { interval: 1800, lifetime: 3600 },
+        threads: { interval: 3600, lifetime: 3600 }
+    },
     intents: [
         "Guilds",
         "GuildMembers",
