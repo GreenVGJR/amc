@@ -11,6 +11,7 @@ import { ForgeClient, LogPriority } from "@tryforge/forgescript";
 import { ForgeMusic, GuildQueueEvent } from "@tryforge/forge.music";
 import { QuorielDB } from "@nationdex/qdb";
 import { QuorielEdge } from "@nationdex/edge";
+import { ForgeH2 } from "forgeH2";
 // import { ForgeDB } from "@tryforge/forge.db";
 
 // Extractor warmup (background, retried, logged - see back/client/extractorWarmup.ts)
@@ -112,6 +113,7 @@ const client = new ForgeClient({
         "?"
     ],
     extensions: [
+        new ForgeH2(),
         // new ForgeDB(),
         quorielDb,
         quorielEdge,
