@@ -21,9 +21,13 @@ export default {
     $let[bannerchannelurl;$get[checkcachebannerksl]]
     ;
     $setCache[initclientmusic;musicplayer_cache-bannermusic-$get[md5urlmv];null]
+    $let[rtrytbn_attempt;0]
+    $jsonLoad[findindexch;{}]
     $localFunction[rtrytbn;
+    $if[$get[rtrytbn_attempt]>=3;$return]
+    $letSum[rtrytbn_attempt;1]
     $jsonLoad[findindexch;$callFunction[getYoutubeChannel;$env[trackLVMTL]]]
-    $if[$env[findindexch;0;channelId]==;$wait[350] $callLocalFunction[rtrytbn]]
+    $if[$env[findindexch;0;channelId]==;$callLocalFunction[rtrytbn]]
     $return
     ]
     $callLocalFunction[rtrytbn]

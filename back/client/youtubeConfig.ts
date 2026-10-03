@@ -368,6 +368,7 @@ function createChunkedStream(url, totalSize, videoId, ext) {
 
             try {
                 const batchStart = start;
+                abortControllers = [];
                 const tasks = [];
 
                 for (let i = 0; i < concurrency; i++) {
@@ -383,7 +384,6 @@ function createChunkedStream(url, totalSize, videoId, ext) {
                     return;
                 }
 
-                abortControllers = [];
                 const results = await Promise.allSettled(tasks);
 
                 for (const result of results) {

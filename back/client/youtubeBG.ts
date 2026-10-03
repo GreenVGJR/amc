@@ -234,6 +234,11 @@ async function generateCbPot(videoId: any, visitorData?: any): Promise<{ token: 
         for (const [k, v] of poTokenCache) {
             if (!v || v.exp <= nowPot) poTokenCache.delete(k);
         }
+        while (poTokenCache.size >= 1000) {
+            const oldest = poTokenCache.keys().next();
+            if (oldest.done) break;
+            poTokenCache.delete(oldest.value);
+        }
     }
     try {
         let token;

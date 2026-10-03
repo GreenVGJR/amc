@@ -77,6 +77,7 @@ const music = new ForgeMusic({
     connectOptions: {
         disableFallbackStream: true,
         disableBiquad: true,
+        maxHistorySize: 1,
         ...(!toggles.useNativeStream && { bufferingTimeout: 250 }),
         connectionTimeout: 30000,
         volume: 50,
