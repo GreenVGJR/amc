@@ -29,7 +29,7 @@
         2
     ],
     "tiktok": [
-        "^(?:https?:\\/\\/)?(?:(?:www\\.)?(?:m\\.)?tiktok\\.com\\/(?:(?:@[^\\/]*\\/video\\/)|v\\/)|t\\.tiktok\\.com\\/i18n\\/share\\/video\\/)(\\d{18,21})(?:\\.html)?(?:[\\/\\?#].*)?$",
+        "^(?:https?:\\/\\/)?(?:(?:www\\.)?(?:m\\.)?tiktok\\.com\\/(?:(?:@[^\\/]*\\/video\\/)|v\\/|share\\/(?:video|photo)\\/)|t\\.tiktok\\.com\\/i18n\\/share\\/video\\/)(\\d{18,21})(?:\\.html)?(?:[\\/\\?#].*)?$",
         1
     ],
     "tiktokmob": [
