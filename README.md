@@ -18,7 +18,7 @@ ___
 2. Clone the repository and install dependencies:
 
 ```bash
-git clone -b dev https://github.com/GreenVGJR/amc.git
+git clone -b main https://github.com/GreenVGJR/amc.git
 cd amc
 npm install
 npm run build
