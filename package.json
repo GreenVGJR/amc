@@ -10,7 +10,7 @@
     "@nationdex/qdb": "github:nationdex/qdb",
     "@snazzah/davey": "^0.1.12",
     "@tryforge/forge.music": "github:tryforge/ForgeMusic#main",
-    "@tryforge/forgescript": "^2.7.1",
+    "@tryforge/forgescript": "^2.8.0",
     "bgutils-js": "^4.0.3",
     "canvas": "^3.2.3",
     "discord-player": "^7.2.0",
@@ -24,6 +24,7 @@
     "googlevideo": "^5.0.1",
     "jsdom": "^30.1.3",
     "lmdb": "^3.5.9",
+    "mediaplex": "^1.0.0",
     "simple-ytdl-core": "^1.1.1",
     "youtubei.js": "^18.3.0"
   },
