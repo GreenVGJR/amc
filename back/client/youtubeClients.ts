@@ -29,6 +29,13 @@ const list_clients: Record<string, YoutubeClientConfig> = {
         "osName": "visionOS",
         "osVersion": "1.3.21O771"
     },
+    "IOS_PRODUCER": {
+        "targetDomain": "youtubei.googleapis.com",
+        "client_id": null,
+        "client_secret": null,
+        "clientName": 92,
+        "clientVersion": "0.149.946",
+    },
     // some countries may not able to stream after 1 minute
     // might enforce SABR-only
     "ANDROID": {

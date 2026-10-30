@@ -201,7 +201,8 @@ export default {
     ]
     $if[$env[whattype;type]==tiktokmob;
     $if[$env[types]==vi;
-    $let[viurl;$djsEval[fetch("https://vt.tiktok.com/$env[whattype;id]", { method: "HEAD" }).then(a => a.url).catch()]]
+    $let[uamib;$callFunction[configMusic;default_userAgent_mobile]]
+    $let[viurl;$djsEval[fetch("https://www.tiktok.com/t/$env[whattype;id]", { headers: { 'User-Agent': ctx.getKeyword("uamib") } }).then(a => a.url).catch()]]
     $jsonLoad[test;$extractTrack[$get[viurl]]]
     $arrayPush[imgurls;$env[test;results;video;cover]]
     $arrayPush[imgurls;$env[test;results;music;cover_large]]

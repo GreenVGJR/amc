@@ -130,7 +130,8 @@ export default {
     $let[results;{"status":null,"results":$if[$env[a;results;0]==;null;$env[a;results;0]]}]
     ]
     $if[$env[filterid;type]==tiktokmob;
-    $let[testtempjr;$djsEval[fetch("https://vt.tiktok.com/$env[filterid;id]", { method: "HEAD" }).then(a => a.url).catch()]]
+    $let[uamib;$callFunction[configMusic;default_userAgent_mobile]]
+    $let[testtempjr;$djsEval[fetch("https://www.tiktok.com/t/$env[filterid;id]", { headers: { 'User-Agent': ctx.getKeyword("uamib") } }).then(a => a.url).catch()]]
     $jsonLoad[filterid;$callFunction[filterMediaID;$get[testtempjr]]]
     $onlyIf[$or[$env[filterid;id]==;$env[filterid;id]==null]!=true;$return]
     ]
