@@ -279,7 +279,7 @@ export default {
     $jsonLoad[b;$env[test;results;video;bitrateInfo;$get[findindex];PlayAddr;UrlList]]
     ]
     $if[$env[b;0]==;$return[$let[finalurl;null]]]
-    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1180]]
+    $let[finalurl;$advancedReplace[$env[b;$arrayFindIndex[b;c;$checkContains[$env[c];tiktok.com/aweme]]];faid=1988;faid=1180;www.tiktok.com;api.tiktokv.com]]
     $let[finalurl;$djsEval[fetch(ctx.getKeyword("finalurl"), { method: "GET" }).then(a => a.url).catch(() => ctx.getKeyword("finalurl"))]]
     ]
     ]
