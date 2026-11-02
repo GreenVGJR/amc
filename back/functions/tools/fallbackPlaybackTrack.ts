@@ -70,7 +70,7 @@ export default {
     $!jsonSet[listclient;clientVersion;"1.03"]
     ;
     $!jsonSet[listclient;clientName;"3"]
-    $!jsonSet[listclient;clientVersion;"21.38.123"]
+    $!jsonSet[listclient;clientVersion;"21.44.528"]
     ]]
 
     $!jsonSet[listclient;visitorData;$getCache[initclientmusic;authmusic_youtube_visitor]]
@@ -502,6 +502,57 @@ export default {
     $if[$env[types]==vi;
     $jsonLoad[thimgs;$default[$env[test;results;images];{}]]
     $arrayForEach[thimgs;thim;$arrayPush[imgurls;$env[thim]]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+    $if[$env[test;results]==null;$return[$let[finalurl;null]]]
+    $if[$env[test;results;error]!=;$return[$let[finalurl;bot|$env[test;results;error]]]]
+    $let[finalurl;$env[test;results;media]]
+    $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Content is not available]]]
+    ]
+    ]
+    $if[$or[$env[whattype;type]==reddit;$env[whattype;type]==redditshare];
+    $if[$env[types]==vi;
+    $jsonLoad[rimgs;$default[$env[test;results;images];{}]]
+    $arrayForEach[rimgs;rim;$arrayPush[imgurls;$env[rim]]]
+    $if[$and[$arrayLength[imgurls]==0;$env[test;results;media]!=;$or[$checkContains[$env[test;results;media];i.redd.it/];$checkContains[$env[test;results;media];preview.redd.it/]]];$arrayPush[imgurls;$env[test;results;media]]]
+    $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
+    $arraySlice[imgurls;imgurls;0;10]
+    $let[finalurl;$arrayJoin[imgurls;
+]]
+    ;
+    $if[$env[test;results]==null;$return[$let[finalurl;null]]]
+    $if[$env[test;results;error]!=;$return[$let[finalurl;bot|$env[test;results;error]]]]
+    $let[finalurl;$env[test;results;media]]
+    $if[$or[$get[finalurl]==null;$get[finalurl]==;$get[finalurl]==undefined];$return[$let[finalurl;bot|Content is not available]]]
+    $if[$and[$checkContains[$get[finalurl];v.redd.it/];$checkContains[$get[finalurl];.mp4]==false];
+    $let[redditvidid;$advancedTextSplit[$get[finalurl];v.redd.it/;1;/;0]]
+    $httpAddHeader[User-Agent;$get[agent]]
+    $httpAddHeader[Accept;application/dash+xml]
+    $httpSetContentType[Text]
+    $let[redditmpdstatus;$httpRequest[https://v.redd.it/$get[redditvidid]/DASHPlaylist.mpd;GET;redditmpdbody]]
+    $let[redditmpdbody;$default[$env[redditmpdbody];]]
+    $if[$get[redditmpdstatus]!=200;$return[$let[finalurl;bot|Content is not available]]]
+    $arrayLoad[redditreps;<Representation;$get[redditmpdbody]]
+    $!arrayShift[redditreps]
+    $let[redditbesth;0]
+    $let[redditbestbase;]
+    $arrayForEach[redditreps;rep;
+    $let[redditreph;$advancedTextSplit[$env[rep];height=";1;";0]]
+    $let[redditrepbase;$advancedTextSplit[$env[rep];<BaseURL>;1;</BaseURL>;0]]
+    $if[$and[$get[redditreph]!=;$get[redditrepbase]!=;$get[redditreph]>$get[redditbesth]];$let[redditbesth;$get[redditreph]]$let[redditbestbase;$get[redditrepbase]]]
+    ]
+    $if[$get[redditbestbase]==;$return[$let[finalurl;bot|Content is not available]]]
+    $let[finalurl;https://v.redd.it/$get[redditvidid]/$get[redditbestbase]]
+    ]
+    ]
+    ]
+    $if[$env[whattype;type]==redgifs;
+    $if[$env[types]==vi;
+    $jsonLoad[rgimgs;$default[$env[test;results;images];{}]]
+    $arrayForEach[rgimgs;rgi;$arrayPush[imgurls;$env[rgi]]]
     $arrayFilter[imgurls;im;$checkCondition[$env[im]!=];imgurls]
     $arraySlice[imgurls;imgurls;0;10]
     $let[finalurl;$arrayJoin[imgurls;

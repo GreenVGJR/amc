@@ -155,6 +155,8 @@ ___
     > Facebook
     > Bandcamp
     > Twitter / X
+    > Reddit
+    > Redgifs
 
 - Auto-generate auth keys needed
 - Autoplay

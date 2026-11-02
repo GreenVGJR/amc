@@ -756,6 +756,82 @@ export default {
     $deleteCache[pornamecachingretry;authretry_instagram]
     ]
     ]
+    $if[$or[$env[type]==all;$env[type]==reddit];
+    $if[$get[typedebug];$chalkLog[Generating Reddit              | Cookies;cyan]]
+    $try[
+        $httpAddHeader[Sec-Fetch-Dest;document]
+        $httpAddHeader[Sec-Fetch-Mode;navigate]
+        $httpAddHeader[Sec-Fetch-Site;none]
+        $httpAddHeader[User-Agent;$get[agent]]
+        $if[$getCache[initclientmusic;authmusic_reddit]!=;$httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_reddit]]]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+        $httpAddHeader[Accept;text/html, */*]
+        $httpSetContentType[Text]
+        $let[cjcjonhttp;$httpRequest[https://www.reddit.com/svc/events/preload-head;GET;nonaniosgn]]
+        $let[kkjvns;$or[$env[nonaniosgn]==OK;$checkContains[$httpGetHeader[Set-Cookie];token_v2]]]
+        $let[kkasg;$callFunction[filterCookies;2;$getCache[initclientmusic;authmusic_reddit];$callFunction[filterCookies;1;$httpGetHeader[Set-Cookie]]]]
+        $c[429 Response will still retries]
+        $if[$get[cjcjonhttp]==403;
+        $if[$env[successlog]==true;
+        $logger[Warn;You have been blocked. - Reddit]
+        ]
+        $let[abortscrd;true]
+        $return
+        ]
+        $if[$get[kkjvns]==false;
+        $let[kkasgcv;]
+        $let[kklasgoc;true]
+        $setCache[initclientmusic;authmusic_reddit;$get[kkasg]]
+        $logger[Warn;Solving challenge - Reddit]
+        ;
+        $let[kkasgcv;$callFunction[filterCookies;2;$get[kkasg];over18=true]]
+        $if[$get[kkasgcv]!=;$setCache[initclientmusic;authmusic_reddit;$get[kkasgcv]]]
+        ]
+        $if[$and[$get[kklasgoc]!=true;$env[successlog]==true];$logger[Info;$if[$get[kkasgcv]!=;$cropText[$get[kkasgcv];0;10;...];Failed to Retrieve] | Reddit / Cookies]]
+    ;$logger[Info;Failed to Retrieve - Reddit]]
+    $if[$get[kkasgcv]==;
+    $setCache[pornamecachingretry;authretry_reddit;$sum[$default[$getCache[pornamecachingretry;authretry_reddit];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_reddit]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_reddit]/3) - Reddit]
+    $callFunction[generateAuth;reddit;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_reddit]
+    $logger[Error;Giving up after 3 attempts - Reddit]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_reddit]
+    ]
+    ]
+    $if[$or[$env[type]==all;$env[type]==redgifs];
+    $if[$get[typedebug];$chalkLog[Generating Redgifs            | Token;cyan]]
+    $try[
+        $httpAddHeader[User-Agent;$get[agent]]
+        $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+        $httpAddHeader[Accept;application/json]
+        $httpAddHeader[Origin;https://www.redgifs.com]
+        $httpAddHeader[Referer;https://www.redgifs.com/]
+        $httpSetContentType[Text]
+        $let[redgifsstatus;$httpRequest[https://api.redgifs.com/v2/auth/temporary;GET;redgifsbody]]
+        $jsonLoad[redgifsbody;$env[redgifsbody]]
+        $let[redgifstoken;$env[redgifsbody;token]]
+        $if[$get[redgifstoken]!=;$setCache[initclientmusic;authmusic_redgifs;$get[redgifstoken]]]
+        $if[$env[successlog]==true;$logger[Info;$if[$get[redgifstoken]!=;$cropText[$get[redgifstoken];0;10;...];Failed to Retrieve] | Redgifs]]
+    ;$logger[Info;Failed to Retrieve - Redgifs]]
+    $if[$get[redgifstoken]==;
+    $setCache[pornamecachingretry;authretry_redgifs;$sum[$default[$getCache[pornamecachingretry;authretry_redgifs];0];1]]
+    $if[$getCache[pornamecachingretry;authretry_redgifs]<=3;
+    $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_redgifs]/3) - Redgifs]
+    $callFunction[generateAuth;redgifs;;true]
+    ;
+    $deleteCache[pornamecachingretry;authretry_redgifs]
+    $logger[Error;Giving up after 3 attempts - Redgifs]
+    $return
+    ]
+    ;
+    $deleteCache[pornamecachingretry;authretry_redgifs]
+    ]
+    ]
     $return
     `
 } satisfies IForgeFunction;

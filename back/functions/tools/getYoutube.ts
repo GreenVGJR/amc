@@ -23,6 +23,7 @@ export default [{
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $!httpRequest[https://music.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.tabbedSearchResultsRenderer.tabs.tabRenderer.content.sectionListRenderer.contents.musicShelfRenderer.contents.musicResponsiveListItemRenderer(flexColumns(musicResponsiveListItemFlexColumnRenderer(text(runs(text,navigationEndpoint(watchEndpoint/videoId))))),thumbnail(musicThumbnailRenderer(thumbnail(thumbnails(url)))));POST;res]
     $jsonLoad[res;$env[res]]
     $jsonLoad[testfetch;$env[res;contents;tabbedSearchResultsRenderer;tabs;0;tabRenderer;content;sectionListRenderer;contents]]
@@ -36,6 +37,7 @@ export default [{
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,detailedMetadataSnippets,title(runs/text),lengthText(simpleText));POST;res]
     $jsonLoad[res;$env[res]]
     $jsonLoad[dofetch;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents;0;itemSectionRenderer;contents]]
@@ -89,6 +91,7 @@ export default [{
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $httpSetContentType[Text]
     $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title(runs/text),richThumbnail(movingThumbnailRenderer/movingThumbnailDetails/thumbnails/url),lengthText(simpleText),navigationEndpoint(commandMetadata/webCommandMetadata(webPageType))),header.searchHeaderRenderer.chipBar.chipCloudRenderer.chips.chipCloudChipRenderer(text,navigationEndpoint/continuationCommand/token);POST]
     $let[tokens;$advancedTextSplit[$httpResult;"Shorts";1;"token":";1;";0]]
@@ -102,6 +105,7 @@ export default [{
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $httpSetContentType[Text]
     $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=onResponseReceivedCommands.reloadContinuationItemsCommand.continuationItems.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,title(runs/text),richThumbnail(movingThumbnailRenderer/movingThumbnailDetails/thumbnails/url),lengthText(simpleText));POST;res]
     $jsonLoad[res;$env[res]]
@@ -143,6 +147,7 @@ export default [{
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.itemSectionRenderer.contents.videoRenderer(videoId,detailedMetadataSnippets,title(runs/text),richThumbnail(movingThumbnailRenderer/movingThumbnailDetails/thumbnails/url),lengthText(simpleText));POST;res]
     $jsonLoad[res;$env[res]]
     $jsonLoad[findindexres;$env[res;contents;twoColumnSearchResultsRenderer;primaryContents;sectionListRenderer;contents]]
@@ -187,6 +192,7 @@ export default [{
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.sectionListRenderer.contents.shelfRenderer.content.horizontalListRenderer.items;POST;res]
     $jsonLoad[res;$env[res]]
     $jsonLoad[dofetch;$env[res;contents;sectionListRenderer;contents;0;shelfRenderer;content;horizontalListRenderer;items]]
@@ -238,6 +244,7 @@ export default [{
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $!httpRequest[https://music.youtube.com/youtubei/v1/next?prettyPrint=false&fields=contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer(tabs.tabRenderer.endpoint.browseEndpoint.browseId);POST;res]
     $let[browseid;$advancedTextSplit[$env[res];"browseId":";1;";0]]
     $if[$env[line]==true;
@@ -247,6 +254,7 @@ export default [{
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $!httpRequest[https://music.youtube.com/youtubei/v1/browse?prettyPrint=false&fields=responseContext(visitorData),contents.elementRenderer.newElement.type.componentType.model.timedLyricsModel.lyricsData(timedLyricsData(lyricLine,cueRange(startTimeMilliseconds)));POST;pers]
     $jsonLoad[pers;$env[pers]]
     $if[$env[pers;responseContext;visitorData]!=;$setCache[initclientmusic;authmusic_youtube_visitor;$env[pers;responseContext;visitorData]]]
@@ -261,6 +269,7 @@ export default [{
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $!httpRequest[https://music.youtube.com/youtubei/v1/browse?prettyPrint=false&fields=responseContext(visitorData),contents.sectionListRenderer.contents.musicDescriptionShelfRenderer.description(runs/text);POST;res2]
     $jsonLoad[res2;$env[res2]]
     $if[$env[res2;responseContext;visitorData]!=;$setCache[initclientmusic;authmusic_youtube_visitor;$env[res2;responseContext;visitorData]]]
@@ -290,6 +299,7 @@ export default [{
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
     $httpAddHeader[Accept-Language;en]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $httpSetContentType[Text]
     $if[$get[checktoken];
     $!httpRequest[https://m.youtube.com/youtubei/v1/browse?prettyPrint=false&fields=contents.singleColumnBrowseResultsRenderer.tabs.tabRenderer.content.sectionListRenderer.contents.itemSectionRenderer.contents(lockupViewModel/contentId,lockupViewModel/contentType,lockupViewModel/metadata/lockupMetadataViewModel/title/content,lockupViewModel/contentImage/thumbnailViewModel/overlays/thumbnailBottomOverlayViewModel/badges/thumbnailBadgeViewModel/text,continuationItemViewModel/continuationCommand/innertubeCommand/continuationCommand/token);POST;a]
@@ -328,7 +338,6 @@ export default [{
     }],
     code: `
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
-    $let[ytinitcookietest1;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
 
     $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":1,"clientVersion":"2.20261231","visitorData":"$getCache[initclientmusic;authmusic_youtube_visitor]","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
     $!jsonSet[inputhttpquery;videoId;$env[videoId]]
@@ -337,7 +346,7 @@ export default [{
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
-    $httpAddHeader[Cookie;$get[ytinitcookietest1]]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $httpAddHeader[Accept-Language;en]
     $!httpRequest[https://m.youtube.com/youtubei/v1/next?prettyPrint=false&fields=contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results(lockupViewModel);POST;oisdn]
     $jsonLoad[oisdn;$env[oisdn]]
@@ -361,7 +370,6 @@ export default [{
     }],
     code: `
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
-    $let[ytinitcookietest1;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
 
     $jsonLoad[inputhttpquery;{"context":{"client":{"clientName":67,"clientVersion":"1.20261231","visitorData":"$getCache[initclientmusic;authmusic_youtube_visitor]","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
     $!jsonSet[inputhttpquery;playlistId;RDAMVM$env[videoId]]
@@ -370,7 +378,7 @@ export default [{
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
-    $httpAddHeader[Cookie;$get[ytinitcookietest1]]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $httpAddHeader[Accept-Language;en]
     $!httpRequest[https://music.youtube.com/youtubei/v1/next?prettyPrint=false&fields=contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.tabRenderer.content.musicQueueRenderer.content.playlistPanelRenderer.contents(playlistPanelVideoRenderer(videoId,title(runs(text)),thumbnail(thumbnails(url)),lengthText(runs(text)),shortBylineText(runs(text))));POST;oysn]
     $jsonLoad[oysn;$env[oysn]]
@@ -394,7 +402,6 @@ export default [{
     }],
     code: `
     $let[agent;$if[$or[$env[userAgent]==null;$env[userAgent]==];$callFunction[configMusic;default_userAgent_desktop];$env[userAgent]]]
-    $let[ytinitcookietest1;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
 
     $jsonLoad[inputhttpquery;{"params":"EgIQAg%3D%3D","context":{"client":{"clientName":2,"clientVersion":"2.20261231","visitorData":"$getCache[initclientmusic;authmusic_youtube_visitor]","hl":"en","gl":"US"}},"attestationRequest":{"omitBotguardData":false}}]
     $!jsonSet[inputhttpquery;query;$env[channelQuery]]
@@ -403,7 +410,7 @@ export default [{
     $httpAddHeader[User-Agent;$get[agent]]
     $httpAddHeader[Accept-Encoding;gzip, br]
     $httpAddHeader[Content-Type;application/json]
-    $httpAddHeader[Cookie;$get[ytinitcookietest1]]
+    $httpAddHeader[Cookie;$getCache[initclientmusic;authmusic_youtube_tempcookies]]
     $httpAddHeader[Accept-Language;en]
     $!httpRequest[https://m.youtube.com/youtubei/v1/search?prettyPrint=false&fields=contents.sectionListRenderer.contents.itemSectionRenderer.contents.compactChannelRenderer;POST;oisdn]
     $jsonLoad[oisdn;$env[oisdn]]

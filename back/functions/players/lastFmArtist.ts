@@ -22,7 +22,7 @@ $let[showEmbed;$if[$or[$env[showEmbed]==null;$env[showEmbed]==];true;$env[showEm
 $let[country;0]
 
 $let[cusque;$env[query]]
-$let[authorurl;https://www.last.fm/music/$encodeURI[$toLowercase[$get[cusque]]]]
+$let[authorurl;https://www.last.fm/music/$encodeURI[$toTitleCase[$get[cusque]]]]
 $let[lookCacheYT;$getCache[initclientmusic;musicplayer_cache-lastfmyt-$md5[$get[cusque]]]]
 
 $localFunction[fetchlastfm;
@@ -32,15 +32,10 @@ $if[$or[$get[lookCache]==null;$get[country]>=9];$return]
 $if[$env[retry]==true;$letSum[country;1]]
 $if[$or[$get[lookCache]==undefined;$get[lookCache]==];
 $try[
-$httpAddHeader[Accept;text/html, */*]
-$httpAddHeader[Accept-Language;en]
-$httpAddHeader[User-Agent;$get[agent]]
-$httpAddHeader[Sec-Fetch-Dest;document]
-$httpAddHeader[Sec-Fetch-Site;none]
 $httpSetContentType[Text]
-$let[checkhttp;$httpRequest[$get[authorurl]?_pjax=%23content&top_tracks_date_preset=ALL;GET]]
+$let[checkhttp;$httpRequest[$get[authorurl];GET]]
 $c[Last fm has weird anti-bot protect fr]
-$if[$or[$get[checkhttp]==502;$get[checkhttp]==416;$get[checkhttp]==429;$get[checkhttp]==406];$callLocalFunction[fetchlastfm;true] $return]
+$if[$or[$get[checkhttp]==502;$get[checkhttp]==416;$get[checkhttp]==429;$get[checkhttp]==406;$get[checkhttp]==600;$get[checkhttp]==];$callLocalFunction[fetchlastfm;true] $return]
 $let[reslast;$httpResult]
 ]
 ;
@@ -48,7 +43,7 @@ $let[reslast;$get[lookCache]]
 ]
 ;retry]
 $callLocalFunction[fetchlastfm;false]
-$if[$advancedTextSplit[$get[reslast];tnew-title;1;intabbr;1;">;1;</abbr>;0]==;
+$if[$advancedTextSplit[$get[reslast];header-new-title;1;">;1]==;
 $setCache[initclientmusic;musicplayer_cache-lastfm-$md5[$get[cusque]];"null"]
 $return[null]
 ]
@@ -132,7 +127,7 @@ $if[$get[bannerchannelurl]!=;
 $image[$get[bannerchannelurl];0]
 ]
 $if[$get[conttracks]!=;
-$author[Top Tracks | All time;$advancedTextSplit[$get[reslast];rel="apple-music-app-icon";1;href=";1;";0];;1]
+$author[Top Tracks | Last 7 Days;$advancedTextSplit[$get[reslast];rel="apple-music-app-icon";1;href=";1;";0];;1]
 $description[$get[conttracks];1]
 $if[$get[firstcovtop]!=;$thumbnail[$get[firstcovtop];1]]
 $color[$get[checkcolor];1]

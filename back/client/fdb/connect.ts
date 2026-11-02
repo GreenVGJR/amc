@@ -59,6 +59,8 @@ export default [{
     $async[$callFunction[generateAuth;applemusic;;true]]
     $async[$callFunction[generateAuth;tidal_token;;true]]
     $async[$callFunction[generateAuth;deezer;;true]]
+    $async[$callFunction[generateAuth;reddit;;true]]
+    $async[$callFunction[generateAuth;redgifs;;true]]
     `
 },
 {

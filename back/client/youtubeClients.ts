@@ -43,9 +43,9 @@ const list_clients: Record<string, YoutubeClientConfig> = {
         "client_id": null,
         "client_secret": null,
         "clientName": 3,
-        "clientVersion": "21.38.123",
+        "clientVersion": "21.44.528",
         "androidSdkVersion": 36,
-        "userAgent": "com.google.android.youtube/21.38.123 (Linux; U; Android 16; en_US; SM-S908E Build/TP1A.220624.014) gzip",
+        "userAgent": "com.google.android.youtube/21.44.528 (Linux; U; Android 16; en_US; SM-S908E Build/TP1A.220624.014) gzip",
         "osName": "Android",
         "osVersion": "16"
     },

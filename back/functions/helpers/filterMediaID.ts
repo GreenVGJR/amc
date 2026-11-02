@@ -31,6 +31,12 @@ export default {
     $if[$endsWith[$get[host];deezer.com];$let[type;deezer]]
     $if[$and[$endsWith[$get[host];instagram.com];$startsWith[$get[paths];/reels/audio/]];$let[type;instagramaudio];$if[$endsWith[$get[host];instagram.com];$let[type;instagram]]]
     $if[$endsWith[$get[host];threads.com];$let[type;threads]]
+    $let[reddithost;$or[$get[host]==reddit.com;$endsWith[$get[host];.reddit.com];$get[host]==redditmedia.com;$endsWith[$get[host];.redditmedia.com];$get[host]==redd.it]]
+    $if[$get[reddithost]==true;
+    $let[type;reddit]
+    $if[$and[$startsWith[$get[paths];/r/];$advancedTextSplit[$get[paths];/;3]==s];$let[type;redditshare]]
+    ]
+    $if[$endsWith[$get[host];redgifs.com];$let[type;redgifs]]
     $if[$endsWith[$get[host];facebook.com];$let[type;facebook]]
     $if[$endsWith[$get[host];bandcamp.com];$let[type;bandcamp]]
     $if[$or[$endsWith[$get[host];x.com];$endsWith[$get[host];twitter.com]];$let[type;twitter]]

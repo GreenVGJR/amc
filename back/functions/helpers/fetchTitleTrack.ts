@@ -107,6 +107,10 @@ export default {
     $let[author;$env[a;results;author]]
     $let[title;$env[a;results;title]]
     ]
+    $if[$or[$env[filtype;type]==reddit;$env[filtype;type]==redditshare;$env[filtype;type]==redgifs];
+    $let[author;$env[a;results;author]]
+    $let[title;$env[a;results;title]]
+    ]
     $let[author;$trim[$if[$checkContains[$toLowercase[$toCamelCase[$get[title]]];$toLowercase[$toCamelCase[$get[author]]]]==false;$get[author]]]]
     $let[finaltitle;$get[author]$if[$and[$get[author]!=;$get[title]!=]; - ]$get[title]]
     $return[$get[finaltitle]]

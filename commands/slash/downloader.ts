@@ -7,7 +7,7 @@ export default {
       {
         "type": 3,
         "name": "url",
-        "description": "Youtube, Soundcloud, Spotify, Apple Music, Tiktok, Twitter, Instagram, Threads, Facebook, Bandcamp",
+        "description": "Link",
         "required": true,
         "min_length": 8
       },
@@ -100,7 +100,7 @@ $onlyIf[$channelHasPerms[$channelID;$clientID;AttachFiles];$ephemeral $callFunct
 $if[$or[$and[$channelExists[$channelID]==false;$option[ephemeral]!=false];$and[$channelExists[$channelID]==true;$option[ephemeral]==true]];$ephemeral]
 $localFunction[runcodessync;
 $let[mid;$interactionReply[
-$addField[Type;\`$toTitleCase[$advancedReplace[$env[musictype;type];tiktokmusic;tiktok music;tiktokmob;tiktok mobile;instagramaudio;instagram audio;applemusic;apple music]]\`;true]
+$addField[Type;\`$toTitleCase[$advancedReplace[$env[musictype;type];tiktokmusic;tiktok music;tiktokmob;tiktok mobile;instagramaudio;instagram audio;applemusic;apple music;redditshare;reddit share]]\`;true]
 $addField[Length Size;$if[$get[clh]==;\`null\`;\`$get[clh]\`\n-# $round[$divide[$get[clh];1024;1024];2] MB - $round[$divide[$get[limitsize];1024;1024];2] MB];true]
 $addField[Format;\`$if[$get[converttype]==;null;.$get[contenttype]$if[$get[contenttype]!=$get[converttype]; => .$get[converttype]]]\`;true]
 $addField[File Name;$if[$and[$option[lyrics]==true;$get[checklyric]];$codeBlock[$default[$get[lyricnames];null]]]$codeBlock[$default[$get[names];null]]$if[$and[$has[checklyric];$get[checklyric]==false];\n-# WARNING: Lyrics not available];false]
@@ -192,6 +192,10 @@ $if[$get[s-fetch]!=false;$break]
 $wait[10]
 ]
 ]
+]
+$if[$and[$get[vafmode]==true;$isJSON[$get[storeobjecthttp]]];
+$jsonLoad[imagecheck;$get[storeobjecthttp]]
+$if[$env[imagecheck;results;images;1]!=;$return[$callLocalFunction[vnmlcodes;chain]]]
 ]
 $if[$advancedTextSplit[$trimLines[$get[getcdn]];|;0]!=bot;
 ;
