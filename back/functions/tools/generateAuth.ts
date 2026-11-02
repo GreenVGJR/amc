@@ -776,7 +776,6 @@ export default {
         $logger[Warn;You have been blocked. - Reddit]
         ]
         $let[abortscrd;true]
-        $return
         ]
         $if[$get[kkjvns]==false;
         $let[kkasgcv;]
@@ -787,9 +786,9 @@ export default {
         $let[kkasgcv;$callFunction[filterCookies;2;$get[kkasg];over18=true]]
         $if[$get[kkasgcv]!=;$setCache[initclientmusic;authmusic_reddit;$get[kkasgcv]]]
         ]
-        $if[$and[$get[kklasgoc]!=true;$env[successlog]==true];$logger[Info;$if[$get[kkasgcv]!=;$cropText[$get[kkasgcv];0;10;...];Failed to Retrieve] | Reddit / Cookies]]
+        $if[$and[$get[abortscrd]!=true;$get[kklasgoc]!=true;$env[successlog]==true];$logger[Info;$if[$get[kkasgcv]!=;$cropText[$get[kkasgcv];0;10;...];Failed to Retrieve] | Reddit / Cookies]]
     ;$logger[Info;Failed to Retrieve - Reddit]]
-    $if[$get[kkasgcv]==;
+    $if[$and[$get[kkasgcv]==;$get[abortscrd]!=true];
     $setCache[pornamecachingretry;authretry_reddit;$sum[$default[$getCache[pornamecachingretry;authretry_reddit];0];1]]
     $if[$getCache[pornamecachingretry;authretry_reddit]<=3;
     $logger[Warn;Re-trying ($getCache[pornamecachingretry;authretry_reddit]/3) - Reddit]
@@ -797,7 +796,6 @@ export default {
     ;
     $deleteCache[pornamecachingretry;authretry_reddit]
     $logger[Error;Giving up after 3 attempts - Reddit]
-    $return
     ]
     ;
     $deleteCache[pornamecachingretry;authretry_reddit]
