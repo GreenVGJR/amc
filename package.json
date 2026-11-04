@@ -8,7 +8,7 @@
   "dependencies": {
     "@nationdex/edge": "github:nationdex/edge",
     "@nationdex/qdb": "github:nationdex/qdb",
-    "@snazzah/davey": "^0.2.0",
+    "@snazzah/davey": "0.1.12",
     "@tryforge/forge.music": "github:tryforge/ForgeMusic#main",
     "@tryforge/forgescript": "^2.8.0",
     "bgutils-js": "^4.0.3",
