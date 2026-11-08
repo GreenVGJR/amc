@@ -5,6 +5,7 @@
 declare module "discord-player-youtubei" {
   export const YoutubeExtractor: any;
   export type YoutubeExtractor = any;
+  export const YOUTUBE_LOGO: any;
 }
 
 declare module "discord-player-soundcloud" {

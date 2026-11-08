@@ -4,10 +4,11 @@ import "./back/client/youtubeiLogs.ts";
 import dotenv from "dotenv";
 dotenv.config({ quiet: true }); // Load Environment
 import toggles from "./back/config.json" with { type: "json" };
-import youtube from "./back/client/youtubeConfig.ts";
+import youtube, { resolveYoutubeMetadata } from "./back/client/youtubeConfig.ts";
 
 // Main
 import { ForgeClient, LogPriority } from "@tryforge/forgescript";
+import { QueryType, Util } from "discord-player";
 import { ForgeMusic, GuildQueueEvent } from "@tryforge/forge.music";
 import { QuorielDB } from "@nationdex/qdb";
 import { QuorielEdge } from "@nationdex/edge";
@@ -39,7 +40,7 @@ const customCaching = (manager: any) => {
 };
 
 import { installTypeScriptModuleLoaders } from "./back/client/typescriptLoaders.ts";
-import { YoutubeExtractor } from "discord-player-youtubei";
+import { YoutubeExtractor, YOUTUBE_LOGO } from "discord-player-youtubei";
 
 // Disable DSP compressor by default for discord-player
 import { FiltersChain } from "@discord-player/equalizer";
@@ -84,7 +85,30 @@ const music = new ForgeMusic({
         leaveOnEmpty: false,
         leaveOnEnd: false,
         leaveOnStop: false,
-        pauseOnEmpty: false
+        pauseOnEmpty: false,
+        onBeforeCreateStream: async (track, queryType) => {
+            if (queryType !== QueryType.YOUTUBE_VIDEO) return null;
+
+            const videoId = track.url.split("v=")[1]?.split("&")[0];
+            if (videoId) {
+                const metadata = await resolveYoutubeMetadata(videoId).catch(() => null);
+                if (metadata) {
+                    if (metadata.title) track.title = metadata.title;
+                    if (metadata.author) track.author = metadata.author;
+                    if (metadata.lengthSeconds > 0) track.duration = Util.buildTimeCode(Util.parseMS(metadata.lengthSeconds * 1000));
+                    if (!track.thumbnail || track.thumbnail === YOUTUBE_LOGO) track.thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                }
+            }
+
+            try {
+                const createStream = (youtube as any).createStream;
+                if (typeof createStream !== "function") return null;
+                const stream = await createStream(track);
+                return stream && typeof stream.pipe === "function" ? stream : null;
+            } catch {
+                return null;
+            }
+        }
     }
 } as any);
 

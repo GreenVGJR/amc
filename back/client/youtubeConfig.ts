@@ -1130,6 +1130,72 @@ async function fallbackYTStream(lstracks, trackInfo?: any) {
 	}
 }
 
+function pickWatchRenderer(contents: any[], key: string) {
+	if (!Array.isArray(contents)) return null;
+	for (const item of contents) {
+		if (item?.[key]) return item[key];
+	}
+	return null;
+}
+
+export async function resolveYoutubeMetadata(videoId: string) {
+	if (!videoId) return null;
+	try {
+		const playerRes = await fetch(`https://m.youtube.com/youtubei/v1/player?prettyPrint=false&fields=responseContext(visitorData),playabilityStatus,videoDetails(videoId,title,author,lengthSeconds)`, {
+			method: "POST",
+			headers: {
+				"Accept-Language": "en-US",
+				"Content-Type": "application/json",
+				"User-Agent": APIuserAgent,
+				...(tempytcookies ? { Cookie: tempytcookies } : {}),
+			},
+			body: JSON.stringify({
+				videoId,
+				context: { client: { clientName: 2, clientVersion: "2.20261231", visitorData: vt, hl: "en", gl: "US" } },
+			}),
+		});
+		const player = await playerRes.json().catch(() => null);
+
+		const newVt = player?.responseContext?.visitorData;
+		if (newVt) {
+			vt = newVt;
+			actuallk.visitorData = newVt;
+			setVisitorData(newVt);
+		}
+
+		const details = player?.videoDetails;
+		if (player?.playabilityStatus?.status === "OK" && details?.videoId) {
+			return {
+				title: details.title,
+				author: details.author,
+				lengthSeconds: Number(details.lengthSeconds) || 0,
+			};
+		}
+
+		const pageRes = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+      headers: {
+				"Accept-Language": "en-US",
+				"User-Agent": APIuserAgent,
+				...(tempytcookies ? { Cookie: tempytcookies } : {}),
+			},
+		});
+		const html = await pageRes.text();
+		const raw = html.split("var ytInitialData =")[1]?.split(";")[0];
+		if (!raw) return null;
+		const init = JSON.parse(raw);
+		const contents = init?.contents?.twoColumnWatchNextResults?.results?.results?.contents;
+		const primary = pickWatchRenderer(contents, "videoPrimaryInfoRenderer");
+		const secondary = pickWatchRenderer(contents, "videoSecondaryInfoRenderer");
+		const title = primary?.title?.runs?.[0]?.text;
+		const author = secondary?.owner?.videoOwnerRenderer?.title?.runs?.[0]?.text;
+		if (!title && !author) return null;
+		const lengthMatch = html.match(/"lengthSeconds":"(\d+)"/) || html.match(/"lengthSeconds":(\d+)/);
+		return { title, author, lengthSeconds: lengthMatch ? Number(lengthMatch[1]) : 0 };
+	} catch {
+		return null;
+	}
+}
+
 export default {
 	get cookie() {
 		return ytcookiesapi;

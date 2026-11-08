@@ -35,6 +35,7 @@ export default {
         ]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpAddHeader[Accept-Encoding;gzip, deflate, br]
+        $httpAddHeader[Accept-Language;en-US]
         $httpAddHeader[Sec-Fetch-Dest;document]
         $httpAddHeader[Sec-Fetch-Site;none]
         $httpSetContentType[Text]
@@ -482,7 +483,7 @@ export default {
     $if[$or[$env[type]==all;$env[type]==amazonmusic];
     $if[$get[typedebug];$chalkLog[Generating Amazon Music        | Config & Token;cyan]]
     $try[
-        $httpAddHeader[Origin;https://music.amazon.com/]    
+        $httpAddHeader[Origin;https://music.amazon.com/]
         $httpAddHeader[Referer;https://music.amazon.com/]
         $httpAddHeader[User-Agent;$get[agent]]
         $httpSetContentType[Text]
