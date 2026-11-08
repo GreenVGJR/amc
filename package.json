@@ -22,7 +22,7 @@
     "entities": "^9.0.0",
     "forgeH2": "github:GreenVGJR/ForgeH2#main",
     "googlevideo": "^5.0.1",
-    "jsdom": "^30.1.3",
+    "jsdom": "^31.0.0",
     "lmdb": "^3.5.9",
     "mediaplex": "^1.0.0",
     "simple-ytdl-core": "^1.2.2",
