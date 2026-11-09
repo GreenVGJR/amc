@@ -113,18 +113,6 @@ export default {
   $setCache[initclientmusic;musicplayer_message_$guildID_messageid;"$get[mid]"]
   ]
   ]
-  $if[$env[typesload]==1-3;
-  $let[mid;$interactionReply[
-  $author[» $env[cstmgod]\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
-  $addField[Query;$codeBlock[$cropText[$get[filquery];0;1000]]]
-  $footer[$if[$and[$get[iscreatedfirst]==false;$option[force_skip]==true];$callFunction[useCustomMusicMessage;config_generalForceSkipTrack]]$env[cstmgos];$callFunction[useIcon;loading]]
-  $color[$callFunction[useIcon;color_embed]]
-  ;$get[iscreatedfirst]]]
-  $if[$or[$get[iscreatedfirst];$getCache[initclientmusic;musicplayer_message_$guildID_channelid]==;$voiceID[$guildID;$clientID]==];
-  $setCache[initclientmusic;musicplayer_message_$guildID_channelid;"$channelID"]
-  $setCache[initclientmusic;musicplayer_message_$guildID_messageid;"$get[mid]"]
-  ]
-  ]
   $if[$env[typesload]==2;
   $let[mid;$interactionReply[
   $author[» Fetching\n$userDisplayName[$authorID];$userAvatar[$authorID;1024];;0]
@@ -178,7 +166,7 @@ export default {
   $footer[slash]
   ]
   ]
-  ;typesload;cstmgod;cstmgos]
+  ;typesload]
 
   $let[default_provider;$callFunction[configMusic;default_provider]]
   $let[fallback_provider;$callFunction[configMusic;fallback_provider]]
@@ -203,21 +191,21 @@ export default {
   ]
   ]
   $if[$get[iscreatedfirst];
-  $callLocalFunction[loadinteraction;1-1;;]
+  $callLocalFunction[loadinteraction;1-1]
   $if[$and[$voiceID[$guildID;$clientID]==;$getCache[initclientmusic;musicplayer_message_$guildID_is247music]==true];
   $callFunction[bulkMusicPlayer;false]
   $let[nhbmk;$callFunction[destroyPlayer]]
   ]
   $let[ml;$try[$callFunction[joinVC]]]
   ;
-  $callLocalFunction[loadinteraction;1-1;;]
+  $callLocalFunction[loadinteraction;1-1]
   ]
   $loop[-1;
   $if[$get[fsearch]!=false;$break]
   $wait[5]
   ]
   $if[$get[fsearch]==null;
-  $callLocalFunction[loadinteraction;error-1;;]
+  $callLocalFunction[loadinteraction;error-1]
   $if[$get[iscreatedfirst]==false;$setTimeout[$async[$!interactionDelete];3s]]
   $stop
   ]
@@ -236,64 +224,20 @@ export default {
   $let[music_playurl;$if[$env[whatmusictype;type]==youtubeplaylist;https://youtube.com/playlist?list=$env[whatmusictype;id];$if[$env[whatmusictype;type]==youtube;https://youtube.com/watch?v=$env[whatmusictype;id];$if[$env[whatmusictype;type]==soundcloud;https://soundcloud.com/$env[whatmusictype;id];$if[$env[whatmusictype;type]==spotify;https://open.spotify.com/$env[whatmusictype;id];$get[filquery]]]]]]
   ]
 
+  $let[found;false]
+  $let[attemptry;0]
+  $let[donetry;5]
+
   $if[$get[basic_type];
-  $callLocalFunction[loadinteraction;2;;]
-  ;
-  $if[$env[whatmusictype;type]==youtubeplaylist;
-  $callLocalFunction[loadinteraction;1-3;Fetching Playlist;Please Wait]
-  $if[$get[iscreatedfirst]==true;$let[ml;$try[$callFunction[joinVC]]]]
-  $jsonLoad[nisndytplbs;$callFunction[slicePlaylistYT;$env[whatmusictype;id]]]
-  $if[$arrayLength[nisndytplbs]==0;
-  $callLocalFunction[loadinteraction;error-1;;]
-  $if[$get[iscreatedfirst]==false;$setTimeout[$async[$!interactionDelete];3s]]
-  $stop
-  ]
-  $if[$get[iscreatedfirst]==false;
-  $callLocalFunction[loadinteraction;1-3;Adding to Queue;Deleting after 3 seconds]
-  $setTimeout[$async[$!interactionDelete];3s]
+  $if[$get[found]==false;
+  $callLocalFunction[loadinteraction;2]
   ]
   ;
-  $callLocalFunction[loadinteraction;1-2;;]
-  ]
+  $callLocalFunction[loadinteraction;1-2]
   ]
 
-  $if[$env[whatmusictype;type]==youtubeplaylist;
-  $let[forceabortytpl;false]
-  $arrayForEach[nisndytplbs;yyoijs;
-  $if[$or[$get[forceabortytpl]==true;$hasMusicNode!=true];
-  $let[forceabortytpl;true]
-  ;
-  $let[found;false]
-  $let[attemptry;0]
-  $let[donetry;5]
   $async[
-  $let[lockprovyt;youtubeVideo]
-
-  $while[$and[$get[attemptry]<=$get[donetry];$get[found]==false];
-    $try[
-    $playTrack[$voiceID;$env[yyoijs;url];$get[lockprovyt]]
-    $let[found;true]
-    ;
-    $if[$env[whatmusictype;type]==youtube;
-    $if[$get[attemptry]==2;$let[lockprovyt;youtube]]
-    ]
-    $letSum[attemptry;1]
-    ;causeplayerror]
-  ]
-
-  ]]
-
-  $loop[-1;
-  $if[$or[$get[attemptry]>=$get[donetry];$get[found]==true];$break]
-  $wait[5]
-  ]
-
-  ]
-  ;
-  $let[found;false]
-  $let[attemptry;0]
-  $let[donetry;5]
-  $async[
+  $let[queue_lengthtemp;$if[$hasMusicNode;$try[$queueLength;0];0]]
   $let[lockprovyt;youtubeVideo]
 
   $if[$get[basic_type];
@@ -305,7 +249,7 @@ export default {
     $if[$env[whatmusictype;type]==youtube;
     $playTrack[$voiceID;$trimLines[$get[music_playurl]];$get[lockprovyt]]
     ;
-    $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==applemusic;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify]!=true;
+    $if[$or[$env[whatmusictype;type]==null;$env[whatmusictype;type]==applemusic;$env[whatmusictype;type]==soundcloud;$env[whatmusictype;type]==spotify;$env[whatmusictype;type]==youtubeplaylist]!=true;
     $playTrack[$voiceID;$trimLines[$get[music_playurl]];$env[whatmusictype;type]]
     ;
     $playTrack[$voiceID;$trimLines[$get[music_playurl]];auto]
@@ -321,7 +265,6 @@ export default {
 
   $deleteCache[initclientmusic;musicplayer_checkmessage_ytwarm_$guildID]
   ]
-  ]
 
   $loop[-1;
   $if[$or[$get[attemptry]>=$get[donetry];$get[found]==true];$break]
@@ -335,7 +278,7 @@ export default {
   $deleteCache[initclientmusic;musicplayer_message_$guildID_messageid]
   $deleteCache[initclientmusic;musicplayer_message_$guildID_channelid]
   ]
-  $callLocalFunction[loadinteraction;error-2;;]
+  $callLocalFunction[loadinteraction;error-2]
   $if[$get[iscreatedfirst]==false;$setTimeout[$async[$!interactionDelete];3s]]
   $stop
   ]
@@ -349,7 +292,7 @@ export default {
   $!interactionDelete
   ]]
   $if[$option[force_skip]!=true;
-  $callLocalFunction[loadinteraction;3;;]
+  $callLocalFunction[loadinteraction;3]
   $setTimeout[$async[$!interactionDelete];1s]
   $callFunction[updateCurrentMusicPlayer;false]
   ]

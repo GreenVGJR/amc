@@ -7,8 +7,8 @@ import toggles from "./back/config.json" with { type: "json" };
 import youtube, { resolveYoutubeMetadata } from "./back/client/youtubeConfig.ts";
 
 // Main
-import { ForgeClient, LogPriority } from "@tryforge/forgescript";
-import { QueryType, Util } from "discord-player";
+import { ForgeClient, LogPriority, Logger } from "@tryforge/forgescript";
+import { Util } from "discord-player";
 import { ForgeMusic, GuildQueueEvent } from "@tryforge/forge.music";
 import { QuorielDB } from "@nationdex/qdb";
 import { QuorielEdge } from "@nationdex/edge";
@@ -18,29 +18,8 @@ import { ForgeH2 } from "forgeH2";
 // Extractor warmup (background, retried, logged - see back/client/extractorWarmup.ts)
 import { warmupExtractors } from "./back/client/extractorWarmup.ts";
 
-import { Collection, LimitedCollection } from "discord.js";
-const djsCacheLimits: Record<string, number> = {
-    MessageManager: 50,
-    ThreadManager: 25,
-    ReactionManager: 25,
-    ReactionUserManager: 25,
-    ThreadMemberManager: 25,
-    UserManager: 500,
-    GuildInviteManager: 0,
-    GuildBanManager: 0,
-    AutoModerationRuleManager: 0,
-    GuildScheduledEventManager: 0,
-    StageInstanceManager: 0,
-    PresenceManager: 0
-};
-const customCaching = (manager: any) => {
-    const maxSize = djsCacheLimits[manager?.constructor?.name];
-    if (maxSize === undefined) return new Collection();
-    return new LimitedCollection({ maxSize });
-};
-
 import { installTypeScriptModuleLoaders } from "./back/client/typescriptLoaders.ts";
-import { YoutubeExtractor, YOUTUBE_LOGO } from "discord-player-youtubei";
+import { YoutubeExtractor } from "./back/client/youtubeExtractor.ts";
 
 // Disable DSP compressor by default for discord-player
 import { FiltersChain } from "@discord-player/equalizer";
@@ -77,8 +56,6 @@ const music = new ForgeMusic({
     blockStreamFrom: toggles.disable_YT ? [YoutubeExtractor.identifier] : [],
     connectOptions: {
         disableFallbackStream: true,
-        disableBiquad: true,
-        maxHistorySize: 1,
         ...(!toggles.useNativeStream && { bufferingTimeout: 250 }),
         connectionTimeout: 30000,
         volume: 50,
@@ -86,17 +63,18 @@ const music = new ForgeMusic({
         leaveOnEnd: false,
         leaveOnStop: false,
         pauseOnEmpty: false,
-        onBeforeCreateStream: async (track, queryType) => {
-            if (queryType !== QueryType.YOUTUBE_VIDEO) return null;
+        onBeforeCreateStream: async (track) => {
+            const videoId = track.url?.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/)?.[1];
+            if (!videoId) return null;
 
-            const videoId = track.url.split("v=")[1]?.split("&")[0];
-            if (videoId) {
+            if (track.raw?.youtubeResolved !== true) {
                 const metadata = await resolveYoutubeMetadata(videoId).catch(() => null);
+                if (!metadata) Logger.warn(`/ [YoutubeConfig] metadata miss | ${videoId} | ${track.url}`);
                 if (metadata) {
                     if (metadata.title) track.title = metadata.title;
                     if (metadata.author) track.author = metadata.author;
                     if (metadata.lengthSeconds > 0) track.duration = Util.buildTimeCode(Util.parseMS(metadata.lengthSeconds * 1000));
-                    if (!track.thumbnail || track.thumbnail === YOUTUBE_LOGO) track.thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                    if (!track.thumbnail) track.thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
                 }
             }
 
@@ -115,11 +93,6 @@ const music = new ForgeMusic({
 const client = new ForgeClient({
     token: process.env.DISCORD_TOKEN,
     logLevel: LogPriority.Medium,
-    makeCache: customCaching,
-    sweepers: {
-        messages: { interval: 1800, lifetime: 3600 },
-        threads: { interval: 3600, lifetime: 3600 }
-    },
     intents: [
         "Guilds",
         "GuildMembers",
@@ -147,7 +120,7 @@ const client = new ForgeClient({
     waitGuildTimeout: 60000,
 } as any);
 
-warmupExtractors(music.player, { youtube });
+warmupExtractors(music.player);
 
 installTypeScriptModuleLoaders();
 

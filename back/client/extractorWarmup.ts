@@ -1,5 +1,5 @@
 import { Logger } from "@tryforge/forgescript";
-import { YoutubeExtractor } from "discord-player-youtubei";
+import { YoutubeExtractor } from "./youtubeExtractor.ts";
 import { SoundcloudExtractor } from "discord-player-soundcloud";
 import { SpotifyExtractor } from "discord-player-spotify";
 import { AppleMusicExtractor } from "discord-player-applemusic";
@@ -40,7 +40,7 @@ async function primeExtractor(label: string, fn: () => Promise<void>, emit: (msg
     }
 }
 
-export async function warmupExtractors(player: any, { youtube, log, retries = 3, backoffMs = 5000 }: { youtube?: any; log?: (...args: any[]) => void; retries?: number; backoffMs?: number } = {}) {
+export async function warmupExtractors(player: any, { log, retries = 3, backoffMs = 5000 }: { log?: (...args: any[]) => void; retries?: number; backoffMs?: number } = {}) {
     const emit = typeof log === "function" ? log : (...args: any[]) => Logger.info(...args);
     try {
         try {
@@ -55,7 +55,7 @@ export async function warmupExtractors(player: any, { youtube, log, retries = 3,
             [SpotifyExtractor, undefined],
             [AppleMusicExtractor, undefined],
             [AttachmentExtractor, undefined],
-            [YoutubeExtractor, youtube]
+            [YoutubeExtractor, undefined]
         ];
         const results = await Promise.allSettled(
             list.map(([Cls, opts]) => registerWithRetry(player, Cls, opts, emit, retries, backoffMs))

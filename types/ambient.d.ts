@@ -1,13 +1,3 @@
-// Ambient declarations for third-party packages that ship no TypeScript types.
-// Kept intentionally loose (any) - these are only used at their existing call
-// sites, so this preserves current runtime behavior while satisfying `tsc`.
-
-declare module "discord-player-youtubei" {
-  export const YoutubeExtractor: any;
-  export type YoutubeExtractor = any;
-  export const YOUTUBE_LOGO: any;
-}
-
 declare module "discord-player-soundcloud" {
   export const SoundcloudExtractor: any;
   export type SoundcloudExtractor = any;

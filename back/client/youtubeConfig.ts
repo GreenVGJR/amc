@@ -77,10 +77,13 @@ async function readBodyText(res) {
 
 async function parseJsonGuarded(res, label) {
 	const text = await readBodyText(res);
+	const snippet = (text || "").slice(0, 160).replace(/\s+/g, " ");
+	if (res.status === 403 || res.status === 429) {
+		throw new Error(`InnerTube ${label} failed: HTTP ${res.status}${res.statusText ? " " + res.statusText : ""}: ${snippet || "<empty body>"}`);
+	}
 	try {
 		return JSON.parse(text);
 	} catch {
-		const snippet = (text || "").slice(0, 160).replace(/\s+/g, " ");
 		throw new Error(`InnerTube ${label} failed: HTTP ${res.status}${res.statusText ? " " + res.statusText : ""}: ${snippet || "<empty body>"}`);
 	}
 }
@@ -319,7 +322,7 @@ function createChunkedStream(url, totalSize, videoId, ext) {
 		});
 	}
 
-	const maxRetries = 3;
+	const maxRetries = 5;
 
 	async function fetchChunk(startByte) {
 		let end = startByte + chunkSize - 1;
@@ -618,7 +621,7 @@ const warmupEmbeddedClient = async () => {
 };
 warmupEmbeddedClient();
 
-async function fallbackYTStream(lstracks, trackInfo?: any) {
+export async function fallbackYTStream(lstracks, trackInfo?: any) {
 	refreshYtAuth();
 	embeddedRetried = false;
 
@@ -769,7 +772,7 @@ async function fallbackYTStream(lstracks, trackInfo?: any) {
 			let durationLength = null;
 			let fr = null;
 
-			for (let prAttempt = 0; prAttempt < 2; prAttempt++) {
+			for (let prAttempt = 0; prAttempt < 6; prAttempt++) {
 				const shouldUseAuth = useAuthMode || Date.now() < authRequiredUntil;
 
 				let sessionPoToken = poToken;
@@ -853,7 +856,7 @@ async function fallbackYTStream(lstracks, trackInfo?: any) {
 						await generateSessionPoToken(actuallk.visitorData, true);
 					}
 					await generateVisitor();
-					if (prAttempt === 0) continue;
+					if (prAttempt < 5) continue;
 					throw fetchErr;
 				}
 
@@ -1035,7 +1038,7 @@ async function fallbackYTStream(lstracks, trackInfo?: any) {
 				let filterlocation;
 				let secfinalurl;
 				let finalWithPot;
-				const maxHeadRetries = 4;
+				const maxHeadRetries = 5;
 				const headCheck = (url) =>
 					fetch(url, {
 						method: "HEAD",
@@ -1048,7 +1051,7 @@ async function fallbackYTStream(lstracks, trackInfo?: any) {
 						secfinalurl = filterlocation.url;
 						finalWithPot = contentPoToken && !secfinalurl.includes("pot=") ? secfinalurl + "&pot=" + contentPoToken : secfinalurl;
 
-						if (filterlocation.status !== 403 || !changeLength || skipOnCheckFormat) {
+						if ((filterlocation.status !== 403 && filterlocation.status !== 429) || !changeLength || skipOnCheckFormat) {
 							break;
 						}
 
@@ -1062,7 +1065,7 @@ async function fallbackYTStream(lstracks, trackInfo?: any) {
 					finalWithPot = finalurl + (contentPoToken ? "&pot=" + contentPoToken : "");
 				}
 
-				if (filterlocation.status === 403 && changeLength) {
+				if ((filterlocation.status === 403 || filterlocation.status === 429) && changeLength) {
 					if (isWebClient && !forceLegacy) {
 						continue;
 					}
@@ -1130,6 +1133,184 @@ async function fallbackYTStream(lstracks, trackInfo?: any) {
 	}
 }
 
+async function fetchYoutubeWithRetry(run: () => Promise<Response>, retries = 5) {
+	let response: Response;
+	for (let attempt = 0; attempt <= retries; attempt++) {
+		response = await run();
+		if (response.status !== 403 && response.status !== 429) return response;
+		if (attempt === retries) return response;
+		await generateVisitor();
+		await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
+	}
+	return response!;
+}
+
+function parsePlaylistItem(item: any) {
+	const lockup = item?.lockupViewModel;
+	if (lockup) {
+		const type = lockup.contentType;
+		if (type !== "LOCKUP_CONTENT_TYPE_VIDEO" && type !== "LOCKUP_CONTENT_TYPE_MUSIC") return null;
+		const id = lockup.contentId;
+		if (!id) return null;
+		const metadata = lockup.metadata?.lockupMetadataViewModel;
+		const title = metadata?.title?.content || metadata?.title?.simpleText || id;
+		const author = metadata?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.text?.content || "";
+		const overlays = lockup.contentImage?.thumbnailViewModel?.overlays || [];
+		let duration = "";
+		for (const overlay of overlays) {
+			const badges = overlay?.thumbnailBottomOverlayViewModel?.badges || [];
+			for (const badge of badges) {
+				const text = badge?.thumbnailBadgeViewModel?.text;
+				if (text && (text === "LIVE" || /\d+:\d+/.test(text))) {
+					duration = text;
+					break;
+				}
+			}
+			if (duration) break;
+		}
+		const thumbnail = lockup.contentImage?.thumbnailViewModel?.image?.sources?.at(-1)?.url || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+		return { id, title, author, duration, thumbnail, live: duration === "LIVE" };
+	}
+
+	const video = item?.playlistVideoRenderer || item?.videoRenderer;
+	if (video?.videoId) {
+		const title = video.title?.runs?.map((run: any) => run.text).join("") || video.title?.simpleText || video.videoId;
+		const author = video.shortBylineText?.runs?.[0]?.text || video.ownerText?.runs?.[0]?.text || "";
+		const duration = video.lengthText?.simpleText || video.lengthText?.runs?.[0]?.text || "";
+		const thumbnail = video.thumbnail?.thumbnails?.at(-1)?.url || `https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`;
+		return { id: video.videoId, title, author, duration, thumbnail, live: !duration };
+	}
+
+	return null;
+}
+
+function getContinuationToken(items: any[]) {
+	for (const item of items) {
+		const token = item?.continuationItemViewModel?.continuationCommand?.innertubeCommand?.continuationCommand?.token
+			|| item?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token;
+		if (token) return token;
+	}
+	return null;
+}
+
+export async function fetchYoutubePlaylist(playlistId: string) {
+	if (!playlistId) return null;
+	try {
+		if (!vt || (!ytcookiesapi && !tempytcookies && !ytcookies)) await generateVisitor();
+		const getCookies = () => ytcookiesapi || tempytcookies || ytcookies;
+		const buildContext = () => ({ client: { clientName: 2, clientVersion: "2.20261231", visitorData: vt, hl: "en", gl: "US" } });
+		const request = async (body: any) => {
+			const res = await fetchYoutubeWithRetry(() => fetch("https://m.youtube.com/youtubei/v1/browse?prettyPrint=false", {
+				method: "POST",
+				headers: {
+					"Accept-Language": "en",
+					"Content-Type": "application/json",
+					"User-Agent": APIuserAgent,
+					...(getCookies() ? { Cookie: getCookies() } : {}),
+				},
+				body: JSON.stringify(body),
+			}));
+			return res.json().catch(() => null);
+		};
+
+		const first = await request({ context: buildContext(), browseId: `VL${playlistId}` });
+		if (!first) return null;
+
+		const newVt = first.responseContext?.visitorData;
+		if (newVt) {
+			vt = newVt;
+			actuallk.visitorData = newVt;
+			setVisitorData(newVt);
+		}
+
+		const header = first.header?.pageHeaderRenderer;
+		const title = header?.pageTitle
+			|| header?.content?.pageHeaderViewModel?.title?.dynamicTextViewModel?.text?.content
+			|| first.microformat?.microformatDataRenderer?.title?.replace(/ - YouTube$/, "")
+			|| playlistId;
+		const author = header?.content?.pageHeaderViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.avatarStack?.avatarStackViewModel?.text?.content
+			|| header?.content?.pageHeaderViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.text?.content
+			|| "";
+		const thumbnail = first.microformat?.microformatDataRenderer?.thumbnail?.thumbnails?.at(-1)?.url || "";
+
+		let items = first?.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents?.flatMap((section: any) => section?.itemSectionRenderer?.contents || []) || [];
+		const tracks: { id: string; title: string; author: string; duration: string; thumbnail: string; live: boolean }[] = [];
+		const seen = new Set<string>();
+		let token = getContinuationToken(items);
+
+		for (let page = 0; page < 100; page++) {
+			for (const item of items) {
+				const track = parsePlaylistItem(item);
+				if (track && !seen.has(track.id)) {
+					seen.add(track.id);
+					tracks.push(track);
+				}
+			}
+			if (!token) break;
+			await new Promise((resolve) => setTimeout(resolve, 200));
+			const next = await request({ context: buildContext(), continuation: token });
+			if (!next) break;
+			items = next?.onResponseReceivedActions?.flatMap((action: any) => action?.appendContinuationItemsAction?.continuationItems || []) || [];
+			token = getContinuationToken(items);
+		}
+
+		return { title, author, thumbnail, tracks };
+	} catch {
+		return null;
+	}
+}
+
+export async function searchYoutube(query: string, limit = 10) {
+	if (!query) return [];
+	try {
+		if (!vt || (!ytcookiesapi && !tempytcookies && !ytcookies)) await generateVisitor();
+		const getCookies = () => ytcookiesapi || tempytcookies || ytcookies;
+		const res = await fetchYoutubeWithRetry(() => fetch("https://m.youtube.com/youtubei/v1/search?prettyPrint=false", {
+			method: "POST",
+			headers: {
+				"Accept-Language": "en-US",
+				"Content-Type": "application/json",
+				"User-Agent": APIuserAgent,
+				...(getCookies() ? { Cookie: getCookies() } : {}),
+			},
+			body: JSON.stringify({
+				context: { client: { clientName: 2, clientVersion: "2.20261231", visitorData: vt, hl: "en", gl: "US" } },
+				query,
+			}),
+		}));
+		const json = await res.json().catch(() => null);
+
+		const newVt = json?.responseContext?.visitorData;
+		if (newVt) {
+			vt = newVt;
+			actuallk.visitorData = newVt;
+			setVisitorData(newVt);
+		}
+
+		const sections = json?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents || json?.contents?.sectionListRenderer?.contents || [];
+		const results: { id: string; title: string; author: string; duration: string; thumbnail: string; live: boolean }[] = [];
+		for (const section of sections) {
+			for (const item of section?.itemSectionRenderer?.contents || []) {
+				const video = item?.videoWithContextRenderer || item?.videoRenderer;
+				if (!video?.videoId) continue;
+				const duration = video.lengthText?.runs?.[0]?.text || video.lengthText?.simpleText || "";
+				results.push({
+					id: video.videoId,
+					title: (video.headline?.runs || video.title?.runs || []).map((r: any) => r.text).join("") || video.title?.simpleText || video.videoId,
+					author: video.shortBylineText?.runs?.[0]?.text || video.ownerText?.runs?.[0]?.text || "",
+					duration,
+					thumbnail: video.thumbnail?.thumbnails?.at(-1)?.url || `https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`,
+					live: !duration,
+				});
+				if (results.length >= limit) return results;
+			}
+		}
+		return results;
+	} catch {
+		return [];
+	}
+}
+
 function pickWatchRenderer(contents: any[], key: string) {
 	if (!Array.isArray(contents)) return null;
 	for (const item of contents) {
@@ -1141,19 +1322,21 @@ function pickWatchRenderer(contents: any[], key: string) {
 export async function resolveYoutubeMetadata(videoId: string) {
 	if (!videoId) return null;
 	try {
-		const playerRes = await fetch(`https://m.youtube.com/youtubei/v1/player?prettyPrint=false&fields=responseContext(visitorData),playabilityStatus,videoDetails(videoId,title,author,lengthSeconds)`, {
+		if (!vt || (!ytcookiesapi && !tempytcookies && !ytcookies)) await generateVisitor();
+		const getCookies = () => ytcookiesapi || tempytcookies || ytcookies;
+		const playerRes = await fetchYoutubeWithRetry(() => fetch(`https://m.youtube.com/youtubei/v1/player?prettyPrint=false&fields=responseContext(visitorData),playabilityStatus,videoDetails(videoId,title,author,lengthSeconds)`, {
 			method: "POST",
 			headers: {
 				"Accept-Language": "en-US",
 				"Content-Type": "application/json",
 				"User-Agent": APIuserAgent,
-				...(tempytcookies ? { Cookie: tempytcookies } : {}),
+				...(getCookies() ? { Cookie: getCookies() } : {}),
 			},
 			body: JSON.stringify({
 				videoId,
 				context: { client: { clientName: 2, clientVersion: "2.20261231", visitorData: vt, hl: "en", gl: "US" } },
 			}),
-		});
+		}));
 		const player = await playerRes.json().catch(() => null);
 
 		const newVt = player?.responseContext?.visitorData;
@@ -1164,7 +1347,7 @@ export async function resolveYoutubeMetadata(videoId: string) {
 		}
 
 		const details = player?.videoDetails;
-		if (player?.playabilityStatus?.status === "OK" && details?.videoId) {
+		if (details?.videoId && (details.title || details.author)) {
 			return {
 				title: details.title,
 				author: details.author,
@@ -1172,13 +1355,13 @@ export async function resolveYoutubeMetadata(videoId: string) {
 			};
 		}
 
-		const pageRes = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
-      headers: {
+		const pageRes = await fetchYoutubeWithRetry(() => fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+			headers: {
 				"Accept-Language": "en-US",
 				"User-Agent": APIuserAgent,
-				...(tempytcookies ? { Cookie: tempytcookies } : {}),
+				...(getCookies() ? { Cookie: getCookies() } : {}),
 			},
-		});
+		}));
 		const html = await pageRes.text();
 		const raw = html.split("var ytInitialData =")[1]?.split(";")[0];
 		if (!raw) return null;

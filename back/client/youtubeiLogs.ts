@@ -59,11 +59,4 @@ try {
     yt.Log.setLevel(0);
     forceWebOnly(yt);
 } catch (e) { }
-try {
-    const ytAlt = require('discord-player-youtubei/node_modules/youtubei.js');
-    ytAlt.Platform.shim.eval = (data: any, env: any) => {
-        return new Function(...Object.keys(env), data.output)(...Object.values(env));
-    };
-    ytAlt.Log.setLevel(0);
-    forceWebOnly(ytAlt);
-} catch (e) { }
+
