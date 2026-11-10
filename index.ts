@@ -4,7 +4,7 @@ import "./back/client/youtubeiLogs.ts";
 import dotenv from "dotenv";
 dotenv.config({ quiet: true }); // Load Environment
 import toggles from "./back/config.json" with { type: "json" };
-import youtube, { resolveYoutubeMetadata } from "./back/client/youtubeConfig.ts";
+import { fallbackYTStream, resolveYoutubeMetadata } from "./back/client/youtubeConfig.ts";
 
 // Main
 import { ForgeClient, LogPriority, Logger } from "@tryforge/forgescript";
@@ -56,7 +56,7 @@ const music = new ForgeMusic({
     blockStreamFrom: toggles.disable_YT ? [YoutubeExtractor.identifier] : [],
     connectOptions: {
         disableFallbackStream: true,
-        ...(!toggles.useNativeStream && { bufferingTimeout: 250 }),
+        bufferingTimeout: 250,
         connectionTimeout: 30000,
         volume: 50,
         leaveOnEmpty: false,
@@ -64,25 +64,38 @@ const music = new ForgeMusic({
         leaveOnStop: false,
         pauseOnEmpty: false,
         onBeforeCreateStream: async (track) => {
+            const storedStream = track.raw?.youtubeCreateStream;
+            if (typeof storedStream === "function") {
+                try {
+                    const stream = await storedStream(track);
+                    if (stream) return stream;
+                } catch { }
+            }
+
             const videoId = track.url?.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/)?.[1];
             if (!videoId) return null;
 
-            if (track.raw?.youtubeResolved !== true) {
-                const metadata = await resolveYoutubeMetadata(videoId).catch(() => null);
-                if (!metadata) Logger.warn(`/ [YoutubeConfig] metadata miss | ${videoId} | ${track.url}`);
-                if (metadata) {
-                    if (metadata.title) track.title = metadata.title;
-                    if (metadata.author) track.author = metadata.author;
-                    if (metadata.lengthSeconds > 0) track.duration = Util.buildTimeCode(Util.parseMS(metadata.lengthSeconds * 1000));
-                    if (!track.thumbnail) track.thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+            const metadata = await resolveYoutubeMetadata(videoId).catch(() => null);
+            if (!metadata) Logger.warn(`/ [YoutubeConfig] metadata miss | ${videoId} | ${track.url}`);
+            if (metadata) {
+                if (metadata.title) track.title = metadata.title;
+                if (metadata.author) track.author = metadata.author;
+                if (metadata.lengthSeconds > 0) track.duration = Util.buildTimeCode(Util.parseMS(metadata.lengthSeconds * 1000));
+                track.live = metadata.lengthSeconds === 0;
+                if (!track.thumbnail) track.thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+                if (metadata.createStream) {
+                    if (!track.raw) track.raw = {};
+                    track.raw.youtubeCreateStream = metadata.createStream;
+                    try {
+                        const stream = await metadata.createStream(track);
+                        if (stream) return stream;
+                    } catch { }
                 }
             }
 
             try {
-                const createStream = (youtube as any).createStream;
-                if (typeof createStream !== "function") return null;
-                const stream = await createStream(track);
-                return stream && typeof stream.pipe === "function" ? stream : null;
+                return await fallbackYTStream(track.url, track);
             } catch {
                 return null;
             }

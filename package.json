@@ -17,10 +17,10 @@
     "discord-player-applemusic": "^1.0.3",
     "discord-player-soundcloud": "^1.0.7",
     "discord-player-spotify": "^1.1.9",
-    "dotenv": "^18.0.9",
+    "dotenv": "^18.0.10",
     "entities": "^9.0.0",
     "forgeH2": "github:GreenVGJR/ForgeH2#main",
-    "jsdom": "^30.1.3",
+    "jsdom": "^31.0.0",
     "lmdb": "^3.5.9",
     "mediaplex": "^1.0.0",
     "youtubei.js": "^18.3.0"

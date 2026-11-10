@@ -1,6 +1,6 @@
 import { Logger } from "@tryforge/forgescript";
 import { YoutubeExtractor } from "./youtubeExtractor.ts";
-import { SoundcloudExtractor } from "discord-player-soundcloud";
+import { SoundcloudExtractor } from "./soundcloudExtractor.ts";
 import { SpotifyExtractor } from "discord-player-spotify";
 import { AppleMusicExtractor } from "discord-player-applemusic";
 import { AttachmentExtractor } from "@discord-player/extractor";

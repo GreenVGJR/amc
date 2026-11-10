@@ -1,6 +1,7 @@
 import config from "../config.json" with { type: "json" };
 import dotenv from "dotenv";
-const { default_userAgent_desktop, streamTypeYT, useClientYT, cacheTrackYT, skipOnCheckFormat, useNativeStream, webClientYT } = config;
+import { getTable } from "@nationdex/edge/dist/core/utils.js";
+const { default_userAgent_desktop, streamTypeYT, useClientYT, cacheTrackYT, skipOnCheckFormat, webClientYT } = config;
 import ytClients from "./youtubeClients.ts";
 const targetClient = useClientYT?.toUpperCase();
 const useClient = ytClients?.[targetClient];
@@ -46,7 +47,7 @@ let authRequiredUntil = 0;
 let poToken = generateAnonPOT();
 
 const apiEndpoint = isWebClient ? "player" : "get_watch";
-const apiFields = isWebClient ? "responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url,signatureCipher),adaptiveFormats(itag,url,contentLength,signatureCipher,audioTrack(displayName,id,audioIsDefault))),videoDetails(isLiveContent,lengthSeconds),captions(playerCaptionsTracklistRenderer(audioTracks(audioTrackId),defaultAudioTrackIndex))" : "playerResponse(responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength,audioTrack(displayName,id,audioIsDefault))),videoDetails(isLiveContent,lengthSeconds),captions(playerCaptionsTracklistRenderer(audioTracks(audioTrackId),defaultAudioTrackIndex)))";
+const apiFields = isWebClient ? "responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url,signatureCipher),adaptiveFormats(itag,url,contentLength,signatureCipher,audioTrack(displayName,id,audioIsDefault))),videoDetails(videoId,isLiveContent,lengthSeconds,title,author),captions(playerCaptionsTracklistRenderer(audioTracks(audioTrackId),defaultAudioTrackIndex))" : "playerResponse(responseContext(visitorData),playabilityStatus,streamingData(serverAbrStreamingUrl,hlsManifestUrl,formats(url),adaptiveFormats(itag,url,contentLength,audioTrack(displayName,id,audioIsDefault))),videoDetails(videoId,isLiveContent,lengthSeconds,title,author),captions(playerCaptionsTracklistRenderer(audioTracks(audioTrackId),defaultAudioTrackIndex)))";
 const buildQuery = apiEndpoint + "?prettyPrint=false&alt=json&fields=" + apiFields;
 
 const APIuserAgent = useClient?.userAgent || default_userAgent_desktop;
@@ -110,6 +111,27 @@ refreshYtAuth();
 
 let actuallk: any = { ...useClient };
 let ytcookiesapi;
+
+function getCacheValue(name: string) {
+	try {
+		return getTable("initclientmusic").get(name);
+	} catch {
+		return undefined;
+	}
+}
+
+function getYoutubeSession() {
+	return {
+		visitorData: getCacheValue("authmusic_youtube_visitor") || vt,
+		cookies: getCacheValue("authmusic_youtube_tempcookies") || ytcookiesapi || tempytcookies || ytcookies,
+	};
+}
+
+function setCachedVisitor(value: string) {
+	try {
+		getTable("initclientmusic").set("authmusic_youtube_visitor", value);
+	} catch {}
+}
 delete actuallk.targetDomain;
 delete actuallk.client_id;
 delete actuallk.client_secret;
@@ -322,7 +344,7 @@ function createChunkedStream(url, totalSize, videoId, ext) {
 		});
 	}
 
-	const maxRetries = 5;
+	const maxRetries = 3;
 
 	async function fetchChunk(startByte) {
 		let end = startByte + chunkSize - 1;
@@ -621,6 +643,165 @@ const warmupEmbeddedClient = async () => {
 };
 warmupEmbeddedClient();
 
+async function createYoutubeStreamFromPlayer(a: any, lstracks: string, trackInfo?: any) {
+	const videoId = lstracks.includes("watch?v=") ? lstracks.split("watch?v=")[1].split("&")[0] : lstracks;
+	let finalurl;
+	let changeLength = false;
+	let streamingLength = null;
+	let durationLength = null;
+	let fr = null;
+	const cpn = randomBytes(12).toString("base64url");
+
+	let forceLegacy = false;
+	let actualfinalurl;
+	let fsFmt: any = {};
+	let frso: any = {};
+	const isLive = !!a?.videoDetails?.isLiveContent;
+
+	const startAttempt = forceLegacyClients.includes(targetClient) ? 1 : 0;
+
+	for (let attempt = startAttempt; attempt < 2; attempt++) {
+		forceLegacy = attempt === 1;
+		finalurl = "";
+		changeLength = false;
+		streamingLength = null;
+		durationLength = null;
+		fr = null;
+
+		if (isLive && a?.streamingData?.hlsManifestUrl) {
+			finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+		} else if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
+			finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+		} else {
+			fsFmt = a.streamingData?.formats?.find(getFormatUrl);
+			const capRenderer = a?.captions?.playerCaptionsTracklistRenderer;
+			const capAudioTracks = Array.isArray(capRenderer?.audioTracks) ? capRenderer.audioTracks : [];
+			const capDefaultIdx = capRenderer?.defaultAudioTrackIndex;
+			const originalAudioTrackId = (typeof capDefaultIdx === "number" && capAudioTracks[capDefaultIdx]?.audioTrackId) || null;
+			const audioCands = (a.streamingData?.adaptiveFormats || []).filter((c) => [...sortTargetOpus, ...sortTargetM4a].includes(c.itag) && getFormatUrl(c)).sort((x, y) => y.itag - x.itag);
+			frso = (originalAudioTrackId && audioCands.find((c) => c?.audioTrack?.id === originalAudioTrackId)) || audioCands[0] || null;
+			if (frso && !forceLegacy) {
+				const rawFormatUrl = getFormatUrl(frso);
+				const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
+				finalurl = withStreamParams(decipheredUrl, {
+					ratebypass: "true",
+					rn: "0",
+					alr: "no",
+					cver: useClient.clientVersion,
+					cpn,
+				});
+				changeLength = true;
+				durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
+				streamingLength = String(frso.contentLength);
+			} else {
+				const rawFormatUrl = getFormatUrl(fsFmt);
+				const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
+				finalurl = withStreamParams(decipheredUrl, {
+					rn: "0",
+					alr: "no",
+					cver: useClient.clientVersion,
+					cpn,
+				});
+			}
+		}
+
+		if (!finalurl && a?.streamingData?.hlsManifestUrl) {
+			finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
+		}
+
+		if (!finalurl) {
+			finalurl = (await searchSoundcloudFallback(trackInfo?.title, trackInfo?.author)) || "";
+		}
+
+		if (!finalurl && a?.streamingData?.serverAbrStreamingUrl) {
+			throw new Error(`This content unavailable due youtube enforce SABR-only`);
+		}
+
+		if (!finalurl) {
+			throw new Error(`No playable YouTube and Soundcloud format URL for ${targetClient}`);
+		}
+
+		if (isHlsUrl(finalurl)) {
+			return finalurl;
+		}
+
+		let contentPoToken;
+		if (usePoToken) {
+			const cbPot = await generateCbPot(videoId, actuallk.visitorData);
+			contentPoToken = cbPot.isReal ? encodeURIComponent(cbPot.token) : null;
+		}
+
+		let filterlocation;
+		let secfinalurl;
+		let finalWithPot;
+		const maxHeadRetries = 3;
+		const headCheck = (url) =>
+			fetch(url, {
+				method: "HEAD",
+				headers: { Range: "bytes=0-", "User-Agent": APIuserAgent },
+			});
+
+		if (!skipOnCheckFormat) {
+			for (let headAttempt = 0; headAttempt <= maxHeadRetries; headAttempt++) {
+				filterlocation = await headCheck(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""));
+				secfinalurl = filterlocation.url;
+				finalWithPot = contentPoToken && !secfinalurl.includes("pot=") ? secfinalurl + "&pot=" + contentPoToken : secfinalurl;
+
+				if ((filterlocation.status !== 403 && filterlocation.status !== 429) || !changeLength || skipOnCheckFormat) {
+					break;
+				}
+
+				if (headAttempt < maxHeadRetries) {
+					await new Promise((r) => setTimeout(r, 1000 * (headAttempt + 1)));
+				}
+			}
+		} else {
+			filterlocation = { status: 200, url: finalurl };
+			secfinalurl = finalurl;
+			finalWithPot = finalurl + (contentPoToken ? "&pot=" + contentPoToken : "");
+		}
+
+		if ((filterlocation.status === 403 || filterlocation.status === 429) && changeLength) {
+			if (isWebClient && !forceLegacy) {
+				continue;
+			}
+			const bytesPerSecond = parseInt(frso.contentLength) / durationLength;
+			const previewLength = String(Math.floor(bytesPerSecond * 60));
+			actualfinalurl = finalWithPot;
+			streamingLength = previewLength;
+			changeLength = true;
+		} else {
+			actualfinalurl = finalWithPot;
+		}
+
+		break;
+	}
+
+	if (isLive) {
+		return createLiveChunkedStream(actualfinalurl);
+	}
+
+	const nowRef = Date.now();
+	for (let ti = templist.length - 1; ti >= 0; ti--) {
+		if (templist[ti].id === lstracks || templist[ti].ref <= nowRef) templist.splice(ti, 1);
+	}
+	if (templist.length >= 500) templist.splice(0, templist.length - 499);
+	templist.push({
+		id: lstracks,
+		url: actualfinalurl,
+		ref: nowRef + 3600000,
+		allowLength: changeLength,
+		contentLength: streamingLength,
+	});
+
+	if (changeLength && streamingLength && parseInt(streamingLength) > 0 && !isHlsUrl(actualfinalurl)) {
+		const ext = sortTargetOpus.includes((frso && !forceLegacy ? frso : fsFmt)?.itag) ? "webm" : "m4a";
+		return createChunkedStream(actualfinalurl, parseInt(streamingLength), videoId, ext);
+	}
+
+	return actualfinalurl;
+}
+
 export async function fallbackYTStream(lstracks, trackInfo?: any) {
 	refreshYtAuth();
 	embeddedRetried = false;
@@ -660,480 +841,16 @@ export async function fallbackYTStream(lstracks, trackInfo?: any) {
 		} else templist.splice(checkindex, 1);
 	}
 	try {
-		let GTH;
-		if (ytcookies) {
-			GTH = (sapisid = ytcookies?.match(/(?:^|;\s*)SAPISID=([^;]*)/)?.[1], secure1psid = ytcookies?.match(/(?:^|;\s*)__Secure-1PAPISID=([^;]*)/)?.[1], secure3psid = ytcookies?.match(/(?:^|;\s*)__Secure-3PAPISID=([^;]*)/)?.[1], origin_url = `https://${hostdomain}`, datasyncid = datasyncID) => {
-				const t = Math.floor(Date.now() / 1000).toString();
-				const dsi = datasyncid && datasyncid !== "null" && datasyncid.trim() !== "" ? datasyncid + " " : "";
-				return (
-					"SAPISIDHASH " +
-					t +
-					"_" +
-					require("crypto")
-						.createHash("sha1")
-						.update(dsi + t + " " + sapisid + " " + origin_url)
-						.digest("hex") +
-					"_u" +
-					" SAPISID1PHASH " +
-					t +
-					"_" +
-					require("crypto")
-						.createHash("sha1")
-						.update(dsi + t + " " + secure1psid + " " + origin_url)
-						.digest("hex") +
-					"_u" +
-					" SAPISID3PHASH " +
-					t +
-					"_" +
-					require("crypto")
-						.createHash("sha1")
-						.update(dsi + t + " " + secure3psid + " " + origin_url)
-						.digest("hex") +
-					"_u"
-				);
-			};
-		}
-
-		const cpn = randomBytes(12).toString("base64url");
-
-		const isVRnAuth = ytauth?.token && (targetClient === "ANDROID_VR" || targetClient === "ANDROID_VR_DOWN");
-
-		if (isWebClient && !actuallk.configInfo?.coldConfigData && !isEmbeddedClient) {
-			if (!vt) await generateVisitor();
-			await fetchWebConfigInfo(); // Just in case it fails before
-		}
-		if (isWebClient && !signatureTimestamp) await fetchSignatureTimestamp();
-		let embeddedContext = null;
-		if (isEmbeddedClient) {
-			if (!vt) await generateVisitor();
-			embeddedContext = await fetchEmbeddedContext(videoId);
-		}
-
-		const buildHeaders = (useAuth) => {
-			const base = {
-				"Accept-Language": "en",
-				"Content-Type": "application/json",
-				"X-Goog-Visitor-Id": vt,
-				Origin: `https://${hostdomain}`,
-				"X-Origin": `https://${hostdomain}`,
-				"X-Youtube-Client-Name": useClient.clientName,
-				"X-Youtube-Client-Version": useClient.clientVersion,
-				"User-Agent": APIuserAgent,
-			};
-			if (useAuth && isVRnAuth) {
-				return {
-					...base,
-					Authorization: "Bearer " + ytauth.token,
-					Cookie: tempytcookies,
-				};
-			}
-			if (useAuth && ytcookies && isWebClient) {
-				return {
-					...base,
-					Authorization: GTH(),
-					Cookie: ytcookies,
-					"X-Youtube-Bootstrap-Logged-In": true,
-					"Alt-Used": hostdomain,
-					"X-Goog-AuthUser": 0,
-				};
-			}
-			return { ...base, Cookie: tempytcookies };
-		};
-
-		const fetchPlayerResponse = (headers, query, route) =>
-			fetchJsonGuarded(
-				`https://${hostdomain}/youtubei/v1/${query}`,
-				{
-					method: "POST",
-					mode: "same-origin",
-					body: JSON.stringify(route),
-					headers,
-				},
-				"player",
-			);
-
-		const hasAuth = isVRnAuth || !!ytcookies;
-		const mustUseAuth = forceAuthClients.includes(targetClient);
-
-		const embeddedThirdParty = embeddedContext?.thirdParty ? { ...embeddedContext.thirdParty, embedUrl } : { embedUrl };
-
-		const clientSupportsAuth = mustUseAuth || isWebClient || isVRnAuth;
-		const authModes = mustUseAuth ? [true] : !hasAuth || !clientSupportsAuth ? [false] : [false, true];
-
-		let result;
-		let lastError = null;
-
-		const runPipeline = async (useAuthMode) => {
-			let a;
-			let usedAuth = false;
-			let finalurl;
-			let changeLength = false;
-			let streamingLength = null;
-			let durationLength = null;
-			let fr = null;
-
-			for (let prAttempt = 0; prAttempt < 6; prAttempt++) {
-				const shouldUseAuth = useAuthMode || Date.now() < authRequiredUntil;
-
-				let sessionPoToken = poToken;
-				let isRealSessionPo = false;
-				if (usePoToken) {
-					let sessionPoData = await generateSessionPoToken(actuallk.visitorData);
-					if (sessionPoData.exp <= Date.now()) {
-						sessionPoData = await generateSessionPoToken(actuallk.visitorData, true);
-					}
-					sessionPoToken = sessionPoData.poToken;
-					isRealSessionPo = sessionPoData.isReal;
-				}
-
-				const playbackContext = signatureTimestamp
-					? {
-							playbackContext: {
-								contentPlaybackContext: {
-									vis: 0,
-									splay: false,
-									lactMilliseconds: "-1",
-									signatureTimestamp,
-									...(embeddedContext?.encryptedHostFlags ? { encryptedHostFlags: embeddedContext.encryptedHostFlags } : {}),
-								},
-							},
-						}
-					: {};
-
-				const webIntegrity = isWebClient
-					? usePoToken && isRealSessionPo
-						? {
-								serviceIntegrityDimensions: { poToken: sessionPoToken },
-								attestationRequest: { omitBotguardData: false },
-							}
-						: {}
-					: {};
-
-				const buildRoute = isWebClient
-					? {
-							videoId: videoId,
-							contentCheckOk: true,
-							racyCheckOk: true,
-							cpn: cpn,
-							context: {
-								client: {
-									...actuallk,
-									...(isEmbeddedClient
-										? {
-												originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1`,
-											}
-										: {}),
-								},
-								...(isEmbeddedClient ? { thirdParty: embeddedThirdParty } : {}),
-							},
-							...playbackContext,
-							...webIntegrity,
-						}
-					: {
-							playerRequest: {
-								videoId: videoId,
-								contentCheckOk: true,
-								racyCheckOk: true,
-							},
-							disablePlayerResponse: false,
-							cpn: cpn,
-							context: { client: { ...actuallk } },
-							serviceIntegrityDimensions: { poToken },
-							attestationRequest: { omitBotguardData: false },
-						};
-
-				try {
-					if (shouldUseAuth) {
-						usedAuth = true;
-						a = await fetchPlayerResponse(buildHeaders(true), buildQuery, buildRoute);
-					} else {
-						a = await fetchPlayerResponse(buildHeaders(false), buildQuery, buildRoute);
-					}
-				} catch (fetchErr) {
-					Logger.info(`/ [YoutubeConfig] Player request failed (${fetchErr?.message || fetchErr}), refreshing session and retrying`);
-					if (usePoToken) {
-						await refreshBotGuardIntegrity();
-						await generateSessionPoToken(actuallk.visitorData, true);
-					}
-					await generateVisitor();
-					if (prAttempt < 5) continue;
-					throw fetchErr;
-				}
-
-				a = filterPlayerObject(a);
-
-				const new_vt = a?.responseContext?.visitorData;
-				if (new_vt) {
-					actuallk.visitorData = new_vt;
-					setVisitorData(new_vt);
-				}
-
-				const embedderDenied = a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.reason?.runs?.some((r) => /Error code: 152/.test(r.text)) || a?.playabilityStatus?.errorScreen?.playerErrorMessageRenderer?.errorCode === "PLAYABILITY_ERROR_CODE_EMBEDDER_IDENTITY_DENIED";
-				if (isEmbeddedClient && embedderDenied && !embeddedRetried) {
-					embeddedRetried = true;
-					Logger.info(`/ [YoutubeConfig] EMBEDDER_IDENTITY_DENIED, refreshing embedded context`);
-					embeddedContextCache = null;
-					await generateVisitor();
-					let retryIsRealPo = false;
-					if (usePoToken) {
-						const retryPoData = await generateSessionPoToken(actuallk.visitorData, true);
-						sessionPoToken = retryPoData.poToken;
-						retryIsRealPo = retryPoData.isReal;
-					}
-					embeddedContext = await fetchEmbeddedContext(videoId);
-					const retryThirdParty = embeddedContext?.thirdParty ? { ...embeddedContext.thirdParty, embedUrl } : { embedUrl };
-					const retryIntegrity = isWebClient
-						? usePoToken && retryIsRealPo
-							? {
-									serviceIntegrityDimensions: { poToken: sessionPoToken },
-									attestationRequest: { omitBotguardData: false },
-								}
-							: {}
-						: {};
-					const retryRoute = {
-						videoId: videoId,
-						contentCheckOk: true,
-						racyCheckOk: true,
-						cpn: cpn,
-						context: {
-							client: {
-								...actuallk,
-								originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1`,
-							},
-							thirdParty: retryThirdParty,
-						},
-						...playbackContext,
-						...retryIntegrity,
-					};
-					a = filterPlayerObject(
-						await fetchJsonGuarded(
-							`https://${hostdomain}/youtubei/v1/${buildQuery}`,
-							{
-								method: "POST",
-								body: JSON.stringify(retryRoute),
-								headers: buildHeaders(usedAuth),
-							},
-							"player-embed-retry",
-						),
-					);
-					const retried_vt = a?.responseContext?.visitorData;
-					if (retried_vt) {
-						actuallk.visitorData = retried_vt;
-						setVisitorData(retried_vt);
-					}
-				}
-
-				if (!a?.playabilityStatus || a.playabilityStatus.status !== "OK") {
-					const playabilityError = a?.playabilityStatus?.status || "";
-					if (!usedAuth && hasAuth && playabilityError === "LOGIN_REQUIRED") {
-						authRequiredUntil = Date.now() + 3600000;
-						usedAuth = true;
-						a = filterPlayerObject(await fetchPlayerResponse(buildHeaders(true), buildQuery, buildRoute));
-						const retry_vt = a?.responseContext?.visitorData;
-						if (retry_vt) {
-							actuallk.visitorData = retry_vt;
-							setVisitorData(retry_vt);
-						}
-					}
-					if (!a?.playabilityStatus || a.playabilityStatus.status !== "OK") {
-						if (a?.playabilityStatus?.status === "UNPLAYABLE") {
-							throw new Error(`InnerTube Error: ${JSON.stringify(a?.playabilityStatus) || null}`);
-						}
-						if (prAttempt === 0) {
-							Logger.info(`/ [YoutubeConfig] Playability ${a?.playabilityStatus?.status || "null"} - refreshing session and retrying`);
-							if (usePoToken) {
-								await refreshBotGuardIntegrity();
-								await generateSessionPoToken(actuallk.visitorData, true);
-							}
-							await generateVisitor();
-							continue;
-						}
-						vt = "";
-						await generateVisitor();
-						throw new Error(`InnerTube Error: ${JSON.stringify(a?.playabilityStatus) || null}`);
-					}
-				}
-				break;
-			}
-
-			let forceLegacy = false;
-			let actualfinalurl;
-			let fsFmt: any = {};
-			let frso: any = {};
-			const isLive = a?.videoDetails?.isLiveContent && a?.videoDetails?.lengthSeconds == 0;
-
-			const startAttempt = forceLegacyClients.includes(targetClient) ? 1 : 0;
-
-			for (let attempt = startAttempt; attempt < 2; attempt++) {
-				forceLegacy = attempt === 1;
-				finalurl = "";
-				changeLength = false;
-				streamingLength = null;
-				durationLength = null;
-				fr = null;
-
-				if (isLive && a?.streamingData?.hlsManifestUrl) {
-					finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
-				} else if (streamTypeYT === 2 && a?.streamingData?.hlsManifestUrl) {
-					finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
-				} else {
-					fsFmt = a.streamingData?.formats?.find(getFormatUrl);
-					const capRenderer = a?.captions?.playerCaptionsTracklistRenderer;
-					const capAudioTracks = Array.isArray(capRenderer?.audioTracks) ? capRenderer.audioTracks : [];
-					const capDefaultIdx = capRenderer?.defaultAudioTrackIndex;
-					const originalAudioTrackId = (typeof capDefaultIdx === "number" && capAudioTracks[capDefaultIdx]?.audioTrackId) || null;
-					const audioCands = (a.streamingData?.adaptiveFormats || []).filter((c) => [...sortTargetOpus, ...sortTargetM4a].includes(c.itag) && getFormatUrl(c)).sort((x, y) => y.itag - x.itag);
-					frso = (originalAudioTrackId && audioCands.find((c) => c?.audioTrack?.id === originalAudioTrackId)) || audioCands[0] || null;
-					if (frso && !forceLegacy) {
-						const rawFormatUrl = getFormatUrl(frso);
-						const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-						finalurl = withStreamParams(decipheredUrl, {
-							ratebypass: "true",
-							rn: "0",
-							alr: "no",
-							cver: useClient.clientVersion,
-							cpn,
-						});
-						changeLength = true;
-						durationLength = parseInt(a.videoDetails?.lengthSeconds || 0);
-						streamingLength = String(frso.contentLength);
-					} else {
-						const rawFormatUrl = getFormatUrl(fsFmt);
-						const decipheredUrl = await decipherYoutubeUrl(rawFormatUrl);
-						finalurl = withStreamParams(decipheredUrl, {
-							rn: "0",
-							alr: "no",
-							cver: useClient.clientVersion,
-							cpn,
-						});
-					}
-				}
-
-				if (!finalurl && a?.streamingData?.hlsManifestUrl) {
-					finalurl = await decipherYoutubeUrl(a.streamingData.hlsManifestUrl);
-				}
-
-				if (!finalurl) {
-					finalurl = (await searchSoundcloudFallback(trackInfo?.title, trackInfo?.author)) || "";
-				}
-
-				if (!finalurl && a?.streamingData?.serverAbrStreamingUrl) {
-					throw new Error(`This content unavailable due youtube enforce SABR-only`);
-				}
-
-				if (!finalurl) {
-					throw new Error(`No playable YouTube and Soundcloud format URL for ${targetClient}`);
-				}
-
-				if (isHlsUrl(finalurl)) {
-					return finalurl;
-				}
-
-				let contentPoToken;
-				if (usePoToken) {
-					const cbPot = await generateCbPot(videoId, actuallk.visitorData);
-					contentPoToken = cbPot.isReal ? encodeURIComponent(cbPot.token) : null;
-				}
-
-				let filterlocation;
-				let secfinalurl;
-				let finalWithPot;
-				const maxHeadRetries = 5;
-				const headCheck = (url) =>
-					fetch(url, {
-						method: "HEAD",
-						headers: { Range: "bytes=0-", "User-Agent": APIuserAgent },
-					});
-
-				if (!skipOnCheckFormat) {
-					for (let headAttempt = 0; headAttempt <= maxHeadRetries; headAttempt++) {
-						filterlocation = await headCheck(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""));
-						secfinalurl = filterlocation.url;
-						finalWithPot = contentPoToken && !secfinalurl.includes("pot=") ? secfinalurl + "&pot=" + contentPoToken : secfinalurl;
-
-						if ((filterlocation.status !== 403 && filterlocation.status !== 429) || !changeLength || skipOnCheckFormat) {
-							break;
-						}
-
-						if (headAttempt < maxHeadRetries) {
-							await new Promise((r) => setTimeout(r, 1000 * (headAttempt + 1)));
-						}
-					}
-				} else {
-					filterlocation = { status: 200, url: finalurl };
-					secfinalurl = finalurl;
-					finalWithPot = finalurl + (contentPoToken ? "&pot=" + contentPoToken : "");
-				}
-
-				if ((filterlocation.status === 403 || filterlocation.status === 429) && changeLength) {
-					if (isWebClient && !forceLegacy) {
-						continue;
-					}
-					const bytesPerSecond = parseInt(frso.contentLength) / durationLength;
-					const previewLength = String(Math.floor(bytesPerSecond * 60));
-					actualfinalurl = finalWithPot;
-					streamingLength = previewLength;
-					changeLength = true;
-				} else {
-					actualfinalurl = finalWithPot;
-				}
-
-				break;
-			}
-
-			if (isLive) {
-				return createLiveChunkedStream(actualfinalurl);
-			}
-
-			const nowRef = Date.now();
-			for (let ti = templist.length - 1; ti >= 0; ti--) {
-				if (templist[ti].id === lstracks || templist[ti].ref <= nowRef) templist.splice(ti, 1);
-			}
-			if (templist.length >= 500) templist.splice(0, templist.length - 499);
-			templist.push({
-				id: lstracks,
-				url: actualfinalurl,
-				ref: nowRef + 3600000,
-				allowLength: changeLength,
-				contentLength: streamingLength,
-			});
-
-			if (changeLength && streamingLength && parseInt(streamingLength) > 0 && !isHlsUrl(actualfinalurl)) {
-				const ext = sortTargetOpus.includes((frso && !forceLegacy ? frso : fsFmt)?.itag) ? "webm" : "m4a";
-				return createChunkedStream(actualfinalurl, parseInt(streamingLength), videoId, ext);
-			}
-
-			return actualfinalurl;
-		};
-
-		for (let modeIdx = 0; modeIdx < authModes.length; modeIdx++) {
-			const useAuthMode = authModes[modeIdx];
-			try {
-				result = await runPipeline(useAuthMode);
-				lastError = null;
-				break;
-			} catch (modeErr) {
-				lastError = modeErr;
-				const isUnplayable = typeof modeErr?.message === "string" && modeErr.message.includes('"status":"UNPLAYABLE"');
-				if (isUnplayable) break;
-				Logger.info(`/ [YoutubeConfig] attempt with auth=${useAuthMode} failed: ${modeErr?.message || modeErr}`);
-				if (isWebClient) {
-					if (usePoToken) await initBotGuard();
-					poToken = generateAnonPOT();
-				}
-				await generateVisitor();
-			}
-		}
-
-		if (lastError) throw lastError;
-		return result;
+		const player = await fetchYoutubePlayerResponse(videoId);
+		if (!player) throw new Error("InnerTube Error: player response unavailable");
+		return await createYoutubeStreamFromPlayer(player, lstracks, trackInfo);
 	} catch (e) {
 		Logger.error(`/ [YoutubeConfig] ${e?.message || e}`);
 		throw e;
 	}
 }
 
-async function fetchYoutubeWithRetry(run: () => Promise<Response>, retries = 5) {
+async function fetchYoutubeWithRetry(run: () => Promise<Response>, retries = 3) {
 	let response: Response;
 	for (let attempt = 0; attempt <= retries; attempt++) {
 		response = await run();
@@ -1153,7 +870,9 @@ function parsePlaylistItem(item: any) {
 		const id = lockup.contentId;
 		if (!id) return null;
 		const metadata = lockup.metadata?.lockupMetadataViewModel;
-		const title = metadata?.title?.content || metadata?.title?.simpleText || id;
+		const rawTitle = metadata?.title?.content || metadata?.title?.simpleText || "";
+		if (!rawTitle || rawTitle === id || /^\[?(private|deleted) video\]?$/i.test(rawTitle)) return null;
+		const title = rawTitle;
 		const author = metadata?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.text?.content || "";
 		const overlays = lockup.contentImage?.thumbnailViewModel?.overlays || [];
 		let duration = "";
@@ -1169,16 +888,32 @@ function parsePlaylistItem(item: any) {
 			if (duration) break;
 		}
 		const thumbnail = lockup.contentImage?.thumbnailViewModel?.image?.sources?.at(-1)?.url || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-		return { id, title, author, duration, thumbnail, live: duration === "LIVE" };
+		return {
+			id,
+			title,
+			author,
+			duration,
+			thumbnail,
+			live: duration === "LIVE",
+		};
 	}
 
 	const video = item?.playlistVideoRenderer || item?.videoRenderer;
 	if (video?.videoId) {
-		const title = video.title?.runs?.map((run: any) => run.text).join("") || video.title?.simpleText || video.videoId;
+		const rawTitle = video.title?.runs?.map((run: any) => run.text).join("") || video.title?.simpleText || "";
+		if (!rawTitle || rawTitle === video.videoId || /^\[?(private|deleted) video\]?$/i.test(rawTitle)) return null;
+		const title = rawTitle;
 		const author = video.shortBylineText?.runs?.[0]?.text || video.ownerText?.runs?.[0]?.text || "";
 		const duration = video.lengthText?.simpleText || video.lengthText?.runs?.[0]?.text || "";
 		const thumbnail = video.thumbnail?.thumbnails?.at(-1)?.url || `https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`;
-		return { id: video.videoId, title, author, duration, thumbnail, live: !duration };
+		return {
+			id: video.videoId,
+			title,
+			author,
+			duration,
+			thumbnail,
+			live: !duration,
+		};
 	}
 
 	return null;
@@ -1186,8 +921,7 @@ function parsePlaylistItem(item: any) {
 
 function getContinuationToken(items: any[]) {
 	for (const item of items) {
-		const token = item?.continuationItemViewModel?.continuationCommand?.innertubeCommand?.continuationCommand?.token
-			|| item?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token;
+		const token = item?.continuationItemViewModel?.continuationCommand?.innertubeCommand?.continuationCommand?.token || item?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token;
 		if (token) return token;
 	}
 	return null;
@@ -1196,24 +930,38 @@ function getContinuationToken(items: any[]) {
 export async function fetchYoutubePlaylist(playlistId: string) {
 	if (!playlistId) return null;
 	try {
-		if (!vt || (!ytcookiesapi && !tempytcookies && !ytcookies)) await generateVisitor();
-		const getCookies = () => ytcookiesapi || tempytcookies || ytcookies;
-		const buildContext = () => ({ client: { clientName: 2, clientVersion: "2.20261231", visitorData: vt, hl: "en", gl: "US" } });
+		const initial = getYoutubeSession();
+		if (!initial.visitorData || !initial.cookies) await generateVisitor();
+		const getCookies = () => getYoutubeSession().cookies;
+		const buildContext = () => ({
+			client: {
+				clientName: 2,
+				clientVersion: "2.20261231",
+				visitorData: getYoutubeSession().visitorData,
+				hl: "en",
+				gl: "US",
+			},
+		});
 		const request = async (body: any) => {
-			const res = await fetchYoutubeWithRetry(() => fetch("https://m.youtube.com/youtubei/v1/browse?prettyPrint=false", {
-				method: "POST",
-				headers: {
-					"Accept-Language": "en",
-					"Content-Type": "application/json",
-					"User-Agent": APIuserAgent,
-					...(getCookies() ? { Cookie: getCookies() } : {}),
-				},
-				body: JSON.stringify(body),
-			}));
+			const res = await fetchYoutubeWithRetry(() =>
+				fetch("https://m.youtube.com/youtubei/v1/browse?prettyPrint=false", {
+					method: "POST",
+					headers: {
+						"Accept-Language": "en",
+						"Content-Type": "application/json",
+						"User-Agent": APIuserAgent,
+						...(getCookies() ? { Cookie: getCookies() } : {}),
+					},
+					body: JSON.stringify(body),
+				}),
+			);
 			return res.json().catch(() => null);
 		};
 
-		const first = await request({ context: buildContext(), browseId: `VL${playlistId}` });
+		const first = await request({
+			context: buildContext(),
+			browseId: `VL${playlistId}`,
+		});
 		if (!first) return null;
 
 		const newVt = first.responseContext?.visitorData;
@@ -1221,20 +969,23 @@ export async function fetchYoutubePlaylist(playlistId: string) {
 			vt = newVt;
 			actuallk.visitorData = newVt;
 			setVisitorData(newVt);
+			setCachedVisitor(newVt);
 		}
 
 		const header = first.header?.pageHeaderRenderer;
-		const title = header?.pageTitle
-			|| header?.content?.pageHeaderViewModel?.title?.dynamicTextViewModel?.text?.content
-			|| first.microformat?.microformatDataRenderer?.title?.replace(/ - YouTube$/, "")
-			|| playlistId;
-		const author = header?.content?.pageHeaderViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.avatarStack?.avatarStackViewModel?.text?.content
-			|| header?.content?.pageHeaderViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.text?.content
-			|| "";
+		const title = header?.pageTitle || header?.content?.pageHeaderViewModel?.title?.dynamicTextViewModel?.text?.content || first.microformat?.microformatDataRenderer?.title?.replace(/ - YouTube$/, "") || playlistId;
+		const author = header?.content?.pageHeaderViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.avatarStack?.avatarStackViewModel?.text?.content || header?.content?.pageHeaderViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.text?.content || "";
 		const thumbnail = first.microformat?.microformatDataRenderer?.thumbnail?.thumbnails?.at(-1)?.url || "";
 
 		let items = first?.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents?.flatMap((section: any) => section?.itemSectionRenderer?.contents || []) || [];
-		const tracks: { id: string; title: string; author: string; duration: string; thumbnail: string; live: boolean }[] = [];
+		const tracks: {
+			id: string;
+			title: string;
+			author: string;
+			duration: string;
+			thumbnail: string;
+			live: boolean;
+		}[] = [];
 		const seen = new Set<string>();
 		let token = getContinuationToken(items);
 
@@ -1248,7 +999,10 @@ export async function fetchYoutubePlaylist(playlistId: string) {
 			}
 			if (!token) break;
 			await new Promise((resolve) => setTimeout(resolve, 200));
-			const next = await request({ context: buildContext(), continuation: token });
+			const next = await request({
+				context: buildContext(),
+				continuation: token,
+			});
 			if (!next) break;
 			items = next?.onResponseReceivedActions?.flatMap((action: any) => action?.appendContinuationItemsAction?.continuationItems || []) || [];
 			token = getContinuationToken(items);
@@ -1263,21 +1017,32 @@ export async function fetchYoutubePlaylist(playlistId: string) {
 export async function searchYoutube(query: string, limit = 10) {
 	if (!query) return [];
 	try {
-		if (!vt || (!ytcookiesapi && !tempytcookies && !ytcookies)) await generateVisitor();
-		const getCookies = () => ytcookiesapi || tempytcookies || ytcookies;
-		const res = await fetchYoutubeWithRetry(() => fetch("https://m.youtube.com/youtubei/v1/search?prettyPrint=false", {
-			method: "POST",
-			headers: {
-				"Accept-Language": "en-US",
-				"Content-Type": "application/json",
-				"User-Agent": APIuserAgent,
-				...(getCookies() ? { Cookie: getCookies() } : {}),
-			},
-			body: JSON.stringify({
-				context: { client: { clientName: 2, clientVersion: "2.20261231", visitorData: vt, hl: "en", gl: "US" } },
-				query,
+		const initial = getYoutubeSession();
+		if (!initial.visitorData || !initial.cookies) await generateVisitor();
+		const getCookies = () => getYoutubeSession().cookies;
+		const res = await fetchYoutubeWithRetry(() =>
+			fetch("https://m.youtube.com/youtubei/v1/search?prettyPrint=false", {
+				method: "POST",
+				headers: {
+					"Accept-Language": "en-US",
+					"Content-Type": "application/json",
+					"User-Agent": APIuserAgent,
+					...(getCookies() ? { Cookie: getCookies() } : {}),
+				},
+				body: JSON.stringify({
+					context: {
+						client: {
+							clientName: 2,
+							clientVersion: "2.20261231",
+							visitorData: getYoutubeSession().visitorData,
+							hl: "en",
+							gl: "US",
+						},
+					},
+					query,
+				}),
 			}),
-		}));
+		);
 		const json = await res.json().catch(() => null);
 
 		const newVt = json?.responseContext?.visitorData;
@@ -1285,10 +1050,18 @@ export async function searchYoutube(query: string, limit = 10) {
 			vt = newVt;
 			actuallk.visitorData = newVt;
 			setVisitorData(newVt);
+			setCachedVisitor(newVt);
 		}
 
 		const sections = json?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents || json?.contents?.sectionListRenderer?.contents || [];
-		const results: { id: string; title: string; author: string; duration: string; thumbnail: string; live: boolean }[] = [];
+		const results: {
+			id: string;
+			title: string;
+			author: string;
+			duration: string;
+			thumbnail: string;
+			live: boolean;
+		}[] = [];
 		for (const section of sections) {
 			for (const item of section?.itemSectionRenderer?.contents || []) {
 				const video = item?.videoWithContextRenderer || item?.videoRenderer;
@@ -1311,86 +1084,226 @@ export async function searchYoutube(query: string, limit = 10) {
 	}
 }
 
-function pickWatchRenderer(contents: any[], key: string) {
-	if (!Array.isArray(contents)) return null;
-	for (const item of contents) {
-		if (item?.[key]) return item[key];
+export async function fetchYoutubePlayerResponse(videoId: string) {
+	refreshYtAuth();
+	const session = getYoutubeSession();
+	if (session.visitorData) vt = session.visitorData;
+	if (!vt) await generateVisitor();
+	actuallk.visitorData = vt;
+	if (isWebClient && !signatureTimestamp) await fetchSignatureTimestamp();
+	const embeddedContext = isEmbeddedClient ? await fetchEmbeddedContext(videoId) : null;
+	const cpn = randomBytes(12).toString("base64url");
+	const anonPoToken = generateAnonPOT();
+	const sessionCookies = session.cookies || tempytcookies;
+
+	const isVRnAuth = ytauth?.token && (targetClient === "ANDROID_VR" || targetClient === "ANDROID_VR_DOWN");
+	const hasAuth = isVRnAuth || !!ytcookies;
+	const mustUseAuth = forceAuthClients.includes(targetClient);
+	const clientSupportsAuth = mustUseAuth || isWebClient || isVRnAuth;
+	const authModes = mustUseAuth ? [true] : !hasAuth || !clientSupportsAuth ? [false] : [false, true];
+	const embeddedThirdParty = embeddedContext?.thirdParty ? { ...embeddedContext.thirdParty, embedUrl } : { embedUrl };
+
+	const authHash = () => {
+		const sapisid = ytcookies?.match(/(?:^|;\s*)SAPISID=([^;]*)/)?.[1];
+		const secure1psid = ytcookies?.match(/(?:^|;\s*)__Secure-1PAPISID=([^;]*)/)?.[1];
+		const secure3psid = ytcookies?.match(/(?:^|;\s*)__Secure-3PAPISID=([^;]*)/)?.[1];
+		const t = Math.floor(Date.now() / 1000).toString();
+		const dsi = datasyncID && datasyncID !== "null" && datasyncID.trim() !== "" ? datasyncID + " " : "";
+		return (
+			"SAPISIDHASH " +
+			t +
+			"_" +
+			require("crypto")
+				.createHash("sha1")
+				.update(dsi + t + " " + sapisid + " " + `https://${hostdomain}`)
+				.digest("hex") +
+			"_u" +
+			" SAPISID1PHASH " +
+			t +
+			"_" +
+			require("crypto")
+				.createHash("sha1")
+				.update(dsi + t + " " + secure1psid + " " + `https://${hostdomain}`)
+				.digest("hex") +
+			"_u" +
+			" SAPISID3PHASH " +
+			t +
+			"_" +
+			require("crypto")
+				.createHash("sha1")
+				.update(dsi + t + " " + secure3psid + " " + `https://${hostdomain}`)
+				.digest("hex") +
+			"_u"
+		);
+	};
+
+	const buildHeaders = (useAuth: boolean) => {
+		const base = {
+			"Accept-Language": "en",
+			"Content-Type": "application/json",
+			"X-Goog-Visitor-Id": vt,
+			Origin: `https://${hostdomain}`,
+			"X-Origin": `https://${hostdomain}`,
+			"X-Youtube-Client-Name": useClient.clientName,
+			"X-Youtube-Client-Version": useClient.clientVersion,
+			"User-Agent": APIuserAgent,
+		};
+		if (useAuth && isVRnAuth)
+			return {
+				...base,
+				Authorization: "Bearer " + ytauth.token,
+				Cookie: sessionCookies,
+			};
+		if (useAuth && ytcookies && isWebClient)
+			return {
+				...base,
+				Authorization: authHash(),
+				Cookie: ytcookies,
+				"X-Youtube-Bootstrap-Logged-In": true,
+				"Alt-Used": hostdomain,
+				"X-Goog-AuthUser": 0,
+			};
+		return { ...base, Cookie: sessionCookies };
+	};
+
+	const buildRoute = (poTokenValue: string, isRealSessionPo: boolean) => {
+		const playbackContext = signatureTimestamp
+			? {
+					playbackContext: {
+						contentPlaybackContext: {
+							vis: 0,
+							splay: false,
+							lactMilliseconds: "-1",
+							signatureTimestamp,
+							...(embeddedContext?.encryptedHostFlags ? { encryptedHostFlags: embeddedContext.encryptedHostFlags } : {}),
+						},
+					},
+				}
+			: {};
+		const webIntegrity = isWebClient
+			? usePoToken && isRealSessionPo
+				? {
+						serviceIntegrityDimensions: { poToken: poTokenValue },
+						attestationRequest: { omitBotguardData: false },
+					}
+				: {}
+			: {};
+		return isWebClient
+			? {
+					videoId,
+					contentCheckOk: true,
+					racyCheckOk: true,
+					cpn,
+					context: {
+						client: {
+							...actuallk,
+							...(isEmbeddedClient
+								? {
+										originalUrl: `https://${hostdomain}/embed/${videoId}?html5=1`,
+									}
+								: {}),
+						},
+						...(isEmbeddedClient ? { thirdParty: embeddedThirdParty } : {}),
+					},
+					...playbackContext,
+					...webIntegrity,
+				}
+			: {
+					playerRequest: { videoId, contentCheckOk: true, racyCheckOk: true },
+					disablePlayerResponse: false,
+					cpn,
+					context: { client: { ...actuallk } },
+					serviceIntegrityDimensions: { poToken: poTokenValue },
+					attestationRequest: { omitBotguardData: false },
+				};
+	};
+
+	let usedAuth = false;
+	for (const authMode of authModes) {
+		for (let attempt = 0; attempt < 4; attempt++) {
+			let sessionPoToken = anonPoToken;
+			let isRealSessionPo = false;
+			if (usePoToken) {
+				let data = await generateSessionPoToken(actuallk.visitorData);
+				if (data.exp <= Date.now()) data = await generateSessionPoToken(actuallk.visitorData, true);
+				sessionPoToken = data.poToken;
+				isRealSessionPo = data.isReal;
+			}
+
+			let shouldUseAuth = authMode || Date.now() < authRequiredUntil;
+			let response;
+			try {
+				response = filterPlayerObject(
+					await fetchJsonGuarded(
+						`https://${hostdomain}/youtubei/v1/${buildQuery}`,
+						{
+							method: "POST",
+							body: JSON.stringify(buildRoute(sessionPoToken, isRealSessionPo)),
+							headers: buildHeaders(shouldUseAuth),
+						},
+						"player-metadata",
+					),
+				);
+			} catch {
+				await generateVisitor();
+				continue;
+			}
+
+			const newVt = response?.responseContext?.visitorData;
+			if (newVt) {
+				vt = newVt;
+				actuallk.visitorData = newVt;
+				setVisitorData(newVt);
+				setCachedVisitor(newVt);
+			}
+
+			if (!usedAuth && !shouldUseAuth && hasAuth && response?.playabilityStatus?.status === "LOGIN_REQUIRED") {
+				authRequiredUntil = Date.now() + 3600000;
+				usedAuth = true;
+				shouldUseAuth = true;
+				try {
+					response = filterPlayerObject(
+						await fetchJsonGuarded(
+							`https://${hostdomain}/youtubei/v1/${buildQuery}`,
+							{
+								method: "POST",
+								body: JSON.stringify(buildRoute(sessionPoToken, isRealSessionPo)),
+								headers: buildHeaders(true),
+							},
+							"player-metadata-auth",
+						),
+					);
+				} catch {}
+			}
+
+			if (response?.videoDetails?.videoId && (response.videoDetails.title || response.videoDetails.author)) return response;
+			if (response?.streamingData) return response;
+			if (response?.playabilityStatus?.status === "UNPLAYABLE") return response;
+			await generateVisitor();
+		}
 	}
+
 	return null;
 }
 
 export async function resolveYoutubeMetadata(videoId: string) {
 	if (!videoId) return null;
-	try {
-		if (!vt || (!ytcookiesapi && !tempytcookies && !ytcookies)) await generateVisitor();
-		const getCookies = () => ytcookiesapi || tempytcookies || ytcookies;
-		const playerRes = await fetchYoutubeWithRetry(() => fetch(`https://m.youtube.com/youtubei/v1/player?prettyPrint=false&fields=responseContext(visitorData),playabilityStatus,videoDetails(videoId,title,author,lengthSeconds)`, {
-			method: "POST",
-			headers: {
-				"Accept-Language": "en-US",
-				"Content-Type": "application/json",
-				"User-Agent": APIuserAgent,
-				...(getCookies() ? { Cookie: getCookies() } : {}),
-			},
-			body: JSON.stringify({
-				videoId,
-				context: { client: { clientName: 2, clientVersion: "2.20261231", visitorData: vt, hl: "en", gl: "US" } },
-			}),
-		}));
-		const player = await playerRes.json().catch(() => null);
 
-		const newVt = player?.responseContext?.visitorData;
-		if (newVt) {
-			vt = newVt;
-			actuallk.visitorData = newVt;
-			setVisitorData(newVt);
-		}
+	const playerResponse = await fetchYoutubePlayerResponse(videoId).catch(() => null);
+	const details = playerResponse?.videoDetails;
+	const createStream = playerResponse?.streamingData
+		? (track: any) => createYoutubeStreamFromPlayer(playerResponse, `https://www.youtube.com/watch?v=${videoId}`, track)
+		: undefined;
 
-		const details = player?.videoDetails;
-		if (details?.videoId && (details.title || details.author)) {
-			return {
-				title: details.title,
-				author: details.author,
-				lengthSeconds: Number(details.lengthSeconds) || 0,
-			};
-		}
-
-		const pageRes = await fetchYoutubeWithRetry(() => fetch(`https://www.youtube.com/watch?v=${videoId}`, {
-			headers: {
-				"Accept-Language": "en-US",
-				"User-Agent": APIuserAgent,
-				...(getCookies() ? { Cookie: getCookies() } : {}),
-			},
-		}));
-		const html = await pageRes.text();
-		const raw = html.split("var ytInitialData =")[1]?.split(";")[0];
-		if (!raw) return null;
-		const init = JSON.parse(raw);
-		const contents = init?.contents?.twoColumnWatchNextResults?.results?.results?.contents;
-		const primary = pickWatchRenderer(contents, "videoPrimaryInfoRenderer");
-		const secondary = pickWatchRenderer(contents, "videoSecondaryInfoRenderer");
-		const title = primary?.title?.runs?.[0]?.text;
-		const author = secondary?.owner?.videoOwnerRenderer?.title?.runs?.[0]?.text;
-		if (!title && !author) return null;
-		const lengthMatch = html.match(/"lengthSeconds":"(\d+)"/) || html.match(/"lengthSeconds":(\d+)/);
-		return { title, author, lengthSeconds: lengthMatch ? Number(lengthMatch[1]) : 0 };
-	} catch {
-		return null;
+	if (details?.videoId && (details.title || details.author)) {
+		return {
+			title: details.title,
+			author: details.author,
+			lengthSeconds: details.isLiveContent ? 0 : Number(details.lengthSeconds) || 0,
+			createStream,
+		};
 	}
-}
 
-export default {
-	get cookie() {
-		return ytcookiesapi;
-	},
-	disablePlayer: true,
-	createStream: useNativeStream
-		? {}
-		: async (q) => {
-				try {
-					return await fallbackYTStream(q.url, q);
-				} catch {
-					return undefined;
-				}
-			},
-};
+	if (createStream) return { title: "", author: "", lengthSeconds: 0, createStream };
+	return null;
+}

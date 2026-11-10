@@ -24,7 +24,6 @@
         "1 = DASH",
         "2 = HLS"
     ],
-    "useNativeStream": false,
     "streamTypeYT": 1,
     "skipOnCheckFormat": false,
     "useClientYT": "VISIONOS",

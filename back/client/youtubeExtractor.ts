@@ -68,6 +68,27 @@ export class YoutubeExtractor extends BaseExtractor {
         return soundcloud ? soundcloud.handle(query, context) : this.createResponse(null, []);
     }
 
+    async bridge(track: Track) {
+        const queries = [this.createBridgeQuery(track), `${track.title} ${track.author}`];
+        for (const query of queries) {
+            const results = await searchYoutube(query, 1);
+            const first = results[0];
+            if (!first) continue;
+            try {
+                const metadata = await resolveYoutubeMetadata(first.id);
+                if (metadata?.createStream) {
+                    if (!track.raw) track.raw = {};
+                    track.raw.youtubeCreateStream = metadata.createStream;
+                    const stream = await metadata.createStream(track);
+                    if (stream) return stream;
+                }
+                const stream = await fallbackYTStream(`https://www.youtube.com/watch?v=${first.id}`, track);
+                if (stream) return stream;
+            } catch { }
+        }
+        return null;
+    }
+
     async stream(info: Track) {
         return fallbackYTStream(info.url, info);
     }
@@ -91,7 +112,7 @@ export class YoutubeExtractor extends BaseExtractor {
         });
     }
 
-    private buildTrack(videoId: string, metadata: { title?: string; author?: string; lengthSeconds?: number } | null, context: ExtractorSearchContext) {
+    private buildTrack(videoId: string, metadata: { title?: string; author?: string; lengthSeconds?: number; createStream?: (track: Track) => Promise<any> } | null, context: ExtractorSearchContext) {
         const lengthSeconds = Number(metadata?.lengthSeconds) || 0;
         return new Track(this.context.player, {
             title: metadata?.title || videoId,
@@ -103,7 +124,7 @@ export class YoutubeExtractor extends BaseExtractor {
             source: "youtube",
             queryType: QueryType.YOUTUBE_VIDEO,
             requestedBy: context.requestedBy,
-            raw: { source: "youtube", videoId, youtubeResolved: !!metadata },
+            raw: { source: "youtube", videoId, youtubeResolved: !!metadata, youtubeCreateStream: metadata?.createStream },
         });
     }
 }
