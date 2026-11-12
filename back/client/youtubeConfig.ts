@@ -735,15 +735,24 @@ async function createYoutubeStreamFromPlayer(a: any, lstracks: string, trackInfo
 		let secfinalurl;
 		let finalWithPot;
 		const maxHeadRetries = 3;
-		const headCheck = (url) =>
-			fetch(url, {
+		const headTimeoutMs = 3000;
+		const headCheck = (url) => {
+			const controller = new AbortController();
+			const timer = setTimeout(() => controller.abort(), headTimeoutMs);
+			return fetch(url, {
 				method: "HEAD",
 				headers: { Range: "bytes=0-", "User-Agent": APIuserAgent },
-			});
+				signal: controller.signal,
+			}).finally(() => clearTimeout(timer));
+		};
 
 		if (!skipOnCheckFormat) {
 			for (let headAttempt = 0; headAttempt <= maxHeadRetries; headAttempt++) {
-				filterlocation = await headCheck(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""));
+				try {
+					filterlocation = await headCheck(finalurl + (contentPoToken ? "&pot=" + contentPoToken : ""));
+				} catch {
+					continue;
+				}
 				secfinalurl = filterlocation.url;
 				finalWithPot = contentPoToken && !secfinalurl.includes("pot=") ? secfinalurl + "&pot=" + contentPoToken : secfinalurl;
 
@@ -756,6 +765,12 @@ async function createYoutubeStreamFromPlayer(a: any, lstracks: string, trackInfo
 				}
 			}
 		} else {
+			filterlocation = { status: 200, url: finalurl };
+			secfinalurl = finalurl;
+			finalWithPot = finalurl + (contentPoToken ? "&pot=" + contentPoToken : "");
+		}
+
+		if (!filterlocation) {
 			filterlocation = { status: 200, url: finalurl };
 			secfinalurl = finalurl;
 			finalWithPot = finalurl + (contentPoToken ? "&pot=" + contentPoToken : "");
